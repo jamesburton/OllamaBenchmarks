@@ -3,6 +3,7 @@ import datetime
 import json
 import os
 import statistics
+import urllib.error
 import urllib.request
 
 from collect_host_info import build_host_info
@@ -16,6 +17,12 @@ DEFAULT_SWEEP = [
 ]
 
 
+def think_setting(model: str):
+    if model.startswith("gpt-oss"):
+        return "low"
+    return False
+
+
 def post_json(payload: dict, timeout: int = 1800) -> dict:
     request = urllib.request.Request(
         "http://127.0.0.1:11434/api/generate",
@@ -27,10 +34,21 @@ def post_json(payload: dict, timeout: int = 1800) -> dict:
         return json.loads(response.read().decode("utf-8"))
 
 
+def format_http_error(exc: urllib.error.HTTPError) -> str:
+    try:
+        body = exc.read().decode("utf-8")
+    except Exception:
+        body = ""
+    if body:
+        return f"HTTP {exc.code}: {body}"
+    return f"HTTP {exc.code}: {exc.reason}"
+
+
 def run_once(model: str, options: dict) -> dict:
     payload = {
         "model": model,
         "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+        "think": think_setting(model),
         "stream": False,
         "options": {
             "num_predict": 192,
@@ -54,6 +72,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", required=True)
     parser.add_argument("--runs", type=int, default=2)
+    parser.add_argument("--num-ctx", type=int, default=8192)
     parser.add_argument("--output")
     args = parser.parse_args()
     run_started_at = datetime.datetime.now(datetime.timezone.utc)
@@ -68,25 +87,42 @@ def main() -> None:
         {
             "model": args.model,
             "prompt": "Warmup short response.",
+            "think": think_setting(args.model),
             "stream": False,
-            "options": {"num_predict": 24, "temperature": 0, "seed": 42},
+            "options": {"num_predict": 24, "temperature": 0, "seed": 42, "num_ctx": args.num_ctx},
         }
     )
 
     results = []
     for name, options in DEFAULT_SWEEP:
-        runs = [run_once(args.model, options) for _ in range(args.runs)]
-        results.append(
-            {
-                "perm": name,
-                "opts": options,
-                "tps_avg": round(statistics.mean(item["tps"] for item in runs), 2),
-                "tps_min": round(min(item["tps"] for item in runs), 2),
-                "tps_max": round(max(item["tps"] for item in runs), 2),
-                "eval_count_avg": round(statistics.mean(item["eval_count"] for item in runs), 1),
-                "total_s_avg": round(statistics.mean(item["total_s"] for item in runs), 3),
-            }
-        )
+        runs = []
+        errors = []
+        for _ in range(args.runs):
+            try:
+                runs.append(run_once(args.model, {**options, "num_ctx": args.num_ctx}))
+            except urllib.error.HTTPError as exc:
+                errors.append(format_http_error(exc))
+            except Exception as exc:
+                errors.append(str(exc))
+
+        row = {
+            "perm": name,
+            "opts": options,
+            "status": "ok" if not errors else ("partial_failed" if runs else "request_failed"),
+        }
+        if runs:
+            row.update(
+                {
+                    "tps_avg": round(statistics.mean(item["tps"] for item in runs), 2),
+                    "tps_min": round(min(item["tps"] for item in runs), 2),
+                    "tps_max": round(max(item["tps"] for item in runs), 2),
+                    "eval_count_avg": round(statistics.mean(item["eval_count"] for item in runs), 1),
+                    "total_s_avg": round(statistics.mean(item["total_s"] for item in runs), 3),
+                }
+            )
+        if errors:
+            row["errors"] = errors
+        results.append(row)
 
     payload_obj = {
         "benchmark": "sweep",
@@ -97,6 +133,8 @@ def main() -> None:
         "host_details": build_host_info(),
         "model": args.model,
         "runs": args.runs,
+        "num_ctx": args.num_ctx,
+        "think": think_setting(args.model),
         "variants": results,
     }
     payload = json.dumps(payload_obj, indent=2)

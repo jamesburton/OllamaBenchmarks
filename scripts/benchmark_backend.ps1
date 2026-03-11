@@ -1,6 +1,7 @@
 param(
   [string]$Model,
   [string[]]$Backends = @("auto", "vulkan", "rocm"),
+  [int]$NumCtx = 8192,
   [string]$OutputPath
 )
 
@@ -21,6 +22,41 @@ function Get-HostDetails {
   }
 }
 
+function Get-ErrorDetails {
+  param(
+    [System.Management.Automation.ErrorRecord]$ErrorRecord
+  )
+
+  $message = $ErrorRecord.Exception.Message
+  $response = $ErrorRecord.Exception.Response
+  if ($response -and $response.GetResponseStream) {
+    try {
+      $stream = $response.GetResponseStream()
+      if ($stream) {
+        $reader = New-Object System.IO.StreamReader($stream)
+        $body = $reader.ReadToEnd()
+        if ($body) {
+          return "$message Body: $body"
+        }
+      }
+    }
+    catch {}
+  }
+  return $message
+}
+
+function Get-ThinkValue {
+  param(
+    [string]$ModelName
+  )
+
+  if ($ModelName -like "gpt-oss*") {
+    return "low"
+  }
+
+  return $false
+}
+
 if (-not $Model) {
   throw "Pass -Model <name>."
 }
@@ -39,8 +75,9 @@ function Test-Lib {
   )
 
   $job = Start-Job -ScriptBlock {
-    param($lib, $port)
+    param($lib, $port, $ctx)
     $env:OLLAMA_HOST = "127.0.0.1:$port"
+    $env:OLLAMA_CONTEXT_LENGTH = "$ctx"
     if ($lib -ne "auto") {
       $env:OLLAMA_LLM_LIBRARY = $lib
     } else {
@@ -48,7 +85,7 @@ function Test-Lib {
     }
     $env:OLLAMA_DEBUG = "1"
     ollama serve
-  } -ArgumentList $Lib, $Port
+  } -ArgumentList $Lib, $Port, $NumCtx
 
   try {
     $ready = $false
@@ -66,19 +103,22 @@ function Test-Lib {
     }
 
     try {
+      $think = Get-ThinkValue -ModelName $ModelName
       $warm = @{
         model = $ModelName
         prompt = "Warmup"
+        think = $think
         stream = $false
-        options = @{ num_predict = 16; temperature = 0; seed = 42 }
+        options = @{ num_predict = 16; temperature = 0; seed = 42; num_ctx = $NumCtx }
       } | ConvertTo-Json -Depth 8 -Compress
       $null = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/generate" -Method Post -ContentType "application/json" -Body $warm -TimeoutSec 600
 
       $body = @{
         model = $ModelName
         prompt = "Write a concise explanation of dependency injection with one short Python example."
+        think = $think
         stream = $false
-        options = @{ num_predict = 192; temperature = 0; top_p = 1; seed = 42 }
+        options = @{ num_predict = 192; temperature = 0; top_p = 1; seed = 42; num_ctx = $NumCtx }
       } | ConvertTo-Json -Depth 8 -Compress
       $r = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/generate" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 1200
 
@@ -97,7 +137,7 @@ function Test-Lib {
       return [pscustomobject]@{
         lib = $Lib
         status = "request_failed"
-        error = $_.Exception.Message
+        error = Get-ErrorDetails -ErrorRecord $_
       }
     }
   }
@@ -126,6 +166,8 @@ $payload = [pscustomobject]@{
   host = $env:COMPUTERNAME
   host_details = $hostDetails
   model = $Model
+  num_ctx = $NumCtx
+  think = Get-ThinkValue -ModelName $Model
   backends = $Backends
   results = $results
 }

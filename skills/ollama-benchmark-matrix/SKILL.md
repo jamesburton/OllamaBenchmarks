@@ -15,6 +15,7 @@ Use this skill to benchmark a machine with the repository harness and keep the c
    - `python .\scripts\benchmark_quality.py --models ... --output .\results\quality-current.json`
    - `.\scripts\benchmark_backend.ps1 -Model <lead-model> -OutputPath .\results\backend-comparison-current.json`
    - `python .\scripts\benchmark_sweep.py --model <lead-model> --output .\results\optimization-sweep-current.json`
+   - Run the backend comparison and option sweep sequentially for very large models; do not overlap them when a model already pushes system memory or VRAM limits.
 3. Capture host details and archive the current benchmark set with:
    - `python .\scripts\archive_system_benchmarks.py --label <yyyymmdd-or-system-tag>`
 4. Rebuild the matrix summary with:

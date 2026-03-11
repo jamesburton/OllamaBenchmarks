@@ -12,6 +12,7 @@
 | gpt-oss:120b | 10.81 | 3 | One coding miss, high memory demand |
 | glm-4.7-flash:bf16 | 7.17 | 2 | Tool use okay, coding still weak |
 | qwen3-coder-next:q8_0 | 6.66 | 4 | Full quality pass, much slower than `latest` |
+| qwen3.5:122b-a10b | 5.45 | 2 | Newly added tag, same weak coding profile as the older `qwen3.5:122b` entry |
 | qwen3.5:122b | 4.94 | 2 | Large footprint without competitive throughput |
 | devstral-small-2:24b-instruct-2512-q8_0 | 3.50 | 4 | Quality solid, speed poor on this machine |
 | MichelRosselli/GLM-4.5-Air:latest | 1.27 | 0 | Not competitive here |
