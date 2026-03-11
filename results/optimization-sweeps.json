@@ -1,0 +1,29 @@
+{
+  "qwen3-coder-next:latest": [
+    { "perm": "baseline", "tps_avg": 34.19, "total_s_avg": 5.363 },
+    { "perm": "threads_8", "tps_avg": 33.06, "total_s_avg": 31.346 },
+    { "perm": "threads_16", "tps_avg": 33.75, "total_s_avg": 31.834 },
+    { "perm": "batch_1024", "tps_avg": 34.04, "total_s_avg": 32.757 },
+    { "perm": "force_gpu_99", "tps_avg": 34.01, "total_s_avg": 31.99 }
+  ],
+  "granite4:32b-a9b-h": [
+    { "perm": "baseline", "tps_avg": 26.28, "total_s_avg": 7.709 },
+    { "perm": "threads_8", "tps_avg": 26.26, "total_s_avg": 23.541 },
+    { "perm": "threads_16", "tps_avg": 26.27, "total_s_avg": 21.55 },
+    { "perm": "batch_1024", "tps_avg": 26.24, "total_s_avg": 20.727 },
+    { "perm": "force_gpu_99", "tps_avg": 26.28, "total_s_avg": 21.28 }
+  ],
+  "lfm2:24b": [
+    { "perm": "baseline", "tps_avg": 35.58, "total_s_avg": 5.603 },
+    { "perm": "threads_8", "tps_avg": 68.11, "total_s_avg": 11.028 },
+    { "perm": "threads_16", "tps_avg": 31.13, "total_s_avg": 14.062 },
+    { "perm": "batch_1024", "tps_avg": 30.47, "total_s_avg": 14.217 },
+    { "perm": "force_gpu_99", "tps_avg": 36.79, "total_s_avg": 13.482 }
+  ],
+  "backend_comparison": [
+    { "lib": "auto", "toks_per_s": 33.69, "e2e_toks_per_s": 30.49, "total_s": 5.346 },
+    { "lib": "vulkan", "toks_per_s": 8.38, "e2e_toks_per_s": 7.97, "total_s": 20.454 },
+    { "lib": "rocm", "toks_per_s": 7.03, "e2e_toks_per_s": 6.81, "total_s": 23.93 }
+  ]
+}
+

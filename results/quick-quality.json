@@ -1,0 +1,14 @@
+[
+  { "model": "qwen3-coder-next:latest", "coding_pass": true, "tool_pass": true, "score": 2 },
+  { "model": "granite4:32b-a9b-h", "coding_pass": true, "tool_pass": true, "score": 2 },
+  { "model": "qwen3-coder-next:q8_0", "coding_pass": true, "tool_pass": true, "score": 2 },
+  { "model": "lfm2:24b", "coding_pass": true, "tool_pass": true, "score": 2 },
+  { "model": "ministral-3:14b", "coding_pass": true, "tool_pass": true, "score": 2 },
+  { "model": "devstral-small-2:24b-instruct-2512-q8_0", "coding_pass": true, "tool_pass": true, "score": 2 },
+  { "model": "gpt-oss:120b", "coding_pass": false, "tool_pass": true, "score": 1 },
+  { "model": "glm-4.7-flash:bf16", "coding_pass": false, "tool_pass": true, "score": 1 },
+  { "model": "glm-4.7-flash:latest", "coding_pass": false, "tool_pass": false, "score": 0 },
+  { "model": "qwen3.5:122b", "coding_pass": false, "tool_pass": false, "score": 0 },
+  { "model": "MichelRosselli/GLM-4.5-Air:latest", "coding_pass": false, "tool_pass": false, "score": 0 }
+]
+
