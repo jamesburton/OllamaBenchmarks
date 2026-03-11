@@ -5,7 +5,7 @@
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-current.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-11T19:38:43.349494+00:00",
+    "captured_at": "2026-03-11T22:37:57.588948+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -43,38 +43,12 @@
     "granite4:32b-a9b-h",
     "glm-4.7-flash:latest",
     "qwen3-coder-next:q8_0",
-    "qwen3.5:122b"
+    "qwen3.5:122b",
+    "nemotron-3-super:latest"
   ],
   "results": [
     {
-      "model": "qwen3.5:122b-a10b",
-      "coding_pass": 0,
-      "coding_total": 2,
-      "tool_pass": 2,
-      "tool_total": 2,
-      "score": 2,
-      "score_max": 4
-    },
-    {
       "model": "devstral-small-2:24b-instruct-2512-q8_0",
-      "coding_pass": 2,
-      "coding_total": 2,
-      "tool_pass": 2,
-      "tool_total": 2,
-      "score": 4,
-      "score_max": 4
-    },
-    {
-      "model": "lfm2:24b",
-      "coding_pass": 2,
-      "coding_total": 2,
-      "tool_pass": 2,
-      "tool_total": 2,
-      "score": 4,
-      "score_max": 4
-    },
-    {
-      "model": "ministral-3:14b",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,
@@ -92,6 +66,42 @@
       "score_max": 4
     },
     {
+      "model": "glm-4.7-flash:latest",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 2,
+      "score_max": 4
+    },
+    {
+      "model": "gpt-oss:120b",
+      "coding_pass": 1,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 3,
+      "score_max": 4
+    },
+    {
+      "model": "granite4:32b-a9b-h",
+      "coding_pass": 1,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 3,
+      "score_max": 4
+    },
+    {
+      "model": "lfm2:24b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 4,
+      "score_max": 4
+    },
+    {
       "model": "MichelRosselli/GLM-4.5-Air:latest",
       "coding_pass": 0,
       "coding_total": 2,
@@ -101,7 +111,16 @@
       "score_max": 4
     },
     {
-      "model": "gpt-oss:120b",
+      "model": "ministral-3:14b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 4,
+      "score_max": 4
+    },
+    {
+      "model": "nemotron-3-super:latest",
       "coding_pass": 1,
       "coding_total": 2,
       "tool_pass": 2,
@@ -119,24 +138,6 @@
       "score_max": 4
     },
     {
-      "model": "granite4:32b-a9b-h",
-      "coding_pass": 1,
-      "coding_total": 2,
-      "tool_pass": 2,
-      "tool_total": 2,
-      "score": 3,
-      "score_max": 4
-    },
-    {
-      "model": "glm-4.7-flash:latest",
-      "coding_pass": 0,
-      "coding_total": 2,
-      "tool_pass": 2,
-      "tool_total": 2,
-      "score": 2,
-      "score_max": 4
-    },
-    {
       "model": "qwen3-coder-next:q8_0",
       "coding_pass": 2,
       "coding_total": 2,
@@ -147,6 +148,15 @@
     },
     {
       "model": "qwen3.5:122b",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 2,
+      "score_max": 4
+    },
+    {
+      "model": "qwen3.5:122b-a10b",
       "coding_pass": 0,
       "coding_total": 2,
       "tool_pass": 2,

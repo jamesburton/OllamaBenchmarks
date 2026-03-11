@@ -12,6 +12,7 @@
 | gpt-oss:120b | 11.12 | 3 | One coding miss, high memory demand |
 | qwen3-coder-next:q8_0 | 7.96 | 4 | Good quality, much slower than `latest` |
 | glm-4.7-flash:bf16 | 7.09 | 2 | Tool use okay, coding still weak |
+| nemotron-3-super:latest | 5.84 | 3 | Large model, better than the `qwen3.5:122b` tags here but not competitive with the top coding options |
 | qwen3.5:122b | 5.22 | 2 | Very large footprint without competitive quality |
 | qwen3.5:122b-a10b | 5.21 | 2 | Essentially tied with `qwen3.5:122b`; see the variant-check artifact for backend details |
 | devstral-small-2:24b-instruct-2512-q8_0 | 3.98 | 4 | Quality solid, speed still poor here |

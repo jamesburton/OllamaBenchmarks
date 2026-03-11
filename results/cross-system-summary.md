@@ -4,7 +4,7 @@ Systems captured: 1
 
 | System | OS | CPU / RAM | GPU | Primary coding model | Best value / balanced | Fastest raw model | Backend note |
 |---|---|---|---|---|---|---|---|
-| strix-20260311 | Windows 11 | AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD / 63.65 GB | AMD Radeon(TM) 8060S Graphics | qwen3-coder-next:latest (32.87 tok/s) (4/4) | lfm2:24b (33.54 tok/s) (4/4) | glm-4.7-flash:latest (43.94 tok/s) (2/4) | auto led at 32.59 tok/s; rocm followed at 32.13 tok/s. |
+| strix-20260311 | Windows 11 | AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD / 63.65 GB | AMD Radeon(TM) 8060S Graphics | qwen3-coder-next:latest (33.92 tok/s) (4/4) | qwen3-coder-next:latest (33.92 tok/s) (4/4) | glm-4.7-flash:latest (43.11 tok/s) (2/4) | auto led at 33.89 tok/s; rocm followed at 33.1 tok/s. |
 
 ## Update Process
 

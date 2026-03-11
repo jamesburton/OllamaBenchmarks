@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-03-11T20:03:52.125471+00:00",
+  "captured_at": "2026-03-11T22:38:54.184820+00:00",
   "system_id": "strix-20260311",
   "system_dir": "C:\\Development\\OllamaBenchmarks\\results\\systems\\strix-20260311",
   "host_info_file": "host-info.json",
@@ -11,7 +11,7 @@
     "session_summary": "session-2026-03-11-summary.md"
   },
   "host": {
-    "captured_at": "2026-03-11T20:03:51.890963+00:00",
+    "captured_at": "2026-03-11T22:38:53.989149+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
