@@ -1,11 +1,11 @@
 {
   "benchmark": "sweep",
-  "run_started_at": "2026-03-11T17:09:55.122153+00:00",
-  "run_finished_at": "2026-03-11T17:19:48.046481+00:00",
+  "run_started_at": "2026-03-11T19:52:30.445701+00:00",
+  "run_finished_at": "2026-03-11T20:02:26.857355+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\optimization-sweep-qwen3.5-122b-a10b.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-11T17:19:49.395949+00:00",
+    "captured_at": "2026-03-11T20:02:28.266462+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -40,11 +40,11 @@
       "perm": "baseline",
       "opts": {},
       "status": "ok",
-      "tps_avg": 5.28,
-      "tps_min": 5.18,
-      "tps_max": 5.37,
+      "tps_avg": 5.15,
+      "tps_min": 5.06,
+      "tps_max": 5.23,
       "eval_count_avg": 192,
-      "total_s_avg": 37.735
+      "total_s_avg": 38.6
     },
     {
       "perm": "threads_8",
@@ -52,11 +52,11 @@
         "num_thread": 8
       },
       "status": "ok",
-      "tps_avg": 7.78,
-      "tps_min": 7.74,
-      "tps_max": 7.82,
+      "tps_avg": 8.03,
+      "tps_min": 8.0,
+      "tps_max": 8.05,
       "eval_count_avg": 192,
-      "total_s_avg": 61.2
+      "total_s_avg": 68.872
     },
     {
       "perm": "threads_16",
@@ -64,11 +64,11 @@
         "num_thread": 16
       },
       "status": "ok",
-      "tps_avg": 5.42,
-      "tps_min": 5.38,
-      "tps_max": 5.45,
+      "tps_avg": 5.5,
+      "tps_min": 5.36,
+      "tps_max": 5.63,
       "eval_count_avg": 192,
-      "total_s_avg": 73.44
+      "total_s_avg": 73.528
     },
     {
       "perm": "batch_1024",
@@ -76,11 +76,11 @@
         "num_batch": 1024
       },
       "status": "ok",
-      "tps_avg": 5.67,
-      "tps_min": 5.65,
-      "tps_max": 5.7,
+      "tps_avg": 5.47,
+      "tps_min": 5.34,
+      "tps_max": 5.6,
       "eval_count_avg": 192,
-      "total_s_avg": 71.786
+      "total_s_avg": 75.551
     },
     {
       "perm": "force_gpu_99",

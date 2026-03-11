@@ -1,11 +1,11 @@
 {
   "benchmark": "backend_comparison",
-  "run_started_at": "2026-03-11T17:24:19.2257227+00:00",
-  "run_finished_at": "2026-03-11T17:35:24.2584689+00:00",
+  "run_started_at": "2026-03-11T19:48:17.8056004+00:00",
+  "run_finished_at": "2026-03-11T19:52:24.2546885+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-qwen3.5-122b-a10b.json",
   "host": "STRIX",
   "host_details": {
-    "captured_at": "2026-03-11T17:35:23.984121+00:00",
+    "captured_at": "2026-03-11T19:52:23.994059+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -43,23 +43,21 @@
     {
       "lib": "auto",
       "status": "ok",
-      "toks_per_s": 5.49,
-      "e2e_toks_per_s": 5.27,
-      "total_s": 36.402
+      "toks_per_s": 4.89,
+      "e2e_toks_per_s": 4.71,
+      "total_s": 40.753
     },
     {
       "lib": "vulkan",
-      "status": "ok",
-      "toks_per_s": 0.73,
-      "e2e_toks_per_s": 0.65,
-      "total_s": 293.733
+      "status": "request_failed",
+      "error": "Response status code does not indicate success: 500 (Internal Server Error)."
     },
     {
       "lib": "rocm",
       "status": "ok",
-      "toks_per_s": 5.12,
-      "e2e_toks_per_s": 4.94,
-      "total_s": 38.857
+      "toks_per_s": 5.34,
+      "e2e_toks_per_s": 5.13,
+      "total_s": 37.412
     }
   ]
 }

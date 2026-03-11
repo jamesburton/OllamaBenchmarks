@@ -1,10 +1,39 @@
 {
   "benchmark": "backend_comparison",
-  "run_started_at": "2026-03-11T11:17:34.6370080+00:00",
-  "run_finished_at": "2026-03-11T11:20:43.2633098+00:00",
+  "run_started_at": "2026-03-11T19:39:42.9307322+00:00",
+  "run_finished_at": "2026-03-11T19:42:50.9726653+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-current.json",
   "host": "STRIX",
+  "host_details": {
+    "captured_at": "2026-03-11T19:42:50.719257+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.17.6",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
   "model": "qwen3-coder-next:latest",
+  "num_ctx": 8192,
+  "think": false,
   "backends": [
     "auto",
     "vulkan",
@@ -14,23 +43,23 @@
     {
       "lib": "auto",
       "status": "ok",
-      "toks_per_s": 32.59,
-      "e2e_toks_per_s": 29.1,
-      "total_s": 5.601
+      "toks_per_s": 33.89,
+      "e2e_toks_per_s": 30.06,
+      "total_s": 5.423
     },
     {
       "lib": "vulkan",
       "status": "ok",
-      "toks_per_s": 6.55,
-      "e2e_toks_per_s": 6.15,
-      "total_s": 26.514
+      "toks_per_s": 8.04,
+      "e2e_toks_per_s": 7.61,
+      "total_s": 21.409
     },
     {
       "lib": "rocm",
       "status": "ok",
-      "toks_per_s": 32.13,
-      "e2e_toks_per_s": 28.71,
-      "total_s": 5.677
+      "toks_per_s": 33.1,
+      "e2e_toks_per_s": 28.96,
+      "total_s": 5.628
     }
   ]
 }

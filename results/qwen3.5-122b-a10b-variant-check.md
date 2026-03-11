@@ -11,18 +11,18 @@ Checked on 2026-03-11 alongside the existing `qwen3.5:122b` result because the `
 
 | Tag | tok/s | Quick quality | Notes |
 |---|---:|---:|---|
-| `qwen3.5:122b-a10b` | 5.45 | 2/4 | Slightly faster than the older tag on the main throughput test |
-| `qwen3.5:122b` | 4.94 | 2/4 | Previously benchmarked baseline |
+| `qwen3.5:122b-a10b` | 5.21 | 2/4 | Essentially tied with the older tag in the full refresh rerun |
+| `qwen3.5:122b` | 5.22 | 2/4 | Refreshed baseline from the same run cycle |
 
 ## Additional checks for qwen3.5:122b-a10b
 
 - Backend comparison artifact: [backend-comparison-qwen3.5-122b-a10b.json](C:/Development/OllamaBenchmarks/results/backend-comparison-qwen3.5-122b-a10b.json)
-  After pinning `num_ctx=8192` and running the backend check on its own, all isolated backend runs completed.
-  `auto` reached 5.49 tok/s, `rocm` reached 5.12 tok/s, and `vulkan` was dramatically slower at 0.73 tok/s.
+  In the refreshed rerun, `auto` reached 4.89 tok/s and `rocm` reached 5.34 tok/s.
+  `vulkan` failed with a server-side `500`, so this tag still shows backend-specific variation even after the context fix.
 - Sweep artifact: [optimization-sweep-qwen3.5-122b-a10b.json](C:/Development/OllamaBenchmarks/results/optimization-sweep-qwen3.5-122b-a10b.json)
   `baseline`, `threads_8`, `threads_16`, and `batch_1024` completed with `num_ctx=8192`.
   `force_gpu_99` failed with `memory layout cannot be allocated with num_gpu = 99`.
 
 ## Interpretation
 
-This still looks like the same underlying model family, but not a perfectly identical runtime profile. The `a10b` tag is modestly faster on the base throughput prompt. The earlier isolated-backend failures were reproducible only when the model was tested with a huge implicit context or while a concurrent sweep was competing for memory; after constraining context length and running the backend check in isolation, the variant behaved normally on `auto` and `rocm`.
+This still looks like the same underlying model family, but not an identical runtime profile. After fixing the context handling, the base throughput of the two tags is effectively the same, but the `a10b` tag still shows backend-specific behavior: `auto` and `rocm` work, while `vulkan` remains unstable on this machine.
