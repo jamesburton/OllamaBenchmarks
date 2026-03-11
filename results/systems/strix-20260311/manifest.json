@@ -1,0 +1,69 @@
+{
+  "captured_at": "2026-03-11T11:45:12.057508+00:00",
+  "system_id": "strix-20260311",
+  "system_dir": "C:\\Development\\OllamaBenchmarks\\results\\systems\\strix-20260311",
+  "host_info_file": "host-info.json",
+  "artifacts": {
+    "throughput": "throughput-resource-current.json",
+    "quality": "quality-current.json",
+    "backend": "backend-comparison-current.json",
+    "sweep": "optimization-sweep-current.json",
+    "session_summary": "session-2026-03-11-summary.md"
+  },
+  "host": {
+    "captured_at": "2026-03-11T11:45:11.878250+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.17.6",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
+  "summary": {
+    "fastest_model": {
+      "model": "glm-4.7-flash:latest",
+      "toks_per_s": 43.94,
+      "score": 2,
+      "score_max": 4
+    },
+    "primary_coding_model": {
+      "model": "qwen3-coder-next:latest",
+      "toks_per_s": 32.87,
+      "score": 4,
+      "score_max": 4
+    },
+    "best_balanced_model": {
+      "model": "lfm2:24b",
+      "toks_per_s": 33.54,
+      "score": 4,
+      "score_max": 4
+    },
+    "full_quality_models": [
+      "lfm2:24b",
+      "qwen3-coder-next:latest",
+      "granite4:32b-a9b-h",
+      "ministral-3:14b",
+      "qwen3-coder-next:q8_0",
+      "devstral-small-2:24b-instruct-2512-q8_0"
+    ],
+    "backend_summary": "auto led at 32.59 tok/s; rocm followed at 32.13 tok/s."
+  }
+}

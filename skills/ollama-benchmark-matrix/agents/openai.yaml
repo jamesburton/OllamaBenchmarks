@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ollama Benchmark Matrix"
+  short_description: "Benchmark and compare Ollama hosts"
+  default_prompt: "Run the repo benchmarks, archive host-specific artifacts, and refresh the cross-system comparison summary."

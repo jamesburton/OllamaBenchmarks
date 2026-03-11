@@ -9,6 +9,11 @@ Local benchmark harness and captured results for evaluating Ollama models on a S
 - `scripts/benchmark_quality.py` runs a compact coding and tool-calling quality suite.
 - `scripts/benchmark_backend.ps1` compares `auto`, `vulkan`, and `rocm` backend selection by launching isolated Ollama servers on alternate ports.
 - `scripts/benchmark_sweep.py` runs decode-side option sweeps for a single model.
+- `scripts/collect_host_info.py` captures machine metadata for archived benchmark snapshots.
+- `scripts/archive_system_benchmarks.py` snapshots the current benchmark artifacts under `results/systems/<host>-<label>/`.
+- `scripts/build_cross_system_summary.py` rebuilds the comparison table across all archived systems.
+- All benchmark scripts now auto-write a structured JSON artifact under `results/` even if you do not pass an output path.
+- The reusable agent workflow for this repo lives in [skills/ollama-benchmark-matrix/SKILL.md](C:/Development/OllamaBenchmarks/skills/ollama-benchmark-matrix/SKILL.md).
 - `plans/` contains the next-step benchmark expansion work.
 
 ## Current headline findings
@@ -19,6 +24,7 @@ Local benchmark harness and captured results for evaluating Ollama models on a S
 - For this machine, forcing `vulkan` or `rocm` was slower than leaving `OLLAMA_LLM_LIBRARY` unset (`auto`)
 
 See [results/session-2026-03-11-summary.md](C:/Development/OllamaBenchmarks/results/session-2026-03-11-summary.md) for the consolidated table and interpretation.
+See [results/cross-system-summary.md](C:/Development/OllamaBenchmarks/results/cross-system-summary.md) for the rolling matrix across archived hosts.
 
 ## Quick start
 
@@ -36,8 +42,7 @@ Example:
 ```powershell
 ./scripts/benchmark_throughput_resource.ps1 `
   -Models @('qwen3-coder-next:latest','lfm2:24b') `
-  -NumPredict 192 `
-  -OutputPath .\results\fresh-throughput.json
+  -NumPredict 192
 ```
 
 Output fields:
@@ -55,8 +60,7 @@ Example:
 
 ```powershell
 python .\scripts\benchmark_quality.py `
-  --models qwen3-coder-next:latest lfm2:24b granite4:32b-a9b-h `
-  --output .\results\fresh-quality.json
+  --models qwen3-coder-next:latest lfm2:24b granite4:32b-a9b-h
 ```
 
 This suite currently checks:
@@ -70,8 +74,7 @@ Example:
 
 ```powershell
 ./scripts/benchmark_backend.ps1 `
-  -Model qwen3-coder-next:latest `
-  -OutputPath .\results\fresh-backends.json
+  -Model qwen3-coder-next:latest
 ```
 
 This launches temporary Ollama servers on alternate ports and compares:
@@ -86,8 +89,7 @@ Example:
 
 ```powershell
 python .\scripts\benchmark_sweep.py `
-  --model qwen3-coder-next:latest `
-  --output .\results\fresh-sweep.json
+  --model qwen3-coder-next:latest
 ```
 
 Default sweep variants:
@@ -97,6 +99,19 @@ Default sweep variants:
 - `num_thread=16`
 - `num_batch=1024`
 - `num_gpu=99`
+
+Each script still accepts an explicit output path if you want a deterministic filename. The generated JSON now includes run metadata such as timestamps, model list, benchmark type, and the resolved artifact path.
+
+## Cross-system workflow
+
+After refreshing the `*-current.json` artifacts for a machine, archive and summarize it with:
+
+```powershell
+python .\scripts\archive_system_benchmarks.py --label 20260311
+python .\scripts\build_cross_system_summary.py
+```
+
+This creates a per-system snapshot under `results/systems/` with `host-info.json` and `manifest.json`, then rebuilds the shared comparison table.
 
 ## How to read the results
 
@@ -112,4 +127,3 @@ No previously saved benchmark artifacts from the parent `C:\Development` workspa
 ## Next work
 
 See [PLANS.md](C:/Development/OllamaBenchmarks/PLANS.md) and the individual files in [plans](C:/Development/OllamaBenchmarks/plans) for the next benchmark phases.
-

@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import json
 import os
 import re
@@ -7,6 +8,7 @@ import tempfile
 import textwrap
 import urllib.request
 
+from collect_host_info import build_host_info
 
 CODING_TASKS = [
     (
@@ -175,16 +177,31 @@ def main() -> None:
     parser.add_argument("--models", nargs="+", required=True)
     parser.add_argument("--output")
     args = parser.parse_args()
+    run_started_at = datetime.datetime.now(datetime.timezone.utc)
+    if not args.output:
+        args.output = os.path.join(
+            ".",
+            "results",
+            f"quality-{run_started_at.strftime('%Y%m%d-%H%M%S')}.json",
+        )
 
     results = [run_model(model) for model in args.models]
-    payload = json.dumps(results, indent=2)
-    if args.output:
-      os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
-      with open(args.output, "w", encoding="utf-8") as handle:
-          handle.write(payload + "\n")
+    payload_obj = {
+        "benchmark": "quality",
+        "run_started_at": run_started_at.isoformat(),
+        "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "output_path": os.path.abspath(args.output),
+        "ollama_host": "http://127.0.0.1:11434",
+        "host_details": build_host_info(),
+        "models": args.models,
+        "results": results,
+    }
+    payload = json.dumps(payload_obj, indent=2)
+    os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
+    with open(args.output, "w", encoding="utf-8") as handle:
+        handle.write(payload + "\n")
     print(payload)
 
 
 if __name__ == "__main__":
     main()
-

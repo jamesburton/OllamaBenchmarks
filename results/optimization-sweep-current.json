@@ -1,0 +1,64 @@
+{
+  "benchmark": "sweep",
+  "run_started_at": "2026-03-11T10:37:58.344958+00:00",
+  "run_finished_at": "2026-03-11T11:09:12.677876+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\optimization-sweep-current.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "model": "qwen3-coder-next:latest",
+  "runs": 2,
+  "variants": [
+    {
+      "perm": "baseline",
+      "opts": {},
+      "tps_avg": 32.76,
+      "tps_min": 31.33,
+      "tps_max": 34.18,
+      "eval_count_avg": 165,
+      "total_s_avg": 75.468
+    },
+    {
+      "perm": "threads_8",
+      "opts": {
+        "num_thread": 8
+      },
+      "tps_avg": 32.17,
+      "tps_min": 31.25,
+      "tps_max": 33.09,
+      "eval_count_avg": 163,
+      "total_s_avg": 78.639
+    },
+    {
+      "perm": "threads_16",
+      "opts": {
+        "num_thread": 16
+      },
+      "tps_avg": 29.91,
+      "tps_min": 29.83,
+      "tps_max": 30.0,
+      "eval_count_avg": 163,
+      "total_s_avg": 101.759
+    },
+    {
+      "perm": "batch_1024",
+      "opts": {
+        "num_batch": 1024
+      },
+      "tps_avg": 32.83,
+      "tps_min": 31.93,
+      "tps_max": 33.74,
+      "eval_count_avg": 170.5,
+      "total_s_avg": 163.951
+    },
+    {
+      "perm": "force_gpu_99",
+      "opts": {
+        "num_gpu": 99
+      },
+      "tps_avg": 32.56,
+      "tps_min": 32.09,
+      "tps_max": 33.03,
+      "eval_count_avg": 163,
+      "total_s_avg": 215.549
+    }
+  ]
+}

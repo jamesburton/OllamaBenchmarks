@@ -3,10 +3,25 @@ param(
   [int]$NumPredict = 192,
   [string]$Prompt = "Write a concise explanation of dependency injection with one short Python example.",
   [int]$Seed = 42,
-  [string]$OutputPath = ".\\results\\throughput-resource.json"
+  [string]$OutputPath
 )
 
 $ErrorActionPreference = "Stop"
+$scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+function Get-HostDetails {
+  $helper = Join-Path $scriptRoot "collect_host_info.py"
+  try {
+    $json = python $helper --compact
+    if ($LASTEXITCODE -eq 0 -and $json) {
+      return $json | ConvertFrom-Json
+    }
+  }
+  catch {}
+  return [pscustomobject]@{
+    hostname = $env:COMPUTERNAME
+  }
+}
 
 function Invoke-OllamaGenerate {
   param(
@@ -38,7 +53,7 @@ function Get-OllamaSample {
   }
 
   $pidPatterns = $procs.Id | ForEach-Object { "pid_$($_)_*" }
-  $gpuCtr = (Get-Counter "\GPU Engine(*)\Utilization Percentage").CounterSamples |
+  $gpuCtr = @((Get-SafeCounterSamples -Path "\GPU Engine(*)\Utilization Percentage")) |
     Where-Object {
       $inst = $_.InstanceName
       foreach ($p in $pidPatterns) {
@@ -46,7 +61,7 @@ function Get-OllamaSample {
       }
       return $false
     }
-  $gpuMemCtr = (Get-Counter "\GPU Process Memory(*)\Dedicated Usage").CounterSamples |
+  $gpuMemCtr = @((Get-SafeCounterSamples -Path "\GPU Process Memory(*)\Dedicated Usage")) |
     Where-Object {
       $inst = $_.InstanceName
       foreach ($p in $pidPatterns) {
@@ -63,8 +78,28 @@ function Get-OllamaSample {
   }
 }
 
+function Get-SafeCounterSamples {
+  param(
+    [string]$Path
+  )
+
+  try {
+    $counter = Get-Counter $Path -ErrorAction Stop
+    return @($counter.CounterSamples | Where-Object { $_.Status -eq 0 })
+  }
+  catch {
+    return @()
+  }
+}
+
 if (-not $Models -or $Models.Count -eq 0) {
   throw "Pass one or more model names with -Models."
+}
+
+$runStarted = Get-Date
+if (-not $OutputPath) {
+  $stamp = $runStarted.ToString("yyyyMMdd-HHmmss")
+  $OutputPath = ".\\results\\throughput-resource-$stamp.json"
 }
 
 $logical = [double][Environment]::ProcessorCount
@@ -146,6 +181,21 @@ $dir = Split-Path -Parent $OutputPath
 if ($dir) {
   New-Item -ItemType Directory -Force -Path $dir | Out-Null
 }
-$results | ConvertTo-Json -Depth 6 | Set-Content -Path $OutputPath
-$results | ConvertTo-Json -Depth 6
-
+$resolvedOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
+$hostDetails = Get-HostDetails
+$payload = [pscustomobject]@{
+  benchmark = "throughput_resource"
+  run_started_at = $runStarted.ToString("o")
+  run_finished_at = (Get-Date).ToString("o")
+  output_path = $resolvedOutputPath
+  host = $env:COMPUTERNAME
+  ollama_host = "http://127.0.0.1:11434"
+  host_details = $hostDetails
+  models = $Models
+  prompt = $Prompt
+  num_predict = $NumPredict
+  seed = $Seed
+  results = $results
+}
+$payload | ConvertTo-Json -Depth 6 | Set-Content -Path $resolvedOutputPath
+$payload | ConvertTo-Json -Depth 6

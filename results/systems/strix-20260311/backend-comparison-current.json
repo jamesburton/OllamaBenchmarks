@@ -1,0 +1,36 @@
+{
+  "benchmark": "backend_comparison",
+  "run_started_at": "2026-03-11T11:17:34.6370080+00:00",
+  "run_finished_at": "2026-03-11T11:20:43.2633098+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-current.json",
+  "host": "STRIX",
+  "model": "qwen3-coder-next:latest",
+  "backends": [
+    "auto",
+    "vulkan",
+    "rocm"
+  ],
+  "results": [
+    {
+      "lib": "auto",
+      "status": "ok",
+      "toks_per_s": 32.59,
+      "e2e_toks_per_s": 29.1,
+      "total_s": 5.601
+    },
+    {
+      "lib": "vulkan",
+      "status": "ok",
+      "toks_per_s": 6.55,
+      "e2e_toks_per_s": 6.15,
+      "total_s": 26.514
+    },
+    {
+      "lib": "rocm",
+      "status": "ok",
+      "toks_per_s": 32.13,
+      "e2e_toks_per_s": 28.71,
+      "total_s": 5.677
+    }
+  ]
+}
