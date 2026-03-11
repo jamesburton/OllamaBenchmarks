@@ -74,10 +74,14 @@ function Test-Lib {
     [string]$ModelName
   )
 
+  $modelsPath = $env:OLLAMA_MODELS
   $job = Start-Job -ScriptBlock {
-    param($lib, $port, $ctx)
+    param($lib, $port, $ctx, $modelsPath)
     $env:OLLAMA_HOST = "127.0.0.1:$port"
     $env:OLLAMA_CONTEXT_LENGTH = "$ctx"
+    if ($modelsPath) {
+      $env:OLLAMA_MODELS = $modelsPath
+    }
     if ($lib -ne "auto") {
       $env:OLLAMA_LLM_LIBRARY = $lib
     } else {
@@ -85,7 +89,7 @@ function Test-Lib {
     }
     $env:OLLAMA_DEBUG = "1"
     ollama serve
-  } -ArgumentList $Lib, $Port, $NumCtx
+  } -ArgumentList $Lib, $Port, $NumCtx, $modelsPath
 
   try {
     $ready = $false

@@ -1,0 +1,66 @@
+{
+  "captured_at": "2026-03-11T20:52:32.674484+00:00",
+  "system_id": "t5500-20260311-xeon3060",
+  "system_dir": "E:\\Development\\OllamaBenchmarks\\results\\systems\\t5500-20260311-xeon3060",
+  "host_info_file": "host-info.json",
+  "artifacts": {
+    "throughput": "throughput-resource-current.json",
+    "quality": "quality-current.json",
+    "backend": "backend-comparison-current.json",
+    "sweep": "optimization-sweep-current.json",
+    "session_summary": "session-2026-03-11-summary.md"
+  },
+  "host": {
+    "captured_at": "2026-03-11T20:52:32.574692+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.17.7",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "summary": {
+    "fastest_model": {
+      "model": "lfm2.5-thinking:latest",
+      "toks_per_s": 220.75,
+      "score": 0,
+      "score_max": 4
+    },
+    "primary_coding_model": {
+      "model": "lfm2:24b",
+      "toks_per_s": 11.67,
+      "score": 4,
+      "score_max": 4
+    },
+    "best_balanced_model": {
+      "model": "ministral-3:14b",
+      "toks_per_s": 29.68,
+      "score": 4,
+      "score_max": 4
+    },
+    "full_quality_models": [
+      "ministral-3:14b",
+      "granite4:7b-a1b-h",
+      "lfm2:24b"
+    ],
+    "backend_summary": "auto led at 20.09 tok/s; rocm followed at 7.57 tok/s."
+  }
+}

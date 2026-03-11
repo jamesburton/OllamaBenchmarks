@@ -1,0 +1,106 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-11T19:28:09.7367194+00:00",
+    "run_finished_at":  "2026-03-11T20:44:13.6121019+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-granite4_7b-a1b-h.json",
+    "host":  "T5500",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "captured_at":  "2026-03-11T19:28:35.467248+00:00",
+                         "hostname":  "T5500",
+                         "host_slug":  "t5500",
+                         "os":  {
+                                    "system":  "Windows",
+                                    "release":  "10",
+                                    "version":  "10.0.26200",
+                                    "machine":  "AMD64"
+                                },
+                         "manufacturer":  "Dell Inc.",
+                         "model":  "Precision WorkStation T5500  ",
+                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+                         "logical_cpu_count":  24,
+                         "total_memory_gb":  36.0,
+                         "python_version":  "3.11.3",
+                         "ollama_version":  "ollama version is 0.17.7",
+                         "gpus":  [
+                                      {
+                                          "Name":  "NVIDIA GeForce RTX 3060",
+                                          "AdapterRAM":  4293918720,
+                                          "DriverVersion":  "32.0.15.6094",
+                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
+                                          "Status":  "OK"
+                                      }
+                                  ]
+                     },
+    "models":  [
+                   "granite4:7b-a1b-h",
+                   "lfm2.5-thinking:latest",
+                   "lfm2:24b",
+                   "ministral-3:14b"
+               ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "granite4:7b-a1b-h",
+                        "eval_count":  192,
+                        "eval_s":  9.385,
+                        "toks_per_s":  20.46,
+                        "total_s":  9.73,
+                        "load_s":  0.184,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  0.78,
+                        "gpu_util_avg":  88.1,
+                        "gpu_util_peak":  88.1,
+                        "gpu_mem_peak_gb":  4.42,
+                        "ollama_ps":  "granite4:7b-a1b-h    566b725534ea    4.5 GB    100% GPU     4096       4 minutes from now    "
+                    },
+                    {
+                        "model":  "lfm2.5-thinking:latest",
+                        "eval_count":  192,
+                        "eval_s":  0.87,
+                        "toks_per_s":  220.75,
+                        "total_s":  1.311,
+                        "load_s":  0.145,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  0.64,
+                        "gpu_util_avg":  0,
+                        "gpu_util_peak":  0,
+                        "gpu_mem_peak_gb":  0.96,
+                        "ollama_ps":  "lfm2.5-thinking:latest    95bd9d45385f    1.0 GB    100% GPU     4096       4 minutes from now    "
+                    },
+                    {
+                        "model":  "lfm2:24b",
+                        "eval_count":  190,
+                        "eval_s":  16.279,
+                        "toks_per_s":  11.67,
+                        "total_s":  18.003,
+                        "load_s":  0.142,
+                        "cpu_avg_pct":  23.4,
+                        "cpu_peak_pct":  23.4,
+                        "ram_peak_gb":  4.1,
+                        "gpu_util_avg":  9.2,
+                        "gpu_util_peak":  18.3,
+                        "gpu_mem_peak_gb":  10.49,
+                        "ollama_ps":  "lfm2:24b    d6c816d74887    14 GB    25%/75% CPU/GPU    4096       4 minutes from now    "
+                    },
+                    {
+                        "model":  "ministral-3:14b",
+                        "eval_count":  192,
+                        "eval_s":  6.469,
+                        "toks_per_s":  29.68,
+                        "total_s":  7.752,
+                        "load_s":  0.392,
+                        "cpu_avg_pct":  1.2,
+                        "cpu_peak_pct":  1.2,
+                        "ram_peak_gb":  1.05,
+                        "gpu_util_avg":  42.5,
+                        "gpu_util_peak":  84.9,
+                        "gpu_mem_peak_gb":  10.02,
+                        "ollama_ps":  "ministral-3:14b    4760c35aeb9d    11 GB    100% GPU     4096       4 minutes from now    "
+                    }
+                ]
+}

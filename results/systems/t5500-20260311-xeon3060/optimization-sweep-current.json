@@ -1,0 +1,98 @@
+{
+  "benchmark": "sweep",
+  "run_started_at": "2026-03-11T20:45:09.477844+00:00",
+  "run_finished_at": "2026-03-11T20:48:12.521729+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\optimization-sweep-current.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-11T20:48:16.956999+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.17.7",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "model": "granite4:7b-a1b-h",
+  "runs": 2,
+  "num_ctx": 8192,
+  "think": false,
+  "variants": [
+    {
+      "perm": "baseline",
+      "opts": {},
+      "status": "ok",
+      "tps_avg": 20.28,
+      "tps_min": 20.02,
+      "tps_max": 20.54,
+      "eval_count_avg": 192,
+      "total_s_avg": 9.805
+    },
+    {
+      "perm": "threads_8",
+      "opts": {
+        "num_thread": 8
+      },
+      "status": "ok",
+      "tps_avg": 20.21,
+      "tps_min": 20.02,
+      "tps_max": 20.4,
+      "eval_count_avg": 185.5,
+      "total_s_avg": 14.455
+    },
+    {
+      "perm": "threads_16",
+      "opts": {
+        "num_thread": 16
+      },
+      "status": "ok",
+      "tps_avg": 20.83,
+      "tps_min": 20.78,
+      "tps_max": 20.89,
+      "eval_count_avg": 185.5,
+      "total_s_avg": 14.24
+    },
+    {
+      "perm": "batch_1024",
+      "opts": {
+        "num_batch": 1024
+      },
+      "status": "ok",
+      "tps_avg": 20.6,
+      "tps_min": 20.6,
+      "tps_max": 20.6,
+      "eval_count_avg": 184,
+      "total_s_avg": 14.155
+    },
+    {
+      "perm": "force_gpu_99",
+      "opts": {
+        "num_gpu": 99
+      },
+      "status": "ok",
+      "tps_avg": 19.64,
+      "tps_min": 18.96,
+      "tps_max": 20.33,
+      "eval_count_avg": 192,
+      "total_s_avg": 15.175
+    }
+  ]
+}

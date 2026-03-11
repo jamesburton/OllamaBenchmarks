@@ -1,0 +1,58 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-11T20:40:36.2418076+00:00",
+    "run_finished_at":  "2026-03-11T20:44:13.5822142+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-ministral-3_14b.json",
+    "host":  "T5500",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "captured_at":  "2026-03-11T20:44:13.475645+00:00",
+                         "hostname":  "T5500",
+                         "host_slug":  "t5500",
+                         "os":  {
+                                    "system":  "Windows",
+                                    "release":  "10",
+                                    "version":  "10.0.26200",
+                                    "machine":  "AMD64"
+                                },
+                         "manufacturer":  "Dell Inc.",
+                         "model":  "Precision WorkStation T5500  ",
+                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+                         "logical_cpu_count":  24,
+                         "total_memory_gb":  36.0,
+                         "python_version":  "3.11.3",
+                         "ollama_version":  "ollama version is 0.17.7",
+                         "gpus":  [
+                                      {
+                                          "Name":  "NVIDIA GeForce RTX 3060",
+                                          "AdapterRAM":  4293918720,
+                                          "DriverVersion":  "32.0.15.6094",
+                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
+                                          "Status":  "OK"
+                                      }
+                                  ]
+                     },
+    "models":  [
+                   "ministral-3:14b"
+               ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "ministral-3:14b",
+                        "eval_count":  192,
+                        "eval_s":  6.469,
+                        "toks_per_s":  29.68,
+                        "total_s":  7.752,
+                        "load_s":  0.392,
+                        "cpu_avg_pct":  1.2,
+                        "cpu_peak_pct":  1.2,
+                        "ram_peak_gb":  1.05,
+                        "gpu_util_avg":  42.5,
+                        "gpu_util_peak":  84.9,
+                        "gpu_mem_peak_gb":  10.02,
+                        "ollama_ps":  "ministral-3:14b    4760c35aeb9d    11 GB    100% GPU     4096       4 minutes from now    "
+                    }
+                ]
+}
