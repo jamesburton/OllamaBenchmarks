@@ -6,7 +6,7 @@ Local benchmark harness and captured results for evaluating Ollama models on a S
 
 - `results/` contains reconstructed benchmark outputs from the March 11, 2026 session.
 - `scripts/benchmark_throughput_resource.ps1` measures generation speed and samples CPU, RAM, GPU utilization, and GPU dedicated memory.
-- `scripts/benchmark_quality.py` runs a compact coding and tool-calling quality suite.
+- `scripts/benchmark_quality.py` runs a compact coding, tool-use, and agent-orchestration quality suite.
 - `scripts/benchmark_backend.ps1` compares `auto`, `vulkan`, and `rocm` backend selection by launching isolated Ollama servers on alternate ports.
 - `scripts/benchmark_sweep.py` runs decode-side option sweeps for a single model.
 - `scripts/collect_host_info.py` captures machine metadata for archived benchmark snapshots.
@@ -67,6 +67,7 @@ This suite currently checks:
 
 - Small executable coding tasks
 - Single-call tool invocation correctness
+- Plan creation plus a follow-up sub-agent request/finalization sequence
 
 ### Backend comparison
 
@@ -118,6 +119,7 @@ This creates a per-system snapshot under `results/systems/` with `host-info.json
 - Prefer `toks_per_s` for steady-state decode speed.
 - Use end-to-end time when comparing user experience, because some settings increase total latency without helping real throughput.
 - Treat the quick quality suite as a screening pass, not a final model quality verdict.
+- The current quick quality score is out of `5`: two coding tasks, two simple tool tasks, and one agentic planning/delegation task.
 - Re-run the same prompt set before making model changes or backend changes.
 
 ## Missing or reconstructed artifacts

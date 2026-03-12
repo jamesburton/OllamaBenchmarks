@@ -5,14 +5,14 @@ Checked on 2026-03-11 alongside the existing `qwen3.5:122b` result because the `
 ## What matched
 
 - `ollama show qwen3.5:122b-a10b` and `ollama show qwen3.5:122b` report the same architecture (`qwen35moe`), parameter count (`125.1B`), quantization (`Q4_K_M`), context length (`262144`), and Ollama requirement (`0.17.1`).
-- Both tags passed the quick tool checks and failed the quick coding checks (`2/4` total score).
+- In the expanded quick-quality suite, both tags reached `5/5`.
 
 ## What changed
 
 | Tag | tok/s | Quick quality | Notes |
 |---|---:|---:|---|
-| `qwen3.5:122b-a10b` | 5.21 | 2/4 | Essentially tied with the older tag in the full refresh rerun |
-| `qwen3.5:122b` | 5.22 | 2/4 | Refreshed baseline from the same run cycle |
+| `qwen3.5:122b-a10b` | 5.21 | 5/5 | Essentially tied with the older tag in the full refresh rerun |
+| `qwen3.5:122b` | 5.22 | 5/5 | Refreshed baseline from the same run cycle |
 
 ## Additional checks for qwen3.5:122b-a10b
 

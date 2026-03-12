@@ -2,21 +2,21 @@
 
 ## Throughput and quick quality
 
-| Model | tok/s | Quick quality (/4) | Notes |
+| Model | tok/s | Quick quality (/5) | Notes |
 |---|---:|---:|---|
-| glm-4.7-flash:latest | 43.11 | 2 | Fastest raw throughput, still weak on coding tasks |
-| qwen3-coder-next:latest | 33.92 | 4 | Best overall result in this refresh |
-| lfm2:24b | 31.78 | 4 | Slightly slower than `qwen3-coder-next:latest`, still a strong lower-footprint option |
-| granite4:32b-a9b-h | 26.12 | 3 | Lost one coding pass in this rerun |
-| ministral-3:14b | 21.94 | 4 | Smaller model with a clean quality pass |
-| gpt-oss:120b | 11.12 | 3 | One coding miss, high memory demand |
-| qwen3-coder-next:q8_0 | 7.96 | 4 | Good quality, much slower than `latest` |
-| glm-4.7-flash:bf16 | 7.09 | 2 | Tool use okay, coding still weak |
-| nemotron-3-super:latest | 5.84 | 3 | Large model, better than the `qwen3.5:122b` tags here but not competitive with the top coding options |
-| qwen3.5:122b | 5.22 | 2 | Very large footprint without competitive quality |
-| qwen3.5:122b-a10b | 5.21 | 2 | Essentially tied with `qwen3.5:122b`; see the variant-check artifact for backend details |
-| devstral-small-2:24b-instruct-2512-q8_0 | 3.98 | 4 | Quality solid, speed still poor here |
-| MichelRosselli/GLM-4.5-Air:latest | 1.27 | 0 | Not competitive here |
+| glm-4.7-flash:latest | 43.11 | 5 | Fastest model in the suite and now a full quick-pass on the expanded checks |
+| qwen3-coder-next:latest | 33.92 | 5 | Strongest coding-oriented option with a full quick-pass |
+| lfm2:24b | 31.78 | 4 | Still a strong lower-footprint option, missed the new agentic check |
+| granite4:32b-a9b-h | 26.12 | 4 | One coding miss in this rerun |
+| ministral-3:14b | 21.94 | 5 | Smallest of the top full-pass group |
+| gpt-oss:120b | 11.12 | 5 | Passed the expanded suite, but remains expensive in memory and latency |
+| qwen3-coder-next:q8_0 | 7.96 | 5 | Full quick-pass, much slower than `latest` |
+| glm-4.7-flash:bf16 | 7.09 | 2 | Still weak relative to its `latest` tag |
+| nemotron-3-super:latest | 5.84 | 5 | Full quick-pass, but slower than the leading models |
+| qwen3.5:122b | 5.22 | 5 | Full quick-pass in the expanded suite, but not competitive on speed |
+| qwen3.5:122b-a10b | 5.21 | 5 | Essentially tied with `qwen3.5:122b`; see the variant-check artifact for backend details |
+| devstral-small-2:24b-instruct-2512-q8_0 | 3.98 | 5 | Full quick-pass, speed still poor here |
+| MichelRosselli/GLM-4.5-Air:latest | 1.27 | 2 | Still not competitive here |
 
 ## Backend comparison on qwen3-coder-next:latest
 
@@ -39,6 +39,6 @@
 ## Recommendation
 
 1. Use `qwen3-coder-next:latest` as the primary coding model.
-2. Keep `lfm2:24b` as the best lower-footprint alternative.
-3. Use `ministral-3:14b` or `qwen3-coder-next:q8_0` if you want another full-pass option from this refreshed run.
+2. If raw speed matters most and the expanded quick suite is enough, `glm-4.7-flash:latest` is now the best all-around throughput result.
+3. Keep `lfm2:24b` as the best lower-footprint alternative, noting that it missed the new agentic orchestration check.
 4. Leave `OLLAMA_LLM_LIBRARY` on `auto`; `rocm` stayed close, but `auto` remained the best default and `vulkan` was far behind.

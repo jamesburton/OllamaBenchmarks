@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-03-11T22:38:54.184820+00:00",
+  "captured_at": "2026-03-11T23:25:06.985911+00:00",
   "system_id": "strix-20260311",
   "system_dir": "C:\\Development\\OllamaBenchmarks\\results\\systems\\strix-20260311",
   "host_info_file": "host-info.json",
@@ -11,7 +11,7 @@
     "session_summary": "session-2026-03-11-summary.md"
   },
   "host": {
-    "captured_at": "2026-03-11T22:38:53.989149+00:00",
+    "captured_at": "2026-03-11T23:25:06.748094+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -41,26 +41,30 @@
     "fastest_model": {
       "model": "glm-4.7-flash:latest",
       "toks_per_s": 43.11,
-      "score": 2,
-      "score_max": 4
+      "score": 5,
+      "score_max": 5
     },
     "primary_coding_model": {
       "model": "qwen3-coder-next:latest",
       "toks_per_s": 33.92,
-      "score": 4,
-      "score_max": 4
+      "score": 5,
+      "score_max": 5
     },
     "best_balanced_model": {
-      "model": "qwen3-coder-next:latest",
-      "toks_per_s": 33.92,
-      "score": 4,
-      "score_max": 4
+      "model": "glm-4.7-flash:latest",
+      "toks_per_s": 43.11,
+      "score": 5,
+      "score_max": 5
     },
     "full_quality_models": [
+      "glm-4.7-flash:latest",
       "qwen3-coder-next:latest",
-      "lfm2:24b",
       "ministral-3:14b",
+      "gpt-oss:120b",
       "qwen3-coder-next:q8_0",
+      "nemotron-3-super:latest",
+      "qwen3.5:122b",
+      "qwen3.5:122b-a10b",
       "devstral-small-2:24b-instruct-2512-q8_0"
     ],
     "backend_summary": "auto led at 33.89 tok/s; rocm followed at 33.1 tok/s."

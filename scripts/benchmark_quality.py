@@ -6,6 +6,7 @@ import re
 import subprocess
 import tempfile
 import textwrap
+from typing import Any
 import urllib.request
 
 from collect_host_info import build_host_info
@@ -70,6 +71,24 @@ TOOL_TASKS = [
     ),
 ]
 
+PLAN_AGENT_TASKS = [
+    {
+        "name": "write_summary_report",
+        "prompt": (
+            "You are coordinating work on a tiny benchmark reporting task. "
+            "First create a short plan using the create_plan tool. "
+            "Then request exactly one sub-agent with request_subagent to draft a summary from benchmark data. "
+            "After the tool returns, finish by calling finalize_result with a concise manager summary. "
+            "Do not skip steps."
+        ),
+        "expected_plan_keywords": ["benchmark", "summary"],
+        "subagent_result": {
+            "status": "completed",
+            "summary": "Drafted a three-line benchmark summary for qwen3-coder-next and lfm2.",
+        },
+    }
+]
+
 
 def post_json(path: str, payload: dict, timeout: int = 1200) -> dict:
     req = urllib.request.Request(
@@ -80,6 +99,25 @@ def post_json(path: str, payload: dict, timeout: int = 1200) -> dict:
     )
     with urllib.request.urlopen(req, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
+
+
+def think_setting(model: str) -> Any:
+    if model.startswith("gpt-oss"):
+        return "low"
+    return False
+
+
+def parse_arguments(arguments: Any) -> dict[str, Any]:
+    if isinstance(arguments, dict):
+        return arguments
+    if isinstance(arguments, str):
+        try:
+            parsed = json.loads(arguments)
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            return {}
+    return {}
 
 
 def extract_code(text: str) -> str:
@@ -117,6 +155,181 @@ def run_python_asserts(code: str, asserts: list[str]) -> bool:
             pass
 
 
+def run_tool_task(model: str, prompt: str, tool: dict, expected_name: str, expected_args: dict[str, Any]) -> bool:
+    response = post_json(
+        "/api/chat",
+        {
+            "model": model,
+            "stream": False,
+            "messages": [{"role": "user", "content": prompt}],
+            "tools": [tool],
+            "think": think_setting(model),
+            "options": {"temperature": 0, "num_predict": 100, "seed": 42},
+        },
+    )
+    calls = (response.get("message") or {}).get("tool_calls") or []
+    if not calls:
+        return False
+    function = calls[0].get("function") or {}
+    if function.get("name") != expected_name:
+        return False
+    arguments = parse_arguments(function.get("arguments"))
+    return all(arguments.get(key) == value for key, value in expected_args.items())
+
+
+def run_plan_agent_task(model: str, task: dict[str, Any]) -> bool:
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "create_plan",
+                "description": "Create a short execution plan before delegating work",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "title": {"type": "string"},
+                        "steps": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+                    },
+                    "required": ["title", "steps"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "request_subagent",
+                "description": "Ask a sub-agent to perform one scoped subtask",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "worker_type": {"type": "string"},
+                        "task": {"type": "string"},
+                    },
+                    "required": ["worker_type", "task"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "finalize_result",
+                "description": "Return the final concise manager summary",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "summary": {"type": "string"},
+                    },
+                    "required": ["summary"],
+                },
+            },
+        },
+    ]
+
+    messages: list[dict[str, Any]] = [{"role": "user", "content": task["prompt"]}]
+    first = post_json(
+        "/api/chat",
+        {
+            "model": model,
+            "stream": False,
+            "messages": messages,
+            "tools": tools,
+            "think": think_setting(model),
+            "options": {"temperature": 0, "num_predict": 220, "seed": 42},
+        },
+    )
+    message = first.get("message") or {}
+    tool_calls = message.get("tool_calls") or []
+    if not tool_calls:
+        return False
+    plan_call = tool_calls[0].get("function") or {}
+    if plan_call.get("name") != "create_plan":
+        return False
+    plan_args = parse_arguments(plan_call.get("arguments"))
+    steps = plan_args.get("steps")
+    if not isinstance(steps, list) or len(steps) < 1:
+        return False
+    plan_text = " ".join(
+        [str(plan_args.get("title") or "")] + [str(step) for step in steps]
+    ).lower()
+    for expected in task["expected_plan_keywords"]:
+        if expected not in plan_text:
+            return False
+
+    messages.extend(
+        [
+            {
+                "role": "assistant",
+                "content": message.get("content") or "",
+                "tool_calls": tool_calls,
+            },
+            {
+                "role": "tool",
+                "name": "create_plan",
+                "content": json.dumps({"status": "ok", "accepted": True}),
+            },
+        ]
+    )
+
+    second = post_json(
+        "/api/chat",
+        {
+            "model": model,
+            "stream": False,
+            "messages": messages,
+            "tools": tools,
+            "think": think_setting(model),
+            "options": {"temperature": 0, "num_predict": 220, "seed": 42},
+        },
+    )
+    second_message = second.get("message") or {}
+    second_calls = second_message.get("tool_calls") or []
+    if not second_calls:
+        return False
+    subagent_call = second_calls[0].get("function") or {}
+    if subagent_call.get("name") != "request_subagent":
+        return False
+    subagent_args = parse_arguments(subagent_call.get("arguments"))
+    if not subagent_args.get("task") or not subagent_args.get("worker_type"):
+        return False
+
+    messages.extend(
+        [
+            {
+                "role": "assistant",
+                "content": second_message.get("content") or "",
+                "tool_calls": second_calls,
+            },
+            {
+                "role": "tool",
+                "name": "request_subagent",
+                "content": json.dumps(task["subagent_result"]),
+            },
+        ]
+    )
+
+    third = post_json(
+        "/api/chat",
+        {
+            "model": model,
+            "stream": False,
+            "messages": messages,
+            "tools": tools,
+            "think": think_setting(model),
+            "options": {"temperature": 0, "num_predict": 220, "seed": 42},
+        },
+    )
+    third_message = third.get("message") or {}
+    third_calls = third_message.get("tool_calls") or []
+    if not third_calls:
+        return False
+    final_call = third_calls[0].get("function") or {}
+    if final_call.get("name") != "finalize_result":
+        return False
+    final_args = parse_arguments(final_call.get("arguments"))
+    summary = str(final_args.get("summary") or "").lower()
+    return "summary" in summary or "draft" in summary or "benchmark" in summary
+
+
 def run_model(model: str) -> dict:
     row = {
         "model": model,
@@ -124,6 +337,8 @@ def run_model(model: str) -> dict:
         "coding_total": len(CODING_TASKS),
         "tool_pass": 0,
         "tool_total": len(TOOL_TASKS),
+        "agentic_pass": 0,
+        "agentic_total": len(PLAN_AGENT_TASKS),
     }
 
     for _, prompt, asserts in CODING_TASKS:
@@ -134,6 +349,7 @@ def run_model(model: str) -> dict:
                     "model": model,
                     "prompt": prompt,
                     "stream": False,
+                    "think": think_setting(model),
                     "options": {"temperature": 0, "num_predict": 220, "seed": 42},
                 },
             )
@@ -145,30 +361,20 @@ def run_model(model: str) -> dict:
 
     for _, prompt, tool, expected_name, expected_args in TOOL_TASKS:
         try:
-            response = post_json(
-                "/api/chat",
-                {
-                    "model": model,
-                    "stream": False,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "tools": [tool],
-                    "options": {"temperature": 0, "num_predict": 100, "seed": 42},
-                },
-            )
-            calls = (response.get("message") or {}).get("tool_calls") or []
-            if not calls:
-                continue
-            function = calls[0].get("function") or {}
-            if function.get("name") != expected_name:
-                continue
-            arguments = function.get("arguments") or {}
-            if all(arguments.get(key) == value for key, value in expected_args.items()):
+            if run_tool_task(model, prompt, tool, expected_name, expected_args):
                 row["tool_pass"] += 1
         except Exception:
             pass
 
-    row["score"] = row["coding_pass"] + row["tool_pass"]
-    row["score_max"] = row["coding_total"] + row["tool_total"]
+    for task in PLAN_AGENT_TASKS:
+        try:
+            if run_plan_agent_task(model, task):
+                row["agentic_pass"] += 1
+        except Exception:
+            pass
+
+    row["score"] = row["coding_pass"] + row["tool_pass"] + row["agentic_pass"]
+    row["score_max"] = row["coding_total"] + row["tool_total"] + row["agentic_total"]
     return row
 
 
