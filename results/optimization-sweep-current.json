@@ -1,44 +1,37 @@
 {
   "benchmark": "sweep",
-  "run_started_at": "2026-03-12T15:53:44.705556+00:00",
-  "run_finished_at": "2026-03-12T15:57:07.549978+00:00",
+  "run_started_at": "2026-03-12T18:12:50.390662+00:00",
+  "run_finished_at": "2026-03-12T18:20:36.001716+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\optimization-sweep-current.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-12T15:57:09.215743+00:00",
-    "hostname": "Framework",
-    "host_slug": "framework",
+    "captured_at": "2026-03-12T18:20:37.054589+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
     "os": {
       "system": "Windows",
-      "release": "10",
-      "version": "10.0.26220",
+      "release": "11",
+      "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": "Framework",
-    "model": "Laptop 13 (Intel Core Ultra Series 1)",
-    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
-    "logical_cpu_count": 22,
-    "total_memory_gb": 95.47,
-    "python_version": "3.10.13",
-    "ollama_version": "ollama version is 0.17.5",
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.17.6",
     "gpus": [
       {
-        "Name": "Intel(R) Arc(TM) Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7026",
-        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
-        "Status": "OK"
-      },
-      {
-        "Name": "NVIDIA GeForce RTX 3060",
+        "Name": "AMD Radeon(TM) 8060S Graphics",
         "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.9186",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
         "Status": "OK"
       }
     ]
   },
-  "model": "qwen3.5:latest",
+  "model": "qwen3-coder-next:latest",
   "runs": 2,
   "num_ctx": 8192,
   "think": false,
@@ -47,11 +40,11 @@
       "perm": "baseline",
       "opts": {},
       "status": "ok",
-      "tps_avg": 37.76,
-      "tps_min": 37.73,
-      "tps_max": 37.8,
-      "eval_count_avg": 192,
-      "total_s_avg": 6.409
+      "tps_avg": 20.01,
+      "tps_min": 19.52,
+      "tps_max": 20.49,
+      "eval_count_avg": 163,
+      "total_s_avg": 9.062
     },
     {
       "perm": "threads_8",
@@ -59,11 +52,11 @@
         "num_thread": 8
       },
       "status": "ok",
-      "tps_avg": 37.85,
-      "tps_min": 37.79,
-      "tps_max": 37.91,
-      "eval_count_avg": 192,
-      "total_s_avg": 15.002
+      "tps_avg": 20.91,
+      "tps_min": 20.67,
+      "tps_max": 21.16,
+      "eval_count_avg": 170.5,
+      "total_s_avg": 48.411
     },
     {
       "perm": "threads_16",
@@ -71,11 +64,11 @@
         "num_thread": 16
       },
       "status": "ok",
-      "tps_avg": 37.65,
-      "tps_min": 37.61,
-      "tps_max": 37.7,
-      "eval_count_avg": 192,
-      "total_s_avg": 14.782
+      "tps_avg": 11.73,
+      "tps_min": 10.04,
+      "tps_max": 13.41,
+      "eval_count_avg": 174.5,
+      "total_s_avg": 57.096
     },
     {
       "perm": "batch_1024",
@@ -83,11 +76,11 @@
         "num_batch": 1024
       },
       "status": "ok",
-      "tps_avg": 37.62,
-      "tps_min": 37.53,
-      "tps_max": 37.71,
-      "eval_count_avg": 192,
-      "total_s_avg": 14.356
+      "tps_avg": 33.53,
+      "tps_min": 33.42,
+      "tps_max": 33.65,
+      "eval_count_avg": 163,
+      "total_s_avg": 38.016
     },
     {
       "perm": "force_gpu_99",
@@ -95,11 +88,11 @@
         "num_gpu": 99
       },
       "status": "ok",
-      "tps_avg": 37.42,
-      "tps_min": 37.23,
-      "tps_max": 37.6,
-      "eval_count_avg": 192,
-      "total_s_avg": 15.074
+      "tps_avg": 33.63,
+      "tps_min": 33.57,
+      "tps_max": 33.68,
+      "eval_count_avg": 163,
+      "total_s_avg": 30.167
     }
   ]
 }

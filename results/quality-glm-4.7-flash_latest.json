@@ -1,8 +1,8 @@
 {
   "benchmark": "quality",
   "run_started_at": "2026-03-12T17:55:16.413437+00:00",
-  "run_finished_at": "2026-03-12T18:06:43.723419+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-lfm2_24b.json",
+  "run_finished_at": "2026-03-12T18:08:04.288383+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-glm-4.7-flash_latest.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
     "captured_at": "2026-03-12T17:55:18.007272+00:00",
@@ -32,18 +32,18 @@
     ]
   },
   "models": [
-    "lfm2:24b"
+    "glm-4.7-flash:latest"
   ],
   "results": [
     {
-      "model": "lfm2:24b",
+      "model": "glm-4.7-flash:latest",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,
       "tool_total": 2,
-      "agentic_pass": 0,
+      "agentic_pass": 1,
       "agentic_total": 1,
-      "score": 4,
+      "score": 5,
       "score_max": 5
     }
   ]

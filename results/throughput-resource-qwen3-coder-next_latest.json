@@ -1,8 +1,8 @@
 {
   "benchmark": "throughput_resource",
   "run_started_at": "2026-03-12T17:55:15.9211610+00:00",
-  "run_finished_at": "2026-03-12T17:56:47.2625300+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2_24b.json",
+  "run_finished_at": "2026-03-12T17:56:21.8816196+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3-coder-next_latest.json",
   "host": "STRIX",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
@@ -33,26 +33,26 @@
     ]
   },
   "models": [
-    "lfm2:24b"
+    "qwen3-coder-next:latest"
   ],
   "prompt": "Write a concise explanation of dependency injection with one short Python example.",
   "num_predict": 192,
   "seed": 42,
   "results": [
     {
-      "model": "lfm2:24b",
-      "eval_count": 190,
-      "eval_s": 5.723,
-      "toks_per_s": 33.2,
-      "total_s": 5.998,
-      "load_s": 0.058,
-      "cpu_avg_pct": 0.0,
-      "cpu_peak_pct": 0.0,
-      "ram_peak_gb": 1.23,
-      "gpu_util_avg": 37.2,
-      "gpu_util_peak": 38.8,
-      "gpu_mem_peak_gb": 15.37,
-      "ollama_ps": null
+      "model": "qwen3-coder-next:latest",
+      "eval_count": 167,
+      "eval_s": 5.131,
+      "toks_per_s": 32.55,
+      "total_s": 8.59,
+      "load_s": 0.129,
+      "cpu_avg_pct": 4.7,
+      "cpu_peak_pct": 5.4,
+      "ram_peak_gb": 1.6,
+      "gpu_util_avg": 82.3,
+      "gpu_util_peak": 82.7,
+      "gpu_mem_peak_gb": 57.85,
+      "ollama_ps": "qwen3-coder-next:latest    ca06e9e4087c    61 GB    100% GPU     262144     4 minutes from now    "
     }
   ]
 }

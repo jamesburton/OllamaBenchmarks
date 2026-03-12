@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-03-12T16:13:10.435952+00:00",
+  "updated_at": "2026-03-12T19:26:27.044907+00:00",
   "benchmark_suite": [
     "qwen3-coder-next:latest",
     "lfm2:24b",
@@ -9,11 +9,19 @@
     "qwen3-coder-next:q8_0"
   ],
   "local_installed": [
-    "rnj-1:8b",
-    "lfm2.5-thinking:1.2b",
+    "nemotron-3-super:latest",
+    "qwen3.5:122b-a10b",
+    "devstral-small-2:24b-instruct-2512-q8_0",
+    "lfm2:24b",
     "ministral-3:14b",
-    "qwen3.5:latest",
-    "codellama:70b"
+    "glm-4.7-flash:bf16",
+    "MichelRosselli/GLM-4.5-Air:latest",
+    "gpt-oss:120b",
+    "qwen3-coder-next:latest",
+    "granite4:32b-a9b-h",
+    "glm-4.7-flash:latest",
+    "qwen3-coder-next:q8_0",
+    "qwen3.5:122b"
   ],
   "effective_models": [
     "qwen3-coder-next:latest",
@@ -22,18 +30,13 @@
     "glm-4.7-flash:latest",
     "glm-4.7-flash:bf16",
     "qwen3-coder-next:q8_0",
-    "codellama:70b",
-    "lfm2.5-thinking:1.2b",
+    "MichelRosselli/GLM-4.5-Air:latest",
+    "devstral-small-2:24b-instruct-2512-q8_0",
+    "gpt-oss:120b",
     "ministral-3:14b",
-    "qwen3.5:latest",
-    "rnj-1:8b"
+    "nemotron-3-super:latest",
+    "qwen3.5:122b",
+    "qwen3.5:122b-a10b"
   ],
-  "missing_from_local": [
-    "qwen3-coder-next:latest",
-    "lfm2:24b",
-    "granite4:32b-a9b-h",
-    "glm-4.7-flash:latest",
-    "glm-4.7-flash:bf16",
-    "qwen3-coder-next:q8_0"
-  ]
+  "missing_from_local": []
 }

@@ -1,44 +1,37 @@
 {
   "benchmark": "backend_comparison",
-  "run_started_at": "2026-03-12T16:13:54.3646322+00:00",
-  "run_finished_at": "2026-03-12T16:14:04.4916844+00:00",
+  "run_started_at": "2026-03-12T18:20:49.1297136+00:00",
+  "run_finished_at": "2026-03-12T18:22:58.2713046+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-current.json",
-  "host": "FRAMEWORK",
+  "host": "STRIX",
   "host_details": {
-    "captured_at": "2026-03-12T16:14:04.191896+00:00",
-    "hostname": "Framework",
-    "host_slug": "framework",
+    "captured_at": "2026-03-12T18:22:58.04404+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
     "os": {
       "system": "Windows",
-      "release": "10",
-      "version": "10.0.26220",
+      "release": "11",
+      "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": "Framework",
-    "model": "Laptop 13 (Intel Core Ultra Series 1)",
-    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
-    "logical_cpu_count": 22,
-    "total_memory_gb": 95.47,
-    "python_version": "3.10.13",
-    "ollama_version": "ollama version is 0.17.5",
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.17.6",
     "gpus": [
       {
-        "Name": "Intel(R) Arc(TM) Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7026",
-        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
-        "Status": "OK"
-      },
-      {
-        "Name": "NVIDIA GeForce RTX 3060",
+        "Name": "AMD Radeon(TM) 8060S Graphics",
         "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.9186",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
         "Status": "OK"
       }
     ]
   },
-  "model": "qwen3.5:latest",
+  "model": "qwen3-coder-next:latest",
   "num_ctx": 8192,
   "think": false,
   "backends": [
@@ -49,18 +42,22 @@
   "results": [
     {
       "lib": "auto",
-      "status": "request_failed",
-      "error": "Response status code does not indicate success: 404 (Not Found)."
+      "status": "ok",
+      "toks_per_s": 6.51,
+      "e2e_toks_per_s": 6.25,
+      "total_s": 26.087
     },
     {
       "lib": "vulkan",
       "status": "request_failed",
-      "error": "Response status code does not indicate success: 404 (Not Found)."
+      "error": "Response status code does not indicate success: 500 (Internal Server Error)."
     },
     {
       "lib": "rocm",
-      "status": "request_failed",
-      "error": "Response status code does not indicate success: 404 (Not Found)."
+      "status": "ok",
+      "toks_per_s": 6.8,
+      "e2e_toks_per_s": 6.49,
+      "total_s": 25.11
     }
   ]
 }

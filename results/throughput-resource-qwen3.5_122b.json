@@ -1,12 +1,12 @@
 {
   "benchmark": "throughput_resource",
-  "run_started_at": "2026-03-12T17:55:15.9211610+00:00",
-  "run_finished_at": "2026-03-12T17:56:47.2625300+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2_24b.json",
+  "run_started_at": "2026-03-12T19:54:57.9700817+00:00",
+  "run_finished_at": "2026-03-12T20:04:48.1526886+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3.5_122b.json",
   "host": "STRIX",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-12T17:55:18.006607+00:00",
+    "captured_at": "2026-03-12T19:54:58.991225+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -21,7 +21,7 @@
     "logical_cpu_count": 32,
     "total_memory_gb": 63.65,
     "python_version": "3.14.3",
-    "ollama_version": "ollama version is 0.17.6",
+    "ollama_version": "ollama version is 0.17.7",
     "gpus": [
       {
         "Name": "AMD Radeon(TM) 8060S Graphics",
@@ -33,26 +33,26 @@
     ]
   },
   "models": [
-    "lfm2:24b"
+    "qwen3.5:122b"
   ],
   "prompt": "Write a concise explanation of dependency injection with one short Python example.",
   "num_predict": 192,
   "seed": 42,
   "results": [
     {
-      "model": "lfm2:24b",
-      "eval_count": 190,
-      "eval_s": 5.723,
-      "toks_per_s": 33.2,
-      "total_s": 5.998,
-      "load_s": 0.058,
-      "cpu_avg_pct": 0.0,
-      "cpu_peak_pct": 0.0,
-      "ram_peak_gb": 1.23,
-      "gpu_util_avg": 37.2,
-      "gpu_util_peak": 38.8,
-      "gpu_mem_peak_gb": 15.37,
-      "ollama_ps": null
+      "model": "qwen3.5:122b",
+      "eval_count": 192,
+      "eval_s": 26.779,
+      "toks_per_s": 7.17,
+      "total_s": 27.785,
+      "load_s": 0.146,
+      "cpu_avg_pct": 34.7,
+      "cpu_peak_pct": 41.1,
+      "ram_peak_gb": 33.88,
+      "gpu_util_avg": 19.8,
+      "gpu_util_peak": 24.3,
+      "gpu_mem_peak_gb": 61.94,
+      "ollama_ps": "qwen3.5:122b    8b9d11d807c5    97 GB    33%/67% CPU/GPU    262144     4 minutes from now    "
     }
   ]
 }

@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-12T17:55:16.413437+00:00",
-  "run_finished_at": "2026-03-12T18:06:43.723419+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-lfm2_24b.json",
+  "run_started_at": "2026-03-12T20:05:35.381720+00:00",
+  "run_finished_at": "2026-03-12T20:16:13.104341+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-devstral-small-2_24b-instruct-2512-q8_0.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-12T17:55:18.007272+00:00",
+    "captured_at": "2026-03-12T20:05:36.297401+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -20,7 +20,7 @@
     "logical_cpu_count": 32,
     "total_memory_gb": 63.65,
     "python_version": "3.14.3",
-    "ollama_version": "ollama version is 0.17.6",
+    "ollama_version": "ollama version is 0.17.7",
     "gpus": [
       {
         "Name": "AMD Radeon(TM) 8060S Graphics",
@@ -32,18 +32,18 @@
     ]
   },
   "models": [
-    "lfm2:24b"
+    "devstral-small-2:24b-instruct-2512-q8_0"
   ],
   "results": [
     {
-      "model": "lfm2:24b",
+      "model": "devstral-small-2:24b-instruct-2512-q8_0",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,
       "tool_total": 2,
-      "agentic_pass": 0,
+      "agentic_pass": 1,
       "agentic_total": 1,
-      "score": 4,
+      "score": 5,
       "score_max": 5
     }
   ]
