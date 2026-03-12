@@ -14,7 +14,6 @@ DEFAULT_FILES = {
     "quality": DEFAULT_RESULTS / "quality-current.json",
     "backend": DEFAULT_RESULTS / "backend-comparison-current.json",
     "sweep": DEFAULT_RESULTS / "optimization-sweep-current.json",
-    "session_summary": DEFAULT_RESULTS / "session-2026-03-11-summary.md",
 }
 PRIMARY_MODEL_PREFERENCE = [
     "qwen3-coder-next:latest",
@@ -78,6 +77,13 @@ def summarize_backend(backend: dict[str, Any]) -> str | None:
     return f"{leader['lib']} led at {leader['toks_per_s']} tok/s."
 
 
+def find_latest_session_summary(results_root: pathlib.Path) -> pathlib.Path | None:
+    session_summaries = sorted(results_root.glob("session-*.md"))
+    if not session_summaries:
+        return None
+    return session_summaries[-1]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--results-root", default=str(DEFAULT_RESULTS))
@@ -94,8 +100,13 @@ def main() -> None:
 
     copied_files: dict[str, str] = {}
     loaded_json: dict[str, dict[str, Any]] = {}
-    for key, relative_path in DEFAULT_FILES.items():
-        source = results_root / relative_path.name
+    source_files = dict(DEFAULT_FILES)
+    latest_session_summary = find_latest_session_summary(results_root)
+    if latest_session_summary:
+        source_files["session_summary"] = latest_session_summary
+
+    for key, relative_path in source_files.items():
+        source = relative_path if relative_path.is_absolute() else results_root / relative_path.name
         if not source.exists():
             continue
         destination = system_dir / relative_path.name

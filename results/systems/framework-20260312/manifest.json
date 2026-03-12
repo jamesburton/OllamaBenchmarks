@@ -1,0 +1,72 @@
+{
+  "captured_at": "2026-03-12T16:31:25.257777+00:00",
+  "system_id": "framework-20260312",
+  "system_dir": "C:\\Development\\OllamaBenchmarks\\results\\systems\\framework-20260312",
+  "host_info_file": "host-info.json",
+  "artifacts": {
+    "throughput": "throughput-resource-current.json",
+    "quality": "quality-current.json",
+    "backend": "backend-comparison-current.json",
+    "sweep": "optimization-sweep-current.json",
+    "session_summary": "session-2026-03-12-summary.md"
+  },
+  "host": {
+    "captured_at": "2026-03-12T16:31:22.583107+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26220",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 22,
+    "total_memory_gb": 95.47,
+    "python_version": "3.10.13",
+    "ollama_version": "ollama version is 0.17.5",
+    "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7026",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "summary": {
+    "fastest_model": {
+      "model": "lfm2.5-thinking:1.2b",
+      "toks_per_s": 205.66,
+      "score": 0,
+      "score_max": 5
+    },
+    "primary_coding_model": {
+      "model": "qwen3.5:latest",
+      "toks_per_s": 37.71,
+      "score": 5,
+      "score_max": 5
+    },
+    "best_balanced_model": {
+      "model": "qwen3.5:latest",
+      "toks_per_s": 37.71,
+      "score": 5,
+      "score_max": 5
+    },
+    "full_quality_models": [
+      "qwen3.5:latest",
+      "ministral-3:14b"
+    ],
+    "backend_summary": null
+  }
+}

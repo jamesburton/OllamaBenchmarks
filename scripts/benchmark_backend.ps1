@@ -57,6 +57,21 @@ function Get-ThinkValue {
   return $false
 }
 
+function Get-ModelsPath {
+  if ($env:OLLAMA_MODELS) {
+    return $env:OLLAMA_MODELS
+  }
+
+  if ($env:USERPROFILE) {
+    $default = Join-Path $env:USERPROFILE ".ollama\models"
+    if (Test-Path $default) {
+      return $default
+    }
+  }
+
+  return $null
+}
+
 if (-not $Model) {
   throw "Pass -Model <name>."
 }
@@ -74,7 +89,7 @@ function Test-Lib {
     [string]$ModelName
   )
 
-  $modelsPath = $env:OLLAMA_MODELS
+  $modelsPath = Get-ModelsPath
   $job = Start-Job -ScriptBlock {
     param($lib, $port, $ctx, $modelsPath)
     $env:OLLAMA_HOST = "127.0.0.1:$port"

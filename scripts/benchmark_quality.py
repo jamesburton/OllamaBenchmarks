@@ -90,6 +90,16 @@ PLAN_AGENT_TASKS = [
 ]
 
 
+def model_slug(model: str) -> str:
+    return re.sub(r"[^\w\.-]", "_", model.replace(":", "_").replace("/", "_").replace("\\", "_"))
+
+
+def write_json(path: str, payload: dict[str, Any]) -> None:
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, indent=2) + "\n")
+
+
 def post_json(path: str, payload: dict, timeout: int = 1200) -> dict:
     req = urllib.request.Request(
         f"http://127.0.0.1:11434{path}",
@@ -382,6 +392,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--models", nargs="+", required=True)
     parser.add_argument("--output")
+    parser.add_argument("--checkpoint-dir")
     args = parser.parse_args()
     run_started_at = datetime.datetime.now(datetime.timezone.utc)
     if not args.output:
@@ -390,22 +401,90 @@ def main() -> None:
             "results",
             f"quality-{run_started_at.strftime('%Y%m%d-%H%M%S')}.json",
         )
+    checkpoint_dir = args.checkpoint_dir or os.path.dirname(args.output) or "."
+    host_details = build_host_info()
+    results: list[dict[str, Any]] = []
+    failed_models: list[dict[str, str]] = []
 
-    results = [run_model(model) for model in args.models]
+    def build_payload() -> dict[str, Any]:
+        completed_models = [row["model"] for row in results]
+        failed_model_names = [item["model"] for item in failed_models]
+        return {
+            "benchmark": "quality",
+            "run_started_at": run_started_at.isoformat(),
+            "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "output_path": os.path.abspath(args.output),
+            "ollama_host": "http://127.0.0.1:11434",
+            "host_details": host_details,
+            "models": args.models,
+            "completed_models": completed_models,
+            "failed_models": failed_models,
+            "incomplete_models": [
+                model for model in args.models if model not in completed_models and model not in failed_model_names
+            ],
+            "results": results,
+        }
+
+    for model in args.models:
+        try:
+            row = run_model(model)
+            results.append(row)
+            per_model_path = os.path.join(checkpoint_dir, f"quality-{model_slug(model)}.json")
+            write_json(
+                per_model_path,
+                {
+                    "benchmark": "quality",
+                    "run_started_at": run_started_at.isoformat(),
+                    "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "output_path": os.path.abspath(per_model_path),
+                    "ollama_host": "http://127.0.0.1:11434",
+                    "host_details": host_details,
+                    "models": [model],
+                    "results": [row],
+                },
+            )
+        except Exception as exc:
+            failed_models.append({"model": model, "error": str(exc)})
+            per_model_path = os.path.join(checkpoint_dir, f"quality-{model_slug(model)}.json")
+            write_json(
+                per_model_path,
+                {
+                    "benchmark": "quality",
+                    "run_started_at": run_started_at.isoformat(),
+                    "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "output_path": os.path.abspath(per_model_path),
+                    "ollama_host": "http://127.0.0.1:11434",
+                    "host_details": host_details,
+                    "models": [model],
+                    "completed_models": [],
+                    "failed_models": [{"model": model, "error": str(exc)}],
+                    "incomplete_models": [],
+                    "results": [],
+                },
+            )
+
+        write_json(args.output, build_payload())
+
     payload_obj = {
         "benchmark": "quality",
         "run_started_at": run_started_at.isoformat(),
         "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "output_path": os.path.abspath(args.output),
         "ollama_host": "http://127.0.0.1:11434",
-        "host_details": build_host_info(),
+        "host_details": host_details,
         "models": args.models,
+        "completed_models": [row["model"] for row in results],
+        "failed_models": failed_models,
+        "incomplete_models": [
+            model
+            for model in args.models
+            if model not in [row["model"] for row in results]
+            and model not in [item["model"] for item in failed_models]
+        ],
         "results": results,
     }
     payload = json.dumps(payload_obj, indent=2)
-    os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
-    with open(args.output, "w", encoding="utf-8") as handle:
-        handle.write(payload + "\n")
+    write_json(args.output, payload_obj)
     print(payload)
 
 

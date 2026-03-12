@@ -1,0 +1,39 @@
+{
+  "updated_at": "2026-03-12T16:13:10.435952+00:00",
+  "benchmark_suite": [
+    "qwen3-coder-next:latest",
+    "lfm2:24b",
+    "granite4:32b-a9b-h",
+    "glm-4.7-flash:latest",
+    "glm-4.7-flash:bf16",
+    "qwen3-coder-next:q8_0"
+  ],
+  "local_installed": [
+    "rnj-1:8b",
+    "lfm2.5-thinking:1.2b",
+    "ministral-3:14b",
+    "qwen3.5:latest",
+    "codellama:70b"
+  ],
+  "effective_models": [
+    "qwen3-coder-next:latest",
+    "lfm2:24b",
+    "granite4:32b-a9b-h",
+    "glm-4.7-flash:latest",
+    "glm-4.7-flash:bf16",
+    "qwen3-coder-next:q8_0",
+    "codellama:70b",
+    "lfm2.5-thinking:1.2b",
+    "ministral-3:14b",
+    "qwen3.5:latest",
+    "rnj-1:8b"
+  ],
+  "missing_from_local": [
+    "qwen3-coder-next:latest",
+    "lfm2:24b",
+    "granite4:32b-a9b-h",
+    "glm-4.7-flash:latest",
+    "glm-4.7-flash:bf16",
+    "qwen3-coder-next:q8_0"
+  ]
+}

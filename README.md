@@ -9,6 +9,7 @@ Local benchmark harness and captured results for evaluating Ollama models on a S
 - `scripts/benchmark_quality.py` runs a compact coding, tool-use, and agent-orchestration quality suite.
 - `scripts/benchmark_backend.ps1` compares `auto`, `vulkan`, and `rocm` backend selection by launching isolated Ollama servers on alternate ports.
 - `scripts/benchmark_sweep.py` runs decode-side option sweeps for a single model.
+- Multi-model throughput and quality runs now checkpoint one JSON artifact per model and keep the combined `*-current.json` refreshed as they progress.
 - `scripts/collect_host_info.py` captures machine metadata for archived benchmark snapshots.
 - `scripts/archive_system_benchmarks.py` snapshots the current benchmark artifacts under `results/systems/<host>-<label>/`.
 - `scripts/build_cross_system_summary.py` rebuilds the comparison table across all archived systems.
@@ -102,6 +103,7 @@ Default sweep variants:
 - `num_gpu=99`
 
 Each script still accepts an explicit output path if you want a deterministic filename. The generated JSON now includes run metadata such as timestamps, model list, benchmark type, and the resolved artifact path.
+When throughput or quality runs cover multiple models, they also write per-model checkpoint files such as `results/throughput-resource-<model>.json` and `results/quality-<model>.json`, then roll those into the combined current artifact.
 
 ## Cross-system workflow
 

@@ -1,31 +1,38 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-11T20:44:13.857162+00:00",
-  "run_finished_at": "2026-03-11T20:44:23.349999+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-ministral-3_14b.json",
+  "run_started_at": "2026-03-12T16:25:41.417902+00:00",
+  "run_finished_at": "2026-03-12T16:28:35.880650+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-ministral-3_14b.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-11T20:44:27.864200+00:00",
-    "hostname": "T5500",
-    "host_slug": "t5500",
+    "captured_at": "2026-03-12T16:25:43.266975+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
     "os": {
       "system": "Windows",
       "release": "10",
-      "version": "10.0.26200",
+      "version": "10.0.26220",
       "machine": "AMD64"
     },
-    "manufacturer": "Dell Inc.",
-    "model": "Precision WorkStation T5500  ",
-    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-    "logical_cpu_count": 24,
-    "total_memory_gb": 36.0,
-    "python_version": "3.11.3",
-    "ollama_version": "ollama version is 0.17.7",
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 22,
+    "total_memory_gb": 95.47,
+    "python_version": "3.10.13",
+    "ollama_version": "ollama version is 0.17.5",
     "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7026",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
       {
         "Name": "NVIDIA GeForce RTX 3060",
         "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.6094",
+        "DriverVersion": "32.0.15.9186",
         "VideoProcessor": "NVIDIA GeForce RTX 3060",
         "Status": "OK"
       }
@@ -41,8 +48,10 @@
       "coding_total": 2,
       "tool_pass": 2,
       "tool_total": 2,
-      "score": 4,
-      "score_max": 4
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 5,
+      "score_max": 5
     }
   ]
 }
