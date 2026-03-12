@@ -8,6 +8,22 @@ Systems captured: 3
 | strix-20260311 | Windows 11 | AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD / 63.65 GB | AMD Radeon(TM) 8060S Graphics | qwen3-coder-next:latest (33.92 tok/s) (5/5) | glm-4.7-flash:latest (43.11 tok/s) (5/5) | glm-4.7-flash:latest (43.11 tok/s) (5/5) | auto led at 33.89 tok/s; rocm followed at 33.1 tok/s. |
 | t5500-20260311-xeon3060 | Windows 10 | Intel64 Family 6 Model 44 Stepping 2, GenuineIntel / 36.0 GB | NVIDIA GeForce RTX 3060 | lfm2:24b (11.67 tok/s) (4/4) | ministral-3:14b (29.68 tok/s) (4/4) | lfm2.5-thinking:latest (220.75 tok/s) (0/4) | auto led at 20.09 tok/s; rocm followed at 7.57 tok/s. |
 
+## T5500 Not Run (N/A)
+
+The following models are listed in the repo but were not run on the T5500 due to RAM/VRAM constraints:
+
+- devstral-small-2:24b-instruct-2512-q8_0
+- glm-4.7-flash:bf16
+- glm-4.7-flash:latest
+- gpt-oss:120b
+- granite4:32b-a9b-h
+- MichelRosselli/GLM-4.5-Air:latest
+- nemotron-3-super:latest
+- qwen3.5:122b
+- qwen3.5:122b-a10b
+- qwen3-coder-next:latest
+- qwen3-coder-next:q8_0
+
 ## Update Process
 
 1. Run the benchmark scripts to refresh the `*-current.json` artifacts for the target system.
