@@ -1,12 +1,12 @@
 {
   "benchmark": "throughput_resource",
   "run_started_at": "2026-03-12T16:14:51.4066519+00:00",
-  "run_finished_at": "2026-03-12T20:05:23.5240471+00:00",
+  "run_finished_at": "2026-03-13T12:52:00.3429469+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-current.json",
   "host": "STRIX",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-12T19:54:58.991225+00:00",
+    "captured_at": "2026-03-13T12:50:19.548945+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -39,6 +39,7 @@
     "glm-4.7-flash:latest",
     "glm-4.7-flash:bf16",
     "qwen3-coder-next:q8_0",
+    "nemotron-3-nano:latest",
     "MichelRosselli/GLM-4.5-Air:latest",
     "devstral-small-2:24b-instruct-2512-q8_0",
     "gpt-oss:120b",
@@ -54,6 +55,7 @@
     "glm-4.7-flash:latest",
     "glm-4.7-flash:bf16",
     "qwen3-coder-next:q8_0",
+    "nemotron-3-nano:latest",
     "MichelRosselli/GLM-4.5-Air:latest",
     "devstral-small-2:24b-instruct-2512-q8_0",
     "gpt-oss:120b",
@@ -159,6 +161,21 @@
       "ollama_ps": "qwen3-coder-next:q8_0    3f68e12b44ee    94 GB    33%/67% CPU/GPU    262144     Less than a second ago    "
     },
     {
+      "model": "nemotron-3-nano:latest",
+      "eval_count": 192,
+      "eval_s": 3.255,
+      "toks_per_s": 58.99,
+      "total_s": 3.787,
+      "load_s": 0.086,
+      "cpu_avg_pct": 2.4,
+      "cpu_peak_pct": 2.4,
+      "ram_peak_gb": 2.04,
+      "gpu_util_avg": 53.3,
+      "gpu_util_peak": 80.7,
+      "gpu_mem_peak_gb": 26.84,
+      "ollama_ps": "nemotron-3-nano:latest    b725f1117407    27 GB    100% GPU     262144     4 minutes from now    "
+    },
+    {
       "model": "MichelRosselli/GLM-4.5-Air:latest",
       "eval_count": 192,
       "eval_s": 88.532,
@@ -221,17 +238,17 @@
     {
       "model": "nemotron-3-super:latest",
       "eval_count": 192,
-      "eval_s": 20.729,
-      "toks_per_s": 9.26,
-      "total_s": 21.95,
-      "load_s": 0.229,
-      "cpu_avg_pct": 29.0,
-      "cpu_peak_pct": 34.5,
-      "ram_peak_gb": 31.02,
-      "gpu_util_avg": 21.8,
-      "gpu_util_peak": 36.2,
-      "gpu_mem_peak_gb": 61.24,
-      "ollama_ps": "nemotron-3-super:latest    95acc78b3ffd    95 GB    33%/67% CPU/GPU    262144     4 minutes from now    "
+      "eval_s": 20.315,
+      "toks_per_s": 9.45,
+      "total_s": 21.289,
+      "load_s": 0.122,
+      "cpu_avg_pct": 30.0,
+      "cpu_peak_pct": 34.3,
+      "ram_peak_gb": 29.46,
+      "gpu_util_avg": 35.4,
+      "gpu_util_peak": 48.9,
+      "gpu_mem_peak_gb": 62.94,
+      "ollama_ps": "nemotron-3-super:latest    95acc78b3ffd    95 GB    30%/70% CPU/GPU    262144     4 minutes from now    "
     },
     {
       "model": "qwen3.5:122b",

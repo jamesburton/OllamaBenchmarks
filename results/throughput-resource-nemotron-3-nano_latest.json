@@ -1,8 +1,8 @@
 {
   "benchmark": "throughput_resource",
   "run_started_at": "2026-03-13T12:50:18.5257231+00:00",
-  "run_finished_at": "2026-03-13T12:51:32.4058279+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-nemotron-3-super_latest.json",
+  "run_finished_at": "2026-03-13T12:52:00.3429469+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-nemotron-3-nano_latest.json",
   "host": "STRIX",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
@@ -33,26 +33,26 @@
     ]
   },
   "models": [
-    "nemotron-3-super:latest"
+    "nemotron-3-nano:latest"
   ],
   "prompt": "Write a concise explanation of dependency injection with one short Python example.",
   "num_predict": 192,
   "seed": 42,
   "results": [
     {
-      "model": "nemotron-3-super:latest",
+      "model": "nemotron-3-nano:latest",
       "eval_count": 192,
-      "eval_s": 20.315,
-      "toks_per_s": 9.45,
-      "total_s": 21.289,
-      "load_s": 0.122,
-      "cpu_avg_pct": 30.0,
-      "cpu_peak_pct": 34.3,
-      "ram_peak_gb": 29.46,
-      "gpu_util_avg": 35.4,
-      "gpu_util_peak": 48.9,
-      "gpu_mem_peak_gb": 62.94,
-      "ollama_ps": "nemotron-3-super:latest    95acc78b3ffd    95 GB    30%/70% CPU/GPU    262144     4 minutes from now    "
+      "eval_s": 3.255,
+      "toks_per_s": 58.99,
+      "total_s": 3.787,
+      "load_s": 0.086,
+      "cpu_avg_pct": 2.4,
+      "cpu_peak_pct": 2.4,
+      "ram_peak_gb": 2.04,
+      "gpu_util_avg": 53.3,
+      "gpu_util_peak": 80.7,
+      "gpu_mem_peak_gb": 26.84,
+      "ollama_ps": "nemotron-3-nano:latest    b725f1117407    27 GB    100% GPU     262144     4 minutes from now    "
     }
   ]
 }

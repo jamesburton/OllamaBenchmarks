@@ -32,14 +32,16 @@ function Invoke-OllamaGenerate {
     [int]$SeedValue
   )
 
+  $sampling = Get-SamplingOptions -Model $Model -UseCase "general"
+
   $body = @{
     model = $Model
     prompt = $PromptText
     stream = $false
     options = @{
       num_predict = $PredictCount
-      temperature = 0
-      top_p = 1
+      temperature = $sampling.temperature
+      top_p = $sampling.top_p
       seed = $SeedValue
     }
   } | ConvertTo-Json -Depth 8 -Compress
@@ -53,6 +55,32 @@ function Get-ModelSlug {
   )
 
   return (($Model -replace "[:/\\]", "_") -replace "[^\w\.-]", "_")
+}
+
+function Get-SamplingOptions {
+  param(
+    [string]$Model,
+    [string]$UseCase = "general"
+  )
+
+  if ($Model -like "nemotron-3-super*" -or $Model -like "nemotron-3-nano*") {
+    if ($UseCase -eq "tool") {
+      return @{
+        temperature = 0.6
+        top_p = 0.95
+      }
+    }
+
+    return @{
+      temperature = 1.0
+      top_p = 1.0
+    }
+  }
+
+  return @{
+    temperature = 0
+    top_p = 1
+  }
 }
 
 function Get-CheckpointPath {
@@ -178,8 +206,8 @@ foreach ($model in $Models) {
       stream = $false
       options = @{
         num_predict = $NumPredict
-        temperature = 0
-        top_p = 1
+        temperature = (Get-SamplingOptions -Model $model -UseCase "general").temperature
+        top_p = (Get-SamplingOptions -Model $model -UseCase "general").top_p
         seed = $Seed
       }
     } | ConvertTo-Json -Depth 8 -Compress

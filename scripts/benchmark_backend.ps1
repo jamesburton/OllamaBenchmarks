@@ -57,6 +57,32 @@ function Get-ThinkValue {
   return $false
 }
 
+function Get-SamplingOptions {
+  param(
+    [string]$ModelName,
+    [string]$UseCase = "general"
+  )
+
+  if ($ModelName -like "nemotron-3-super*" -or $ModelName -like "nemotron-3-nano*") {
+    if ($UseCase -eq "tool") {
+      return @{
+        temperature = 0.6
+        top_p = 0.95
+      }
+    }
+
+    return @{
+      temperature = 1.0
+      top_p = 1.0
+    }
+  }
+
+  return @{
+    temperature = 0
+    top_p = 1
+  }
+}
+
 function Get-ModelsPath {
   if ($env:OLLAMA_MODELS) {
     return $env:OLLAMA_MODELS
@@ -123,12 +149,13 @@ function Test-Lib {
 
     try {
       $think = Get-ThinkValue -ModelName $ModelName
+      $sampling = Get-SamplingOptions -ModelName $ModelName -UseCase "general"
       $warm = @{
         model = $ModelName
         prompt = "Warmup"
         think = $think
         stream = $false
-        options = @{ num_predict = 16; temperature = 0; seed = 42; num_ctx = $NumCtx }
+        options = @{ num_predict = 16; temperature = $sampling.temperature; top_p = $sampling.top_p; seed = 42; num_ctx = $NumCtx }
       } | ConvertTo-Json -Depth 8 -Compress
       $null = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/generate" -Method Post -ContentType "application/json" -Body $warm -TimeoutSec 600
 
@@ -137,7 +164,7 @@ function Test-Lib {
         prompt = "Write a concise explanation of dependency injection with one short Python example."
         think = $think
         stream = $false
-        options = @{ num_predict = 192; temperature = 0; top_p = 1; seed = 42; num_ctx = $NumCtx }
+        options = @{ num_predict = 192; temperature = $sampling.temperature; top_p = $sampling.top_p; seed = 42; num_ctx = $NumCtx }
       } | ConvertTo-Json -Depth 8 -Compress
       $r = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/generate" -Method Post -ContentType "application/json" -Body $body -TimeoutSec 1200
 

@@ -117,6 +117,14 @@ def think_setting(model: str) -> Any:
     return False
 
 
+def sampling_options(model: str, use_case: str = "general") -> dict[str, Any]:
+    if model.startswith(("nemotron-3-super", "nemotron-3-nano")):
+        if use_case == "tool":
+            return {"temperature": 0.6, "top_p": 0.95}
+        return {"temperature": 1.0, "top_p": 1.0}
+    return {"temperature": 0, "top_p": 1}
+
+
 def parse_arguments(arguments: Any) -> dict[str, Any]:
     if isinstance(arguments, dict):
         return arguments
@@ -166,6 +174,7 @@ def run_python_asserts(code: str, asserts: list[str]) -> bool:
 
 
 def run_tool_task(model: str, prompt: str, tool: dict, expected_name: str, expected_args: dict[str, Any]) -> bool:
+    options = sampling_options(model, use_case="tool")
     response = post_json(
         "/api/chat",
         {
@@ -174,7 +183,7 @@ def run_tool_task(model: str, prompt: str, tool: dict, expected_name: str, expec
             "messages": [{"role": "user", "content": prompt}],
             "tools": [tool],
             "think": think_setting(model),
-            "options": {"temperature": 0, "num_predict": 100, "seed": 42},
+            "options": {**options, "num_predict": 100, "seed": 42},
         },
     )
     calls = (response.get("message") or {}).get("tool_calls") or []
@@ -188,6 +197,7 @@ def run_tool_task(model: str, prompt: str, tool: dict, expected_name: str, expec
 
 
 def run_plan_agent_task(model: str, task: dict[str, Any]) -> bool:
+    options = sampling_options(model, use_case="tool")
     tools = [
         {
             "type": "function",
@@ -244,7 +254,7 @@ def run_plan_agent_task(model: str, task: dict[str, Any]) -> bool:
             "messages": messages,
             "tools": tools,
             "think": think_setting(model),
-            "options": {"temperature": 0, "num_predict": 220, "seed": 42},
+            "options": {**options, "num_predict": 220, "seed": 42},
         },
     )
     message = first.get("message") or {}
@@ -288,7 +298,7 @@ def run_plan_agent_task(model: str, task: dict[str, Any]) -> bool:
             "messages": messages,
             "tools": tools,
             "think": think_setting(model),
-            "options": {"temperature": 0, "num_predict": 220, "seed": 42},
+            "options": {**options, "num_predict": 220, "seed": 42},
         },
     )
     second_message = second.get("message") or {}
@@ -325,7 +335,7 @@ def run_plan_agent_task(model: str, task: dict[str, Any]) -> bool:
             "messages": messages,
             "tools": tools,
             "think": think_setting(model),
-            "options": {"temperature": 0, "num_predict": 220, "seed": 42},
+            "options": {**options, "num_predict": 220, "seed": 42},
         },
     )
     third_message = third.get("message") or {}
@@ -341,6 +351,7 @@ def run_plan_agent_task(model: str, task: dict[str, Any]) -> bool:
 
 
 def run_model(model: str) -> dict:
+    general_options = sampling_options(model, use_case="general")
     row = {
         "model": model,
         "coding_pass": 0,
@@ -360,7 +371,7 @@ def run_model(model: str) -> dict:
                     "prompt": prompt,
                     "stream": False,
                     "think": think_setting(model),
-                    "options": {"temperature": 0, "num_predict": 220, "seed": 42},
+                    "options": {**general_options, "num_predict": 220, "seed": 42},
                 },
             )
             code = extract_code(response.get("response", ""))

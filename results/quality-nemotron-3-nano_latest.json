@@ -1,8 +1,8 @@
 {
   "benchmark": "quality",
   "run_started_at": "2026-03-13T12:52:06.349247+00:00",
-  "run_finished_at": "2026-03-13T12:54:44.747652+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-nemotron-3-super_latest.json",
+  "run_finished_at": "2026-03-13T12:55:15.852166+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-nemotron-3-nano_latest.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
     "captured_at": "2026-03-13T12:52:06.976776+00:00",
@@ -32,11 +32,11 @@
     ]
   },
   "models": [
-    "nemotron-3-super:latest"
+    "nemotron-3-nano:latest"
   ],
   "results": [
     {
-      "model": "nemotron-3-super:latest",
+      "model": "nemotron-3-nano:latest",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,

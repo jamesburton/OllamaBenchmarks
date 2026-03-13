@@ -1,0 +1,65 @@
+{
+  "benchmark": "backend_comparison",
+  "run_started_at": "2026-03-13T10:52:51.4056632+00:00",
+  "run_finished_at": "2026-03-13T10:57:03.0212038+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-gpt-oss_120b.json",
+  "host": "STRIX",
+  "host_details": {
+    "captured_at": "2026-03-13T10:57:02.917884+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.17.7",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
+  "model": "gpt-oss:120b",
+  "num_ctx": 8192,
+  "think": "low",
+  "backends": [
+    "auto",
+    "vulkan",
+    "rocm"
+  ],
+  "results": [
+    {
+      "lib": "auto",
+      "status": "ok",
+      "toks_per_s": 33.72,
+      "e2e_toks_per_s": 29.04,
+      "total_s": 6.612
+    },
+    {
+      "lib": "vulkan",
+      "status": "ok",
+      "toks_per_s": 2.75,
+      "e2e_toks_per_s": 2.44,
+      "total_s": 78.663
+    },
+    {
+      "lib": "rocm",
+      "status": "ok",
+      "toks_per_s": 33.4,
+      "e2e_toks_per_s": 28.66,
+      "total_s": 6.699
+    }
+  ]
+}
