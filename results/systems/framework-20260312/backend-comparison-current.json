@@ -1,11 +1,11 @@
 {
   "benchmark": "backend_comparison",
-  "run_started_at": "2026-03-12T16:13:54.3646322+00:00",
-  "run_finished_at": "2026-03-12T16:14:04.4916844+00:00",
+  "run_started_at": "2026-03-12T17:36:23.4555195+00:00",
+  "run_finished_at": "2026-03-12T17:41:29.0432431+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-current.json",
   "host": "FRAMEWORK",
   "host_details": {
-    "captured_at": "2026-03-12T16:14:04.191896+00:00",
+    "captured_at": "2026-03-12T17:41:26.216527+00:00",
     "hostname": "Framework",
     "host_slug": "framework",
     "os": {
@@ -49,18 +49,24 @@
   "results": [
     {
       "lib": "auto",
-      "status": "request_failed",
-      "error": "Response status code does not indicate success: 404 (Not Found)."
+      "status": "ok",
+      "toks_per_s": 2.97,
+      "e2e_toks_per_s": 2.81,
+      "total_s": 59.526
     },
     {
       "lib": "vulkan",
-      "status": "request_failed",
-      "error": "Response status code does not indicate success: 404 (Not Found)."
+      "status": "ok",
+      "toks_per_s": 2.29,
+      "e2e_toks_per_s": 2.15,
+      "total_s": 77.661
     },
     {
       "lib": "rocm",
-      "status": "request_failed",
-      "error": "Response status code does not indicate success: 404 (Not Found)."
+      "status": "ok",
+      "toks_per_s": 2.33,
+      "e2e_toks_per_s": 2.16,
+      "total_s": 77.335
     }
   ]
 }

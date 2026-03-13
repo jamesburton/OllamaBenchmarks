@@ -12,7 +12,11 @@
 
 ## Backend comparison on qwen3.5:latest
 
-The temporary alternate-port Ollama servers used by `benchmark_backend.ps1` still returned `404` for all three backends (`auto`, `vulkan`, `rocm`) on this machine, so there is no backend winner from this run yet.
+| Backend | Avg tok/s | Avg end-to-end tok/s | Total s | Notes |
+|---|---:|---:|---:|---|
+| auto | 2.97 | 2.81 | 59.526 | Best result on this machine |
+| vulkan | 2.29 | 2.15 | 77.661 | Slower than auto |
+| rocm | 2.33 | 2.16 | 77.335 | Slightly ahead of vulkan, but still behind auto |
 
 ## Option sweep on qwen3.5:latest
 
@@ -30,4 +34,4 @@ The temporary alternate-port Ollama servers used by `benchmark_backend.ps1` stil
 2. Keep `ministral-3:14b` as a second full-pass option when you want a different model family.
 3. Use `rnj-1:8b` when speed matters more than the agentic benchmark.
 4. Do not treat `lfm2.5-thinking:1.2b` as a coding benchmark winner despite its raw throughput.
-5. Investigate why the backend-comparison harness cannot resolve locally installed models from the temporary servers on this host.
+5. Keep `OLLAMA_LLM_LIBRARY` unset (`auto`) on this machine unless a future Ollama release materially changes backend behavior.

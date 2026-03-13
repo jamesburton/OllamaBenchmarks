@@ -1,13 +1,14 @@
 # OllamaBenchmarks
 
-Local benchmark harness and captured results for evaluating Ollama models on a Strix Halo 128 GB Windows system.
+Local benchmark harness and captured results for evaluating Ollama models across multiple Windows hosts.
 
 ## What is in this repo
 
-- `results/` contains reconstructed benchmark outputs from the March 11, 2026 session.
+- `results/` contains the current benchmark outputs plus archived system snapshots.
+- `benchmark-models.json` tracks the benchmark-suite models, locally installed models, and the combined effective benchmark list for the current machine.
 - `scripts/benchmark_throughput_resource.ps1` measures generation speed and samples CPU, RAM, GPU utilization, and GPU dedicated memory.
 - `scripts/benchmark_quality.py` runs a compact coding, tool-use, and agent-orchestration quality suite.
-- `scripts/benchmark_backend.ps1` compares `auto`, `vulkan`, and `rocm` backend selection by launching isolated Ollama servers on alternate ports.
+- `scripts/benchmark_backend.ps1` compares `auto`, `vulkan`, and `rocm` backend selection by launching isolated Ollama servers on alternate ports, and now preflights desktop-managed models so those temporary servers can resolve them reliably.
 - `scripts/benchmark_sweep.py` runs decode-side option sweeps for a single model.
 - Multi-model throughput and quality runs now checkpoint one JSON artifact per model and keep the combined `*-current.json` refreshed as they progress.
 - `scripts/collect_host_info.py` captures machine metadata for archived benchmark snapshots.
@@ -19,12 +20,13 @@ Local benchmark harness and captured results for evaluating Ollama models on a S
 
 ## Current headline findings
 
-- Best overall coding model from this session: `qwen3-coder-next:latest`
-- Best value contender: `lfm2:24b`
-- Best raw throughput: `glm-4.7-flash:latest`, but it underperformed on the quick quality checks used here
-- For this machine, forcing `vulkan` or `rocm` was slower than leaving `OLLAMA_LLM_LIBRARY` unset (`auto`)
+- Latest Framework capture (`2026-03-12`): `qwen3.5:latest` is the best overall local coding model at `37.71 tok/s` with a `5/5` quality pass.
+- `ministral-3:14b` also full-passed at `32.14 tok/s`; `rnj-1:8b` is faster at `46.60 tok/s` but missed the agentic task.
+- `lfm2.5-thinking:1.2b` is the local raw-throughput outlier at `205.66 tok/s`, but it failed the compact quality suite.
+- On the Framework machine, backend comparison on `qwen3.5:latest` now favors `auto` over both `vulkan` and `rocm`.
+- Across archived systems, the current strongest fully-tested coding captures remain `qwen3-coder-next:latest` on Strix Halo and `qwen3.5:latest` on the Framework machine.
 
-See [results/session-2026-03-11-summary.md](C:/Development/OllamaBenchmarks/results/session-2026-03-11-summary.md) for the consolidated table and interpretation.
+See [results/session-2026-03-12-summary.md](C:/Development/OllamaBenchmarks/results/session-2026-03-12-summary.md) for the latest Framework session summary.
 See [results/cross-system-summary.md](C:/Development/OllamaBenchmarks/results/cross-system-summary.md) for the rolling matrix across archived hosts.
 
 ## Quick start

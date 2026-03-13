@@ -98,6 +98,118 @@ function Get-ModelsPath {
   return $null
 }
 
+function Start-StandaloneServer {
+  param(
+    [string]$Lib,
+    [int]$Port,
+    [string]$ModelsPath
+  )
+
+  return Start-Job -ScriptBlock {
+    param($lib, $port, $ctx, $modelsPath)
+    $env:OLLAMA_HOST = "127.0.0.1:$port"
+    $env:OLLAMA_CONTEXT_LENGTH = "$ctx"
+    if ($modelsPath) {
+      $env:OLLAMA_MODELS = $modelsPath
+    }
+    if ($lib -ne "auto") {
+      $env:OLLAMA_LLM_LIBRARY = $lib
+    }
+    else {
+      Remove-Item Env:OLLAMA_LLM_LIBRARY -ErrorAction SilentlyContinue
+    }
+    $env:OLLAMA_DEBUG = "1"
+    ollama serve
+  } -ArgumentList $Lib, $Port, $NumCtx, $ModelsPath
+}
+
+function Wait-StandaloneServerReady {
+  param(
+    [int]$Port
+  )
+
+  for ($i = 0; $i -lt 40; $i++) {
+    Start-Sleep -Milliseconds 500
+    try {
+      $null = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/tags" -TimeoutSec 2
+      return $true
+    }
+    catch {}
+  }
+
+  return $false
+}
+
+function Get-StandaloneModelNames {
+  param(
+    [int]$Port
+  )
+
+  try {
+    $tags = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/tags" -TimeoutSec 5
+    return @($tags.models | ForEach-Object { $_.name })
+  }
+  catch {
+    return @()
+  }
+}
+
+function Ensure-StandaloneModelAvailable {
+  param(
+    [string]$ModelName
+  )
+
+  $modelsPath = Get-ModelsPath
+  $bootstrapPort = 11435 + $Backends.Count + 10
+  $job = Start-StandaloneServer -Lib "auto" -Port $bootstrapPort -ModelsPath $modelsPath
+
+  try {
+    if (-not (Wait-StandaloneServerReady -Port $bootstrapPort)) {
+      throw "Bootstrap Ollama server on port $bootstrapPort did not start."
+    }
+
+    $available = Get-StandaloneModelNames -Port $bootstrapPort
+    if ($available -contains $ModelName) {
+      return
+    }
+
+    Write-Host "Materializing standalone manifest for $ModelName"
+    $previousHost = $env:OLLAMA_HOST
+    try {
+      $env:OLLAMA_HOST = "127.0.0.1:$bootstrapPort"
+      ollama pull $ModelName | Out-Null
+    }
+    finally {
+      if ($null -eq $previousHost) {
+        Remove-Item Env:OLLAMA_HOST -ErrorAction SilentlyContinue
+      }
+      else {
+        $env:OLLAMA_HOST = $previousHost
+      }
+    }
+  }
+  finally {
+    Stop-Job $job -ErrorAction SilentlyContinue
+    Remove-Job $job -Force -ErrorAction SilentlyContinue
+  }
+
+  $verifyJob = Start-StandaloneServer -Lib "auto" -Port $bootstrapPort -ModelsPath $modelsPath
+  try {
+    if (-not (Wait-StandaloneServerReady -Port $bootstrapPort)) {
+      throw "Verification Ollama server on port $bootstrapPort did not start."
+    }
+
+    $available = Get-StandaloneModelNames -Port $bootstrapPort
+    if (-not ($available -contains $ModelName)) {
+      throw "Standalone Ollama server still cannot resolve '$ModelName'. Available models: $($available -join ', ')"
+    }
+  }
+  finally {
+    Stop-Job $verifyJob -ErrorAction SilentlyContinue
+    Remove-Job $verifyJob -Force -ErrorAction SilentlyContinue
+  }
+}
+
 if (-not $Model) {
   throw "Pass -Model <name>."
 }
@@ -108,6 +220,8 @@ if (-not $OutputPath) {
   $OutputPath = ".\\results\\backend-comparison-$stamp.json"
 }
 
+Ensure-StandaloneModelAvailable -ModelName $Model
+
 function Test-Lib {
   param(
     [string]$Lib,
@@ -116,34 +230,10 @@ function Test-Lib {
   )
 
   $modelsPath = Get-ModelsPath
-  $job = Start-Job -ScriptBlock {
-    param($lib, $port, $ctx, $modelsPath)
-    $env:OLLAMA_HOST = "127.0.0.1:$port"
-    $env:OLLAMA_CONTEXT_LENGTH = "$ctx"
-    if ($modelsPath) {
-      $env:OLLAMA_MODELS = $modelsPath
-    }
-    if ($lib -ne "auto") {
-      $env:OLLAMA_LLM_LIBRARY = $lib
-    } else {
-      Remove-Item Env:OLLAMA_LLM_LIBRARY -ErrorAction SilentlyContinue
-    }
-    $env:OLLAMA_DEBUG = "1"
-    ollama serve
-  } -ArgumentList $Lib, $Port, $NumCtx, $modelsPath
+  $job = Start-StandaloneServer -Lib $Lib -Port $Port -ModelsPath $modelsPath
 
   try {
-    $ready = $false
-    for ($i = 0; $i -lt 40; $i++) {
-      Start-Sleep -Milliseconds 500
-      try {
-        $null = Invoke-RestMethod -Uri "http://127.0.0.1:$Port/api/tags" -TimeoutSec 2
-        $ready = $true
-        break
-      } catch {}
-    }
-
-    if (-not $ready) {
+    if (-not (Wait-StandaloneServerReady -Port $Port)) {
       return [pscustomobject]@{ lib = $Lib; status = "startup_failed" }
     }
 

@@ -1,5 +1,5 @@
 {
-  "captured_at": "2026-03-12T16:31:25.257777+00:00",
+  "captured_at": "2026-03-12T17:43:43.061224+00:00",
   "system_id": "framework-20260312",
   "system_dir": "C:\\Development\\OllamaBenchmarks\\results\\systems\\framework-20260312",
   "host_info_file": "host-info.json",
@@ -11,7 +11,7 @@
     "session_summary": "session-2026-03-12-summary.md"
   },
   "host": {
-    "captured_at": "2026-03-12T16:31:22.583107+00:00",
+    "captured_at": "2026-03-12T17:43:42.444191+00:00",
     "hostname": "Framework",
     "host_slug": "framework",
     "os": {
@@ -67,6 +67,6 @@
       "qwen3.5:latest",
       "ministral-3:14b"
     ],
-    "backend_summary": null
+    "backend_summary": "auto led at 2.97 tok/s; rocm followed at 2.33 tok/s."
   }
 }
