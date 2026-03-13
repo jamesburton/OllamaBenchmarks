@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-13T14:55:16.857224+00:00",
-  "run_finished_at": "2026-03-13T15:15:28.467265+00:00",
+  "run_started_at": "2026-03-13T15:07:06.204523+00:00",
+  "run_finished_at": "2026-03-13T15:21:08.761915+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-phi4-mini_latest.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-13T14:55:33.058475+00:00",
+    "captured_at": "2026-03-13T15:07:10.895301+00:00",
     "hostname": "Framework",
     "host_slug": "framework",
     "os": {
@@ -41,11 +41,6 @@
   "models": [
     "phi4-mini:latest"
   ],
-  "completed_models": [
-    "phi4-mini:latest"
-  ],
-  "failed_models": [],
-  "incomplete_models": [],
   "results": [
     {
       "model": "phi4-mini:latest",
