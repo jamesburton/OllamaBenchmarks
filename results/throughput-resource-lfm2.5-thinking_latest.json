@@ -1,12 +1,12 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-11T19:43:17.8541467+00:00",
-    "run_finished_at":  "2026-03-11T19:43:41.7042616+00:00",
+    "run_started_at":  "2026-03-13T10:24:00.6138222+00:00",
+    "run_finished_at":  "2026-03-13T10:24:16.6970405+00:00",
     "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2.5-thinking_latest.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "captured_at":  "2026-03-11T19:43:41.604027+00:00",
+                         "captured_at":  "2026-03-13T10:24:03.878500+00:00",
                          "hostname":  "T5500",
                          "host_slug":  "t5500",
                          "os":  {
@@ -15,21 +15,15 @@
                                     "version":  "10.0.26200",
                                     "machine":  "AMD64"
                                 },
-                         "manufacturer":  "Dell Inc.",
-                         "model":  "Precision WorkStation T5500  ",
+                         "manufacturer":  null,
+                         "model":  null,
                          "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
                          "logical_cpu_count":  24,
-                         "total_memory_gb":  36.0,
+                         "total_memory_gb":  null,
                          "python_version":  "3.11.3",
-                         "ollama_version":  "ollama version is 0.17.7",
+                         "ollama_version":  null,
                          "gpus":  [
-                                      {
-                                          "Name":  "NVIDIA GeForce RTX 3060",
-                                          "AdapterRAM":  4293918720,
-                                          "DriverVersion":  "32.0.15.6094",
-                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
-                                          "Status":  "OK"
-                                      }
+
                                   ]
                      },
     "models":  [
@@ -42,17 +36,17 @@
                     {
                         "model":  "lfm2.5-thinking:latest",
                         "eval_count":  192,
-                        "eval_s":  0.87,
-                        "toks_per_s":  220.75,
-                        "total_s":  1.311,
-                        "load_s":  0.145,
+                        "eval_s":  0.944,
+                        "toks_per_s":  203.33,
+                        "total_s":  1.399,
+                        "load_s":  0.152,
                         "cpu_avg_pct":  0,
                         "cpu_peak_pct":  0,
                         "ram_peak_gb":  0.64,
                         "gpu_util_avg":  0,
                         "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  0.96,
-                        "ollama_ps":  "lfm2.5-thinking:latest    95bd9d45385f    1.0 GB    100% GPU     4096       4 minutes from now    "
+                        "gpu_mem_peak_gb":  2.7,
+                        "ollama_ps":  "lfm2.5-thinking:latest size=2.67GB vram=2.67GB ctx=128000 quant=Q4_K_M"
                     }
                 ]
 }

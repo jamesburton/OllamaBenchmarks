@@ -1,58 +1,52 @@
 {
-    "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-11T19:28:09.7367194+00:00",
-    "run_finished_at":  "2026-03-11T19:28:35.5780801+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-granite4_7b-a1b-h.json",
-    "host":  "T5500",
-    "ollama_host":  "http://127.0.0.1:11434",
-    "host_details":  {
-                         "captured_at":  "2026-03-11T19:28:35.467248+00:00",
-                         "hostname":  "T5500",
-                         "host_slug":  "t5500",
-                         "os":  {
-                                    "system":  "Windows",
-                                    "release":  "10",
-                                    "version":  "10.0.26200",
-                                    "machine":  "AMD64"
-                                },
-                         "manufacturer":  "Dell Inc.",
-                         "model":  "Precision WorkStation T5500  ",
-                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-                         "logical_cpu_count":  24,
-                         "total_memory_gb":  36.0,
-                         "python_version":  "3.11.3",
-                         "ollama_version":  "ollama version is 0.17.7",
-                         "gpus":  [
-                                      {
-                                          "Name":  "NVIDIA GeForce RTX 3060",
-                                          "AdapterRAM":  4293918720,
-                                          "DriverVersion":  "32.0.15.6094",
-                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
-                                          "Status":  "OK"
-                                      }
-                                  ]
-                     },
-    "models":  [
-                   "granite4:7b-a1b-h"
-               ],
-    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
-    "num_predict":  192,
-    "seed":  42,
-    "results":  [
-                    {
-                        "model":  "granite4:7b-a1b-h",
-                        "eval_count":  192,
-                        "eval_s":  9.385,
-                        "toks_per_s":  20.46,
-                        "total_s":  9.73,
-                        "load_s":  0.184,
-                        "cpu_avg_pct":  0,
-                        "cpu_peak_pct":  0,
-                        "ram_peak_gb":  0.78,
-                        "gpu_util_avg":  88.1,
-                        "gpu_util_peak":  88.1,
-                        "gpu_mem_peak_gb":  4.42,
-                        "ollama_ps":  "granite4:7b-a1b-h    566b725534ea    4.5 GB    100% GPU     4096       4 minutes from now    "
-                    }
-                ]
+  "benchmark": "throughput_openai",
+  "run_started_at": "2026-03-13T21:20:33.300801+00:00",
+  "run_finished_at": "2026-03-13T21:21:12.840506+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-granite4_7b-a1b-h.json",
+  "base_url": "http://127.0.0.1:8081",
+  "host_details": {
+    "captured_at": "2026-03-13T21:20:34.970751+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.17.8-rc4",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "granite4:7b-a1b-h"
+  ],
+  "results": [
+    {
+      "model": "granite4:7b-a1b-h",
+      "completion_tokens": 192,
+      "toks_per_s": 5.86,
+      "total_s": 32.788,
+      "cpu_avg_pct": 50.6,
+      "cpu_peak_pct": 51.0,
+      "ram_peak_gb": 4.54,
+      "gpu_util_avg": 36.5,
+      "gpu_util_peak": 40.8,
+      "gpu_mem_peak_gb": 4.19,
+      "response_preview": "Dependency Injection (DI) is a design pattern used to implement IoC (Inversion of Control). It allows the decoupling of the usage of an object from its creation. Instead of the class creating its depe"
+    }
+  ]
 }

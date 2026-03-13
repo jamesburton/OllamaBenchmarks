@@ -1,8 +1,8 @@
 {
   "benchmark": "throughput_openai",
   "run_started_at": "2026-03-13T20:30:28.643026+00:00",
-  "run_finished_at": "2026-03-13T20:31:08.701842+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2_24b.json",
+  "run_finished_at": "2026-03-13T20:31:08.694183+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-openai-20260313-203028.json",
   "base_url": "http://127.0.0.1:8081",
   "host_details": {
     "captured_at": "2026-03-13T20:30:30.635014+00:00",

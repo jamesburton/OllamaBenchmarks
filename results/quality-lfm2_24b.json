@@ -1,32 +1,32 @@
 {
-  "benchmark": "quality",
-  "run_started_at": "2026-03-12T17:55:16.413437+00:00",
-  "run_finished_at": "2026-03-12T18:06:43.723419+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-lfm2_24b.json",
-  "ollama_host": "http://127.0.0.1:11434",
+  "benchmark": "quality_openai",
+  "run_started_at": "2026-03-13T20:31:09.006512+00:00",
+  "run_finished_at": "2026-03-13T20:33:06.778461+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-lfm2_24b.json",
+  "base_url": "http://127.0.0.1:8081",
   "host_details": {
-    "captured_at": "2026-03-12T17:55:18.007272+00:00",
-    "hostname": "Strix",
-    "host_slug": "strix",
+    "captured_at": "2026-03-13T20:31:10.557788+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
     "os": {
       "system": "Windows",
-      "release": "11",
+      "release": "10",
       "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": "Bosgame",
-    "model": "BeyondMax Series",
-    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
-    "logical_cpu_count": 32,
-    "total_memory_gb": 63.65,
-    "python_version": "3.14.3",
-    "ollama_version": "ollama version is 0.17.6",
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.17.8-rc4",
     "gpus": [
       {
-        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "Name": "NVIDIA GeForce RTX 3060",
         "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.12064.27",
-        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
         "Status": "OK"
       }
     ]
@@ -37,13 +37,13 @@
   "results": [
     {
       "model": "lfm2:24b",
-      "coding_pass": 2,
+      "coding_pass": 1,
       "coding_total": 2,
-      "tool_pass": 2,
+      "tool_pass": 0,
       "tool_total": 2,
       "agentic_pass": 0,
       "agentic_total": 1,
-      "score": 4,
+      "score": 1,
       "score_max": 5
     }
   ]

@@ -49,6 +49,31 @@ function Invoke-OllamaGenerate {
   Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/generate" -Method Post -ContentType "application/json" -Body $body
 }
 
+function Get-OllamaPsLine {
+  param(
+    [string]$Model
+  )
+
+  try {
+    $response = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/ps" -Method Get
+    $match = @($response.models | Where-Object { $_.name -eq $Model } | Select-Object -First 1)
+    if (-not $match) {
+      return $null
+    }
+
+    $details = $match[0].details
+    $sizeGb = if ($match[0].size) { [math]::Round(([double]$match[0].size / 1GB), 2) } else { 0 }
+    $vramGb = if ($match[0].size_vram) { [math]::Round(([double]$match[0].size_vram / 1GB), 2) } else { 0 }
+    $ctx = if ($match[0].context_length) { [int]$match[0].context_length } else { 0 }
+    $quant = if ($details -and $details.quantization_level) { $details.quantization_level } else { "unknown" }
+
+    return "{0} size={1}GB vram={2}GB ctx={3} quant={4}" -f $Model, $sizeGb, $vramGb, $ctx, $quant
+  }
+  catch {
+    return $null
+  }
+}
+
 function Get-ModelSlug {
   param(
     [string]$Model
@@ -109,7 +134,7 @@ function Write-JsonFile {
 function Get-IncompleteModels {
   $completed = @($results | ForEach-Object { $_.model })
   $failed = @($failedModels | ForEach-Object { $_.model })
-  return [string[]]($Models | Where-Object { $_ -notin $completed -and $_ -notin $failed })
+  return @($Models | Where-Object { $_ -and $_ -notin $completed -and $_ -notin $failed })
 }
 
 function Get-OllamaSample {
@@ -250,7 +275,7 @@ foreach ($model in $Models) {
     $resp = $raw | ConvertFrom-Json
     $evalSec = [double]$resp.eval_duration / 1e9
     $tokps = if ($evalSec -gt 0) { [double]$resp.eval_count / $evalSec } else { 0 }
-    $psLine = (ollama ps | Select-String -Pattern ([regex]::Escape($model)) | Select-Object -First 1).Line
+    $psLine = Get-OllamaPsLine -Model $model
 
     $modelPayload = [pscustomobject]@{
       benchmark = "throughput_resource"

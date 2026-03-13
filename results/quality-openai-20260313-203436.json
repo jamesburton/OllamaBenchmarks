@@ -2,7 +2,7 @@
   "benchmark": "quality_openai",
   "run_started_at": "2026-03-13T20:34:36.155666+00:00",
   "run_finished_at": "2026-03-13T20:37:14.742435+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-granite4_7b-a1b-h.json",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-openai-20260313-203436.json",
   "base_url": "http://127.0.0.1:8081",
   "host_details": {
     "captured_at": "2026-03-13T20:34:37.733827+00:00",
@@ -34,6 +34,11 @@
   "models": [
     "granite4:7b-a1b-h"
   ],
+  "completed_models": [
+    "granite4:7b-a1b-h"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
       "model": "granite4:7b-a1b-h",

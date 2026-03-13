@@ -1,0 +1,5 @@
+# Keep the GGUF's embedded chat template so Ollama can use the model's native tool-calling format.
+FROM hf.co/bartowski/Qwen_Qwen3.5-35B-A3B-GGUF:Q2_K_L
+
+PARAMETER num_ctx 32768
+PARAMETER temperature 0

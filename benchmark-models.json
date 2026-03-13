@@ -3,6 +3,8 @@
   "benchmark_suite": [
     "qwen3-coder-next:latest",
     "lfm2:24b",
+    "lfm2.5-thinking:latest",
+    "qwen3.5:35b-a3b-q2_k_l",
     "granite4:32b-a9b-h",
     "glm-4.7-flash:latest",
     "glm-4.7-flash:bf16",
@@ -28,6 +30,8 @@
     "MichelRosselli/GLM-4.5-Air:latest",
     "gpt-oss:120b",
     "qwen3-coder-next:latest",
+    "lfm2.5-thinking:latest",
+    "qwen3.5:35b-a3b-q2_k_l",
     "granite4:32b-a9b-h",
     "glm-4.7-flash:latest",
     "qwen3-coder-next:q8_0",
@@ -36,6 +40,7 @@
   "effective_models": [
     "qwen3-coder-next:latest",
     "lfm2:24b",
+    "lfm2.5-thinking:latest",
     "granite4:32b-a9b-h",
     "glm-4.7-flash:latest",
     "glm-4.7-flash:bf16",
@@ -60,5 +65,8 @@
     "cogito:14b",
     "zac/phi4-tools:latest",
     "phi4-mini:latest"
-  ]
+  ],
+  "backend_notes": {
+    "qwen3.5:35b-a3b-q2_k_l": "Runs via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 still fails to load qwen35moe."
+  }
 }

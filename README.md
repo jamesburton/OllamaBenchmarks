@@ -10,6 +10,8 @@ Local benchmark harness and captured results for evaluating Ollama models across
 - `scripts/benchmark_quality.py` runs a compact coding, tool-use, and agent-orchestration quality suite.
 - `scripts/benchmark_backend.ps1` compares `auto`, `vulkan`, and `rocm` backend selection by launching isolated Ollama servers on alternate ports, and now preflights desktop-managed models so those temporary servers can resolve them reliably.
 - `scripts/benchmark_sweep.py` runs decode-side option sweeps for a single model.
+- `scripts/benchmark_throughput_openai.py` measures throughput and host-side resource usage against an OpenAI-compatible backend such as `llama-server`.
+- `scripts/benchmark_quality_openai.py` runs the compact coding, tool-use, and agent-orchestration quality suite against an OpenAI-compatible backend such as `llama-server`.
 - Multi-model throughput and quality runs now checkpoint one JSON artifact per model and keep the combined `*-current.json` refreshed as they progress.
 - `scripts/collect_host_info.py` captures machine metadata for archived benchmark snapshots.
 - `scripts/archive_system_benchmarks.py` snapshots the current benchmark artifacts under `results/systems/<host>-<label>/`.
@@ -28,6 +30,7 @@ Local benchmark harness and captured results for evaluating Ollama models across
 
 See [results/session-2026-03-12-summary.md](C:/Development/OllamaBenchmarks/results/session-2026-03-12-summary.md) for the latest Framework session summary.
 See [results/cross-system-summary.md](C:/Development/OllamaBenchmarks/results/cross-system-summary.md) for the rolling matrix across archived hosts.
+See [results/session-2026-03-13-llama-server-summary.md](C:/Development/OllamaBenchmarks/results/session-2026-03-13-llama-server-summary.md) for the direct `llama-server` comparison run on the T5500 host.
 
 ## Quick start
 
@@ -37,6 +40,7 @@ Prerequisites:
 - Python 3 on `PATH`
 - Ollama running locally on `http://127.0.0.1:11434`
 - Models already pulled with `ollama pull <model>`
+- For `llama-server` runs, a compatible OpenAI-style endpoint such as `http://127.0.0.1:8081/v1/chat/completions`
 
 ### Throughput and resource benchmark
 
@@ -71,6 +75,46 @@ This suite currently checks:
 - Small executable coding tasks
 - Single-call tool invocation correctness
 - Plan creation plus a follow-up sub-agent request/finalization sequence
+
+### OpenAI-compatible backend benchmark
+
+Use this path for models that run in `llama-server` but not in Ollama yet. The OpenAI-compatible scripts target `/v1/chat/completions` and write the same style of JSON artifacts under `results/`.
+
+Throughput example:
+
+```powershell
+python .\scripts\benchmark_throughput_openai.py `
+  --model qwen3.5:35b-a3b-q2_k_l `
+  --base-url http://127.0.0.1:8081
+```
+
+Quality example:
+
+```powershell
+python .\scripts\benchmark_quality_openai.py `
+  --models qwen3.5:35b-a3b-q2_k_l `
+  --base-url http://127.0.0.1:8081
+```
+
+One-command launcher example:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run_llama_server_benchmarks.ps1 `
+  -Models qwen3.5:35b-a3b-q2_k_l granite4:7b-a1b-h `
+  -LlamaServerPath C:\path\to\llama-server.exe
+```
+
+Current backend note:
+
+- `qwen3.5:35b-a3b-q2_k_l` is currently a `llama-server` model on this machine. It passes the compact tool/coding/agent checks there, but Ollama `0.17.8-rc4` still fails to load `qwen35moe`.
+
+Recent `llama-server` comparison on this T5500 host:
+
+| Model | Backend | tok/s | RAM peak (GB) | GPU mem peak (GB) | Quick quality | Notes |
+| --- | --- | ---: | ---: | ---: | ---: | --- |
+| `qwen3.5:35b-a3b-q2_k_l` | `llama-server` | 3.28 | 12.8 | 3.71 | 5/5 | Strongest large-model result in this path so far |
+| `lfm2:24b` | `llama-server` | 4.36 | 14.1 | 4.11 | 1/5 | Faster than Qwen here, but weak on tool and agent checks |
+| `granite4:7b-a1b-h` | `llama-server` | 6.48 | 4.54 | 4.13 | 5/5 | Best speed/quality balance in the direct llama.cpp path |
 
 ### Backend comparison
 
