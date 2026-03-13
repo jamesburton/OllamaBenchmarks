@@ -1,0 +1,101 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-03-13T15:07:06.204523+00:00",
+  "run_finished_at": "2026-03-13T15:13:11.680361+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-requested-20260313.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-13T15:07:10.895301+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26220",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 22,
+    "total_memory_gb": 95.47,
+    "python_version": "3.10.13",
+    "ollama_version": "ollama version is 0.17.5",
+    "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7026",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "cogito:8b",
+    "cogito:14b",
+    "zac/phi4-tools:latest",
+    "phi4-mini:latest"
+  ],
+  "completed_models": [
+    "cogito:8b",
+    "cogito:14b",
+    "zac/phi4-tools:latest",
+    "phi4-mini:latest"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "results": [
+    {
+      "model": "cogito:8b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 3,
+      "score_max": 5
+    },
+    {
+      "model": "cogito:14b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 5,
+      "score_max": 5
+    },
+    {
+      "model": "zac/phi4-tools:latest",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 0,
+      "agentic_total": 1,
+      "score": 2,
+      "score_max": 5
+    },
+    {
+      "model": "phi4-mini:latest",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 0,
+      "agentic_total": 1,
+      "score": 2,
+      "score_max": 5
+    }
+  ]
+}

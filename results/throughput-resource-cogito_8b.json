@@ -1,0 +1,65 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-13T14:58:35.2691806+00:00",
+  "run_finished_at": "2026-03-13T15:00:16.0332711+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-cogito_8b.json",
+  "host": "FRAMEWORK",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-13T14:58:46.126072+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26220",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 22,
+    "total_memory_gb": 95.47,
+    "python_version": "3.10.13",
+    "ollama_version": "ollama version is 0.17.5",
+    "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7026",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "cogito:8b"
+  ],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "cogito:8b",
+      "eval_count": 161,
+      "eval_s": 3.901,
+      "toks_per_s": 41.27,
+      "total_s": 5.99,
+      "load_s": 1.324,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 0.09,
+      "gpu_util_avg": 0.0,
+      "gpu_util_peak": 0.0,
+      "gpu_mem_peak_gb": 0.0,
+      "ollama_ps": "cogito:8b           75b508ddece1    5.5 GB    100% GPU          4096       4 minutes from now    "
+    }
+  ]
+}
