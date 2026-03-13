@@ -1,11 +1,11 @@
 {
   "benchmark": "backend_comparison",
-  "run_started_at": "2026-03-13T13:15:11.3267512+00:00",
-  "run_finished_at": "2026-03-13T13:15:51.6449372+00:00",
+  "run_started_at": "2026-03-13T20:31:23.2817949+00:00",
+  "run_finished_at": "2026-03-13T20:32:07.6987860+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-lfm2_24b.json",
   "host": "STRIX",
   "host_details": {
-    "captured_at": "2026-03-13T13:15:51.576356+00:00",
+    "captured_at": "2026-03-13T20:32:07.628047+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -43,23 +43,23 @@
     {
       "lib": "auto",
       "status": "ok",
-      "toks_per_s": 54.31,
-      "e2e_toks_per_s": 51.28,
-      "total_s": 3.705
+      "toks_per_s": 70.79,
+      "e2e_toks_per_s": 66.25,
+      "total_s": 2.868
     },
     {
       "lib": "vulkan",
       "status": "ok",
-      "toks_per_s": 34.79,
-      "e2e_toks_per_s": 33.0,
-      "total_s": 5.667
+      "toks_per_s": 34.15,
+      "e2e_toks_per_s": 32.13,
+      "total_s": 5.819
     },
     {
       "lib": "rocm",
       "status": "ok",
-      "toks_per_s": 69.05,
-      "e2e_toks_per_s": 64.92,
-      "total_s": 2.927
+      "toks_per_s": 70.78,
+      "e2e_toks_per_s": 65.6,
+      "total_s": 2.896
     }
   ]
 }

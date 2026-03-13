@@ -1,11 +1,11 @@
 {
   "benchmark": "backend_comparison",
-  "run_started_at": "2026-03-13T13:58:40.7050338+00:00",
-  "run_finished_at": "2026-03-13T14:00:38.6085453+00:00",
+  "run_started_at": "2026-03-13T20:46:03.2571519+00:00",
+  "run_finished_at": "2026-03-13T20:47:28.7673547+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-nemotron-3-nano_30b-a3b-q8_0.json",
   "host": "STRIX",
   "host_details": {
-    "captured_at": "2026-03-13T14:00:38.536066+00:00",
+    "captured_at": "2026-03-13T20:47:28.698709+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -43,23 +43,23 @@
     {
       "lib": "auto",
       "status": "ok",
-      "toks_per_s": 35.7,
-      "e2e_toks_per_s": 32.22,
-      "total_s": 5.959
+      "toks_per_s": 48.67,
+      "e2e_toks_per_s": 43.69,
+      "total_s": 4.394
     },
     {
       "lib": "vulkan",
       "status": "ok",
-      "toks_per_s": 15.9,
-      "e2e_toks_per_s": 15.04,
-      "total_s": 12.765
+      "toks_per_s": 16.51,
+      "e2e_toks_per_s": 15.31,
+      "total_s": 12.542
     },
     {
       "lib": "rocm",
       "status": "ok",
-      "toks_per_s": 24.95,
-      "e2e_toks_per_s": 23.36,
-      "total_s": 8.219
+      "toks_per_s": 47.5,
+      "e2e_toks_per_s": 41.5,
+      "total_s": 4.626
     }
   ]
 }

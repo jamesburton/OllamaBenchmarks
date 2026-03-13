@@ -1,11 +1,11 @@
 {
   "benchmark": "backend_comparison",
-  "run_started_at": "2026-03-13T15:05:07.3068605+00:00",
-  "run_finished_at": "2026-03-13T15:25:15.6196279+00:00",
+  "run_started_at": "2026-03-13T20:47:28.7723332+00:00",
+  "run_finished_at": "2026-03-13T20:52:30.4211937+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-llama4_16x17b.json",
   "host": "STRIX",
   "host_details": {
-    "captured_at": "2026-03-13T15:25:15.000373+00:00",
+    "captured_at": "2026-03-13T20:52:30.306377+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -42,20 +42,24 @@
   "results": [
     {
       "lib": "auto",
-      "status": "request_failed",
-      "error": "The request was canceled due to the configured HttpClient.Timeout of 600 seconds elapsing."
+      "status": "ok",
+      "toks_per_s": 12.22,
+      "e2e_toks_per_s": 11.69,
+      "total_s": 16.425
     },
     {
       "lib": "vulkan",
-      "status": "request_failed",
-      "error": "Response status code does not indicate success: 500 (Internal Server Error)."
+      "status": "ok",
+      "toks_per_s": 3.51,
+      "e2e_toks_per_s": 2.76,
+      "total_s": 69.665
     },
     {
       "lib": "rocm",
       "status": "ok",
-      "toks_per_s": 0.98,
-      "e2e_toks_per_s": 0.91,
-      "total_s": 210.02
+      "toks_per_s": 11.95,
+      "e2e_toks_per_s": 11.4,
+      "total_s": 16.838
     }
   ]
 }
