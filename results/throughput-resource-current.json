@@ -1,12 +1,12 @@
 {
   "benchmark": "throughput_resource",
   "run_started_at": "2026-03-12T16:14:51.4066519+00:00",
-  "run_finished_at": "2026-03-13T13:59:33.6866489+00:00",
+  "run_finished_at": "2026-03-13T15:28:01.4476186+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-current.json",
   "host": "STRIX",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-13T13:58:41.732828+00:00",
+    "captured_at": "2026-03-13T15:05:08.213392+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -41,6 +41,7 @@
     "qwen3-coder-next:q8_0",
     "nemotron-3-nano:latest",
     "nemotron-3-nano:30b-a3b-q8_0",
+    "llama4:16x17b",
     "MichelRosselli/GLM-4.5-Air:latest",
     "devstral-small-2:24b-instruct-2512-q8_0",
     "gpt-oss:120b",
@@ -58,6 +59,7 @@
     "qwen3-coder-next:q8_0",
     "nemotron-3-nano:latest",
     "nemotron-3-nano:30b-a3b-q8_0",
+    "llama4:16x17b",
     "MichelRosselli/GLM-4.5-Air:latest",
     "devstral-small-2:24b-instruct-2512-q8_0",
     "gpt-oss:120b",
@@ -191,6 +193,21 @@
       "gpu_util_peak": 168.6,
       "gpu_mem_peak_gb": 62.89,
       "ollama_ps": "nemotron-3-nano:30b-a3b-q8_0    a98df31bcc4a    37 GB    100% GPU     262144     5 minutes from now    "
+    },
+    {
+      "model": "llama4:16x17b",
+      "eval_count": 192,
+      "eval_s": 50.816,
+      "toks_per_s": 3.78,
+      "total_s": 163.705,
+      "load_s": 0.157,
+      "cpu_avg_pct": 26.1,
+      "cpu_peak_pct": 50.9,
+      "ram_peak_gb": 55.32,
+      "gpu_util_avg": 5.6,
+      "gpu_util_peak": 10.5,
+      "gpu_mem_peak_gb": 61.13,
+      "ollama_ps": "llama4:16x17b    bf31604e25c2    154 GB    58%/42% CPU/GPU    262144     4 minutes from now    "
     },
     {
       "model": "MichelRosselli/GLM-4.5-Air:latest",

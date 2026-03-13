@@ -1,0 +1,58 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-13T15:05:07.3091770+00:00",
+  "run_finished_at": "2026-03-13T15:28:01.4476186+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-llama4_16x17b.json",
+  "host": "STRIX",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-13T15:05:08.213392+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.17.7",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "llama4:16x17b"
+  ],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "llama4:16x17b",
+      "eval_count": 192,
+      "eval_s": 50.816,
+      "toks_per_s": 3.78,
+      "total_s": 163.705,
+      "load_s": 0.157,
+      "cpu_avg_pct": 26.1,
+      "cpu_peak_pct": 50.9,
+      "ram_peak_gb": 55.32,
+      "gpu_util_avg": 5.6,
+      "gpu_util_peak": 10.5,
+      "gpu_mem_peak_gb": 61.13,
+      "ollama_ps": "llama4:16x17b    bf31604e25c2    154 GB    58%/42% CPU/GPU    262144     4 minutes from now    "
+    }
+  ]
+}
