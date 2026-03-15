@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-03-13T15:33:18.578943+00:00",
+  "updated_at": "2026-03-15T22:38:14.235210+00:00",
   "benchmark_suite": [
     "qwen3-coder-next:latest",
     "lfm2:24b",
@@ -15,7 +15,9 @@
     "cogito:14b",
     "zac/phi4-tools:latest",
     "phi4-mini:latest",
-    "llama4:16x17b"
+    "llama4:16x17b",
+    "omnicoder:9b-q4_k_m",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m"
   ],
   "local_installed": [
     "llama4:16x17b",
@@ -35,7 +37,9 @@
     "granite4:32b-a9b-h",
     "glm-4.7-flash:latest",
     "qwen3-coder-next:q8_0",
-    "qwen3.5:122b"
+    "qwen3.5:122b",
+    "omnicoder:9b-q4_k_m",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m"
   ],
   "effective_models": [
     "qwen3-coder-next:latest",
@@ -67,6 +71,8 @@
     "phi4-mini:latest"
   ],
   "backend_notes": {
-    "qwen3.5:35b-a3b-q2_k_l": "Runs via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 still fails to load qwen35moe."
+    "qwen3.5:35b-a3b-q2_k_l": "Runs via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 still fails to load qwen35moe.",
+    "omnicoder:9b-q4_k_m": "Benchmarked via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 imports it, but local runner allocation fails on this machine.",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m": "Benchmarked via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 imports it, but local runner cannot load qwen35."
   }
 }

@@ -1,0 +1,6 @@
+# Keep the GGUF's embedded chat template so Ollama can use the model's native coding-agent formatting.
+FROM hf.co/Tesslate/OmniCoder-9B-GGUF:Q4_K_M
+
+PARAMETER num_ctx 4096
+PARAMETER num_batch 64
+PARAMETER temperature 0

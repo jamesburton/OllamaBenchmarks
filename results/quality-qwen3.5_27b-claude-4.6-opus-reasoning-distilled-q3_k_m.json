@@ -1,0 +1,50 @@
+{
+  "benchmark": "quality_openai",
+  "run_started_at": "2026-03-15T21:46:15.097884+00:00",
+  "run_finished_at": "2026-03-15T22:37:35.295786+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-qwen3.5_27b-claude-4.6-opus-reasoning-distilled-q3_k_m.json",
+  "base_url": "http://127.0.0.1:8081",
+  "host_details": {
+    "captured_at": "2026-03-15T21:46:16.758089+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.17.8-rc4",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m"
+  ],
+  "results": [
+    {
+      "model": "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 1,
+      "score_max": 5
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "benchmark": "throughput_openai",
+  "run_started_at": "2026-03-15T21:38:35.708260+00:00",
+  "run_finished_at": "2026-03-15T21:46:14.813347+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-openai-20260315-213835.json",
+  "base_url": "http://127.0.0.1:8081",
+  "host_details": {
+    "captured_at": "2026-03-15T21:38:37.856654+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.17.8-rc4",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m"
+  ],
+  "results": [
+    {
+      "model": "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
+      "completion_tokens": 192,
+      "toks_per_s": 0.48,
+      "total_s": 403.368,
+      "cpu_avg_pct": 49.7,
+      "cpu_peak_pct": 50.1,
+      "ram_peak_gb": 14.73,
+      "gpu_util_avg": 33.1,
+      "gpu_util_peak": 39.4,
+      "gpu_mem_peak_gb": 4.8,
+      "response_preview": "The user wants a concise explanation of dependency injection with a short Python example. Let me think about how to explain this clearly and provide a good example.\n\nDependency injection is a design p"
+    }
+  ]
+}
