@@ -1,0 +1,5 @@
+# Keep the GGUF's embedded chat template so Ollama can use the model's native reasoning and tool formatting.
+FROM hf.co/Jackrong/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-GGUF:Q2_K
+
+PARAMETER num_ctx 8192
+PARAMETER temperature 0

@@ -27,10 +27,12 @@ Local benchmark harness and captured results for evaluating Ollama models across
 - `lfm2.5-thinking:1.2b` is the local raw-throughput outlier at `205.66 tok/s`, but it failed the compact quality suite.
 - On the Framework machine, backend comparison on `qwen3.5:latest` now favors `auto` over both `vulkan` and `rocm`.
 - Across archived systems, the current strongest fully-tested coding captures remain `qwen3-coder-next:latest` on Strix Halo and `qwen3.5:latest` on the Framework machine.
+- On the T5500 `llama-server` path, `omnicoder:9b-q4_k_m` now full-passes the compact suite at `1.48 tok/s`; the tested Jackrong `qwen3.5:27b` distilled quants remain much slower and only score `1/5`.
 
 See [results/session-2026-03-12-summary.md](C:/Development/OllamaBenchmarks/results/session-2026-03-12-summary.md) for the latest Framework session summary.
 See [results/cross-system-summary.md](C:/Development/OllamaBenchmarks/results/cross-system-summary.md) for the rolling matrix across archived hosts.
 See [results/session-2026-03-13-llama-server-summary.md](C:/Development/OllamaBenchmarks/results/session-2026-03-13-llama-server-summary.md) for the direct `llama-server` comparison run on the T5500 host.
+See [results/current-best-summary.md](C:/Development/OllamaBenchmarks/results/current-best-summary.md) for the current best quality/speed rollup across the latest per-model artifacts.
 
 ## Quick start
 
@@ -112,6 +114,7 @@ Recent `llama-server` comparison on this T5500 host:
 
 | Model | Backend | tok/s | RAM peak (GB) | GPU mem peak (GB) | Quick quality | Notes |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
+| `omnicoder:9b-q4_k_m` | `llama-server` | 1.48 | 6.17 | 4.8 | 5/5 | Strong coding/tool result from Tesslate's OmniCoder GGUF despite Ollama runner limits on this host |
 | `qwen3.5:35b-a3b-q2_k_l` | `llama-server` | 3.28 | 12.8 | 3.71 | 5/5 | Strongest large-model result in this path so far |
 | `lfm2:24b` | `llama-server` | 4.36 | 14.1 | 4.11 | 1/5 | Faster than Qwen here, but weak on tool and agent checks |
 | `granite4:7b-a1b-h` | `llama-server` | 6.48 | 4.54 | 4.13 | 5/5 | Best speed/quality balance in the direct llama.cpp path |
