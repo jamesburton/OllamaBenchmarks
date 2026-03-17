@@ -1,65 +1,58 @@
 {
-  "benchmark": "throughput_resource",
-  "run_started_at": "2026-03-13T14:58:35.2691806+00:00",
-  "run_finished_at": "2026-03-13T15:04:53.6079945+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-cogito_14b.json",
-  "host": "FRAMEWORK",
-  "ollama_host": "http://127.0.0.1:11434",
-  "host_details": {
-    "captured_at": "2026-03-13T14:58:46.126072+00:00",
-    "hostname": "Framework",
-    "host_slug": "framework",
-    "os": {
-      "system": "Windows",
-      "release": "10",
-      "version": "10.0.26220",
-      "machine": "AMD64"
-    },
-    "manufacturer": "Framework",
-    "model": "Laptop 13 (Intel Core Ultra Series 1)",
-    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
-    "logical_cpu_count": 22,
-    "total_memory_gb": 95.47,
-    "python_version": "3.10.13",
-    "ollama_version": "ollama version is 0.17.5",
-    "gpus": [
-      {
-        "Name": "Intel(R) Arc(TM) Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7026",
-        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
-        "Status": "OK"
-      },
-      {
-        "Name": "NVIDIA GeForce RTX 3060",
-        "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.9186",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
-        "Status": "OK"
-      }
-    ]
-  },
-  "models": [
-    "cogito:14b"
-  ],
-  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
-  "num_predict": 192,
-  "seed": 42,
-  "results": [
-    {
-      "model": "cogito:14b",
-      "eval_count": 192,
-      "eval_s": 6.648,
-      "toks_per_s": 28.88,
-      "total_s": 43.268,
-      "load_s": 0.396,
-      "cpu_avg_pct": 0.0,
-      "cpu_peak_pct": 0.0,
-      "ram_peak_gb": 0.09,
-      "gpu_util_avg": 0.0,
-      "gpu_util_peak": 0.0,
-      "gpu_mem_peak_gb": 0.0,
-      "ollama_ps": "cogito:14b          d0cac86a2347    9.7 GB    100% GPU          4096       4 minutes from now    "
-    }
-  ]
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-17T15:32:55.7809293+00:00",
+    "run_finished_at":  "2026-03-17T15:33:22.6183088+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-cogito_14b.json",
+    "host":  "T5500",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "captured_at":  "2026-03-17T15:32:57.651824+00:00",
+                         "hostname":  "T5500",
+                         "host_slug":  "t5500",
+                         "os":  {
+                                    "system":  "Windows",
+                                    "release":  "10",
+                                    "version":  "10.0.26200",
+                                    "machine":  "AMD64"
+                                },
+                         "manufacturer":  "Dell Inc.",
+                         "model":  "Precision WorkStation T5500  ",
+                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+                         "logical_cpu_count":  24,
+                         "total_memory_gb":  36.0,
+                         "python_version":  "3.11.3",
+                         "ollama_version":  "ollama version is 0.18.0",
+                         "gpus":  [
+                                      {
+                                          "Name":  "NVIDIA GeForce RTX 3060",
+                                          "AdapterRAM":  4293918720,
+                                          "DriverVersion":  "32.0.15.6094",
+                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
+                                          "Status":  "OK"
+                                      }
+                                  ]
+                     },
+    "models":  [
+                   "cogito:14b"
+               ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "cogito:14b",
+                        "eval_count":  163,
+                        "eval_s":  4.743,
+                        "toks_per_s":  34.36,
+                        "total_s":  6.543,
+                        "load_s":  0.277,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  1.03,
+                        "gpu_util_avg":  84.8,
+                        "gpu_util_peak":  84.8,
+                        "gpu_mem_peak_gb":  9.26,
+                        "ollama_ps":  "cogito:14b size=9.05GB vram=9.05GB ctx=4096 quant=Q4_K_M"
+                    }
+                ]
 }

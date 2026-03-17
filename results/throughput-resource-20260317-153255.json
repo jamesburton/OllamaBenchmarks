@@ -1,12 +1,12 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-17T15:26:40.1830258+00:00",
-    "run_finished_at":  "2026-03-17T15:26:45.4898507+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-zac_phi4-tools_latest.json",
+    "run_started_at":  "2026-03-17T15:32:55.7809293+00:00",
+    "run_finished_at":  "2026-03-17T15:33:22.6755702+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260317-153255.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "captured_at":  "2026-03-17T15:26:42.028489+00:00",
+                         "captured_at":  "2026-03-17T15:32:57.651824+00:00",
                          "hostname":  "T5500",
                          "host_slug":  "t5500",
                          "os":  {
@@ -33,16 +33,13 @@
                                   ]
                      },
     "models":  [
-                   "zac/phi4-tools:latest"
+                   "cogito:14b"
                ],
     "completed_models":  [
-
+                             "cogito:14b"
                          ],
     "failed_models":  [
-                          {
-                              "model":  "zac/phi4-tools:latest",
-                              "error":  "The remote server returned an error: (500) Internal Server Error."
-                          }
+
                       ],
     "incomplete_models":  [
 
@@ -51,6 +48,20 @@
     "num_predict":  192,
     "seed":  42,
     "results":  [
-
+                    {
+                        "model":  "cogito:14b",
+                        "eval_count":  163,
+                        "eval_s":  4.743,
+                        "toks_per_s":  34.36,
+                        "total_s":  6.543,
+                        "load_s":  0.277,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  1.03,
+                        "gpu_util_avg":  84.8,
+                        "gpu_util_peak":  84.8,
+                        "gpu_mem_peak_gb":  9.26,
+                        "ollama_ps":  "cogito:14b size=9.05GB vram=9.05GB ctx=4096 quant=Q4_K_M"
+                    }
                 ]
 }

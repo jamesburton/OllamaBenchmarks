@@ -1,12 +1,12 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-17T15:26:40.1830258+00:00",
-    "run_finished_at":  "2026-03-17T15:26:45.4898507+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-zac_phi4-tools_latest.json",
+    "run_started_at":  "2026-03-17T15:26:08.0268056+00:00",
+    "run_finished_at":  "2026-03-17T15:26:15.9536035+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260317-152608.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "captured_at":  "2026-03-17T15:26:42.028489+00:00",
+                         "captured_at":  "2026-03-17T15:26:09.996116+00:00",
                          "hostname":  "T5500",
                          "host_slug":  "t5500",
                          "os":  {

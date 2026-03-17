@@ -1,65 +1,58 @@
 {
-  "benchmark": "throughput_resource",
-  "run_started_at": "2026-03-13T14:58:35.2691806+00:00",
-  "run_finished_at": "2026-03-13T15:14:18.9380120+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-phi4-mini_latest.json",
-  "host": "FRAMEWORK",
-  "ollama_host": "http://127.0.0.1:11434",
-  "host_details": {
-    "captured_at": "2026-03-13T14:58:46.126072+00:00",
-    "hostname": "Framework",
-    "host_slug": "framework",
-    "os": {
-      "system": "Windows",
-      "release": "10",
-      "version": "10.0.26220",
-      "machine": "AMD64"
-    },
-    "manufacturer": "Framework",
-    "model": "Laptop 13 (Intel Core Ultra Series 1)",
-    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
-    "logical_cpu_count": 22,
-    "total_memory_gb": 95.47,
-    "python_version": "3.10.13",
-    "ollama_version": "ollama version is 0.17.5",
-    "gpus": [
-      {
-        "Name": "Intel(R) Arc(TM) Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7026",
-        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
-        "Status": "OK"
-      },
-      {
-        "Name": "NVIDIA GeForce RTX 3060",
-        "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.9186",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
-        "Status": "OK"
-      }
-    ]
-  },
-  "models": [
-    "phi4-mini:latest"
-  ],
-  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
-  "num_predict": 192,
-  "seed": 42,
-  "results": [
-    {
-      "model": "phi4-mini:latest",
-      "eval_count": 176,
-      "eval_s": 194.351,
-      "toks_per_s": 0.91,
-      "total_s": 404.284,
-      "load_s": 0.719,
-      "cpu_avg_pct": 0.0,
-      "cpu_peak_pct": 0.0,
-      "ram_peak_gb": 0.08,
-      "gpu_util_avg": 0.0,
-      "gpu_util_peak": 0.0,
-      "gpu_mem_peak_gb": 0.0,
-      "ollama_ps": "phi4-mini:latest         78fad5d182a7    3.3 GB    92%/8% CPU/GPU    4096       Stopping...           "
-    }
-  ]
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-17T15:32:38.9518364+00:00",
+    "run_finished_at":  "2026-03-17T15:32:57.6772178+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-phi4-mini_latest.json",
+    "host":  "T5500",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "captured_at":  "2026-03-17T15:32:40.899571+00:00",
+                         "hostname":  "T5500",
+                         "host_slug":  "t5500",
+                         "os":  {
+                                    "system":  "Windows",
+                                    "release":  "10",
+                                    "version":  "10.0.26200",
+                                    "machine":  "AMD64"
+                                },
+                         "manufacturer":  "Dell Inc.",
+                         "model":  "Precision WorkStation T5500  ",
+                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+                         "logical_cpu_count":  24,
+                         "total_memory_gb":  36.0,
+                         "python_version":  "3.11.3",
+                         "ollama_version":  "ollama version is 0.18.0",
+                         "gpus":  [
+                                      {
+                                          "Name":  "NVIDIA GeForce RTX 3060",
+                                          "AdapterRAM":  4293918720,
+                                          "DriverVersion":  "32.0.15.6094",
+                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
+                                          "Status":  "OK"
+                                      }
+                                  ]
+                     },
+    "models":  [
+                   "phi4-mini:latest"
+               ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "phi4-mini:latest",
+                        "eval_count":  192,
+                        "eval_s":  2.063,
+                        "toks_per_s":  93.05,
+                        "total_s":  6.415,
+                        "load_s":  0.422,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  1.09,
+                        "gpu_util_avg":  91.8,
+                        "gpu_util_peak":  91.8,
+                        "gpu_mem_peak_gb":  3.38,
+                        "ollama_ps":  "phi4-mini:latest size=3.06GB vram=3.06GB ctx=4096 quant=Q4_K_M"
+                    }
+                ]
 }

@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-03-17T14:35:43.507361+00:00",
+  "updated_at": "2026-03-17T15:34:00.000000+00:00",
   "benchmark_suite": [
     "qwen3-coder-next:latest",
     "lfm2:24b",
@@ -76,10 +76,6 @@
   "missing_from_local": [
     "lfm2.5-thinking:latest",
     "qwen3.5:35b-a3b-q2_k_l",
-    "cogito:8b",
-    "cogito:14b",
-    "zac/phi4-tools:latest",
-    "phi4-mini:latest",
     "omnicoder:9b-q4_k_m",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
@@ -92,6 +88,7 @@
     "qwen3.5:35b-a3b-q2_k_l": "Runs via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 still fails to load qwen35moe.",
     "omnicoder:9b-q4_k_m": "Benchmarked via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 imports it, but local runner allocation fails on this machine.",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m": "Benchmarked via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 imports it, but local runner cannot load qwen35.",
-    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k": "Benchmarked via llama-server/OpenAI-compatible API on this host. This smaller follow-up quant improves memory use and speed versus Q3_K_M, but still only scores 1/5 on the quick suite."
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k": "Benchmarked via llama-server/OpenAI-compatible API on this host. This smaller follow-up quant improves memory use and speed versus Q3_K_M, but still only scores 1/5 on the quick suite.",
+    "zac/phi4-tools:latest": "Ollama 0.18.0 generate API returns 500 on T5500. Chat API works but model scores 0/5 on quality suite."
   }
 }
