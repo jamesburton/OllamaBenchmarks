@@ -1,0 +1,67 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-17T19:25:23.4160823+00:00",
+    "run_finished_at":  "2026-03-17T19:26:13.5933114+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-GLM-4.7-Flash-REAP-23B-A3B_q4_k_m.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "captured_at":  "2026-03-17T19:25:25.522552+00:00",
+                         "hostname":  "Strix",
+                         "host_slug":  "strix",
+                         "os":  {
+                                    "system":  "Windows",
+                                    "release":  "11",
+                                    "version":  "10.0.26200",
+                                    "machine":  "AMD64"
+                                },
+                         "manufacturer":  "Bosgame",
+                         "model":  "BeyondMax Series",
+                         "processor":  "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+                         "logical_cpu_count":  32,
+                         "total_memory_gb":  63.65,
+                         "python_version":  "3.14.3",
+                         "ollama_version":  "ollama version is 0.18.0",
+                         "gpus":  [
+                                      {
+                                          "Name":  "AMD Radeon(TM) 8060S Graphics",
+                                          "AdapterRAM":  4293918720,
+                                          "DriverVersion":  "32.0.12064.27",
+                                          "VideoProcessor":  "AMD Radeon Graphics Processor (0x1586)",
+                                          "Status":  "OK"
+                                      }
+                                  ]
+                     },
+    "models":  [
+                   "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M"
+               ],
+    "completed_models":  [
+                             "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
+                        "eval_count":  192,
+                        "eval_s":  11.301,
+                        "toks_per_s":  16.99,
+                        "total_s":  12.094,
+                        "load_s":  0.305,
+                        "cpu_avg_pct":  0.7,
+                        "cpu_peak_pct":  0.7,
+                        "ram_peak_gb":  14.93,
+                        "gpu_util_avg":  35.5,
+                        "gpu_util_peak":  70.9,
+                        "gpu_mem_peak_gb":  52.52,
+                        "ollama_ps":  "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M size=33.07GB vram=33.07GB ctx=202752 quant=unknown"
+                    }
+                ]
+}

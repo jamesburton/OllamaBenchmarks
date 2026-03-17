@@ -1,0 +1,55 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-03-17T19:19:54.626142+00:00",
+  "run_finished_at": "2026-03-17T19:20:33.631739+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-qwen3_8b.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-17T19:19:56.769286+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.18.0",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "qwen3:8b"
+  ],
+  "completed_models": [
+    "qwen3:8b"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "results": [
+    {
+      "model": "qwen3:8b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 5,
+      "score_max": 5
+    }
+  ]
+}

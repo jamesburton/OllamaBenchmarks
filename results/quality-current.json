@@ -1,7 +1,7 @@
 {
   "benchmark": "quality",
   "run_started_at": "2026-03-12T16:25:41.417902+00:00",
-  "run_finished_at": "2026-03-16T18:24:51.445787+00:00",
+  "run_finished_at": "2026-03-17T19:21:37.792031+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-current.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
@@ -42,11 +42,13 @@
     "cogito:14b",
     "cogito:8b",
     "devstral-small-2:24b-instruct-2512-q8_0",
+    "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
     "glm-4.7-flash:bf16",
     "glm-4.7-flash:latest",
     "gpt-oss:120b",
     "granite4:32b-a9b-h",
     "granite4:7b-a1b-h",
+    "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
     "lfm2.5-thinking:1.2b",
     "lfm2.5-thinking:latest",
     "lfm2:24b",
@@ -60,12 +62,16 @@
     "phi4-mini:latest",
     "qwen3-coder-next:latest",
     "qwen3-coder-next:q8_0",
+    "qwen3-coder:30b",
     "qwen3.5:122b-a10b",
     "qwen3.5:122b",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
     "qwen3.5:35b-a3b-q2_k_l",
+    "qwen3.5:9b",
     "qwen3.5:latest",
+    "qwen3:14b",
+    "qwen3:8b",
     "rnj-1:8b",
     "zac/phi4-tools:latest"
   ],
@@ -73,11 +79,13 @@
     "cogito:14b",
     "cogito:8b",
     "devstral-small-2:24b-instruct-2512-q8_0",
+    "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
     "glm-4.7-flash:bf16",
     "glm-4.7-flash:latest",
     "gpt-oss:120b",
     "granite4:32b-a9b-h",
     "granite4:7b-a1b-h",
+    "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
     "lfm2.5-thinking:1.2b",
     "lfm2.5-thinking:latest",
     "lfm2:24b",
@@ -91,12 +99,16 @@
     "phi4-mini:latest",
     "qwen3-coder-next:latest",
     "qwen3-coder-next:q8_0",
+    "qwen3-coder:30b",
     "qwen3.5:122b-a10b",
     "qwen3.5:122b",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
     "qwen3.5:35b-a3b-q2_k_l",
+    "qwen3.5:9b",
     "qwen3.5:latest",
+    "qwen3:14b",
+    "qwen3:8b",
     "rnj-1:8b",
     "zac/phi4-tools:latest"
   ],
@@ -134,6 +146,17 @@
       "agentic_pass": 1,
       "agentic_total": 1,
       "score": 5,
+      "score_max": 5
+    },
+    {
+      "model": "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 0,
+      "agentic_total": 1,
+      "score": 0,
       "score_max": 5
     },
     {
@@ -189,6 +212,17 @@
       "agentic_pass": 1,
       "agentic_total": 1,
       "score": 5,
+      "score_max": 5
+    },
+    {
+      "model": "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 0,
+      "agentic_total": 1,
+      "score": 0,
       "score_max": 5
     },
     {
@@ -335,6 +369,17 @@
       "score_max": 5
     },
     {
+      "model": "qwen3-coder:30b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 5,
+      "score_max": 5
+    },
+    {
       "model": "qwen3.5:122b-a10b",
       "coding_pass": 2,
       "coding_total": 2,
@@ -390,7 +435,40 @@
       "score_max": 5
     },
     {
+      "model": "qwen3.5:9b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 5,
+      "score_max": 5
+    },
+    {
       "model": "qwen3.5:latest",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 5,
+      "score_max": 5
+    },
+    {
+      "model": "qwen3:14b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 5,
+      "score_max": 5
+    },
+    {
+      "model": "qwen3:8b",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,
