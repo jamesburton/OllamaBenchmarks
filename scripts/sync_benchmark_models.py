@@ -59,6 +59,9 @@ def main() -> None:
         "effective_models": effective_models,
         "missing_from_local": missing_from_local,
     }
+    backend_notes = inventory.get("backend_notes")
+    if backend_notes:
+        updated["backend_notes"] = backend_notes
     save_inventory(updated)
     print(json.dumps(updated, indent=2))
 
