@@ -1,0 +1,10 @@
+# Nemotron-Nano-9B-v2 with nemotron-3-nano renderer for tool calling support.
+# The HF GGUF import uses a raw Go template that lacks tool call formatting.
+# Using the same RENDERER/PARSER as the official nemotron-3-nano model.
+FROM hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M
+
+TEMPLATE {{ .Prompt }}
+RENDERER nemotron-3-nano
+PARSER nemotron-3-nano
+PARAMETER temperature 1
+PARAMETER top_p 1

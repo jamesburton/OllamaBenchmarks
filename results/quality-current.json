@@ -1,38 +1,31 @@
 {
   "benchmark": "quality",
   "run_started_at": "2026-03-12T16:25:41.417902+00:00",
-  "run_finished_at": "2026-03-17T19:21:37.792031+00:00",
+  "run_finished_at": "2026-03-17T21:59:29.139430+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-current.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-13T15:10:50.307274+00:00",
-    "hostname": "Framework",
-    "host_slug": "framework",
+    "captured_at": "2026-03-17T15:26:10.552843+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
     "os": {
       "system": "Windows",
       "release": "10",
-      "version": "10.0.26220",
+      "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": "Framework",
-    "model": "Laptop 13 (Intel Core Ultra Series 1)",
-    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
-    "logical_cpu_count": 22,
-    "total_memory_gb": 95.47,
-    "python_version": "3.10.13",
-    "ollama_version": "ollama version is 0.17.5",
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.18.0",
     "gpus": [
-      {
-        "Name": "Intel(R) Arc(TM) Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7026",
-        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
-        "Status": "OK"
-      },
       {
         "Name": "NVIDIA GeForce RTX 3060",
         "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.9186",
+        "DriverVersion": "32.0.15.6094",
         "VideoProcessor": "NVIDIA GeForce RTX 3060",
         "Status": "OK"
       }
@@ -43,12 +36,12 @@
     "cogito:8b",
     "devstral-small-2:24b-instruct-2512-q8_0",
     "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
+    "glm-4.7-flash-reap-toolfix",
     "glm-4.7-flash:bf16",
     "glm-4.7-flash:latest",
     "gpt-oss:120b",
     "granite4:32b-a9b-h",
     "granite4:7b-a1b-h",
-    "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
     "lfm2.5-thinking:1.2b",
     "lfm2.5-thinking:latest",
     "lfm2:24b",
@@ -58,6 +51,8 @@
     "nemotron-3-nano:30b-a3b-q8_0",
     "nemotron-3-nano:latest",
     "nemotron-3-super:latest",
+    "nemotron-nano-9b-v2-toolfix",
+    "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
     "omnicoder:9b-q4_k_m",
     "phi4-mini:latest",
     "qwen3-coder-next:latest",
@@ -80,12 +75,12 @@
     "cogito:8b",
     "devstral-small-2:24b-instruct-2512-q8_0",
     "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
+    "glm-4.7-flash-reap-toolfix",
     "glm-4.7-flash:bf16",
     "glm-4.7-flash:latest",
     "gpt-oss:120b",
     "granite4:32b-a9b-h",
     "granite4:7b-a1b-h",
-    "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
     "lfm2.5-thinking:1.2b",
     "lfm2.5-thinking:latest",
     "lfm2:24b",
@@ -95,6 +90,8 @@
     "nemotron-3-nano:30b-a3b-q8_0",
     "nemotron-3-nano:latest",
     "nemotron-3-super:latest",
+    "nemotron-nano-9b-v2-toolfix",
+    "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
     "omnicoder:9b-q4_k_m",
     "phi4-mini:latest",
     "qwen3-coder-next:latest",
@@ -160,6 +157,17 @@
       "score_max": 5
     },
     {
+      "model": "glm-4.7-flash-reap-toolfix",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 1,
+      "score_max": 5
+    },
+    {
       "model": "glm-4.7-flash:bf16",
       "coding_pass": 1,
       "coding_total": 2,
@@ -215,17 +223,6 @@
       "score_max": 5
     },
     {
-      "model": "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
-      "coding_pass": 0,
-      "coding_total": 2,
-      "tool_pass": 0,
-      "tool_total": 2,
-      "agentic_pass": 0,
-      "agentic_total": 1,
-      "score": 0,
-      "score_max": 5
-    },
-    {
       "model": "lfm2.5-thinking:1.2b",
       "coding_pass": 0,
       "coding_total": 2,
@@ -249,13 +246,13 @@
     },
     {
       "model": "lfm2:24b",
-      "coding_pass": 1,
+      "coding_pass": 2,
       "coding_total": 2,
-      "tool_pass": 0,
+      "tool_pass": 2,
       "tool_total": 2,
       "agentic_pass": 0,
       "agentic_total": 1,
-      "score": 1,
+      "score": 4,
       "score_max": 5
     },
     {
@@ -325,6 +322,28 @@
       "score_max": 5
     },
     {
+      "model": "nemotron-nano-9b-v2-toolfix",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "agentic_pass": 0,
+      "agentic_total": 1,
+      "score": 4,
+      "score_max": 5
+    },
+    {
+      "model": "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 0,
+      "agentic_total": 1,
+      "score": 0,
+      "score_max": 5
+    },
+    {
       "model": "omnicoder:9b-q4_k_m",
       "coding_pass": 2,
       "coding_total": 2,
@@ -337,13 +356,13 @@
     },
     {
       "model": "phi4-mini:latest",
-      "coding_pass": 2,
+      "coding_pass": 1,
       "coding_total": 2,
       "tool_pass": 0,
       "tool_total": 2,
       "agentic_pass": 0,
       "agentic_total": 1,
-      "score": 2,
+      "score": 1,
       "score_max": 5
     },
     {
@@ -491,13 +510,13 @@
     },
     {
       "model": "zac/phi4-tools:latest",
-      "coding_pass": 2,
+      "coding_pass": 0,
       "coding_total": 2,
       "tool_pass": 0,
       "tool_total": 2,
       "agentic_pass": 0,
       "agentic_total": 1,
-      "score": 2,
+      "score": 0,
       "score_max": 5
     }
   ]

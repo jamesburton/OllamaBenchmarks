@@ -1,0 +1,67 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-17T22:00:04.6154536+00:00",
+    "run_finished_at":  "2026-03-17T22:00:27.3982399+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-glm-4.7-flash-reap-toolfix.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "captured_at":  "2026-03-17T22:00:06.472598+00:00",
+                         "hostname":  "Strix",
+                         "host_slug":  "strix",
+                         "os":  {
+                                    "system":  "Windows",
+                                    "release":  "11",
+                                    "version":  "10.0.26200",
+                                    "machine":  "AMD64"
+                                },
+                         "manufacturer":  "Bosgame",
+                         "model":  "BeyondMax Series",
+                         "processor":  "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+                         "logical_cpu_count":  32,
+                         "total_memory_gb":  63.65,
+                         "python_version":  "3.14.3",
+                         "ollama_version":  "ollama version is 0.18.0",
+                         "gpus":  [
+                                      {
+                                          "Name":  "AMD Radeon(TM) 8060S Graphics",
+                                          "AdapterRAM":  4293918720,
+                                          "DriverVersion":  "32.0.12064.27",
+                                          "VideoProcessor":  "AMD Radeon Graphics Processor (0x1586)",
+                                          "Status":  "OK"
+                                      }
+                                  ]
+                     },
+    "models":  [
+                   "glm-4.7-flash-reap-toolfix"
+               ],
+    "completed_models":  [
+                             "glm-4.7-flash-reap-toolfix"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "glm-4.7-flash-reap-toolfix",
+                        "eval_count":  192,
+                        "eval_s":  9.836,
+                        "toks_per_s":  19.52,
+                        "total_s":  10.689,
+                        "load_s":  0.337,
+                        "cpu_avg_pct":  0.7,
+                        "cpu_peak_pct":  0.7,
+                        "ram_peak_gb":  14.61,
+                        "gpu_util_avg":  39.2,
+                        "gpu_util_peak":  78.4,
+                        "gpu_mem_peak_gb":  48.26,
+                        "ollama_ps":  null
+                    }
+                ]
+}

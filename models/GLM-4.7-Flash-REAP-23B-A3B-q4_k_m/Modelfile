@@ -1,0 +1,9 @@
+# GLM-4.7-Flash-REAP-23B-A3B with correct glm-4.7 renderer for tool calling support.
+# The HF GGUF import uses a raw Go template that lacks tool call formatting.
+# Using the same RENDERER/PARSER as the official glm-4.7-flash model.
+FROM hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M
+
+TEMPLATE {{ .Prompt }}
+RENDERER glm-4.7
+PARSER glm-4.7
+PARAMETER temperature 1

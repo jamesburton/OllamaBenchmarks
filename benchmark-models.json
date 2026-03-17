@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-03-17T19:26:19.939170+00:00",
+  "updated_at": "2026-03-17T22:00:36.507072+00:00",
   "benchmark_suite": [
     "qwen3-coder-next:latest",
     "lfm2:24b",
@@ -25,6 +25,8 @@
     "rnj-1:8b"
   ],
   "local_installed": [
+    "glm-4.7-flash-reap-toolfix:latest",
+    "nemotron-nano-9b-v2-toolfix:latest",
     "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
     "qwen3:8b",
     "qwen3.5:9b",
@@ -73,11 +75,13 @@
     "rnj-1:8b",
     "MichelRosselli/GLM-4.5-Air:latest",
     "devstral-small-2:24b-instruct-2512-q8_0",
+    "glm-4.7-flash-reap-toolfix:latest",
     "gpt-oss:120b",
     "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
     "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
     "ministral-3:14b",
     "nemotron-3-super:latest",
+    "nemotron-nano-9b-v2-toolfix:latest",
     "qwen3-coder:30b",
     "qwen3.5:122b",
     "qwen3.5:122b-a10b",
@@ -88,6 +92,10 @@
   "missing_from_local": [
     "lfm2.5-thinking:latest",
     "qwen3.5:35b-a3b-q2_k_l",
+    "cogito:8b",
+    "cogito:14b",
+    "zac/phi4-tools:latest",
+    "phi4-mini:latest",
     "omnicoder:9b-q4_k_m",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
