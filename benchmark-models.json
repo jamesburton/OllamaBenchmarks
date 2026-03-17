@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-03-17T13:54:23.486591+00:00",
+  "updated_at": "2026-03-17T14:35:43.507361+00:00",
   "benchmark_suite": [
     "qwen3-coder-next:latest",
     "lfm2:24b",
@@ -17,7 +17,12 @@
     "phi4-mini:latest",
     "llama4:16x17b",
     "omnicoder:9b-q4_k_m",
-    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m"
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
+    "granite4:7b-a1b-h",
+    "lfm2.5-thinking:1.2b",
+    "qwen3.5:latest",
+    "rnj-1:8b"
   ],
   "local_installed": [
     "llama4:16x17b",
@@ -55,6 +60,11 @@
     "llama4:16x17b",
     "omnicoder:9b-q4_k_m",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
+    "granite4:7b-a1b-h",
+    "lfm2.5-thinking:1.2b",
+    "qwen3.5:latest",
+    "rnj-1:8b",
     "MichelRosselli/GLM-4.5-Air:latest",
     "devstral-small-2:24b-instruct-2512-q8_0",
     "gpt-oss:120b",
@@ -71,7 +81,12 @@
     "zac/phi4-tools:latest",
     "phi4-mini:latest",
     "omnicoder:9b-q4_k_m",
-    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m"
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
+    "granite4:7b-a1b-h",
+    "lfm2.5-thinking:1.2b",
+    "qwen3.5:latest",
+    "rnj-1:8b"
   ],
   "backend_notes": {
     "qwen3.5:35b-a3b-q2_k_l": "Runs via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 still fails to load qwen35moe.",
