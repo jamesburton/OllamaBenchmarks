@@ -1,32 +1,33 @@
 {
-  "benchmark": "throughput_openai",
-  "run_started_at": "2026-03-13T21:20:33.300801+00:00",
-  "run_finished_at": "2026-03-13T21:21:12.840506+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-granite4_7b-a1b-h.json",
-  "base_url": "http://127.0.0.1:8081",
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-16T02:03:49.7522405+00:00",
+  "run_finished_at": "2026-03-16T02:10:21.1690384+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-granite4_7b-a1b-h.json",
+  "host": "OLDFRAMEWORK",
+  "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-13T21:20:34.970751+00:00",
-    "hostname": "T5500",
-    "host_slug": "t5500",
+    "captured_at": "2026-03-16T02:04:00.590634+00:00",
+    "hostname": "OldFramework",
+    "host_slug": "oldframework",
     "os": {
       "system": "Windows",
       "release": "10",
       "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": "Dell Inc.",
-    "model": "Precision WorkStation T5500  ",
-    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-    "logical_cpu_count": 24,
-    "total_memory_gb": 36.0,
-    "python_version": "3.11.3",
-    "ollama_version": "ollama version is 0.17.8-rc4",
+    "manufacturer": "Framework",
+    "model": "Laptop",
+    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 8,
+    "total_memory_gb": 63.79,
+    "python_version": "3.9.25",
+    "ollama_version": "ollama version is 0.18.0",
     "gpus": [
       {
-        "Name": "NVIDIA GeForce RTX 3060",
-        "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.6094",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Name": "Intel(R) Iris(R) Xe Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7082",
+        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
         "Status": "OK"
       }
     ]
@@ -34,19 +35,24 @@
   "models": [
     "granite4:7b-a1b-h"
   ],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
   "results": [
     {
       "model": "granite4:7b-a1b-h",
-      "completion_tokens": 192,
-      "toks_per_s": 5.86,
-      "total_s": 32.788,
-      "cpu_avg_pct": 50.6,
-      "cpu_peak_pct": 51.0,
-      "ram_peak_gb": 4.54,
-      "gpu_util_avg": 36.5,
-      "gpu_util_peak": 40.8,
-      "gpu_mem_peak_gb": 4.19,
-      "response_preview": "Dependency Injection (DI) is a design pattern used to implement IoC (Inversion of Control). It allows the decoupling of the usage of an object from its creation. Instead of the class creating its depe"
+      "eval_count": 192,
+      "eval_s": 20.907,
+      "toks_per_s": 9.18,
+      "total_s": 23.409,
+      "load_s": 0.687,
+      "cpu_avg_pct": 34.0,
+      "cpu_peak_pct": 58.7,
+      "ram_peak_gb": 21.31,
+      "gpu_util_avg": 0.0,
+      "gpu_util_peak": 0.0,
+      "gpu_mem_peak_gb": 0.0,
+      "ollama_ps": "granite4:7b-a1b-h size=4.02GB vram=0GB ctx=4096 quant=Q4_K_M"
     }
   ]
 }

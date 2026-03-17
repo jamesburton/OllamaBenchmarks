@@ -1,40 +1,33 @@
 {
   "benchmark": "throughput_resource",
-  "run_started_at": "2026-03-12T16:14:51.4066519+00:00",
-  "run_finished_at": "2026-03-12T16:18:37.7117403+00:00",
+  "run_started_at": "2026-03-16T02:03:49.7522405+00:00",
+  "run_finished_at": "2026-03-16T02:07:46.9057205+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-ministral-3_14b.json",
-  "host": "FRAMEWORK",
+  "host": "OLDFRAMEWORK",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-12T16:14:53.195644+00:00",
-    "hostname": "Framework",
-    "host_slug": "framework",
+    "captured_at": "2026-03-16T02:04:00.590634+00:00",
+    "hostname": "OldFramework",
+    "host_slug": "oldframework",
     "os": {
       "system": "Windows",
       "release": "10",
-      "version": "10.0.26220",
+      "version": "10.0.26200",
       "machine": "AMD64"
     },
     "manufacturer": "Framework",
-    "model": "Laptop 13 (Intel Core Ultra Series 1)",
-    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
-    "logical_cpu_count": 22,
-    "total_memory_gb": 95.47,
-    "python_version": "3.10.13",
-    "ollama_version": "ollama version is 0.17.5",
+    "model": "Laptop",
+    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 8,
+    "total_memory_gb": 63.79,
+    "python_version": "3.9.25",
+    "ollama_version": "ollama version is 0.18.0",
     "gpus": [
       {
-        "Name": "Intel(R) Arc(TM) Graphics",
+        "Name": "Intel(R) Iris(R) Xe Graphics",
         "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7026",
-        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
-        "Status": "OK"
-      },
-      {
-        "Name": "NVIDIA GeForce RTX 3060",
-        "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.9186",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "DriverVersion": "32.0.101.7082",
+        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
         "Status": "OK"
       }
     ]
@@ -49,17 +42,17 @@
     {
       "model": "ministral-3:14b",
       "eval_count": 192,
-      "eval_s": 5.975,
-      "toks_per_s": 32.14,
-      "total_s": 6.78,
-      "load_s": 0.256,
-      "cpu_avg_pct": 0,
-      "cpu_peak_pct": 0,
-      "ram_peak_gb": 0.05,
+      "eval_s": 67.287,
+      "toks_per_s": 2.85,
+      "total_s": 72.829,
+      "load_s": 1.783,
+      "cpu_avg_pct": 44.7,
+      "cpu_peak_pct": 65.8,
+      "ram_peak_gb": 9.45,
       "gpu_util_avg": 0.0,
       "gpu_util_peak": 0.0,
       "gpu_mem_peak_gb": 0.0,
-      "ollama_ps": "ministral-3:14b    4760c35aeb9d    11 GB    100% GPU     4096       4 minutes from now    "
+      "ollama_ps": "ministral-3:14b size=9.82GB vram=0GB ctx=4096 quant=Q4_K_M"
     }
   ]
 }

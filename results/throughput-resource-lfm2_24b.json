@@ -1,32 +1,33 @@
 {
-  "benchmark": "throughput_openai",
-  "run_started_at": "2026-03-13T20:30:28.643026+00:00",
-  "run_finished_at": "2026-03-13T20:31:08.701842+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2_24b.json",
-  "base_url": "http://127.0.0.1:8081",
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-16T02:03:49.7522405+00:00",
+  "run_finished_at": "2026-03-16T02:11:51.8661511+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2_24b.json",
+  "host": "OLDFRAMEWORK",
+  "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-13T20:30:30.635014+00:00",
-    "hostname": "T5500",
-    "host_slug": "t5500",
+    "captured_at": "2026-03-16T02:04:00.590634+00:00",
+    "hostname": "OldFramework",
+    "host_slug": "oldframework",
     "os": {
       "system": "Windows",
       "release": "10",
       "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": "Dell Inc.",
-    "model": "Precision WorkStation T5500  ",
-    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-    "logical_cpu_count": 24,
-    "total_memory_gb": 36.0,
-    "python_version": "3.11.3",
-    "ollama_version": "ollama version is 0.17.8-rc4",
+    "manufacturer": "Framework",
+    "model": "Laptop",
+    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 8,
+    "total_memory_gb": 63.79,
+    "python_version": "3.9.25",
+    "ollama_version": "ollama version is 0.18.0",
     "gpus": [
       {
-        "Name": "NVIDIA GeForce RTX 3060",
-        "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.6094",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Name": "Intel(R) Iris(R) Xe Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7082",
+        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
         "Status": "OK"
       }
     ]
@@ -34,19 +35,24 @@
   "models": [
     "lfm2:24b"
   ],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
   "results": [
     {
       "model": "lfm2:24b",
-      "completion_tokens": 150,
-      "toks_per_s": 4.36,
-      "total_s": 34.39,
-      "cpu_avg_pct": 49.8,
-      "cpu_peak_pct": 49.8,
-      "ram_peak_gb": 14.1,
-      "gpu_util_avg": 20.8,
-      "gpu_util_peak": 34.5,
-      "gpu_mem_peak_gb": 4.11,
-      "response_preview": "Dependency Injection (DI) is a design pattern that allows components to be loosely coupled by injecting their dependencies rather than creating them internally. This promotes modularity and testabilit"
+      "eval_count": 187,
+      "eval_s": 13.402,
+      "toks_per_s": 13.95,
+      "total_s": 14.865,
+      "load_s": 0.293,
+      "cpu_avg_pct": 62.1,
+      "cpu_peak_pct": 81.1,
+      "ram_peak_gb": 27.33,
+      "gpu_util_avg": 0.0,
+      "gpu_util_peak": 0.0,
+      "gpu_mem_peak_gb": 0.0,
+      "ollama_ps": "lfm2:24b size=13.69GB vram=0GB ctx=4096 quant=Q4_K_M"
     }
   ]
 }

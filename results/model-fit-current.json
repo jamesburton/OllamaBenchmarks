@@ -1,0 +1,537 @@
+{
+  "host": {
+    "captured_at": "2026-03-15T21:11:06.119118+00:00",
+    "hostname": "OldFramework",
+    "host_slug": "oldframework",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop",
+    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 8,
+    "total_memory_gb": 63.79,
+    "python_version": "3.9.25",
+    "ollama_version": null,
+    "gpus": [
+      {
+        "Name": "Intel(R) Iris(R) Xe Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7082",
+        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
+        "Status": "OK"
+      }
+    ]
+  },
+  "summary": {
+    "likely": [
+      "granite4:7b-a1b-h",
+      "lfm2.5-thinking:latest",
+      "ministral-3:14b"
+    ],
+    "borderline": [
+      "glm-4.7-flash:latest",
+      "granite4:32b-a9b-h",
+      "lfm2.5-thinking:1.2b",
+      "lfm2:24b",
+      "qwen3-coder-next:latest",
+      "qwen3.5:latest",
+      "rnj-1:8b"
+    ],
+    "unlikely": [
+      "MichelRosselli/GLM-4.5-Air:latest",
+      "devstral-small-2:24b-instruct-2512-q8_0",
+      "glm-4.7-flash:bf16",
+      "gpt-oss:120b",
+      "nemotron-3-super:latest",
+      "qwen3-coder-next:q8_0",
+      "qwen3.5:122b",
+      "qwen3.5:122b-a10b",
+      "qwen3.5:35b-a3b-q2_k_l"
+    ]
+  },
+  "assessments": [
+    {
+      "model": "MichelRosselli/GLM-4.5-Air:latest",
+      "status": "unlikely",
+      "best_score": 2,
+      "smallest_observed_resident_gb": 148.0,
+      "reasons": [
+        "smallest observed resident set was 148.00 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 2/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 1.27,
+          "score": 2,
+          "score_max": 5,
+          "observed_resident_gb": 148.0
+        }
+      ]
+    },
+    {
+      "model": "devstral-small-2:24b-instruct-2512-q8_0",
+      "status": "unlikely",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 70.0,
+      "reasons": [
+        "smallest observed resident set was 70.00 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 5/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 3.98,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 70.0
+        }
+      ]
+    },
+    {
+      "model": "glm-4.7-flash:bf16",
+      "status": "unlikely",
+      "best_score": 2,
+      "smallest_observed_resident_gb": 77.38,
+      "reasons": [
+        "smallest observed resident set was 77.38 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 2/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 7.09,
+          "score": 2,
+          "score_max": 5,
+          "observed_resident_gb": 77.38
+        }
+      ]
+    },
+    {
+      "model": "glm-4.7-flash:latest",
+      "status": "borderline",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 41.06,
+      "reasons": [
+        "smallest observed resident set was 41.06 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 5/5",
+        "current machine has materially weaker graphics than the weakest archived success"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 43.11,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 41.06
+        }
+      ]
+    },
+    {
+      "model": "gpt-oss:120b",
+      "status": "unlikely",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 71.0,
+      "reasons": [
+        "smallest observed resident set was 71.00 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 5/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 11.12,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 71.0
+        }
+      ]
+    },
+    {
+      "model": "granite4:32b-a9b-h",
+      "status": "borderline",
+      "best_score": 4,
+      "smallest_observed_resident_gb": 43.18,
+      "reasons": [
+        "smallest observed resident set was 43.18 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 4/5",
+        "current machine has materially weaker graphics than the weakest archived success"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 26.12,
+          "score": 4,
+          "score_max": 5,
+          "observed_resident_gb": 43.18
+        }
+      ]
+    },
+    {
+      "model": "granite4:7b-a1b-h",
+      "status": "likely",
+      "best_score": 4,
+      "smallest_observed_resident_gb": 4.5,
+      "reasons": [
+        "smallest observed resident set was 4.50 GB",
+        "completed on t5500-20260311-xeon3060 (36.00 GB RAM, GPU tier 3, CPU tier 3)",
+        "best quick-quality score was 4/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "t5500-20260311-xeon3060",
+          "host_slug": "t5500",
+          "host_memory_gb": 36.0,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 3,
+          "toks_per_s": 20.46,
+          "score": 4,
+          "score_max": 4,
+          "observed_resident_gb": 4.5
+        }
+      ]
+    },
+    {
+      "model": "lfm2.5-thinking:1.2b",
+      "status": "borderline",
+      "best_score": 0,
+      "smallest_observed_resident_gb": 1.0,
+      "reasons": [
+        "smallest observed resident set was 1.00 GB",
+        "completed on framework-20260312 (95.47 GB RAM, GPU tier 3, CPU tier 2)",
+        "best quick-quality score was 0/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "framework-20260312",
+          "host_slug": "framework",
+          "host_memory_gb": 95.47,
+          "host_cpu_tier": 2,
+          "host_gpu_tier": 3,
+          "toks_per_s": 205.66,
+          "score": 0,
+          "score_max": 5,
+          "observed_resident_gb": 1.0
+        }
+      ]
+    },
+    {
+      "model": "lfm2.5-thinking:latest",
+      "status": "likely",
+      "best_score": 0,
+      "smallest_observed_resident_gb": 1.0,
+      "reasons": [
+        "smallest observed resident set was 1.00 GB",
+        "completed on t5500-20260311-xeon3060 (36.00 GB RAM, GPU tier 3, CPU tier 3)",
+        "best quick-quality score was 0/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "t5500-20260311-xeon3060",
+          "host_slug": "t5500",
+          "host_memory_gb": 36.0,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 3,
+          "toks_per_s": 220.75,
+          "score": 0,
+          "score_max": 4,
+          "observed_resident_gb": 1.0
+        }
+      ]
+    },
+    {
+      "model": "lfm2:24b",
+      "status": "borderline",
+      "best_score": 4,
+      "smallest_observed_resident_gb": 14.0,
+      "reasons": [
+        "smallest observed resident set was 14.00 GB",
+        "completed on t5500-20260311-xeon3060 (36.00 GB RAM, GPU tier 3, CPU tier 3)",
+        "best quick-quality score was 4/5",
+        "current machine has materially weaker graphics than the weakest archived success"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 31.78,
+          "score": 4,
+          "score_max": 5,
+          "observed_resident_gb": 16.56
+        },
+        {
+          "system_id": "t5500-20260311-xeon3060",
+          "host_slug": "t5500",
+          "host_memory_gb": 36.0,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 3,
+          "toks_per_s": 11.67,
+          "score": 4,
+          "score_max": 4,
+          "observed_resident_gb": 14.0
+        }
+      ]
+    },
+    {
+      "model": "ministral-3:14b",
+      "status": "likely",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 11.0,
+      "reasons": [
+        "smallest observed resident set was 11.00 GB",
+        "completed on t5500-20260311-xeon3060 (36.00 GB RAM, GPU tier 3, CPU tier 3)",
+        "best quick-quality score was 5/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "framework-20260312",
+          "host_slug": "framework",
+          "host_memory_gb": 95.47,
+          "host_cpu_tier": 2,
+          "host_gpu_tier": 3,
+          "toks_per_s": 32.14,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 11.0
+        },
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 21.94,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 66.91
+        },
+        {
+          "system_id": "t5500-20260311-xeon3060",
+          "host_slug": "t5500",
+          "host_memory_gb": 36.0,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 3,
+          "toks_per_s": 29.68,
+          "score": 4,
+          "score_max": 4,
+          "observed_resident_gb": 11.0
+        }
+      ]
+    },
+    {
+      "model": "nemotron-3-super:latest",
+      "status": "unlikely",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 95.0,
+      "reasons": [
+        "smallest observed resident set was 95.00 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 5/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 5.84,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 95.0
+        }
+      ]
+    },
+    {
+      "model": "qwen3-coder-next:latest",
+      "status": "borderline",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 60.54,
+      "reasons": [
+        "smallest observed resident set was 60.54 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 5/5",
+        "current machine has materially weaker graphics than the weakest archived success"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 33.92,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 60.54
+        }
+      ]
+    },
+    {
+      "model": "qwen3-coder-next:q8_0",
+      "status": "unlikely",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 94.0,
+      "reasons": [
+        "smallest observed resident set was 94.00 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 5/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 7.96,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 94.0
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:122b",
+      "status": "unlikely",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 97.0,
+      "reasons": [
+        "smallest observed resident set was 97.00 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 5/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 5.22,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 97.0
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:122b-a10b",
+      "status": "unlikely",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 97.0,
+      "reasons": [
+        "smallest observed resident set was 97.00 GB",
+        "completed on strix-20260311 (63.65 GB RAM, GPU tier 4, CPU tier 3)",
+        "best quick-quality score was 5/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "strix-20260311",
+          "host_slug": "strix",
+          "host_memory_gb": 63.65,
+          "host_cpu_tier": 3,
+          "host_gpu_tier": 4,
+          "toks_per_s": 5.21,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 97.0
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:35b-a3b-q2_k_l",
+      "status": "unlikely",
+      "best_score": null,
+      "smallest_observed_resident_gb": null,
+      "reasons": [
+        "Runs via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 still fails to load qwen35moe."
+      ],
+      "evidence": []
+    },
+    {
+      "model": "qwen3.5:latest",
+      "status": "borderline",
+      "best_score": 5,
+      "smallest_observed_resident_gb": 8.8,
+      "reasons": [
+        "smallest observed resident set was 8.80 GB",
+        "completed on framework-20260312 (95.47 GB RAM, GPU tier 3, CPU tier 2)",
+        "best quick-quality score was 5/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "framework-20260312",
+          "host_slug": "framework",
+          "host_memory_gb": 95.47,
+          "host_cpu_tier": 2,
+          "host_gpu_tier": 3,
+          "toks_per_s": 37.71,
+          "score": 5,
+          "score_max": 5,
+          "observed_resident_gb": 8.8
+        }
+      ]
+    },
+    {
+      "model": "rnj-1:8b",
+      "status": "borderline",
+      "best_score": 4,
+      "smallest_observed_resident_gb": 6.3,
+      "reasons": [
+        "smallest observed resident set was 6.30 GB",
+        "completed on framework-20260312 (95.47 GB RAM, GPU tier 3, CPU tier 2)",
+        "best quick-quality score was 4/5"
+      ],
+      "evidence": [
+        {
+          "system_id": "framework-20260312",
+          "host_slug": "framework",
+          "host_memory_gb": 95.47,
+          "host_cpu_tier": 2,
+          "host_gpu_tier": 3,
+          "toks_per_s": 46.6,
+          "score": 4,
+          "score_max": 5,
+          "observed_resident_gb": 6.3
+        }
+      ]
+    }
+  ]
+}

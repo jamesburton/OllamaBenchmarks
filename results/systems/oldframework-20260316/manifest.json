@@ -1,0 +1,66 @@
+{
+  "captured_at": "2026-03-16T04:11:26.126860+00:00",
+  "system_id": "oldframework-20260316",
+  "system_dir": "C:\\Development\\OllamaBenchmarks\\results\\systems\\oldframework-20260316",
+  "host_info_file": "host-info.json",
+  "artifacts": {
+    "throughput": "throughput-resource-current.json",
+    "quality": "quality-current.json",
+    "backend": "backend-comparison-current.json",
+    "sweep": "optimization-sweep-current.json",
+    "session_summary": "session-2026-03-16-summary.md"
+  },
+  "host": {
+    "captured_at": "2026-03-16T04:11:26.041167+00:00",
+    "hostname": "OldFramework",
+    "host_slug": "oldframework",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop",
+    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 8,
+    "total_memory_gb": 63.79,
+    "python_version": "3.9.25",
+    "ollama_version": "ollama version is 0.18.0",
+    "gpus": [
+      {
+        "Name": "Intel(R) Iris(R) Xe Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7082",
+        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
+        "Status": "OK"
+      }
+    ]
+  },
+  "summary": {
+    "fastest_model": {
+      "model": "lfm2:24b",
+      "toks_per_s": 13.95,
+      "score": 4,
+      "score_max": 5
+    },
+    "primary_coding_model": {
+      "model": "granite4:7b-a1b-h",
+      "toks_per_s": 9.18,
+      "score": 5,
+      "score_max": 5
+    },
+    "best_balanced_model": {
+      "model": "granite4:7b-a1b-h",
+      "toks_per_s": 9.18,
+      "score": 5,
+      "score_max": 5
+    },
+    "full_quality_models": [
+      "granite4:7b-a1b-h",
+      "ministral-3:14b",
+      "qwen3.5:latest"
+    ],
+    "backend_summary": "auto led at 2.57 tok/s; vulkan followed at 2.54 tok/s."
+  }
+}
