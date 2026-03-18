@@ -1,22 +1,22 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-18T17:20:42.7617797+00:00",
-    "run_finished_at":  "2026-03-18T17:20:50.8352345+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3.5_9b.json",
+    "run_started_at":  "2026-03-18T17:15:39.2167691+00:00",
+    "run_finished_at":  "2026-03-18T17:15:42.9300101+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-171539.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
                          "hostname":  "T5500"
                      },
     "models":  [
-                   "qwen3.5:9b"
+                   "qwen3.5:4b"
                ],
     "completed_models":  [
 
                          ],
     "failed_models":  [
                           {
-                              "model":  "qwen3.5:9b",
+                              "model":  "qwen3.5:4b",
                               "error":  "The remote server returned an error: (500) Internal Server Error."
                           }
                       ],

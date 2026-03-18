@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-18T17:20:43.984071+00:00",
-  "run_finished_at": "2026-03-18T17:21:13.719482+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-qwen3.5_9b.json",
+  "run_started_at": "2026-03-18T17:15:40.155587+00:00",
+  "run_finished_at": "2026-03-18T17:15:59.106861+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-qwen3.5_4b.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-18T17:20:45.666352+00:00",
+    "captured_at": "2026-03-18T17:15:42.251996+00:00",
     "hostname": "T5500",
     "host_slug": "t5500",
     "os": {
@@ -32,11 +32,11 @@
     ]
   },
   "models": [
-    "qwen3.5:9b"
+    "qwen3.5:4b"
   ],
   "results": [
     {
-      "model": "qwen3.5:9b",
+      "model": "qwen3.5:4b",
       "coding_pass": 0,
       "coding_total": 2,
       "tool_pass": 0,
