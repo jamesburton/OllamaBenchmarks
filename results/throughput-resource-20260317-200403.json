@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-17T20:04:03.2797334+00:00",
+    "run_finished_at":  "2026-03-17T20:06:53.1444736+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260317-200403.json",
+    "host":  "OLDFRAMEWORK",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "OLDFRAMEWORK"
+                     },
+    "models":  [
+                   "ministral-3:14b"
+               ],
+    "completed_models":  [
+                             "ministral-3:14b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "ministral-3:14b",
+                        "eval_count":  192,
+                        "eval_s":  88.893,
+                        "toks_per_s":  2.16,
+                        "total_s":  93.46,
+                        "load_s":  0.618,
+                        "cpu_avg_pct":  47.2,
+                        "cpu_peak_pct":  56.4,
+                        "ram_peak_gb":  9.46,
+                        "gpu_util_avg":  0,
+                        "gpu_util_peak":  0,
+                        "gpu_mem_peak_gb":  0,
+                        "ollama_ps":  "ministral-3:14b size=9.82GB vram=0GB ctx=4096 quant=Q4_K_M"
+                    }
+                ]
+}

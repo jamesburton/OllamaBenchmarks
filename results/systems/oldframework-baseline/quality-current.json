@@ -1,0 +1,15 @@
+{
+  "benchmark": "quality",
+  "results": [
+    {
+      "model": "phi4-mini-16k",
+      "score": 2,
+      "score_max": 2
+    },
+    {
+      "model": "phi4-mini-strict",
+      "score": 0,
+      "score_max": 2
+    }
+  ]
+}

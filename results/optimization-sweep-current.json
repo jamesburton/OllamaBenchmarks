@@ -1,97 +1,42 @@
 {
   "benchmark": "sweep",
-  "run_started_at": "2026-03-16T02:42:06.804472+00:00",
-  "run_finished_at": "2026-03-16T04:10:16.243971+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\optimization-sweep-current.json",
-  "ollama_host": "http://127.0.0.1:11434",
+  "model": "ministral-3:14b",
   "host_details": {
-    "captured_at": "2026-03-16T04:10:19.899281+00:00",
-    "hostname": "OldFramework",
-    "host_slug": "oldframework",
+    "captured_at": "2026-03-17T22:26:36.1969811Z",
+    "hostname": "OLDFRAMEWORK",
     "os": {
       "system": "Windows",
-      "release": "10",
-      "version": "10.0.26200",
+      "version": "Microsoft Windows NT 10.0.26200.0",
       "machine": "AMD64"
     },
-    "manufacturer": "Framework",
-    "model": "Laptop",
-    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
     "logical_cpu_count": 8,
-    "total_memory_gb": 63.79,
-    "python_version": "3.9.25",
     "ollama_version": "ollama version is 0.18.0",
-    "gpus": [
-      {
-        "Name": "Intel(R) Iris(R) Xe Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7082",
-        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
-        "Status": "OK"
-      }
-    ]
+    "total_memory_gb": 63.79
   },
-  "model": "qwen3.5:latest",
-  "runs": 2,
-  "num_ctx": 8192,
-  "think": false,
   "variants": [
     {
-      "perm": "baseline",
-      "opts": {},
-      "status": "ok",
-      "tps_avg": 2.47,
-      "tps_min": 2.44,
-      "tps_max": 2.5,
-      "eval_count_avg": 167,
-      "total_s_avg": 73.375
+      "model": "ministral-3:14b",
+      "eval_count": 192,
+      "eval_s": 142.737,
+      "toks_per_s": 1.35,
+      "total_s": 147.943,
+      "variant": "baseline"
     },
     {
-      "perm": "threads_8",
-      "opts": {
-        "num_thread": 8
-      },
-      "status": "ok",
-      "tps_avg": 1.08,
-      "tps_min": 0.17,
-      "tps_max": 2.0,
-      "eval_count_avg": 167,
-      "total_s_avg": 623.202
+      "model": "ministral-3:14b",
+      "eval_count": 192,
+      "eval_s": 143.953,
+      "toks_per_s": 1.33,
+      "total_s": 145.334,
+      "variant": "threads_8"
     },
     {
-      "perm": "threads_16",
-      "opts": {
-        "num_thread": 16
-      },
-      "status": "request_failed",
-      "errors": [
-        "timed out",
-        "timed out"
-      ]
-    },
-    {
-      "perm": "batch_1024",
-      "opts": {
-        "num_batch": 1024
-      },
-      "status": "ok",
-      "tps_avg": 2.69,
-      "tps_min": 2.63,
-      "tps_max": 2.76,
-      "eval_count_avg": 167,
-      "total_s_avg": 72.366
-    },
-    {
-      "perm": "force_gpu_99",
-      "opts": {
-        "num_gpu": 99
-      },
-      "status": "ok",
-      "tps_avg": 2.75,
-      "tps_min": 2.75,
-      "tps_max": 2.76,
-      "eval_count_avg": 167,
-      "total_s_avg": 66.65
+      "model": "ministral-3:14b",
+      "eval_count": 192,
+      "eval_s": 149.29,
+      "toks_per_s": 1.29,
+      "total_s": 150.691,
+      "variant": "batch_1024"
     }
   ]
 }

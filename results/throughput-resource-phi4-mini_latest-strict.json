@@ -1,12 +1,12 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-17T20:22:50.4791556+00:00",
-    "run_finished_at":  "2026-03-17T20:26:07.5686735+00:00",
-    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3.5_latest.json",
+    "run_started_at":  "2026-03-17T20:44:47.4946848+00:00",
+    "run_finished_at":  "2026-03-17T20:44:50.6623806+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-phi4-mini_latest-strict.json",
     "host":  "OLDFRAMEWORK",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "captured_at":  "2026-03-17T20:22:56.091495+00:00",
+                         "captured_at":  "2026-03-17T20:44:50.589699+00:00",
                          "hostname":  "OldFramework",
                          "host_slug":  "oldframework",
                          "os":  {
@@ -33,26 +33,24 @@
                                   ]
                      },
     "models":  [
-                   "qwen3.5:latest"
+                   "phi4-mini:latest-strict"
                ],
+    "completed_models":  [
+
+                         ],
+    "failed_models":  [
+                          {
+                              "model":  "phi4-mini:latest-strict",
+                              "error":  "The remote server returned an error: (404) Not Found."
+                          }
+                      ],
+    "incomplete_models":  [
+
+                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,
     "results":  [
-                    {
-                        "model":  "qwen3.5:latest",
-                        "eval_count":  192,
-                        "eval_s":  157.158,
-                        "toks_per_s":  1.22,
-                        "total_s":  162.78,
-                        "load_s":  0.659,
-                        "cpu_avg_pct":  50.6,
-                        "cpu_peak_pct":  204.4,
-                        "ram_peak_gb":  17.15,
-                        "gpu_util_avg":  0,
-                        "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  0,
-                        "ollama_ps":  "qwen3.5:latest size=7.91GB vram=0GB ctx=4096 quant=Q4_K_M"
-                    }
+
                 ]
 }

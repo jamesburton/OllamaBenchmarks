@@ -13,7 +13,8 @@ $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 function Get-HostDetails {
   $helper = Join-Path $scriptRoot "collect_host_info.py"
   try {
-    $json = python $helper --compact
+    $PYTHON = "C:\ProgramData\miniconda3\python.exe"
+    $json = & $PYTHON $helper --compact
     if ($LASTEXITCODE -eq 0 -and $json) {
       return $json | ConvertFrom-Json
     }
