@@ -2,7 +2,7 @@
   "benchmark": "throughput_openai",
   "run_started_at": "2026-03-18T15:20:19.587311+00:00",
   "run_finished_at": "2026-03-18T15:26:03.636780+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-cogito_14b.json",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-openai-20260318-152019.json",
   "base_url": "http://127.0.0.1:8081",
   "host_details": {
     "captured_at": "2026-03-18T15:20:22.545822+00:00",

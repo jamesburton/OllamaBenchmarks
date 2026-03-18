@@ -1,12 +1,12 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-18T13:07:14.0836918+00:00",
-    "run_finished_at":  "2026-03-18T13:07:34.1587911+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-zac_phi4-tools_latest.json",
+    "run_started_at":  "2026-03-18T13:07:13.5761778+00:00",
+    "run_finished_at":  "2026-03-18T13:07:41.6703189+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-130713.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "captured_at":  "2026-03-18T13:07:16.317291+00:00",
+                         "captured_at":  "2026-03-18T13:07:16.325391+00:00",
                          "hostname":  "T5500",
                          "host_slug":  "t5500",
                          "os":  {
@@ -33,14 +33,14 @@
                                   ]
                      },
     "models":  [
-                   "zac/phi4-tools:latest"
+                   "qwen3:8b"
                ],
     "completed_models":  [
 
                          ],
     "failed_models":  [
                           {
-                              "model":  "zac/phi4-tools:latest",
+                              "model":  "qwen3:8b",
                               "error":  "The remote server returned an error: (500) Internal Server Error."
                           }
                       ],

@@ -1,11 +1,11 @@
 {
-  "benchmark": "throughput_openai",
-  "run_started_at": "2026-03-18T15:20:19.587311+00:00",
-  "run_finished_at": "2026-03-18T15:26:03.636780+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-cogito_14b.json",
+  "benchmark": "quality_openai",
+  "run_started_at": "2026-03-18T15:20:19.942117+00:00",
+  "run_finished_at": "2026-03-18T15:37:54.312817+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-openai-20260318-152019.json",
   "base_url": "http://127.0.0.1:8081",
   "host_details": {
-    "captured_at": "2026-03-18T15:20:22.545822+00:00",
+    "captured_at": "2026-03-18T15:20:22.549975+00:00",
     "hostname": "T5500",
     "host_slug": "t5500",
     "os": {
@@ -34,19 +34,22 @@
   "models": [
     "cogito:14b"
   ],
+  "completed_models": [
+    "cogito:14b"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
       "model": "cogito:14b",
-      "completion_tokens": 153,
-      "toks_per_s": 0.52,
-      "total_s": 296.639,
-      "cpu_avg_pct": 49.8,
-      "cpu_peak_pct": 50.2,
-      "ram_peak_gb": 14.06,
-      "gpu_util_avg": 3.6,
-      "gpu_util_peak": 44.4,
-      "gpu_mem_peak_gb": 6.76,
-      "response_preview": "Dependency injection is a design pattern where objects receive their dependencies from external sources rather than creating them internally. This makes code more modular, testable, and easier to main"
+      "coding_pass": 1,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "agentic_pass": 1,
+      "agentic_total": 1,
+      "score": 4,
+      "score_max": 5
     }
   ]
 }

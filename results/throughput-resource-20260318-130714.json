@@ -1,8 +1,8 @@
 {
     "benchmark":  "throughput_resource",
     "run_started_at":  "2026-03-18T13:07:14.0836918+00:00",
-    "run_finished_at":  "2026-03-18T13:07:34.1587911+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-zac_phi4-tools_latest.json",
+    "run_finished_at":  "2026-03-18T13:07:34.2111733+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-130714.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {

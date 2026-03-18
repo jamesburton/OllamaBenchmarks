@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-18T13:07:21.297960+00:00",
-  "run_finished_at": "2026-03-18T13:08:19.726738+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-zac_phi4-tools_latest.json",
+  "run_started_at": "2026-03-18T15:39:00.791086+00:00",
+  "run_finished_at": "2026-03-18T15:39:20.777556+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-jacob-ebey_phi4-tools_latest.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-18T13:07:22.874271+00:00",
+    "captured_at": "2026-03-18T15:39:02.277006+00:00",
     "hostname": "T5500",
     "host_slug": "t5500",
     "os": {
@@ -32,11 +32,11 @@
     ]
   },
   "models": [
-    "zac/phi4-tools:latest"
+    "jacob-ebey/phi4-tools:latest"
   ],
   "results": [
     {
-      "model": "zac/phi4-tools:latest",
+      "model": "jacob-ebey/phi4-tools:latest",
       "coding_pass": 0,
       "coding_total": 2,
       "tool_pass": 0,
