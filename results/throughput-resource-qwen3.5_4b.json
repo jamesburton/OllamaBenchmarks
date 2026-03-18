@@ -1,7 +1,7 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-18T17:15:39.2167691+00:00",
-    "run_finished_at":  "2026-03-18T17:15:42.8983951+00:00",
+    "run_started_at":  "2026-03-18T19:14:35.6614819+00:00",
+    "run_finished_at":  "2026-03-18T19:16:08.0351083+00:00",
     "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3.5_4b.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
@@ -11,22 +11,24 @@
     "models":  [
                    "qwen3.5:4b"
                ],
-    "completed_models":  [
-
-                         ],
-    "failed_models":  [
-                          {
-                              "model":  "qwen3.5:4b",
-                              "error":  "The remote server returned an error: (500) Internal Server Error."
-                          }
-                      ],
-    "incomplete_models":  [
-
-                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,
     "results":  [
-
+                    {
+                        "model":  "qwen3.5:4b",
+                        "eval_count":  192,
+                        "eval_s":  3.449,
+                        "toks_per_s":  55.66,
+                        "total_s":  5.607,
+                        "load_s":  0.553,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  1.73,
+                        "gpu_util_avg":  94.7,
+                        "gpu_util_peak":  94.7,
+                        "gpu_mem_peak_gb":  5.48,
+                        "ollama_ps":  "qwen3.5:4b size=5.73GB vram=5.73GB ctx=4096 quant=Q4_K_M"
+                    }
                 ]
 }

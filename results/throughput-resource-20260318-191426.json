@@ -1,8 +1,8 @@
 {
     "benchmark":  "throughput_resource",
     "run_started_at":  "2026-03-18T19:14:26.6545649+00:00",
-    "run_finished_at":  "2026-03-18T19:14:37.5580444+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3.5_9b.json",
+    "run_finished_at":  "2026-03-18T19:14:37.6175845+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-191426.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
@@ -11,6 +11,15 @@
     "models":  [
                    "qwen3.5:9b"
                ],
+    "completed_models":  [
+                             "qwen3.5:9b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,

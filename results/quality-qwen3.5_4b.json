@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-18T17:15:40.155587+00:00",
-  "run_finished_at": "2026-03-18T17:15:59.106861+00:00",
+  "run_started_at": "2026-03-18T19:14:36.383488+00:00",
+  "run_finished_at": "2026-03-18T19:21:57.872064+00:00",
   "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-qwen3.5_4b.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-18T17:15:42.251996+00:00",
+    "captured_at": "2026-03-18T19:14:37.976280+00:00",
     "hostname": "T5500",
     "host_slug": "t5500",
     "os": {
@@ -20,7 +20,7 @@
     "logical_cpu_count": 24,
     "total_memory_gb": 36.0,
     "python_version": "3.11.3",
-    "ollama_version": null,
+    "ollama_version": "ollama version is 0.18.1",
     "gpus": [
       {
         "Name": "NVIDIA GeForce RTX 3060",
@@ -37,13 +37,13 @@
   "results": [
     {
       "model": "qwen3.5:4b",
-      "coding_pass": 0,
+      "coding_pass": 2,
       "coding_total": 2,
-      "tool_pass": 0,
+      "tool_pass": 2,
       "tool_total": 2,
-      "agentic_pass": 0,
+      "agentic_pass": 1,
       "agentic_total": 1,
-      "score": 0,
+      "score": 5,
       "score_max": 5
     }
   ]
