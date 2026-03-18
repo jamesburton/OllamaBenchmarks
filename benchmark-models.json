@@ -22,7 +22,11 @@
     "granite4:7b-a1b-h",
     "lfm2.5-thinking:1.2b",
     "qwen3.5:latest",
-    "rnj-1:8b"
+    "rnj-1:8b",
+    "gemma3:4b",
+    "gemma3:12b",
+    "gemma3:27b",
+    "mistral-small:latest"
   ],
   "local_installed": [
     "zac/phi4-tools:latest",
