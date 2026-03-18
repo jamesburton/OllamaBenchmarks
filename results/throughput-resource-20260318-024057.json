@@ -1,8 +1,8 @@
 {
     "benchmark":  "throughput_resource",
     "run_started_at":  "2026-03-18T02:40:57.5431939+00:00",
-    "run_finished_at":  "2026-03-18T02:41:12.6768373+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3_8b.json",
+    "run_finished_at":  "2026-03-18T02:41:12.7209671+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-024057.json",
     "host":  "T5500",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
