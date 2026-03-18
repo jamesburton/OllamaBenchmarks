@@ -1,33 +1,33 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-18T02:40:57.5431939+00:00",
-    "run_finished_at":  "2026-03-18T02:41:12.6768373+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3_8b.json",
-    "host":  "T5500",
+    "run_started_at":  "2026-03-18T12:00:06.8405158+00:00",
+    "run_finished_at":  "2026-03-18T12:00:37.6640792+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3_8b.json",
+    "host":  "STRIX",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "captured_at":  "2026-03-18T02:41:00.179653+00:00",
-                         "hostname":  "T5500",
-                         "host_slug":  "t5500",
+                         "captured_at":  "2026-03-18T12:00:09.424648+00:00",
+                         "hostname":  "Strix",
+                         "host_slug":  "strix",
                          "os":  {
                                     "system":  "Windows",
-                                    "release":  "10",
+                                    "release":  "11",
                                     "version":  "10.0.26200",
                                     "machine":  "AMD64"
                                 },
-                         "manufacturer":  "Dell Inc.",
-                         "model":  "Precision WorkStation T5500  ",
-                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-                         "logical_cpu_count":  24,
-                         "total_memory_gb":  36.0,
-                         "python_version":  "3.11.3",
+                         "manufacturer":  "Bosgame",
+                         "model":  "BeyondMax Series",
+                         "processor":  "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+                         "logical_cpu_count":  32,
+                         "total_memory_gb":  63.65,
+                         "python_version":  "3.14.3",
                          "ollama_version":  "ollama version is 0.18.0",
                          "gpus":  [
                                       {
-                                          "Name":  "NVIDIA GeForce RTX 3060",
+                                          "Name":  "AMD Radeon(TM) 8060S Graphics",
                                           "AdapterRAM":  4293918720,
-                                          "DriverVersion":  "32.0.15.6094",
-                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
+                                          "DriverVersion":  "32.0.12064.27",
+                                          "VideoProcessor":  "AMD Radeon Graphics Processor (0x1586)",
                                           "Status":  "OK"
                                       }
                                   ]
@@ -36,13 +36,10 @@
                    "qwen3:8b"
                ],
     "completed_models":  [
-
+                             "qwen3:8b"
                          ],
     "failed_models":  [
-                          {
-                              "model":  "qwen3:8b",
-                              "error":  "The remote server returned an error: (500) Internal Server Error."
-                          }
+
                       ],
     "incomplete_models":  [
 
@@ -51,6 +48,20 @@
     "num_predict":  192,
     "seed":  42,
     "results":  [
-
+                    {
+                        "model":  "qwen3:8b",
+                        "eval_count":  192,
+                        "eval_s":  13.498,
+                        "toks_per_s":  14.22,
+                        "total_s":  14.045,
+                        "load_s":  0.257,
+                        "cpu_avg_pct":  0.2,
+                        "cpu_peak_pct":  0.2,
+                        "ram_peak_gb":  0.78,
+                        "gpu_util_avg":  36,
+                        "gpu_util_peak":  72,
+                        "gpu_mem_peak_gb":  11.27,
+                        "ollama_ps":  "qwen3:8b size=10.66GB vram=10.66GB ctx=40960 quant=Q4_K_M"
+                    }
                 ]
 }
