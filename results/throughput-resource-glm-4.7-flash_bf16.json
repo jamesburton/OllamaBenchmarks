@@ -1,58 +1,67 @@
 {
-  "benchmark": "throughput_resource",
-  "run_started_at": "2026-03-12T17:55:15.9211610+00:00",
-  "run_finished_at": "2026-03-12T18:03:06.2333404+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-glm-4.7-flash_bf16.json",
-  "host": "STRIX",
-  "ollama_host": "http://127.0.0.1:11434",
-  "host_details": {
-    "captured_at": "2026-03-12T17:55:18.006607+00:00",
-    "hostname": "Strix",
-    "host_slug": "strix",
-    "os": {
-      "system": "Windows",
-      "release": "11",
-      "version": "10.0.26200",
-      "machine": "AMD64"
-    },
-    "manufacturer": "Bosgame",
-    "model": "BeyondMax Series",
-    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
-    "logical_cpu_count": 32,
-    "total_memory_gb": 63.65,
-    "python_version": "3.14.3",
-    "ollama_version": "ollama version is 0.17.6",
-    "gpus": [
-      {
-        "Name": "AMD Radeon(TM) 8060S Graphics",
-        "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.12064.27",
-        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
-        "Status": "OK"
-      }
-    ]
-  },
-  "models": [
-    "glm-4.7-flash:bf16"
-  ],
-  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
-  "num_predict": 192,
-  "seed": 42,
-  "results": [
-    {
-      "model": "glm-4.7-flash:bf16",
-      "eval_count": 192,
-      "eval_s": 25.168,
-      "toks_per_s": 7.63,
-      "total_s": 97.167,
-      "load_s": 70.821,
-      "cpu_avg_pct": 38.2,
-      "cpu_peak_pct": 97.7,
-      "ram_peak_gb": 19.48,
-      "gpu_util_avg": 48.9,
-      "gpu_util_peak": 92.7,
-      "gpu_mem_peak_gb": 58.75,
-      "ollama_ps": "glm-4.7-flash:bf16    69c2c86b80aa    81 GB    23%/77% CPU/GPU    202752     Less than a second ago    "
-    }
-  ]
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-18T02:27:04.2502940+00:00",
+    "run_finished_at":  "2026-03-18T02:30:23.0879454+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-glm-4.7-flash_bf16.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "captured_at":  "2026-03-18T02:27:06.597420+00:00",
+                         "hostname":  "Strix",
+                         "host_slug":  "strix",
+                         "os":  {
+                                    "system":  "Windows",
+                                    "release":  "11",
+                                    "version":  "10.0.26200",
+                                    "machine":  "AMD64"
+                                },
+                         "manufacturer":  "Bosgame",
+                         "model":  "BeyondMax Series",
+                         "processor":  "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+                         "logical_cpu_count":  32,
+                         "total_memory_gb":  63.65,
+                         "python_version":  "3.14.3",
+                         "ollama_version":  "ollama version is 0.18.0",
+                         "gpus":  [
+                                      {
+                                          "Name":  "AMD Radeon(TM) 8060S Graphics",
+                                          "AdapterRAM":  4293918720,
+                                          "DriverVersion":  "32.0.12064.27",
+                                          "VideoProcessor":  "AMD Radeon Graphics Processor (0x1586)",
+                                          "Status":  "OK"
+                                      }
+                                  ]
+                     },
+    "models":  [
+                   "glm-4.7-flash:bf16"
+               ],
+    "completed_models":  [
+                             "glm-4.7-flash:bf16"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "glm-4.7-flash:bf16",
+                        "eval_count":  192,
+                        "eval_s":  32.312,
+                        "toks_per_s":  5.94,
+                        "total_s":  33.106,
+                        "load_s":  0.398,
+                        "cpu_avg_pct":  12.7,
+                        "cpu_peak_pct":  13.9,
+                        "ram_peak_gb":  15,
+                        "gpu_util_avg":  29.4,
+                        "gpu_util_peak":  51.3,
+                        "gpu_mem_peak_gb":  61.77,
+                        "ollama_ps":  "glm-4.7-flash:bf16 size=76.18GB vram=61.67GB ctx=202752 quant=F16"
+                    }
+                ]
 }

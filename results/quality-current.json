@@ -1,32 +1,32 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-12T16:25:41.417902+00:00",
-  "run_finished_at": "2026-03-17T21:59:29.139430+00:00",
+  "run_started_at": "2026-03-12T17:55:16.413437+00:00",
+  "run_finished_at": "2026-03-18T02:39:21.858827+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-current.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-17T15:26:10.552843+00:00",
-    "hostname": "T5500",
-    "host_slug": "t5500",
+    "captured_at": "2026-03-18T02:38:22.281763+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
     "os": {
       "system": "Windows",
-      "release": "10",
+      "release": "11",
       "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": "Dell Inc.",
-    "model": "Precision WorkStation T5500  ",
-    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-    "logical_cpu_count": 24,
-    "total_memory_gb": 36.0,
-    "python_version": "3.11.3",
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
     "ollama_version": "ollama version is 0.18.0",
     "gpus": [
       {
-        "Name": "NVIDIA GeForce RTX 3060",
+        "Name": "AMD Radeon(TM) 8060S Graphics",
         "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.6094",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
         "Status": "OK"
       }
     ]
@@ -169,13 +169,13 @@
     },
     {
       "model": "glm-4.7-flash:bf16",
-      "coding_pass": 1,
+      "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 1,
       "tool_total": 2,
-      "agentic_pass": 0,
+      "agentic_pass": 1,
       "agentic_total": 1,
-      "score": 2,
+      "score": 4,
       "score_max": 5
     },
     {
@@ -356,13 +356,13 @@
     },
     {
       "model": "phi4-mini:latest",
-      "coding_pass": 1,
+      "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 0,
       "tool_total": 2,
       "agentic_pass": 0,
       "agentic_total": 1,
-      "score": 1,
+      "score": 2,
       "score_max": 5
     },
     {
@@ -510,13 +510,13 @@
     },
     {
       "model": "zac/phi4-tools:latest",
-      "coding_pass": 0,
+      "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 0,
       "tool_total": 2,
       "agentic_pass": 0,
       "agentic_total": 1,
-      "score": 0,
+      "score": 2,
       "score_max": 5
     }
   ]

@@ -1,31 +1,44 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-13T10:23:15.574160+00:00",
-  "run_finished_at": "2026-03-13T10:23:24.702953+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-lfm2.5-thinking_latest.json",
+  "run_started_at": "2026-03-18T02:36:38.160054+00:00",
+  "run_finished_at": "2026-03-18T02:37:08.608770+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-lfm2.5-thinking_latest.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-13T10:23:18.416518+00:00",
-    "hostname": "T5500",
-    "host_slug": "t5500",
+    "captured_at": "2026-03-18T02:36:40.137799+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
     "os": {
       "system": "Windows",
-      "release": "10",
+      "release": "11",
       "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": null,
-    "model": null,
-    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-    "logical_cpu_count": 24,
-    "total_memory_gb": null,
-    "python_version": "3.11.3",
-    "ollama_version": null,
-    "gpus": []
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.18.0",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
   },
   "models": [
     "lfm2.5-thinking:latest"
   ],
+  "completed_models": [
+    "lfm2.5-thinking:latest"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
       "model": "lfm2.5-thinking:latest",

@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-12T17:55:16.413437+00:00",
-  "run_finished_at": "2026-03-12T18:09:51.511523+00:00",
+  "run_started_at": "2026-03-18T02:04:31.304584+00:00",
+  "run_finished_at": "2026-03-18T02:08:17.176474+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-glm-4.7-flash_bf16.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-12T17:55:18.007272+00:00",
+    "captured_at": "2026-03-18T02:04:33.044543+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -20,7 +20,7 @@
     "logical_cpu_count": 32,
     "total_memory_gb": 63.65,
     "python_version": "3.14.3",
-    "ollama_version": "ollama version is 0.17.6",
+    "ollama_version": "ollama version is 0.18.0",
     "gpus": [
       {
         "Name": "AMD Radeon(TM) 8060S Graphics",
@@ -34,16 +34,21 @@
   "models": [
     "glm-4.7-flash:bf16"
   ],
+  "completed_models": [
+    "glm-4.7-flash:bf16"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
       "model": "glm-4.7-flash:bf16",
-      "coding_pass": 1,
+      "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 1,
       "tool_total": 2,
-      "agentic_pass": 0,
+      "agentic_pass": 1,
       "agentic_total": 1,
-      "score": 2,
+      "score": 4,
       "score_max": 5
     }
   ]
