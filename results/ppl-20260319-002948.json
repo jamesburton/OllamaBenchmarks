@@ -1,0 +1,285 @@
+{
+  "benchmark": "ppl",
+  "run_started_at": "2026-03-19T00:21:02.051120+00:00",
+  "run_finished_at": "2026-03-19T00:29:48.501500+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\ppl-20260319-002948.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-19T00:21:00.883232+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.18.1",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "qwen3.5:4b",
+    "qwen3:8b",
+    "qwen3.5:9b",
+    "cogito:14b"
+  ],
+  "completed_models": [
+    "qwen3.5:4b",
+    "qwen3:8b",
+    "qwen3.5:9b",
+    "cogito:14b"
+  ],
+  "failed_models": [],
+  "results": [
+    {
+      "model": "qwen3.5:4b",
+      "ppl_proxy": 1000000.0,
+      "avg_overlap": 0.0,
+      "avg_prefix_match": 0.0,
+      "avg_char_similarity": 0.0,
+      "passages": [
+        {
+          "passage": "python_fibonacci",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 65,
+          "eval_duration_ms": 1120.3
+        },
+        {
+          "passage": "explain_http",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 106,
+          "eval_duration_ms": 1797.0
+        },
+        {
+          "passage": "sql_query",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 75,
+          "eval_duration_ms": 1264.7
+        },
+        {
+          "passage": "science_gravity",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 101,
+          "eval_duration_ms": 1706.9
+        },
+        {
+          "passage": "json_example",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 67,
+          "eval_duration_ms": 1130.6
+        }
+      ]
+    },
+    {
+      "model": "qwen3:8b",
+      "ppl_proxy": 1000000.0,
+      "avg_overlap": 0.0,
+      "avg_prefix_match": 0.0,
+      "avg_char_similarity": 0.0,
+      "passages": [
+        {
+          "passage": "python_fibonacci",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 65,
+          "eval_duration_ms": 1223.5
+        },
+        {
+          "passage": "explain_http",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 106,
+          "eval_duration_ms": 2137.3
+        },
+        {
+          "passage": "sql_query",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 75,
+          "eval_duration_ms": 1342.2
+        },
+        {
+          "passage": "science_gravity",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 101,
+          "eval_duration_ms": 1802.0
+        },
+        {
+          "passage": "json_example",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 67,
+          "eval_duration_ms": 1196.4
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:9b",
+      "ppl_proxy": 120598.7445,
+      "avg_overlap": 0.0235,
+      "avg_prefix_match": 0.0,
+      "avg_char_similarity": 0.0,
+      "passages": [
+        {
+          "passage": "python_fibonacci",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 65,
+          "eval_duration_ms": 1514.7
+        },
+        {
+          "passage": "explain_http",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 106,
+          "eval_duration_ms": 2446.8
+        },
+        {
+          "passage": "sql_query",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 75,
+          "eval_duration_ms": 1735.7
+        },
+        {
+          "passage": "science_gravity",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 101,
+          "eval_duration_ms": 2669.4
+        },
+        {
+          "passage": "json_example",
+          "scores": {
+            "overlap": 0.1176,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "eval_count": 67,
+          "eval_duration_ms": 1549.8
+        }
+      ]
+    },
+    {
+      "model": "cogito:14b",
+      "ppl_proxy": 5.4344,
+      "avg_overlap": 0.5438,
+      "avg_prefix_match": 0.0,
+      "avg_char_similarity": 0.0475,
+      "passages": [
+        {
+          "passage": "python_fibonacci",
+          "scores": {
+            "overlap": 0.4545,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0246
+          },
+          "eval_count": 65,
+          "eval_duration_ms": 1724.3
+        },
+        {
+          "passage": "explain_http",
+          "scores": {
+            "overlap": 0.55,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0741
+          },
+          "eval_count": 106,
+          "eval_duration_ms": 2779.2
+        },
+        {
+          "passage": "sql_query",
+          "scores": {
+            "overlap": 0.2609,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0333
+          },
+          "eval_count": 75,
+          "eval_duration_ms": 1985.0
+        },
+        {
+          "passage": "science_gravity",
+          "scores": {
+            "overlap": 0.5714,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0504
+          },
+          "eval_count": 101,
+          "eval_duration_ms": 2700.3
+        },
+        {
+          "passage": "json_example",
+          "scores": {
+            "overlap": 0.8824,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0549
+          },
+          "eval_count": 57,
+          "eval_duration_ms": 1499.6
+        }
+      ]
+    }
+  ]
+}

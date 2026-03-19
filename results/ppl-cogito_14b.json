@@ -1,0 +1,92 @@
+{
+  "benchmark": "ppl",
+  "host_details": {
+    "captured_at": "2026-03-19T00:42:40.829595+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.18.1",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "model": "cogito:14b",
+  "ppl_proxy": 3.4721,
+  "avg_overlap": 0.63,
+  "avg_prefix_match": 0.2099,
+  "avg_char_similarity": 0.2325,
+  "passages": [
+    {
+      "passage": "python_fibonacci",
+      "scores": {
+        "overlap": 0.5455,
+        "prefix_match": 0.0,
+        "char_similarity": 0.0488
+      },
+      "generated_preview": "```python\ndef fibonacci(n):\n    if n <= 0:\n        return 0\n    elif n == 1:\n        return 1\n    else:\n        a, b = 0, 1\n        for _ in range(2, n + 1):\n            a, b = b,",
+      "eval_count": 65,
+      "eval_duration_ms": 1942.8
+    },
+    {
+      "passage": "explain_http",
+      "scores": {
+        "overlap": 0.55,
+        "prefix_match": 0.0,
+        "char_similarity": 0.0579
+      },
+      "generated_preview": "The HTTP request-response cycle begins when a client (like a web browser) sends an HTTP request to a server, specifying the desired resource and method (GET, POST, etc.). The server processes this req",
+      "eval_count": 106,
+      "eval_duration_ms": 3157.5
+    },
+    {
+      "passage": "sql_query",
+      "scores": {
+        "overlap": 0.6957,
+        "prefix_match": 0.1132,
+        "char_similarity": 0.107
+      },
+      "generated_preview": "SELECT \n    c.customer_id,\n    c.first_name,\n    c.last_name,\n    SUM(o.total_amount) AS total_order_amount\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.cu",
+      "eval_count": 75,
+      "eval_duration_ms": 2235.5
+    },
+    {
+      "passage": "science_gravity",
+      "scores": {
+        "overlap": 0.4762,
+        "prefix_match": 0.0,
+        "char_similarity": 0.0616
+      },
+      "generated_preview": "Gravity is the curvature of spacetime caused by mass and energy. Massive objects create \"dips\" in the fabric of spacetime, causing other objects to follow curved paths around them rather than moving i",
+      "eval_count": 66,
+      "eval_duration_ms": 2065.4
+    },
+    {
+      "passage": "json_example",
+      "scores": {
+        "overlap": 0.8824,
+        "prefix_match": 0.9365,
+        "char_similarity": 0.8872
+      },
+      "generated_preview": "{\n  \"title\": \"The Great Gatsby\",\n  \"author\": \"F. Scott Fitzgerald\",\n  \"year\": 1925,\n  \"tags\": [\"classic\", \"fiction\", \"american literature\"]\n}",
+      "eval_count": 47,
+      "eval_duration_ms": 1604.8
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "benchmark": "ppl",
+  "host_details": {
+    "captured_at": "2026-03-19T00:42:40.829595+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.18.1",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "model": "qwen3:8b",
+  "ppl_proxy": 4.0833,
+  "avg_overlap": 0.6531,
+  "avg_prefix_match": 0.0101,
+  "avg_char_similarity": 0.0802,
+  "passages": [
+    {
+      "passage": "python_fibonacci",
+      "scores": {
+        "overlap": 0.6364,
+        "prefix_match": 0.0,
+        "char_similarity": 0.0508
+      },
+      "generated_preview": "```python\ndef fibonacci(n):\n    if n <= 0:\n        return 0\n    elif n == 1:\n        return 1\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n```",
+      "eval_count": 49,
+      "eval_duration_ms": 1004.2
+    },
+    {
+      "passage": "explain_http",
+      "scores": {
+        "overlap": 0.55,
+        "prefix_match": 0.0,
+        "char_similarity": 0.053
+      },
+      "generated_preview": "The HTTP request-response cycle begins when a client, such as a web browser, sends an HTTP request to a server, specifying the desired resource and method (like GET or POST). The server processes the ",
+      "eval_count": 84,
+      "eval_duration_ms": 1643.2
+    },
+    {
+      "passage": "sql_query",
+      "scores": {
+        "overlap": 0.4348,
+        "prefix_match": 0.0503,
+        "char_similarity": 0.2075
+      },
+      "generated_preview": "SELECT customer_id, SUM(order_amount) AS total_order_amount\nFROM orders\nGROUP BY customer_id\nORDER BY total_order_amount DESC\nLIMIT 5;",
+      "eval_count": 33,
+      "eval_duration_ms": 632.0
+    },
+    {
+      "passage": "science_gravity",
+      "scores": {
+        "overlap": 0.7619,
+        "prefix_match": 0.0,
+        "char_similarity": 0.0291
+      },
+      "generated_preview": "According to general relativity, gravity is not a force but a curvature of spacetime caused by mass and energy. Objects with mass bend the fabric of spacetime around them, and other objects move along",
+      "eval_count": 99,
+      "eval_duration_ms": 1958.7
+    },
+    {
+      "passage": "json_example",
+      "scores": {
+        "overlap": 0.8824,
+        "prefix_match": 0.0,
+        "char_similarity": 0.0606
+      },
+      "generated_preview": "```json\n{\n  \"title\": \"The Great Gatsby\",\n  \"author\": \"F. Scott Fitzgerald\",\n  \"year\": 1925,\n  \"tags\": [\"classic\", \"literary\", \"novel\"]\n}\n```",
+      "eval_count": 52,
+      "eval_duration_ms": 1028.2
+    }
+  ]
+}

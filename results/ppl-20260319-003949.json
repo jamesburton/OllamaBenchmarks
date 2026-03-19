@@ -1,0 +1,305 @@
+{
+  "benchmark": "ppl",
+  "run_started_at": "2026-03-19T00:31:06.523623+00:00",
+  "run_finished_at": "2026-03-19T00:39:49.805775+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\ppl-20260319-003949.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-19T00:31:06.207784+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.18.1",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "qwen3.5:4b",
+    "qwen3:8b",
+    "qwen3.5:9b",
+    "cogito:14b"
+  ],
+  "completed_models": [
+    "qwen3.5:4b",
+    "qwen3:8b",
+    "qwen3.5:9b",
+    "cogito:14b"
+  ],
+  "failed_models": [],
+  "results": [
+    {
+      "model": "qwen3.5:4b",
+      "ppl_proxy": 217.0552,
+      "avg_overlap": 0.1624,
+      "avg_prefix_match": 0.0127,
+      "avg_char_similarity": 0.0352,
+      "passages": [
+        {
+          "passage": "python_fibonacci",
+          "scores": {
+            "overlap": 0.1818,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0455
+          },
+          "generated_preview": "```python\ndef fibonacci(n):\n    if n",
+          "eval_count": 65,
+          "eval_duration_ms": 1183.3
+        },
+        {
+          "passage": "explain_http",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 106,
+          "eval_duration_ms": 1920.2
+        },
+        {
+          "passage": "sql_query",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0063
+          },
+          "generated_preview": "` tags.\n\n2.  **Determine the SQL Structure:**",
+          "eval_count": 75,
+          "eval_duration_ms": 1356.2
+        },
+        {
+          "passage": "science_gravity",
+          "scores": {
+            "overlap": 0.5714,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0605
+          },
+          "generated_preview": "According to general relativity, gravity is not a force but a curvature of spacetime caused by mass and energy. Massive objects warp the fabric of space and time around them, and this curvature dictat",
+          "eval_count": 101,
+          "eval_duration_ms": 1817.8
+        },
+        {
+          "passage": "json_example",
+          "scores": {
+            "overlap": 0.0588,
+            "prefix_match": 0.0635,
+            "char_similarity": 0.0635
+          },
+          "generated_preview": "{\n  \"title",
+          "eval_count": 67,
+          "eval_duration_ms": 1247.1
+        }
+      ]
+    },
+    {
+      "model": "qwen3:8b",
+      "ppl_proxy": 1000000.0,
+      "avg_overlap": 0.0,
+      "avg_prefix_match": 0.0,
+      "avg_char_similarity": 0.0,
+      "passages": [
+        {
+          "passage": "python_fibonacci",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 65,
+          "eval_duration_ms": 1259.3
+        },
+        {
+          "passage": "explain_http",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 106,
+          "eval_duration_ms": 2066.1
+        },
+        {
+          "passage": "sql_query",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 75,
+          "eval_duration_ms": 1448.7
+        },
+        {
+          "passage": "science_gravity",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 101,
+          "eval_duration_ms": 1970.5
+        },
+        {
+          "passage": "json_example",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 67,
+          "eval_duration_ms": 1297.0
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:9b",
+      "ppl_proxy": 87327.4657,
+      "avg_overlap": 0.1048,
+      "avg_prefix_match": 0.0,
+      "avg_char_similarity": 0.0134,
+      "passages": [
+        {
+          "passage": "python_fibonacci",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 65,
+          "eval_duration_ms": 1637.2
+        },
+        {
+          "passage": "explain_http",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 58,
+          "eval_duration_ms": 1472.5
+        },
+        {
+          "passage": "sql_query",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 59,
+          "eval_duration_ms": 1705.5
+        },
+        {
+          "passage": "science_gravity",
+          "scores": {
+            "overlap": 0.5238,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0669
+          },
+          "generated_preview": "According to general relativity, gravity is not a force in the traditional sense but rather a curvature of spacetime caused by mass and energy. Massive objects like stars and planets warp the four-dim",
+          "eval_count": 101,
+          "eval_duration_ms": 2562.3
+        },
+        {
+          "passage": "json_example",
+          "scores": {
+            "overlap": 0.0,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0
+          },
+          "generated_preview": "",
+          "eval_count": 67,
+          "eval_duration_ms": 1684.6
+        }
+      ]
+    },
+    {
+      "model": "cogito:14b",
+      "ppl_proxy": 3.6149,
+      "avg_overlap": 0.6157,
+      "avg_prefix_match": 0.2099,
+      "avg_char_similarity": 0.2272,
+      "passages": [
+        {
+          "passage": "python_fibonacci",
+          "scores": {
+            "overlap": 0.5455,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0488
+          },
+          "generated_preview": "```python\ndef fibonacci(n):\n    if n <= 0:\n        return 0\n    elif n == 1:\n        return 1\n    else:\n        a, b = 0, 1\n        for _ in range(2, n + 1):\n            a, b = b,",
+          "eval_count": 65,
+          "eval_duration_ms": 1840.5
+        },
+        {
+          "passage": "explain_http",
+          "scores": {
+            "overlap": 0.55,
+            "prefix_match": 0.0,
+            "char_similarity": 0.0591
+          },
+          "generated_preview": "The HTTP (Hypertext Transfer Protocol) request-response cycle begins when a client, typically a web browser, sends an HTTP request to a server specifying what resource it wants and how to process it u",
+          "eval_count": 106,
+          "eval_duration_ms": 3180.2
+        },
+        {
+          "passage": "sql_query",
+          "scores": {
+            "overlap": 0.6957,
+            "prefix_match": 0.1132,
+            "char_similarity": 0.107
+          },
+          "generated_preview": "SELECT \n    c.customer_id,\n    c.first_name,\n    c.last_name,\n    SUM(o.total_amount) AS total_order_amount\nFROM \n    customers c\nJOIN \n    orders o ON c.customer_id = o.customer_id\nGROUP BY \n    c.cu",
+          "eval_count": 75,
+          "eval_duration_ms": 2193.4
+        },
+        {
+          "passage": "science_gravity",
+          "scores": {
+            "overlap": 0.4048,
+            "prefix_match": 0.0,
+            "char_similarity": 0.034
+          },
+          "generated_preview": "Gravity is the curvature of spacetime caused by mass and energy, with objects following geodesics (shortest paths) through this curved geometry rather than being pulled by a force. Massive objects lik",
+          "eval_count": 67,
+          "eval_duration_ms": 2026.7
+        },
+        {
+          "passage": "json_example",
+          "scores": {
+            "overlap": 0.8824,
+            "prefix_match": 0.9365,
+            "char_similarity": 0.8872
+          },
+          "generated_preview": "{\n  \"title\": \"The Great Gatsby\",\n  \"author\": \"F. Scott Fitzgerald\",\n  \"year\": 1925,\n  \"tags\": [\"classic\", \"fiction\", \"american literature\"]\n}",
+          "eval_count": 47,
+          "eval_duration_ms": 1419.0
+        }
+      ]
+    }
+  ]
+}
