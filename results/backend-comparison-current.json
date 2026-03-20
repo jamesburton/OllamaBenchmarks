@@ -1,65 +1,28 @@
 {
   "benchmark": "backend_comparison",
-  "run_started_at": "2026-03-16T02:36:05.5167810+00:00",
-  "run_finished_at": "2026-03-16T02:41:41.9160587+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-current.json",
-  "host": "OLDFRAMEWORK",
-  "host_details": {
-    "captured_at": "2026-03-16T02:41:40.591518+00:00",
-    "hostname": "OldFramework",
-    "host_slug": "oldframework",
-    "os": {
-      "system": "Windows",
-      "release": "10",
-      "version": "10.0.26200",
-      "machine": "AMD64"
-    },
-    "manufacturer": "Framework",
-    "model": "Laptop",
-    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
-    "logical_cpu_count": 8,
-    "total_memory_gb": 63.79,
-    "python_version": "3.9.25",
-    "ollama_version": "ollama version is 0.18.0",
-    "gpus": [
-      {
-        "Name": "Intel(R) Iris(R) Xe Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7082",
-        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
-        "Status": "OK"
-      }
-    ]
-  },
-  "model": "qwen3.5:latest",
-  "num_ctx": 8192,
-  "think": false,
+  "run_started_at": "2026-03-19T00:20:35.976805+00:00",
+  "run_finished_at": "2026-03-19T00:21:52.782650+00:00",
+  "models": [
+    "nemotron-3-nano:latest"
+  ],
   "backends": [
-    "auto",
-    "vulkan",
-    "rocm"
+    "ollama",
+    "llama-server-vulkan"
   ],
   "results": [
     {
-      "lib": "auto",
-      "status": "ok",
-      "toks_per_s": 2.57,
-      "e2e_toks_per_s": 2.34,
-      "total_s": 71.228
+      "backend": "ollama",
+      "model": "nemotron-3-nano:latest",
+      "toks_per_s": 0,
+      "error_throughput": "failed",
+      "score": 0,
+      "score_max": 5
     },
     {
-      "lib": "vulkan",
-      "status": "ok",
-      "toks_per_s": 2.54,
-      "e2e_toks_per_s": 2.22,
-      "total_s": 75.057
-    },
-    {
-      "lib": "rocm",
-      "status": "ok",
-      "toks_per_s": 2.27,
-      "e2e_toks_per_s": 2.09,
-      "total_s": 79.833
+      "backend": "llama-server-vulkan",
+      "model": "nemotron-3-nano:latest",
+      "error": "Could not resolve GGUF blob for nemotron-3-nano:latest"
     }
-  ]
+  ],
+  "comparison_table": "Backend                   Model                                      Score    tok/s   RAM GB   VRAM GB\n----------------------------------------------------------------------------------------------------\nollama                    nemotron-3-nano:latest                       0/5      0.0      0.0       0.0\nllama-server-vulkan       nemotron-3-nano:latest                     ERROR   Could not resolve GGUF blob for nemotron-3-nano:latest"
 }

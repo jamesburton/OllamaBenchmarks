@@ -1,8 +1,8 @@
 {
     "benchmark":  "throughput_resource",
     "run_started_at":  "2026-03-19T00:20:41.0186076+00:00",
-    "run_finished_at":  "2026-03-19T00:21:01.1450073+00:00",
-    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-nemotron-3-nano_latest.json",
+    "run_finished_at":  "2026-03-19T00:21:01.2452258+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\compare-ollama-tp-nemotron-3-nano_latest.json",
     "host":  "STRIX",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
