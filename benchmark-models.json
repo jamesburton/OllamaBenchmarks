@@ -113,6 +113,11 @@
     "omnicoder:9b-q4_k_m": "Benchmarked via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 imports it, but local runner allocation fails on this machine.",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m": "Benchmarked via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 imports it, but local runner cannot load qwen35.",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k": "Benchmarked via llama-server/OpenAI-compatible API on this host. This smaller follow-up quant improves memory use and speed versus Q3_K_M, but still only scores 1/5 on the quick suite.",
-    "zac/phi4-tools:latest": "Ollama 0.18.0 generate API returns 500 on T5500. Chat API works but model scores 0/5 on quality suite."
+    "zac/phi4-tools:latest": "T5500 Ollama 0.18.1: 31.86 tok/s, 2/5 quality. Previously failed on 0.18.0.",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-v2-q4_k_m": "Ollama 0.18.1 cannot load 27B qwen35 architecture on T5500 (unknown model architecture error). 9B variant works.",
+    "qwen3.5:9b": "T5500 champion tier: 38.87 tok/s, 5/5 quality, 8.2GB VRAM, PPL 3.89 on Ollama 0.18.1.",
+    "qwen3.5:4b": "T5500 best value: 55.66 tok/s, 5/5 quality, 5.73GB VRAM, PPL 4.62 on Ollama 0.18.1.",
+    "qwen3:8b": "T5500: 48.65 tok/s, 5/5 quality on Ollama 0.18.1. Failed on 0.18.0.",
+    "cogito:14b": "T5500 best PPL: 34.36 tok/s, 5/5 quality, 9.05GB VRAM, PPL 3.47."
   }
 }

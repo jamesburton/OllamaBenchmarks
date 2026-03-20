@@ -1,0 +1,32 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-20T12:26:32.1299106+00:00",
+    "run_finished_at":  "2026-03-20T12:26:36.6671346+00:00",
+    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3.5_27b-claude-4.6-opus-reasoning-distilled-v2-q4_k_m.json",
+    "host":  "T5500",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "T5500"
+                     },
+    "models":  [
+                   "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-v2-q4_k_m"
+               ],
+    "completed_models":  [
+
+                         ],
+    "failed_models":  [
+                          {
+                              "model":  "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-v2-q4_k_m",
+                              "error":  "The remote server returned an error: (500) Internal Server Error."
+                          }
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+
+                ]
+}
