@@ -158,3 +158,192 @@ Backups are created automatically at:
 | Linux | `~/.config/rustdesk-backup-YYYYMMDD-HHMMSS/` |
 
 To revert, delete the current `config/peers/` directory and copy the backed-up one back.
+
+---
+
+## Using Ollama Remotely via Tailscale
+
+Once Ollama is listening on `0.0.0.0:11434` and Tailscale is connected, any device on your tailnet can use the remote GPU as if it were local.
+
+### Server Setup (one-time)
+
+On the machine running Ollama, set `OLLAMA_HOST=0.0.0.0:11434` as a system environment variable and restart Ollama. See [Ollama FAQ](https://docs.ollama.com/faq) for OS-specific instructions.
+
+**Windows (PowerShell as Admin):**
+```powershell
+[Environment]::SetEnvironmentVariable("OLLAMA_HOST", "0.0.0.0:11434", "Machine")
+# Restart Ollama after setting
+```
+
+**Linux:**
+```bash
+sudo systemctl edit ollama
+# Add: Environment="OLLAMA_HOST=0.0.0.0:11434"
+sudo systemctl restart ollama
+```
+
+### Client Usage
+
+From any Tailscale-connected device, replace `localhost` with the server's Tailscale IP.
+
+**curl:**
+```bash
+curl http://100.79.118.92:11434/api/chat -d '{
+  "model": "qwen3.5:9b",
+  "messages": [{"role": "user", "content": "Hello"}],
+  "stream": false
+}'
+```
+
+**Python (official ollama library):**
+```python
+from ollama import Client
+
+client = Client(host='http://100.79.118.92:11434')
+response = client.chat(model='qwen3.5:9b', messages=[
+    {'role': 'user', 'content': 'Explain dependency injection'}
+])
+print(response['message']['content'])
+```
+
+**Environment variable (makes all Ollama CLI commands use the remote server):**
+```bash
+export OLLAMA_HOST=http://100.79.118.92:11434
+ollama list          # lists models on the REMOTE machine
+ollama run qwen3.5:9b   # runs on the REMOTE GPU
+```
+
+This is powerful — a lightweight laptop can run `ollama run` and the inference happens on the remote GPU server.
+
+### Integration with Dev Tools
+
+Many tools support Ollama's API endpoint and can be pointed at a remote Tailscale address:
+
+**[Open WebUI](https://github.com/open-webui/open-webui):**
+```bash
+# On the client machine, point Open WebUI at the remote Ollama
+docker run -d -p 3000:8080 \
+  -e OLLAMA_BASE_URL=http://100.79.118.92:11434 \
+  ghcr.io/open-webui/open-webui:main
+```
+
+**[Continue.dev](https://continue.dev/) (VS Code / JetBrains):**
+
+In `~/.continue/config.yaml`:
+```yaml
+models:
+  - title: "Remote Qwen3.5 9B"
+    provider: ollama
+    model: qwen3.5:9b
+    apiBase: http://100.79.118.92:11434
+```
+
+**[Claude Code](https://claude.ai/claude-code) with remote Ollama:**
+
+Claude Code's Remote Control feature can connect to a GPU server running Ollama over Tailscale. Set `OLLAMA_HOST` on the server and use the Tailscale IP from your client. See the [Claude Code + Ollama guide](https://lgallardo.com/2026/02/28/claude-code-remote-control-ollama/) for details.
+
+**Any OpenAI-compatible client:**
+
+Ollama exposes an OpenAI-compatible API at `/v1/`. Point any client that supports custom base URLs to:
+```
+http://100.79.118.92:11434/v1
+```
+
+### Security Notes
+
+- Tailscale encrypts all traffic end-to-end via WireGuard — no TLS/HTTPS needed
+- Only devices on your tailnet can reach port 11434
+- For extra control, use [Tailscale ACLs](https://tailscale.com/kb/1018/acls) to restrict which devices can access the Ollama port
+- Do **not** set `OLLAMA_HOST=0.0.0.0` without Tailscale or a firewall — it exposes the API to your entire LAN
+
+---
+
+## Remote Desktop Access with RustDesk + Tailscale
+
+RustDesk over Tailscale gives you full graphical desktop access to remote machines without relying on external relay servers.
+
+### Connecting via RustDesk UI
+
+1. Open RustDesk on your local machine
+2. Enter the **Tailscale IP** of the remote machine (e.g. `100.79.118.92`)
+3. Enter the permanent password
+4. Click **Connect**
+
+The connection goes directly through the Tailscale tunnel — no relay, no RustDesk account needed.
+
+### Connecting via Command Line
+
+RustDesk supports CLI-initiated connections, useful for scripting or quick access:
+
+**Windows:**
+```powershell
+& "C:\Program Files\RustDesk\RustDesk.exe" --connect 100.79.118.92
+```
+
+**Linux / macOS:**
+```bash
+rustdesk --connect 100.79.118.92
+```
+
+With password (note: password is visible in process list):
+```bash
+rustdesk --connect 100.79.118.92 --password YOUR_PASSWORD
+```
+
+### Headless Host Configuration
+
+For machines without a monitor or where you can't access the RustDesk UI (e.g. a server in a closet), configure everything via config files and command line.
+
+**Set permanent password (CLI):**
+```bash
+# Linux
+sudo rustdesk --password mypassword
+
+# Windows (PowerShell as Admin)
+& "C:\Program Files\RustDesk\RustDesk.exe" --password mypassword
+```
+
+**Get RustDesk ID (CLI):**
+```bash
+# Linux
+sudo rustdesk --get-id
+
+# Windows
+& "C:\Program Files\RustDesk\RustDesk.exe" --get-id
+```
+
+**Enable direct IP access (config file):**
+
+Edit `RustDesk2.toml` (see [Setup Step 1](#step-1-enable-direct-ip-access-on-each-host) for paths) and add under `[options]`:
+```toml
+direct-server = 'Y'
+direct-access-port = '21118'
+```
+
+**Allow remote configuration changes (useful for managed fleets):**
+```bash
+rustdesk --option allow-remote-config-modification Y
+```
+
+### Combined Workflow: RustDesk + Ollama
+
+A common pattern is using RustDesk for desktop access and Ollama API for inference, both over Tailscale:
+
+1. **RustDesk** for administration — install models, check GPU usage, restart services
+2. **Ollama API** for inference — point your dev tools at `http://<tailscale-ip>:11434`
+
+This way your laptop does the coding while the remote GPU does the heavy lifting, and you can always RustDesk in if something needs manual attention.
+
+### Using Tailscale SSH as an Alternative
+
+For terminal-only access (no GUI), Tailscale has built-in SSH support that avoids RustDesk entirely:
+
+```bash
+# Enable on the remote machine (one-time)
+tailscale set --ssh
+
+# Connect from any tailnet device
+ssh user@100.79.118.92
+```
+
+This is simpler than RustDesk for headless servers where you only need a terminal. See [Tailscale SSH docs](https://tailscale.com/kb/1193/tailscale-ssh) for setup.
