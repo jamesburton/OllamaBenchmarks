@@ -1,58 +1,43 @@
 {
-  "benchmark": "throughput_resource",
-  "run_started_at": "2026-03-16T02:03:49.7522405+00:00",
-  "run_finished_at": "2026-03-16T02:10:21.1690384+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-granite4_7b-a1b-h.json",
-  "host": "OLDFRAMEWORK",
-  "ollama_host": "http://127.0.0.1:11434",
-  "host_details": {
-    "captured_at": "2026-03-16T02:04:00.590634+00:00",
-    "hostname": "OldFramework",
-    "host_slug": "oldframework",
-    "os": {
-      "system": "Windows",
-      "release": "10",
-      "version": "10.0.26200",
-      "machine": "AMD64"
-    },
-    "manufacturer": "Framework",
-    "model": "Laptop",
-    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
-    "logical_cpu_count": 8,
-    "total_memory_gb": 63.79,
-    "python_version": "3.9.25",
-    "ollama_version": "ollama version is 0.18.0",
-    "gpus": [
-      {
-        "Name": "Intel(R) Iris(R) Xe Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7082",
-        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
-        "Status": "OK"
-      }
-    ]
-  },
-  "models": [
-    "granite4:7b-a1b-h"
-  ],
-  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
-  "num_predict": 192,
-  "seed": 42,
-  "results": [
-    {
-      "model": "granite4:7b-a1b-h",
-      "eval_count": 192,
-      "eval_s": 20.907,
-      "toks_per_s": 9.18,
-      "total_s": 23.409,
-      "load_s": 0.687,
-      "cpu_avg_pct": 34.0,
-      "cpu_peak_pct": 58.7,
-      "ram_peak_gb": 21.31,
-      "gpu_util_avg": 0.0,
-      "gpu_util_peak": 0.0,
-      "gpu_mem_peak_gb": 0.0,
-      "ollama_ps": "granite4:7b-a1b-h size=4.02GB vram=0GB ctx=4096 quant=Q4_K_M"
-    }
-  ]
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-21T11:21:14.3100898+00:00",
+    "run_finished_at":  "2026-03-21T11:21:24.6389695+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-granite4_7b-a1b-h.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "granite4:7b-a1b-h"
+               ],
+    "completed_models":  [
+                             "granite4:7b-a1b-h"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "granite4:7b-a1b-h",
+                        "eval_count":  192,
+                        "eval_s":  7.136,
+                        "toks_per_s":  26.91,
+                        "total_s":  7.699,
+                        "load_s":  0.164,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  6.85,
+                        "gpu_util_avg":  67.5,
+                        "gpu_util_peak":  67.5,
+                        "gpu_mem_peak_gb":  43.03,
+                        "ollama_ps":  "granite4:7b-a1b-h size=10.1GB vram=10.1GB ctx=262144 quant=Q4_K_M"
+                    }
+                ]
 }
