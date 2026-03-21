@@ -334,9 +334,42 @@ A common pattern is using RustDesk for desktop access and Ollama API for inferen
 
 This way your laptop does the coding while the remote GPU does the heavy lifting, and you can always RustDesk in if something needs manual attention.
 
-### SSH Terminal Access via Tailscale
+### Remote Terminal via RustDesk (Recommended for Windows)
 
-For terminal-only access (no GUI needed), SSH over Tailscale is simpler than RustDesk.
+RustDesk includes a built-in **Terminal (beta)** feature that gives you a remote PowerShell session without any SSH setup, extra accounts, or key exchange.
+
+**To use it:**
+1. In the RustDesk main window, find the remote machine in your peer list
+2. Click the **three-dot menu** (...)
+3. Select **"Terminal (beta)"** or **"Terminal (Run as administrator) (beta)"**
+
+This opens a PowerShell session on the remote machine, authenticated with RustDesk's permanent password. Over Tailscale direct IP, the connection is fully encrypted.
+
+**Why this is better than SSH on Windows:**
+- No extra user accounts needed
+- Works with Microsoft account logins (no password re-enabling)
+- No SSH key exchange to manage
+- Same authentication you already use for remote desktop
+- Admin option available for elevated tasks
+
+**Known limitations:**
+- The terminal runs in the **SYSTEM profile context** (`C:\Windows\System32\config\systemprofile`), not your user profile
+- Per-user installed tools (e.g. `winget`) may not be in the PATH
+- For Ollama, nvidia-smi, Python, and most admin tasks this is not an issue since they're installed system-wide
+
+**Example usage over Tailscale:**
+Once you've migrated your peers to Tailscale IPs (see [Migration Script](#step-3-run-the-migration-script)), the terminal session goes directly through the Tailscale tunnel:
+
+```
+# From the RustDesk terminal on 100.79.118.92 (T5500):
+ollama list
+nvidia-smi
+python E:\Development\OllamaBenchmarks\scripts\benchmark_quality.py --models qwen3.5:9b
+```
+
+### SSH Terminal Access via Tailscale (Alternative)
+
+For environments where RustDesk isn't available, or where you need user-context shells, SSH over Tailscale is an alternative.
 
 #### Linux / macOS hosts
 
