@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-21T14:14:40.4650525+00:00",
+    "run_finished_at":  "2026-03-21T14:14:56.3341621+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-trinity-mini_q4_k_m.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "trinity-mini:q4_k_m"
+               ],
+    "completed_models":  [
+                             "trinity-mini:q4_k_m"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "trinity-mini:q4_k_m",
+                        "eval_count":  192,
+                        "eval_s":  7.454,
+                        "toks_per_s":  25.76,
+                        "total_s":  8.206,
+                        "load_s":  0.263,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  15.19,
+                        "gpu_util_avg":  0,
+                        "gpu_util_peak":  0,
+                        "gpu_mem_peak_gb":  17.36,
+                        "ollama_ps":  "trinity-mini:q4_k_m size=19.29GB vram=19.29GB ctx=32768 quant=Q4_K_M"
+                    }
+                ]
+}
