@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-21T12:30:09.9736298+00:00",
+    "run_finished_at":  "2026-03-21T12:32:12.3629016+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-ingu627_exaone4.0_32b.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "ingu627/exaone4.0:32b"
+               ],
+    "completed_models":  [
+                             "ingu627/exaone4.0:32b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "ingu627/exaone4.0:32b",
+                        "eval_count":  192,
+                        "eval_s":  106.413,
+                        "toks_per_s":  1.8,
+                        "total_s":  107.702,
+                        "load_s":  0.123,
+                        "cpu_avg_pct":  18.1,
+                        "cpu_peak_pct":  21.1,
+                        "ram_peak_gb":  28.55,
+                        "gpu_util_avg":  22.7,
+                        "gpu_util_peak":  39.7,
+                        "gpu_mem_peak_gb":  35.38,
+                        "ollama_ps":  "ingu627/exaone4.0:32b size=76.4GB vram=60.52GB ctx=131072 quant=Q4_K_M"
+                    }
+                ]
+}

@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-21T12:12:54.0514941+00:00",
+    "run_finished_at":  "2026-03-21T12:13:14.1209992+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-gpt-oss_20b.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "gpt-oss:20b"
+               ],
+    "completed_models":  [
+                             "gpt-oss:20b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "gpt-oss:20b",
+                        "eval_count":  192,
+                        "eval_s":  10.145,
+                        "toks_per_s":  18.93,
+                        "total_s":  11.386,
+                        "load_s":  0.459,
+                        "cpu_avg_pct":  0.6,
+                        "cpu_peak_pct":  0.6,
+                        "ram_peak_gb":  1.65,
+                        "gpu_util_avg":  34.7,
+                        "gpu_util_peak":  69.4,
+                        "gpu_mem_peak_gb":  16.3,
+                        "ollama_ps":  "gpt-oss:20b size=16.38GB vram=16.38GB ctx=131072 quant=MXFP4"
+                    }
+                ]
+}
