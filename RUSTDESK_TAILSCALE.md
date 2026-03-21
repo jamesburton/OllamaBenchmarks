@@ -334,9 +334,13 @@ A common pattern is using RustDesk for desktop access and Ollama API for inferen
 
 This way your laptop does the coding while the remote GPU does the heavy lifting, and you can always RustDesk in if something needs manual attention.
 
-### Using Tailscale SSH as an Alternative
+### SSH Terminal Access via Tailscale
 
-For terminal-only access (no GUI), Tailscale has built-in SSH support that avoids RustDesk entirely:
+For terminal-only access (no GUI needed), SSH over Tailscale is simpler than RustDesk.
+
+#### Linux / macOS hosts
+
+Tailscale has built-in SSH that requires zero key management:
 
 ```bash
 # Enable on the remote machine (one-time)
@@ -346,4 +350,79 @@ tailscale set --ssh
 ssh user@100.79.118.92
 ```
 
-This is simpler than RustDesk for headless servers where you only need a terminal. See [Tailscale SSH docs](https://tailscale.com/kb/1193/tailscale-ssh) for setup.
+See [Tailscale SSH docs](https://tailscale.com/kb/1193/tailscale-ssh) for details.
+
+#### Windows hosts
+
+**Tailscale's built-in SSH server does not support Windows.** You need OpenSSH Server instead, which Tailscale secures at the network layer.
+
+**The Microsoft account gotcha:** Windows SSH key-based authentication (`authorized_keys`) only works with **local Windows accounts**, not Microsoft accounts. If all your machines use Microsoft account logins, you have two options:
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **Password auth over Tailscale** | Works immediately with Microsoft accounts | Must type password each time |
+| **Create a local account for SSH** | Key-based auth, no password prompts | Extra account to manage |
+
+Password auth over Tailscale is still secure — Tailscale encrypts everything with WireGuard, so the password never crosses the public internet.
+
+#### Automated Setup Script
+
+The included `setup_tailscale_ssh.ps1` script handles the full Windows SSH setup:
+
+```powershell
+# Run as Administrator
+
+# 1. Install and configure OpenSSH Server on this machine
+.\scripts\setup_tailscale_ssh.ps1 -SetupServer
+
+# 2. Exchange keys with a remote Tailscale host
+.\scripts\setup_tailscale_ssh.ps1 -ExchangeKeys -RemoteHost 100.79.118.92
+
+# 3. Both at once
+.\scripts\setup_tailscale_ssh.ps1 -SetupServer -ExchangeKeys -RemoteHost 100.80.83.33
+```
+
+The script will:
+
+1. **Install** OpenSSH Server (if not already installed)
+2. **Configure** `sshd_config` — enables public key auth, keeps password auth for Microsoft accounts
+3. **Scope the firewall** to Tailscale's IP range only (`100.64.0.0/10`) — SSH is not exposed to your LAN
+4. **Start** the sshd service and set it to auto-start
+5. **Generate** an ED25519 key pair (if you don't have one)
+6. **Deploy** your public key to the remote machine's `authorized_keys` (handles the Windows admin path quirk)
+7. **Test** the connection
+
+#### Key Exchange Walkthrough (manual)
+
+If you prefer to do it manually:
+
+**On the client machine (the one you SSH from):**
+```powershell
+# Generate a key pair (skip if you already have one)
+ssh-keygen -t ed25519
+
+# Copy your public key to the remote machine
+# You'll be prompted for the remote password once
+type $env:USERPROFILE\.ssh\id_ed25519.pub | ssh james@100.79.118.92 "powershell -Command `"Add-Content -Path 'C:/ProgramData/ssh/administrators_authorized_keys' -Value (Read-Host -Prompt 'key') -Force`""
+```
+
+**On the remote Windows machine (admin PowerShell):**
+```powershell
+# Fix permissions on the admin authorized_keys file
+icacls C:\ProgramData\ssh\administrators_authorized_keys /inheritance:r /grant "SYSTEM:(F)" /grant "BUILTIN\Administrators:(F)"
+```
+
+**Important:** For admin users on Windows, keys go in `C:\ProgramData\ssh\administrators_authorized_keys` (not `~/.ssh/authorized_keys`). The file must have restricted permissions or sshd silently ignores it. The setup script handles this automatically.
+
+#### After Setup
+
+```bash
+# Connect from any Tailscale device — no password needed
+ssh james@100.79.118.92
+
+# Run commands remotely
+ssh james@100.79.118.92 "ollama list"
+ssh james@100.79.118.92 "nvidia-smi"
+```
+
+See [Microsoft's OpenSSH key management guide](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement) for more details.
