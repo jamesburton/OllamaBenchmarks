@@ -1,16 +1,25 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-18T19:14:26.6545649+00:00",
-    "run_finished_at":  "2026-03-18T19:14:37.5580444+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3.5_9b.json",
-    "host":  "T5500",
+    "run_started_at":  "2026-03-21T10:57:30.1037783+00:00",
+    "run_finished_at":  "2026-03-21T10:58:15.9747847+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen3.5_9b.json",
+    "host":  "STRIX",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "hostname":  "T5500"
+                         "hostname":  "STRIX"
                      },
     "models":  [
                    "qwen3.5:9b"
                ],
+    "completed_models":  [
+                             "qwen3.5:9b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,
@@ -18,17 +27,17 @@
                     {
                         "model":  "qwen3.5:9b",
                         "eval_count":  192,
-                        "eval_s":  4.939,
-                        "toks_per_s":  38.87,
-                        "total_s":  5.965,
-                        "load_s":  0.543,
-                        "cpu_avg_pct":  0,
-                        "cpu_peak_pct":  0,
-                        "ram_peak_gb":  1.34,
-                        "gpu_util_avg":  94.8,
-                        "gpu_util_peak":  94.8,
-                        "gpu_mem_peak_gb":  7.76,
-                        "ollama_ps":  "qwen3.5:9b size=8.2GB vram=8.2GB ctx=4096 quant=Q4_K_M"
+                        "eval_s":  12.742,
+                        "toks_per_s":  15.07,
+                        "total_s":  13.716,
+                        "load_s":  0.502,
+                        "cpu_avg_pct":  0.4,
+                        "cpu_peak_pct":  0.4,
+                        "ram_peak_gb":  14.47,
+                        "gpu_util_avg":  41.1,
+                        "gpu_util_peak":  82.2,
+                        "gpu_mem_peak_gb":  42.28,
+                        "ollama_ps":  "qwen3.5:9b size=18.78GB vram=18.78GB ctx=262144 quant=Q4_K_M"
                     }
                 ]
 }

@@ -1,40 +1,25 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-17T20:13:06.2424643+00:00",
-    "run_finished_at":  "2026-03-17T20:15:19.3236801+00:00",
+    "run_started_at":  "2026-03-21T11:00:00.2675630+00:00",
+    "run_finished_at":  "2026-03-21T11:00:54.1341033+00:00",
     "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-ministral-3_14b.json",
-    "host":  "OLDFRAMEWORK",
+    "host":  "STRIX",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "captured_at":  "2026-03-17T20:13:25.848759+00:00",
-                         "hostname":  "OldFramework",
-                         "host_slug":  "oldframework",
-                         "os":  {
-                                    "system":  "Windows",
-                                    "release":  "11",
-                                    "version":  "10.0.26200",
-                                    "machine":  "AMD64"
-                                },
-                         "manufacturer":  "Framework",
-                         "model":  "Laptop",
-                         "processor":  "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
-                         "logical_cpu_count":  8,
-                         "total_memory_gb":  63.79,
-                         "python_version":  "3.13.12",
-                         "ollama_version":  "ollama version is 0.18.0",
-                         "gpus":  [
-                                      {
-                                          "Name":  "Intel(R) Iris(R) Xe Graphics",
-                                          "AdapterRAM":  2147479552,
-                                          "DriverVersion":  "32.0.101.7082",
-                                          "VideoProcessor":  "Intel(R) Iris(R) Xe Graphics Family",
-                                          "Status":  "OK"
-                                      }
-                                  ]
+                         "hostname":  "STRIX"
                      },
     "models":  [
                    "ministral-3:14b"
                ],
+    "completed_models":  [
+                             "ministral-3:14b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,
@@ -42,17 +27,17 @@
                     {
                         "model":  "ministral-3:14b",
                         "eval_count":  192,
-                        "eval_s":  93.224,
-                        "toks_per_s":  2.06,
-                        "total_s":  98.071,
-                        "load_s":  0.382,
-                        "cpu_avg_pct":  49.5,
-                        "cpu_peak_pct":  56.1,
-                        "ram_peak_gb":  9.45,
-                        "gpu_util_avg":  0,
-                        "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  0,
-                        "ollama_ps":  "ministral-3:14b size=9.82GB vram=0GB ctx=4096 quant=Q4_K_M"
+                        "eval_s":  16.614,
+                        "toks_per_s":  11.56,
+                        "total_s":  17.281,
+                        "load_s":  0.348,
+                        "cpu_avg_pct":  0.8,
+                        "cpu_peak_pct":  0.8,
+                        "ram_peak_gb":  10.59,
+                        "gpu_util_avg":  30.8,
+                        "gpu_util_peak":  61.7,
+                        "gpu_mem_peak_gb":  60.7,
+                        "ollama_ps":  "ministral-3:14b size=49.43GB vram=49.43GB ctx=262144 quant=Q4_K_M"
                     }
                 ]
 }

@@ -1,58 +1,43 @@
 {
-  "benchmark": "throughput_resource",
-  "run_started_at": "2026-03-16T02:03:49.7522405+00:00",
-  "run_finished_at": "2026-03-16T02:11:51.8661511+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2_24b.json",
-  "host": "OLDFRAMEWORK",
-  "ollama_host": "http://127.0.0.1:11434",
-  "host_details": {
-    "captured_at": "2026-03-16T02:04:00.590634+00:00",
-    "hostname": "OldFramework",
-    "host_slug": "oldframework",
-    "os": {
-      "system": "Windows",
-      "release": "10",
-      "version": "10.0.26200",
-      "machine": "AMD64"
-    },
-    "manufacturer": "Framework",
-    "model": "Laptop",
-    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
-    "logical_cpu_count": 8,
-    "total_memory_gb": 63.79,
-    "python_version": "3.9.25",
-    "ollama_version": "ollama version is 0.18.0",
-    "gpus": [
-      {
-        "Name": "Intel(R) Iris(R) Xe Graphics",
-        "AdapterRAM": 2147479552,
-        "DriverVersion": "32.0.101.7082",
-        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
-        "Status": "OK"
-      }
-    ]
-  },
-  "models": [
-    "lfm2:24b"
-  ],
-  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
-  "num_predict": 192,
-  "seed": 42,
-  "results": [
-    {
-      "model": "lfm2:24b",
-      "eval_count": 187,
-      "eval_s": 13.402,
-      "toks_per_s": 13.95,
-      "total_s": 14.865,
-      "load_s": 0.293,
-      "cpu_avg_pct": 62.1,
-      "cpu_peak_pct": 81.1,
-      "ram_peak_gb": 27.33,
-      "gpu_util_avg": 0.0,
-      "gpu_util_peak": 0.0,
-      "gpu_mem_peak_gb": 0.0,
-      "ollama_ps": "lfm2:24b size=13.69GB vram=0GB ctx=4096 quant=Q4_K_M"
-    }
-  ]
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-21T10:59:06.0975557+00:00",
+    "run_finished_at":  "2026-03-21T10:59:55.7033786+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2_24b.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "lfm2:24b"
+               ],
+    "completed_models":  [
+                             "lfm2:24b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "lfm2:24b",
+                        "eval_count":  190,
+                        "eval_s":  15.706,
+                        "toks_per_s":  12.1,
+                        "total_s":  16.296,
+                        "load_s":  0.143,
+                        "cpu_avg_pct":  8.1,
+                        "cpu_peak_pct":  13.9,
+                        "ram_peak_gb":  14.32,
+                        "gpu_util_avg":  19.9,
+                        "gpu_util_peak":  31.2,
+                        "gpu_mem_peak_gb":  46.2,
+                        "ollama_ps":  "lfm2:24b size=14.32GB vram=14.32GB ctx=32768 quant=Q4_K_M"
+                    }
+                ]
 }
