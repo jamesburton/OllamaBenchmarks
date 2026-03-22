@@ -1,52 +1,43 @@
 {
-  "benchmark": "throughput_openai",
-  "run_started_at": "2026-03-15T21:23:00.738681+00:00",
-  "run_finished_at": "2026-03-15T21:24:56.737856+00:00",
-  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-omnicoder_9b-q4_k_m.json",
-  "base_url": "http://127.0.0.1:8081",
-  "host_details": {
-    "captured_at": "2026-03-15T21:23:02.462357+00:00",
-    "hostname": "T5500",
-    "host_slug": "t5500",
-    "os": {
-      "system": "Windows",
-      "release": "10",
-      "version": "10.0.26200",
-      "machine": "AMD64"
-    },
-    "manufacturer": "Dell Inc.",
-    "model": "Precision WorkStation T5500  ",
-    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-    "logical_cpu_count": 24,
-    "total_memory_gb": 36.0,
-    "python_version": "3.11.3",
-    "ollama_version": "ollama version is 0.17.8-rc4",
-    "gpus": [
-      {
-        "Name": "NVIDIA GeForce RTX 3060",
-        "AdapterRAM": 4293918720,
-        "DriverVersion": "32.0.15.6094",
-        "VideoProcessor": "NVIDIA GeForce RTX 3060",
-        "Status": "OK"
-      }
-    ]
-  },
-  "models": [
-    "omnicoder:9b-q4_k_m"
-  ],
-  "results": [
-    {
-      "model": "omnicoder:9b-q4_k_m",
-      "completion_tokens": 151,
-      "toks_per_s": 1.48,
-      "total_s": 101.958,
-      "cpu_avg_pct": 49.9,
-      "cpu_peak_pct": 50.1,
-      "ram_peak_gb": 6.17,
-      "gpu_util_avg": 30.4,
-      "gpu_util_peak": 34.7,
-      "gpu_mem_peak_gb": 4.8,
-      "response_preview": "Dependency injection (DI) is a design pattern where an object receives its dependencies from external sources rather than creating them internally. This promotes loose coupling, making code more modul"
-    }
-  ]
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-22T13:50:03.7408826+00:00",
+    "run_finished_at":  "2026-03-22T13:50:12.6132456+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-omnicoder_9b-q4_k_m.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M"
+               ],
+    "completed_models":  [
+                             "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M",
+                        "eval_count":  143,
+                        "eval_s":  5.273,
+                        "toks_per_s":  27.12,
+                        "total_s":  5.666,
+                        "load_s":  0.131,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  1.13,
+                        "gpu_util_avg":  87.6,
+                        "gpu_util_peak":  87.6,
+                        "gpu_mem_peak_gb":  16,
+                        "ollama_ps":  "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M size=15.56GB vram=15.56GB ctx=262144 quant=unknown"
+                    }
+                ]
 }

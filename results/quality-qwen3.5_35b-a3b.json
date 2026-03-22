@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-22T13:49:18.057987+00:00",
-  "run_finished_at": "2026-03-22T13:49:34.287396+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-omnicoder_9b-q4_k_m.json",
+  "run_started_at": "2026-03-22T14:00:16.176452+00:00",
+  "run_finished_at": "2026-03-22T14:00:58.167576+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-qwen3.5_35b-a3b.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-22T13:49:18.745749+00:00",
+    "captured_at": "2026-03-22T14:00:16.798456+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -32,23 +32,23 @@
     ]
   },
   "models": [
-    "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M"
+    "qwen3.5:35b-a3b"
   ],
   "completed_models": [
-    "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M"
+    "qwen3.5:35b-a3b"
   ],
   "failed_models": [],
   "incomplete_models": [],
   "results": [
     {
-      "model": "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M",
-      "coding_pass": 0,
+      "model": "qwen3.5:35b-a3b",
+      "coding_pass": 2,
       "coding_total": 2,
-      "tool_pass": 0,
+      "tool_pass": 2,
       "tool_total": 2,
-      "agentic_pass": 0,
+      "agentic_pass": 1,
       "agentic_total": 1,
-      "score": 0,
+      "score": 5,
       "score_max": 5
     }
   ]
