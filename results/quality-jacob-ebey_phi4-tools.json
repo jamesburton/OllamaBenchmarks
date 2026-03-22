@@ -1,0 +1,50 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-03-18T15:39:00.791086+00:00",
+  "run_finished_at": "2026-03-18T15:39:20.777556+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-jacob-ebey_phi4-tools_latest.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-18T15:39:02.277006+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.18.0",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "jacob-ebey/phi4-tools"
+  ],
+  "results": [
+    {
+      "model": "jacob-ebey/phi4-tools",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 0,
+      "agentic_total": 1,
+      "score": 0,
+      "score_max": 5
+    }
+  ]
+}

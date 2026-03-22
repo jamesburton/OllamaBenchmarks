@@ -12,7 +12,7 @@
       "score_max": 2
     },
     {
-      "model": "mistral-small:latest",
+      "model": "mistral-small",
       "score": 2,
       "score_max": 2
     }

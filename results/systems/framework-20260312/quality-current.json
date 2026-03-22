@@ -41,14 +41,14 @@
   "models": [
     "lfm2.5-thinking:1.2b",
     "rnj-1:8b",
-    "qwen3.5:latest",
+    "qwen3.5",
     "ministral-3:14b",
     "codellama:70b"
   ],
   "completed_models": [
     "lfm2.5-thinking:1.2b",
     "rnj-1:8b",
-    "qwen3.5:latest",
+    "qwen3.5",
     "ministral-3:14b"
   ],
   "failed_models": [],
@@ -79,7 +79,7 @@
       "score_max": 5
     },
     {
-      "model": "qwen3.5:latest",
+      "model": "qwen3.5",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,

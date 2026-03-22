@@ -1,67 +1,63 @@
 {
-    "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-17T20:45:10.3346750+00:00",
-    "run_finished_at":  "2026-03-17T20:45:37.4235501+00:00",
-    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-phi4-default.json",
-    "host":  "OLDFRAMEWORK",
-    "ollama_host":  "http://127.0.0.1:11434",
-    "host_details":  {
-                         "captured_at":  "2026-03-17T20:45:13.489354+00:00",
-                         "hostname":  "OldFramework",
-                         "host_slug":  "oldframework",
-                         "os":  {
-                                    "system":  "Windows",
-                                    "release":  "11",
-                                    "version":  "10.0.26200",
-                                    "machine":  "AMD64"
-                                },
-                         "manufacturer":  "Framework",
-                         "model":  "Laptop",
-                         "processor":  "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
-                         "logical_cpu_count":  8,
-                         "total_memory_gb":  63.79,
-                         "python_version":  "3.13.12",
-                         "ollama_version":  "ollama version is 0.18.0",
-                         "gpus":  [
-                                      {
-                                          "Name":  "Intel(R) Iris(R) Xe Graphics",
-                                          "AdapterRAM":  2147479552,
-                                          "DriverVersion":  "32.0.101.7082",
-                                          "VideoProcessor":  "Intel(R) Iris(R) Xe Graphics Family",
-                                          "Status":  "OK"
-                                      }
-                                  ]
-                     },
-    "models":  [
-                   "phi4-mini:latest"
-               ],
-    "completed_models":  [
-                             "phi4-mini:latest"
-                         ],
-    "failed_models":  [
-
-                      ],
-    "incomplete_models":  [
-
-                          ],
-    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
-    "num_predict":  192,
-    "seed":  42,
-    "results":  [
-                    {
-                        "model":  "phi4-mini:latest",
-                        "eval_count":  187,
-                        "eval_s":  16.23,
-                        "toks_per_s":  11.52,
-                        "total_s":  17.786,
-                        "load_s":  0.393,
-                        "cpu_avg_pct":  44.9,
-                        "cpu_peak_pct":  49.4,
-                        "ram_peak_gb":  3.04,
-                        "gpu_util_avg":  0,
-                        "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  0,
-                        "ollama_ps":  "phi4-mini:latest size=2.81GB vram=0GB ctx=4096 quant=Q4_K_M"
-                    }
-                ]
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-17T20:45:10.3346750+00:00",
+  "run_finished_at": "2026-03-17T20:45:37.4235501+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-phi4-default.json",
+  "host": "OLDFRAMEWORK",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-17T20:45:13.489354+00:00",
+    "hostname": "OldFramework",
+    "host_slug": "oldframework",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop",
+    "processor": "Intel64 Family 6 Model 140 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 8,
+    "total_memory_gb": 63.79,
+    "python_version": "3.13.12",
+    "ollama_version": "ollama version is 0.18.0",
+    "gpus": [
+      {
+        "Name": "Intel(R) Iris(R) Xe Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7082",
+        "VideoProcessor": "Intel(R) Iris(R) Xe Graphics Family",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "phi4-mini"
+  ],
+  "completed_models": [
+    "phi4-mini"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "phi4-mini",
+      "eval_count": 187,
+      "eval_s": 16.23,
+      "toks_per_s": 11.52,
+      "total_s": 17.786,
+      "load_s": 0.393,
+      "cpu_avg_pct": 44.9,
+      "cpu_peak_pct": 49.4,
+      "ram_peak_gb": 3.04,
+      "gpu_util_avg": 0,
+      "gpu_util_peak": 0,
+      "gpu_mem_peak_gb": 0,
+      "ollama_ps": "phi4-mini size=2.81GB vram=0GB ctx=4096 quant=Q4_K_M"
+    }
+  ]
 }

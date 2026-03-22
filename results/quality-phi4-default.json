@@ -32,16 +32,16 @@
     ]
   },
   "models": [
-    "phi4-mini:latest"
+    "phi4-mini"
   ],
   "completed_models": [
-    "phi4-mini:latest"
+    "phi4-mini"
   ],
   "failed_models": [],
   "incomplete_models": [],
   "results": [
     {
-      "model": "phi4-mini:latest",
+      "model": "phi4-mini",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 0,

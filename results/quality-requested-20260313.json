@@ -41,14 +41,14 @@
   "models": [
     "cogito:8b",
     "cogito:14b",
-    "zac/phi4-tools:latest",
-    "phi4-mini:latest"
+    "zac/phi4-tools",
+    "phi4-mini"
   ],
   "completed_models": [
     "cogito:8b",
     "cogito:14b",
-    "zac/phi4-tools:latest",
-    "phi4-mini:latest"
+    "zac/phi4-tools",
+    "phi4-mini"
   ],
   "failed_models": [],
   "incomplete_models": [],
@@ -76,7 +76,7 @@
       "score_max": 5
     },
     {
-      "model": "zac/phi4-tools:latest",
+      "model": "zac/phi4-tools",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 0,
@@ -87,7 +87,7 @@
       "score_max": 5
     },
     {
-      "model": "phi4-mini:latest",
+      "model": "phi4-mini",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 0,

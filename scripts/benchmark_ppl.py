@@ -208,6 +208,7 @@ def benchmark_model(model: str) -> dict[str, Any]:
 
 
 def get_model_slug(model: str) -> str:
+    model = re.sub(r":latest$", "", model)
     return re.sub(r"[:/\\]", "_", model).rstrip("_")
 
 

@@ -39,30 +39,30 @@
   },
   "summary": {
     "fastest_model": {
-      "model": "glm-4.7-flash:latest",
+      "model": "glm-4.7-flash",
       "toks_per_s": 43.11,
       "score": 5,
       "score_max": 5
     },
     "primary_coding_model": {
-      "model": "qwen3-coder-next:latest",
+      "model": "qwen3-coder-next",
       "toks_per_s": 33.92,
       "score": 5,
       "score_max": 5
     },
     "best_balanced_model": {
-      "model": "glm-4.7-flash:latest",
+      "model": "glm-4.7-flash",
       "toks_per_s": 43.11,
       "score": 5,
       "score_max": 5
     },
     "full_quality_models": [
-      "glm-4.7-flash:latest",
-      "qwen3-coder-next:latest",
+      "glm-4.7-flash",
+      "qwen3-coder-next",
       "ministral-3:14b",
       "gpt-oss:120b",
       "qwen3-coder-next:q8_0",
-      "nemotron-3-super:latest",
+      "nemotron-3-super",
       "qwen3.5:122b",
       "qwen3.5:122b-a10b",
       "devstral-small-2:24b-instruct-2512-q8_0"

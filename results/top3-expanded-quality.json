@@ -1,6 +1,6 @@
 [
   {
-    "model": "qwen3-coder-next:latest",
+    "model": "qwen3-coder-next",
     "coding_pass": 3,
     "coding_total": 3,
     "tool_pass": 2,
@@ -27,4 +27,3 @@
     "score_max": 5
   }
 ]
-

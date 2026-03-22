@@ -1,77 +1,73 @@
 {
-    "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-18T19:14:35.6614819+00:00",
-    "run_finished_at":  "2026-03-18T19:21:04.9884003+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-191435.json",
-    "host":  "T5500",
-    "ollama_host":  "http://127.0.0.1:11434",
-    "host_details":  {
-                         "hostname":  "T5500"
-                     },
-    "models":  [
-                   "qwen3.5:4b",
-                   "qwen3:8b",
-                   "zac/phi4-tools:latest"
-               ],
-    "completed_models":  [
-                             "qwen3.5:4b",
-                             "qwen3:8b",
-                             "zac/phi4-tools:latest"
-                         ],
-    "failed_models":  [
-
-                      ],
-    "incomplete_models":  [
-
-                          ],
-    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
-    "num_predict":  192,
-    "seed":  42,
-    "results":  [
-                    {
-                        "model":  "qwen3.5:4b",
-                        "eval_count":  192,
-                        "eval_s":  3.449,
-                        "toks_per_s":  55.66,
-                        "total_s":  5.607,
-                        "load_s":  0.553,
-                        "cpu_avg_pct":  0,
-                        "cpu_peak_pct":  0,
-                        "ram_peak_gb":  1.73,
-                        "gpu_util_avg":  94.7,
-                        "gpu_util_peak":  94.7,
-                        "gpu_mem_peak_gb":  5.48,
-                        "ollama_ps":  "qwen3.5:4b size=5.73GB vram=5.73GB ctx=4096 quant=Q4_K_M"
-                    },
-                    {
-                        "model":  "qwen3:8b",
-                        "eval_count":  192,
-                        "eval_s":  3.947,
-                        "toks_per_s":  48.65,
-                        "total_s":  4.466,
-                        "load_s":  0.311,
-                        "cpu_avg_pct":  0,
-                        "cpu_peak_pct":  0,
-                        "ram_peak_gb":  1.2,
-                        "gpu_util_avg":  0,
-                        "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  0.12,
-                        "ollama_ps":  null
-                    },
-                    {
-                        "model":  "zac/phi4-tools:latest",
-                        "eval_count":  192,
-                        "eval_s":  6.027,
-                        "toks_per_s":  31.86,
-                        "total_s":  6.944,
-                        "load_s":  0.204,
-                        "cpu_avg_pct":  0,
-                        "cpu_peak_pct":  0,
-                        "ram_peak_gb":  0.86,
-                        "gpu_util_avg":  88.9,
-                        "gpu_util_peak":  88.9,
-                        "gpu_mem_peak_gb":  9.38,
-                        "ollama_ps":  null
-                    }
-                ]
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-18T19:14:35.6614819+00:00",
+  "run_finished_at": "2026-03-18T19:21:04.9884003+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-191435.json",
+  "host": "T5500",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "hostname": "T5500"
+  },
+  "models": [
+    "qwen3.5:4b",
+    "qwen3:8b",
+    "zac/phi4-tools"
+  ],
+  "completed_models": [
+    "qwen3.5:4b",
+    "qwen3:8b",
+    "zac/phi4-tools"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "qwen3.5:4b",
+      "eval_count": 192,
+      "eval_s": 3.449,
+      "toks_per_s": 55.66,
+      "total_s": 5.607,
+      "load_s": 0.553,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 1.73,
+      "gpu_util_avg": 94.7,
+      "gpu_util_peak": 94.7,
+      "gpu_mem_peak_gb": 5.48,
+      "ollama_ps": "qwen3.5:4b size=5.73GB vram=5.73GB ctx=4096 quant=Q4_K_M"
+    },
+    {
+      "model": "qwen3:8b",
+      "eval_count": 192,
+      "eval_s": 3.947,
+      "toks_per_s": 48.65,
+      "total_s": 4.466,
+      "load_s": 0.311,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 1.2,
+      "gpu_util_avg": 0,
+      "gpu_util_peak": 0,
+      "gpu_mem_peak_gb": 0.12,
+      "ollama_ps": null
+    },
+    {
+      "model": "zac/phi4-tools",
+      "eval_count": 192,
+      "eval_s": 6.027,
+      "toks_per_s": 31.86,
+      "total_s": 6.944,
+      "load_s": 0.204,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 0.86,
+      "gpu_util_avg": 88.9,
+      "gpu_util_peak": 88.9,
+      "gpu_mem_peak_gb": 9.38,
+      "ollama_ps": null
+    }
+  ]
 }

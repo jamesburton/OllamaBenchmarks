@@ -1,0 +1,65 @@
+{
+  "benchmark": "backend_comparison",
+  "run_started_at": "2026-03-13T20:52:30.4402093+00:00",
+  "run_finished_at": "2026-03-13T21:01:43.7305362+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-MichelRosselli_GLM-4.5-Air_latest.json",
+  "host": "STRIX",
+  "host_details": {
+    "captured_at": "2026-03-13T21:01:43.56011+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.17.7",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
+  "model": "MichelRosselli/GLM-4.5-Air",
+  "num_ctx": 8192,
+  "think": false,
+  "backends": [
+    "auto",
+    "vulkan",
+    "rocm"
+  ],
+  "results": [
+    {
+      "lib": "auto",
+      "status": "ok",
+      "toks_per_s": 7.46,
+      "e2e_toks_per_s": 6.77,
+      "total_s": 28.368
+    },
+    {
+      "lib": "vulkan",
+      "status": "ok",
+      "toks_per_s": 1.27,
+      "e2e_toks_per_s": 1.14,
+      "total_s": 168.389
+    },
+    {
+      "lib": "rocm",
+      "status": "ok",
+      "toks_per_s": 7.27,
+      "e2e_toks_per_s": 6.69,
+      "total_s": 28.689
+    }
+  ]
+}

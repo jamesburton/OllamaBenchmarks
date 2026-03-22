@@ -1,67 +1,63 @@
 {
-    "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-17T15:32:38.9518364+00:00",
-    "run_finished_at":  "2026-03-17T15:32:57.7455801+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260317-153238.json",
-    "host":  "T5500",
-    "ollama_host":  "http://127.0.0.1:11434",
-    "host_details":  {
-                         "captured_at":  "2026-03-17T15:32:40.899571+00:00",
-                         "hostname":  "T5500",
-                         "host_slug":  "t5500",
-                         "os":  {
-                                    "system":  "Windows",
-                                    "release":  "10",
-                                    "version":  "10.0.26200",
-                                    "machine":  "AMD64"
-                                },
-                         "manufacturer":  "Dell Inc.",
-                         "model":  "Precision WorkStation T5500  ",
-                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-                         "logical_cpu_count":  24,
-                         "total_memory_gb":  36.0,
-                         "python_version":  "3.11.3",
-                         "ollama_version":  "ollama version is 0.18.0",
-                         "gpus":  [
-                                      {
-                                          "Name":  "NVIDIA GeForce RTX 3060",
-                                          "AdapterRAM":  4293918720,
-                                          "DriverVersion":  "32.0.15.6094",
-                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
-                                          "Status":  "OK"
-                                      }
-                                  ]
-                     },
-    "models":  [
-                   "phi4-mini:latest"
-               ],
-    "completed_models":  [
-                             "phi4-mini:latest"
-                         ],
-    "failed_models":  [
-
-                      ],
-    "incomplete_models":  [
-
-                          ],
-    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
-    "num_predict":  192,
-    "seed":  42,
-    "results":  [
-                    {
-                        "model":  "phi4-mini:latest",
-                        "eval_count":  192,
-                        "eval_s":  2.063,
-                        "toks_per_s":  93.05,
-                        "total_s":  6.415,
-                        "load_s":  0.422,
-                        "cpu_avg_pct":  0,
-                        "cpu_peak_pct":  0,
-                        "ram_peak_gb":  1.09,
-                        "gpu_util_avg":  91.8,
-                        "gpu_util_peak":  91.8,
-                        "gpu_mem_peak_gb":  3.38,
-                        "ollama_ps":  "phi4-mini:latest size=3.06GB vram=3.06GB ctx=4096 quant=Q4_K_M"
-                    }
-                ]
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-17T15:32:38.9518364+00:00",
+  "run_finished_at": "2026-03-17T15:32:57.7455801+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260317-153238.json",
+  "host": "T5500",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-17T15:32:40.899571+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.18.0",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "phi4-mini"
+  ],
+  "completed_models": [
+    "phi4-mini"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "phi4-mini",
+      "eval_count": 192,
+      "eval_s": 2.063,
+      "toks_per_s": 93.05,
+      "total_s": 6.415,
+      "load_s": 0.422,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 1.09,
+      "gpu_util_avg": 91.8,
+      "gpu_util_peak": 91.8,
+      "gpu_mem_peak_gb": 3.38,
+      "ollama_ps": "phi4-mini size=3.06GB vram=3.06GB ctx=4096 quant=Q4_K_M"
+    }
+  ]
 }

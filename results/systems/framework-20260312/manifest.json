@@ -52,19 +52,19 @@
       "score_max": 5
     },
     "primary_coding_model": {
-      "model": "qwen3.5:latest",
+      "model": "qwen3.5",
       "toks_per_s": 37.71,
       "score": 5,
       "score_max": 5
     },
     "best_balanced_model": {
-      "model": "qwen3.5:latest",
+      "model": "qwen3.5",
       "toks_per_s": 37.71,
       "score": 5,
       "score_max": 5
     },
     "full_quality_models": [
-      "qwen3.5:latest",
+      "qwen3.5",
       "ministral-3:14b"
     ],
     "backend_summary": "auto led at 2.97 tok/s; rocm followed at 2.33 tok/s."

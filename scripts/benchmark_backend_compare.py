@@ -43,6 +43,7 @@ LLAMA_SERVER_PORT = 8081
 
 
 def model_slug(model: str) -> str:
+    model = re.sub(r":latest$", "", model)
     return re.sub(r"[^\w\.-]", "_", model.replace(":", "_").replace("/", "_"))
 
 

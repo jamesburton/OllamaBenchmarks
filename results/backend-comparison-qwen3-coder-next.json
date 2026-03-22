@@ -1,0 +1,65 @@
+{
+  "benchmark": "backend_comparison",
+  "run_started_at": "2026-03-13T20:28:15.6070848+00:00",
+  "run_finished_at": "2026-03-13T20:31:23.2597539+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\backend-comparison-qwen3-coder-next_latest.json",
+  "host": "STRIX",
+  "host_details": {
+    "captured_at": "2026-03-13T20:31:23.143324+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.17.7",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
+  "model": "qwen3-coder-next",
+  "num_ctx": 8192,
+  "think": false,
+  "backends": [
+    "auto",
+    "vulkan",
+    "rocm"
+  ],
+  "results": [
+    {
+      "lib": "auto",
+      "status": "ok",
+      "toks_per_s": 11.56,
+      "e2e_toks_per_s": 10.94,
+      "total_s": 14.903
+    },
+    {
+      "lib": "vulkan",
+      "status": "ok",
+      "toks_per_s": 8.12,
+      "e2e_toks_per_s": 7.76,
+      "total_s": 21.011
+    },
+    {
+      "lib": "rocm",
+      "status": "ok",
+      "toks_per_s": 12.92,
+      "e2e_toks_per_s": 12.37,
+      "total_s": 13.182
+    }
+  ]
+}

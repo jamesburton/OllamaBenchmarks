@@ -1,6 +1,6 @@
 [
   {
-    "model": "glm-4.7-flash:latest",
+    "model": "glm-4.7-flash",
     "toks_per_s": 44.99,
     "cpu_avg_pct": 4.0,
     "ram_peak_gb": 1.74,
@@ -9,7 +9,7 @@
     "processor_split": "100% GPU"
   },
   {
-    "model": "qwen3-coder-next:latest",
+    "model": "qwen3-coder-next",
     "toks_per_s": 32.78,
     "cpu_avg_pct": 4.8,
     "ram_peak_gb": 2.0,
@@ -90,7 +90,7 @@
     "processor_split": "10%/90% CPU/GPU"
   },
   {
-    "model": "MichelRosselli/GLM-4.5-Air:latest",
+    "model": "MichelRosselli/GLM-4.5-Air",
     "toks_per_s": 1.49,
     "cpu_avg_pct": 41.2,
     "ram_peak_gb": 50.53,
@@ -99,4 +99,3 @@
     "processor_split": "58%/42% CPU/GPU"
   }
 ]
-

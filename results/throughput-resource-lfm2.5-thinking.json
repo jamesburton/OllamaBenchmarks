@@ -1,0 +1,63 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-18T02:39:32.1117296+00:00",
+  "run_finished_at": "2026-03-18T02:39:44.2032046+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-lfm2.5-thinking_latest.json",
+  "host": "STRIX",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-18T02:39:34.300062+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.18.0",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "lfm2.5-thinking"
+  ],
+  "completed_models": [
+    "lfm2.5-thinking"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "lfm2.5-thinking",
+      "eval_count": 192,
+      "eval_s": 4.429,
+      "toks_per_s": 43.35,
+      "total_s": 4.693,
+      "load_s": 0.172,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 11.8,
+      "gpu_util_avg": 0,
+      "gpu_util_peak": 0,
+      "gpu_mem_peak_gb": 34.33,
+      "ollama_ps": "lfm2.5-thinking size=2.65GB vram=2.65GB ctx=128000 quant=Q4_K_M"
+    }
+  ]
+}

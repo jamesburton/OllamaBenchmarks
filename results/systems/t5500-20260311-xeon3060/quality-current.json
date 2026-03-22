@@ -1,78 +1,78 @@
 {
-    "benchmark":  "quality",
-    "run_started_at":  "2026-03-11T19:28:35.924446+00:00",
-    "run_finished_at":  "2026-03-11T20:44:27.9928512+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\quality-granite4_7b-a1b-h.json",
-    "ollama_host":  "http://127.0.0.1:11434",
-    "host_details":  {
-                         "captured_at":  "2026-03-11T19:29:05.749335+00:00",
-                         "hostname":  "T5500",
-                         "host_slug":  "t5500",
-                         "os":  {
-                                    "system":  "Windows",
-                                    "release":  "10",
-                                    "version":  "10.0.26200",
-                                    "machine":  "AMD64"
-                                },
-                         "manufacturer":  "Dell Inc.",
-                         "model":  "Precision WorkStation T5500  ",
-                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-                         "logical_cpu_count":  24,
-                         "total_memory_gb":  36.0,
-                         "python_version":  "3.11.3",
-                         "ollama_version":  "ollama version is 0.17.7",
-                         "gpus":  [
-                                      {
-                                          "Name":  "NVIDIA GeForce RTX 3060",
-                                          "AdapterRAM":  4293918720,
-                                          "DriverVersion":  "32.0.15.6094",
-                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
-                                          "Status":  "OK"
-                                      }
-                                  ]
-                     },
-    "models":  [
-                   "granite4:7b-a1b-h",
-                   "lfm2.5-thinking:latest",
-                   "lfm2:24b",
-                   "ministral-3:14b"
-               ],
-    "results":  [
-                    {
-                        "model":  "granite4:7b-a1b-h",
-                        "coding_pass":  2,
-                        "coding_total":  2,
-                        "tool_pass":  2,
-                        "tool_total":  2,
-                        "score":  4,
-                        "score_max":  4
-                    },
-                    {
-                        "model":  "lfm2.5-thinking:latest",
-                        "coding_pass":  0,
-                        "coding_total":  2,
-                        "tool_pass":  0,
-                        "tool_total":  2,
-                        "score":  0,
-                        "score_max":  4
-                    },
-                    {
-                        "model":  "lfm2:24b",
-                        "coding_pass":  2,
-                        "coding_total":  2,
-                        "tool_pass":  2,
-                        "tool_total":  2,
-                        "score":  4,
-                        "score_max":  4
-                    },
-                    {
-                        "model":  "ministral-3:14b",
-                        "coding_pass":  2,
-                        "coding_total":  2,
-                        "tool_pass":  2,
-                        "tool_total":  2,
-                        "score":  4,
-                        "score_max":  4
-                    }
-                ]
+  "benchmark": "quality",
+  "run_started_at": "2026-03-11T19:28:35.924446+00:00",
+  "run_finished_at": "2026-03-11T20:44:27.9928512+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-granite4_7b-a1b-h.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-11T19:29:05.749335+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.17.7",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "granite4:7b-a1b-h",
+    "lfm2.5-thinking",
+    "lfm2:24b",
+    "ministral-3:14b"
+  ],
+  "results": [
+    {
+      "model": "granite4:7b-a1b-h",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 4,
+      "score_max": 4
+    },
+    {
+      "model": "lfm2.5-thinking",
+      "coding_pass": 0,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "score": 0,
+      "score_max": 4
+    },
+    {
+      "model": "lfm2:24b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 4,
+      "score_max": 4
+    },
+    {
+      "model": "ministral-3:14b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 2,
+      "tool_total": 2,
+      "score": 4,
+      "score_max": 4
+    }
+  ]
 }

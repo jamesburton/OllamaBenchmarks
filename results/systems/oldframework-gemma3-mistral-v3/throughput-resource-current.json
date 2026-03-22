@@ -28,7 +28,7 @@
       "total_s": 84.259
     },
     {
-      "model": "mistral-small:latest",
+      "model": "mistral-small",
       "eval_count": 192,
       "eval_s": 135.127,
       "toks_per_s": 1.42,

@@ -29,24 +29,24 @@
   "summary": {
     "likely": [
       "granite4:7b-a1b-h",
-      "lfm2.5-thinking:latest",
+      "lfm2.5-thinking",
       "ministral-3:14b"
     ],
     "borderline": [
-      "glm-4.7-flash:latest",
+      "glm-4.7-flash",
       "granite4:32b-a9b-h",
       "lfm2.5-thinking:1.2b",
       "lfm2:24b",
-      "qwen3-coder-next:latest",
-      "qwen3.5:latest",
+      "qwen3-coder-next",
+      "qwen3.5",
       "rnj-1:8b"
     ],
     "unlikely": [
-      "MichelRosselli/GLM-4.5-Air:latest",
+      "MichelRosselli/GLM-4.5-Air",
       "devstral-small-2:24b-instruct-2512-q8_0",
       "glm-4.7-flash:bf16",
       "gpt-oss:120b",
-      "nemotron-3-super:latest",
+      "nemotron-3-super",
       "qwen3-coder-next:q8_0",
       "qwen3.5:122b",
       "qwen3.5:122b-a10b",
@@ -55,7 +55,7 @@
   },
   "assessments": [
     {
-      "model": "MichelRosselli/GLM-4.5-Air:latest",
+      "model": "MichelRosselli/GLM-4.5-Air",
       "status": "unlikely",
       "best_score": 2,
       "smallest_observed_resident_gb": 148.0,
@@ -127,7 +127,7 @@
       ]
     },
     {
-      "model": "glm-4.7-flash:latest",
+      "model": "glm-4.7-flash",
       "status": "borderline",
       "best_score": 5,
       "smallest_observed_resident_gb": 41.06,
@@ -249,7 +249,7 @@
       ]
     },
     {
-      "model": "lfm2.5-thinking:latest",
+      "model": "lfm2.5-thinking",
       "status": "likely",
       "best_score": 0,
       "smallest_observed_resident_gb": 1.0,
@@ -355,7 +355,7 @@
       ]
     },
     {
-      "model": "nemotron-3-super:latest",
+      "model": "nemotron-3-super",
       "status": "unlikely",
       "best_score": 5,
       "smallest_observed_resident_gb": 95.0,
@@ -379,7 +379,7 @@
       ]
     },
     {
-      "model": "qwen3-coder-next:latest",
+      "model": "qwen3-coder-next",
       "status": "borderline",
       "best_score": 5,
       "smallest_observed_resident_gb": 60.54,
@@ -486,7 +486,7 @@
       "evidence": []
     },
     {
-      "model": "qwen3.5:latest",
+      "model": "qwen3.5",
       "status": "borderline",
       "best_score": 5,
       "smallest_observed_resident_gb": 8.8,

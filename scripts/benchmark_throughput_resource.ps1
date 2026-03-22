@@ -80,6 +80,7 @@ function Get-ModelSlug {
     [string]$Model
   )
 
+  if ($Model -match ':latest$') { $Model = $Model -replace ':latest$', '' }
   return (($Model -replace "[:/\\]", "_") -replace "[^\w\.-]", "_")
 }
 

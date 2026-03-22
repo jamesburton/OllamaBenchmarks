@@ -91,6 +91,7 @@ PLAN_AGENT_TASKS = [
 
 
 def model_slug(model: str) -> str:
+    model = re.sub(r":latest$", "", model)
     return re.sub(r"[^\w\.-]", "_", model.replace(":", "_").replace("/", "_").replace("\\", "_"))
 
 

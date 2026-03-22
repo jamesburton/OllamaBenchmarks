@@ -18,7 +18,7 @@ DEFAULT_FILES = {
     "sweep": DEFAULT_RESULTS / "optimization-sweep-current.json",
 }
 PRIMARY_MODEL_PREFERENCE = [
-    "qwen3-coder-next:latest",
+    "qwen3-coder-next",
     "lfm2:24b",
     "granite4:32b-a9b-h",
 ]

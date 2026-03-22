@@ -39,7 +39,7 @@
   },
   "summary": {
     "fastest_model": {
-      "model": "lfm2.5-thinking:latest",
+      "model": "lfm2.5-thinking",
       "toks_per_s": 220.75,
       "score": 0,
       "score_max": 4

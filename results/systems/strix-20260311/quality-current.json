@@ -37,14 +37,14 @@
     "lfm2:24b",
     "ministral-3:14b",
     "glm-4.7-flash:bf16",
-    "MichelRosselli/GLM-4.5-Air:latest",
+    "MichelRosselli/GLM-4.5-Air",
     "gpt-oss:120b",
-    "qwen3-coder-next:latest",
+    "qwen3-coder-next",
     "granite4:32b-a9b-h",
-    "glm-4.7-flash:latest",
+    "glm-4.7-flash",
     "qwen3-coder-next:q8_0",
     "qwen3.5:122b",
-    "nemotron-3-super:latest"
+    "nemotron-3-super"
   ],
   "results": [
     {
@@ -103,7 +103,7 @@
       "score_max": 5
     },
     {
-      "model": "MichelRosselli/GLM-4.5-Air:latest",
+      "model": "MichelRosselli/GLM-4.5-Air",
       "coding_pass": 1,
       "coding_total": 2,
       "tool_pass": 0,
@@ -125,7 +125,7 @@
       "score_max": 5
     },
     {
-      "model": "qwen3-coder-next:latest",
+      "model": "qwen3-coder-next",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,
@@ -147,7 +147,7 @@
       "score_max": 5
     },
     {
-      "model": "glm-4.7-flash:latest",
+      "model": "glm-4.7-flash",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,
@@ -180,7 +180,7 @@
       "score_max": 5
     },
     {
-      "model": "nemotron-3-super:latest",
+      "model": "nemotron-3-super",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,

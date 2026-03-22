@@ -42,14 +42,14 @@
   "models": [
     "cogito:8b",
     "cogito:14b",
-    "zac/phi4-tools:latest",
-    "phi4-mini:latest"
+    "zac/phi4-tools",
+    "phi4-mini"
   ],
   "completed_models": [
     "cogito:8b",
     "cogito:14b",
-    "zac/phi4-tools:latest",
-    "phi4-mini:latest"
+    "zac/phi4-tools",
+    "phi4-mini"
   ],
   "failed_models": [],
   "incomplete_models": [
@@ -90,7 +90,7 @@
       "ollama_ps": "cogito:14b          d0cac86a2347    9.7 GB    100% GPU          4096       4 minutes from now    "
     },
     {
-      "model": "zac/phi4-tools:latest",
+      "model": "zac/phi4-tools",
       "eval_count": 192,
       "eval_s": 6.431,
       "toks_per_s": 29.85,
@@ -102,10 +102,10 @@
       "gpu_util_avg": 0.0,
       "gpu_util_peak": 0.0,
       "gpu_mem_peak_gb": 0.0,
-      "ollama_ps": "zac/phi4-tools:latest    84c834455dfa    10 GB     100% GPU          4096       4 minutes from now    "
+      "ollama_ps": "zac/phi4-tools    84c834455dfa    10 GB     100% GPU          4096       4 minutes from now    "
     },
     {
-      "model": "phi4-mini:latest",
+      "model": "phi4-mini",
       "eval_count": 176,
       "eval_s": 194.351,
       "toks_per_s": 0.91,
@@ -117,7 +117,7 @@
       "gpu_util_avg": 0.0,
       "gpu_util_peak": 0.0,
       "gpu_mem_peak_gb": 0.0,
-      "ollama_ps": "phi4-mini:latest         78fad5d182a7    3.3 GB    92%/8% CPU/GPU    4096       Stopping...           "
+      "ollama_ps": "phi4-mini         78fad5d182a7    3.3 GB    92%/8% CPU/GPU    4096       Stopping...           "
     }
   ]
 }

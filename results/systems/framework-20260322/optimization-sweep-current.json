@@ -1,0 +1,42 @@
+{
+  "benchmark": "sweep",
+  "model": "ministral-3:14b",
+  "host_details": {
+    "captured_at": "2026-03-17T22:26:36.1969811Z",
+    "hostname": "OLDFRAMEWORK",
+    "os": {
+      "system": "Windows",
+      "version": "Microsoft Windows NT 10.0.26200.0",
+      "machine": "AMD64"
+    },
+    "logical_cpu_count": 8,
+    "ollama_version": "ollama version is 0.18.0",
+    "total_memory_gb": 63.79
+  },
+  "variants": [
+    {
+      "model": "ministral-3:14b",
+      "eval_count": 192,
+      "eval_s": 142.737,
+      "toks_per_s": 1.35,
+      "total_s": 147.943,
+      "variant": "baseline"
+    },
+    {
+      "model": "ministral-3:14b",
+      "eval_count": 192,
+      "eval_s": 143.953,
+      "toks_per_s": 1.33,
+      "total_s": 145.334,
+      "variant": "threads_8"
+    },
+    {
+      "model": "ministral-3:14b",
+      "eval_count": 192,
+      "eval_s": 149.29,
+      "toks_per_s": 1.29,
+      "total_s": 150.691,
+      "variant": "batch_1024"
+    }
+  ]
+}

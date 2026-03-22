@@ -42,14 +42,14 @@
   "models": [
     "lfm2.5-thinking:1.2b",
     "rnj-1:8b",
-    "qwen3.5:latest",
+    "qwen3.5",
     "ministral-3:14b",
     "codellama:70b"
   ],
   "completed_models": [
     "lfm2.5-thinking:1.2b",
     "rnj-1:8b",
-    "qwen3.5:latest",
+    "qwen3.5",
     "ministral-3:14b"
   ],
   "failed_models": [],
@@ -91,7 +91,7 @@
       "ollama_ps": "rnj-1:8b                d20e29ab8d0f    6.3 GB    100% GPU     4096       4 minutes from now    "
     },
     {
-      "model": "qwen3.5:latest",
+      "model": "qwen3.5",
       "eval_count": 192,
       "eval_s": 5.091,
       "toks_per_s": 37.71,
@@ -103,7 +103,7 @@
       "gpu_util_avg": 0.0,
       "gpu_util_peak": 0.0,
       "gpu_mem_peak_gb": 0.0,
-      "ollama_ps": "qwen3.5:latest    6488c96fa5fa    8.8 GB    100% GPU     4096       4 minutes from now    "
+      "ollama_ps": "qwen3.5    6488c96fa5fa    8.8 GB    100% GPU     4096       4 minutes from now    "
     },
     {
       "model": "ministral-3:14b",

@@ -1,56 +1,50 @@
 {
-    "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-18T13:07:14.0836918+00:00",
-    "run_finished_at":  "2026-03-18T13:07:34.2111733+00:00",
-    "output_path":  "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-130714.json",
-    "host":  "T5500",
-    "ollama_host":  "http://127.0.0.1:11434",
-    "host_details":  {
-                         "captured_at":  "2026-03-18T13:07:16.317291+00:00",
-                         "hostname":  "T5500",
-                         "host_slug":  "t5500",
-                         "os":  {
-                                    "system":  "Windows",
-                                    "release":  "10",
-                                    "version":  "10.0.26200",
-                                    "machine":  "AMD64"
-                                },
-                         "manufacturer":  "Dell Inc.",
-                         "model":  "Precision WorkStation T5500  ",
-                         "processor":  "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
-                         "logical_cpu_count":  24,
-                         "total_memory_gb":  36.0,
-                         "python_version":  "3.11.3",
-                         "ollama_version":  "ollama version is 0.18.0",
-                         "gpus":  [
-                                      {
-                                          "Name":  "NVIDIA GeForce RTX 3060",
-                                          "AdapterRAM":  4293918720,
-                                          "DriverVersion":  "32.0.15.6094",
-                                          "VideoProcessor":  "NVIDIA GeForce RTX 3060",
-                                          "Status":  "OK"
-                                      }
-                                  ]
-                     },
-    "models":  [
-                   "zac/phi4-tools:latest"
-               ],
-    "completed_models":  [
-
-                         ],
-    "failed_models":  [
-                          {
-                              "model":  "zac/phi4-tools:latest",
-                              "error":  "The remote server returned an error: (500) Internal Server Error."
-                          }
-                      ],
-    "incomplete_models":  [
-
-                          ],
-    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
-    "num_predict":  192,
-    "seed":  42,
-    "results":  [
-
-                ]
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-03-18T13:07:14.0836918+00:00",
+  "run_finished_at": "2026-03-18T13:07:34.2111733+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260318-130714.json",
+  "host": "T5500",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-18T13:07:16.317291+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.18.0",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.6094",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "zac/phi4-tools"
+  ],
+  "completed_models": [],
+  "failed_models": [
+    {
+      "model": "zac/phi4-tools",
+      "error": "The remote server returned an error: (500) Internal Server Error."
+    }
+  ],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": []
 }

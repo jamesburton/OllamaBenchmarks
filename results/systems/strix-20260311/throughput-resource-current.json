@@ -38,14 +38,14 @@
     "lfm2:24b",
     "ministral-3:14b",
     "glm-4.7-flash:bf16",
-    "MichelRosselli/GLM-4.5-Air:latest",
+    "MichelRosselli/GLM-4.5-Air",
     "gpt-oss:120b",
-    "qwen3-coder-next:latest",
+    "qwen3-coder-next",
     "granite4:32b-a9b-h",
-    "glm-4.7-flash:latest",
+    "glm-4.7-flash",
     "qwen3-coder-next:q8_0",
     "qwen3.5:122b",
-    "nemotron-3-super:latest"
+    "nemotron-3-super"
   ],
   "prompt": "Write a concise explanation of dependency injection with one short Python example.",
   "num_predict": 192,
@@ -82,7 +82,7 @@
       "ollama_ps": null
     },
     {
-      "model": "glm-4.7-flash:latest",
+      "model": "glm-4.7-flash",
       "eval_count": 192,
       "eval_s": 4.454,
       "toks_per_s": 43.11,
@@ -142,7 +142,7 @@
       "ollama_ps": null
     },
     {
-      "model": "MichelRosselli/GLM-4.5-Air:latest",
+      "model": "MichelRosselli/GLM-4.5-Air",
       "eval_count": 192,
       "eval_s": 151.382,
       "toks_per_s": 1.27,
@@ -154,7 +154,7 @@
       "gpu_util_avg": 4.1,
       "gpu_util_peak": 100.5,
       "gpu_mem_peak_gb": 50.17,
-      "ollama_ps": "MichelRosselli/GLM-4.5-Air:latest    2de19e9823fb    148 GB    58%/42% CPU/GPU    131072     Stopping...    "
+      "ollama_ps": "MichelRosselli/GLM-4.5-Air    2de19e9823fb    148 GB    58%/42% CPU/GPU    131072     Stopping...    "
     },
     {
       "model": "ministral-3:14b",
@@ -172,7 +172,7 @@
       "ollama_ps": null
     },
     {
-      "model": "nemotron-3-super:latest",
+      "model": "nemotron-3-super",
       "eval_count": 192,
       "eval_s": 32.894,
       "toks_per_s": 5.84,
@@ -184,10 +184,10 @@
       "gpu_util_avg": 22.2,
       "gpu_util_peak": 40.1,
       "gpu_mem_peak_gb": 58.85,
-      "ollama_ps": "nemotron-3-super:latest    95acc78b3ffd    95 GB    33%/67% CPU/GPU    262144     4 minutes from now    "
+      "ollama_ps": "nemotron-3-super    95acc78b3ffd    95 GB    33%/67% CPU/GPU    262144     4 minutes from now    "
     },
     {
-      "model": "qwen3-coder-next:latest",
+      "model": "qwen3-coder-next",
       "eval_count": 163,
       "eval_s": 4.805,
       "toks_per_s": 33.92,
