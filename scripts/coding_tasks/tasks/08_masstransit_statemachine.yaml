@@ -1,0 +1,69 @@
+name: masstransit_statemachine
+category: masstransit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - masstransit_v8.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. An `OrderState` class implementing `SagaStateMachineInstance` with properties:
+     - Guid CorrelationId
+     - string CurrentState
+     - DateTime OrderDate
+     - DateTime? AcceptedAt
+  2. Event records:
+     - `OrderSubmitted` with Guid OrderId and DateTime OrderDate
+     - `OrderAccepted` with Guid OrderId and DateTime AcceptedAt
+     - `OrderCompleted` with Guid OrderId
+  3. An `OrderStateMachine` class extending `MassTransitStateMachine<OrderState>` with:
+     - States: Submitted, Accepted, Completed
+     - Events: OrderSubmitted (correlated by OrderId), OrderAccepted (correlated by OrderId), OrderCompleted (correlated by OrderId)
+     - Initially: When OrderSubmitted → set OrderDate, TransitionTo Submitted
+     - During Submitted: When OrderAccepted → set AcceptedAt, TransitionTo Accepted
+     - During Accepted: When OrderCompleted → Finalize
+     - Call SetCompletedWhenFinalized()
+
+  Return only valid C# code in a single file.
+test_code: |
+  using MassTransit;
+  using MassTransit.Testing;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public class OrderStateMachineTests
+  {
+      [Fact]
+      public async Task Saga_Transitions_Through_All_States()
+      {
+          await using var provider = new ServiceCollection()
+              .AddMassTransitTestHarness(cfg =>
+              {
+                  cfg.AddSagaStateMachine<OrderStateMachine, OrderState>()
+                      .InMemoryRepository();
+              })
+              .BuildServiceProvider(true);
+
+          var harness = provider.GetRequiredService<ITestHarness>();
+          await harness.Start();
+
+          var orderId = Guid.NewGuid();
+
+          await harness.Bus.Publish(new OrderSubmitted(orderId, DateTime.UtcNow));
+          Assert.True(await harness.Consumed.Any<OrderSubmitted>());
+
+          await harness.Bus.Publish(new OrderAccepted(orderId, DateTime.UtcNow));
+          Assert.True(await harness.Consumed.Any<OrderAccepted>());
+
+          await harness.Bus.Publish(new OrderCompleted(orderId));
+          Assert.True(await harness.Consumed.Any<OrderCompleted>());
+
+          var sagaHarness = harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
+          Assert.True(await sagaHarness.Created.Any(x => x.CorrelationId == orderId));
+          Assert.False(await sagaHarness.Exists(orderId, x => x.Submitted));
+      }
+  }

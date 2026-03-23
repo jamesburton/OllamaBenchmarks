@@ -1,0 +1,58 @@
+name: blazor_interactive_component
+category: blazor
+weight: 1
+template: blazor_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - blazor_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing a code-behind class for a Counter component:
+
+  1. A `CounterBase` class inheriting from `Microsoft.AspNetCore.Components.ComponentBase`
+  2. A `[Parameter] public int InitialCount { get; set; }` property
+  3. A `[Parameter] public EventCallback<int> OnCountChanged { get; set; }` property
+  4. A private `currentCount` field that is initialized to InitialCount in OnInitialized
+  5. An `IncrementCount` method that increments currentCount and invokes OnCountChanged with the new value
+  6. A public `CurrentCount` property that returns currentCount (for test access)
+
+  The class should be public. Make IncrementCount public so it can be called from tests.
+  Return only valid C# code in a single file.
+test_code: |
+  using Bunit;
+  using Microsoft.AspNetCore.Components;
+
+  public class CounterTests : TestContext
+  {
+      [Fact]
+      public void Counter_StartsAtInitialCount()
+      {
+          var cut = RenderComponent<CounterBase>(p =>
+              p.Add(x => x.InitialCount, 5));
+          Assert.Equal(5, cut.Instance.CurrentCount);
+      }
+
+      [Fact]
+      public async Task Counter_Increment_UpdatesCount()
+      {
+          var cut = RenderComponent<CounterBase>(p =>
+              p.Add(x => x.InitialCount, 0));
+          await cut.InvokeAsync(() => cut.Instance.IncrementCount());
+          Assert.Equal(1, cut.Instance.CurrentCount);
+      }
+
+      [Fact]
+      public async Task Counter_Increment_InvokesCallback()
+      {
+          int callbackValue = -1;
+          var cut = RenderComponent<CounterBase>(p =>
+              p.Add(x => x.InitialCount, 10)
+               .Add(x => x.OnCountChanged,
+                    EventCallback.Factory.Create<int>(this, v => callbackValue = v)));
+          await cut.InvokeAsync(() => cut.Instance.IncrementCount());
+          Assert.Equal(11, callbackValue);
+      }
+  }

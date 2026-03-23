@@ -1,0 +1,50 @@
+name: masstransit_consumer
+category: masstransit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - masstransit_v8.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `SubmitOrder` message record with properties: Guid OrderId, string CustomerName, decimal Amount
+  2. An `OrderSubmitted` event record with properties: Guid OrderId, DateTime SubmittedAt
+  3. A `SubmitOrderConsumer` class implementing `IConsumer<SubmitOrder>` that:
+     - In its Consume method, publishes an `OrderSubmitted` event with the OrderId from the message and DateTime.UtcNow as SubmittedAt
+  4. A `SubmitOrderConsumerDefinition` class extending `ConsumerDefinition<SubmitOrderConsumer>` that:
+     - Sets ConcurrentMessageLimit = 4 in the constructor
+     - In ConfigureConsumer, calls `ep.UseMessageRetry(r => r.Interval(3, 1000))`
+
+  Return only valid C# code in a single file.
+test_code: |
+  using MassTransit;
+  using MassTransit.Testing;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public class SubmitOrderConsumerTests
+  {
+      [Fact]
+      public async Task Consumer_Processes_SubmitOrder_And_Publishes_OrderSubmitted()
+      {
+          await using var provider = new ServiceCollection()
+              .AddMassTransitTestHarness(cfg =>
+              {
+                  cfg.AddConsumer<SubmitOrderConsumer, SubmitOrderConsumerDefinition>();
+              })
+              .BuildServiceProvider(true);
+
+          var harness = provider.GetRequiredService<ITestHarness>();
+          await harness.Start();
+
+          var orderId = Guid.NewGuid();
+          await harness.Bus.Publish(new SubmitOrder(orderId, "Alice", 99.95m));
+
+          Assert.True(await harness.Consumed.Any<SubmitOrder>());
+          Assert.True(await harness.Published.Any<OrderSubmitted>());
+      }
+  }

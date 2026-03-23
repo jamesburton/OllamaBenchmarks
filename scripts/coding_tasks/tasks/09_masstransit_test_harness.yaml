@@ -1,0 +1,48 @@
+name: masstransit_test_harness
+category: masstransit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - masstransit_v8.md
+  - xunit_v3.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  You are given this existing consumer:
+
+  ```csharp
+  public record ProcessPayment(Guid OrderId, decimal Amount);
+  public record PaymentProcessed(Guid OrderId, string TransactionId);
+  public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
+  {
+      public async Task Consume(ConsumeContext<ProcessPayment> context)
+      {
+          await context.Publish(new PaymentProcessed(context.Message.OrderId, Guid.NewGuid().ToString()));
+      }
+  }
+  ```
+
+  Write comprehensive xUnit v3 tests using `AddMassTransitTestHarness` that verify:
+  1. The consumer receives and processes the ProcessPayment message
+  2. A PaymentProcessed event is published with the correct OrderId
+  3. Use `Assert.Multiple` to check both assertions in a single test
+
+  Include the consumer code above in your file so it compiles standalone.
+  Return only valid C# code in a single file.
+test_code: |
+  using MassTransit;
+  using MassTransit.Testing;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public record ProcessPayment(Guid OrderId, decimal Amount);
+  public record PaymentProcessed(Guid OrderId, string TransactionId);
+  public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
+  {
+      public async Task Consume(ConsumeContext<ProcessPayment> context)
+      {
+          await context.Publish(new PaymentProcessed(context.Message.OrderId, Guid.NewGuid().ToString()));
+      }
+  }

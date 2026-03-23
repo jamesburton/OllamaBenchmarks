@@ -1,0 +1,61 @@
+name: blazor_streaming_render
+category: blazor
+weight: 1
+template: blazor_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - blazor_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `WeatherForecast` record with properties: DateOnly Date, int TemperatureC, string Summary
+  2. An `IWeatherService` interface with method: Task<WeatherForecast[]> GetForecastsAsync()
+  3. A `WeatherPageBase` class inheriting from `ComponentBase` that:
+     - Is marked with the `[StreamRendering]` attribute
+     - Injects `IWeatherService` via `[Inject]`
+     - Has a public `Forecasts` property of type `WeatherForecast[]?` (null initially)
+     - Overrides `OnInitializedAsync` to load forecasts from the service into the Forecasts property
+
+  Return only valid C# code in a single file.
+test_code: |
+  using Bunit;
+  using NSubstitute;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public class WeatherPageTests : TestContext
+  {
+      [Fact]
+      public void InitialRender_ForecastsAreNull()
+      {
+          var service = Substitute.For<IWeatherService>();
+          var tcs = new TaskCompletionSource<WeatherForecast[]>();
+          service.GetForecastsAsync().Returns(tcs.Task);
+          Services.AddSingleton(service);
+
+          var cut = RenderComponent<WeatherPageBase>();
+          Assert.Null(cut.Instance.Forecasts);
+      }
+
+      [Fact]
+      public async Task AfterLoad_ForecastsArePopulated()
+      {
+          var forecasts = new[]
+          {
+              new WeatherForecast(new DateOnly(2026, 1, 1), 20, "Warm"),
+              new WeatherForecast(new DateOnly(2026, 1, 2), 25, "Hot")
+          };
+          var service = Substitute.For<IWeatherService>();
+          service.GetForecastsAsync().Returns(Task.FromResult(forecasts));
+          Services.AddSingleton(service);
+
+          var cut = RenderComponent<WeatherPageBase>();
+          await cut.InvokeAsync(() => Task.CompletedTask);
+
+          Assert.NotNull(cut.Instance.Forecasts);
+          Assert.Equal(2, cut.Instance.Forecasts!.Length);
+      }
+  }

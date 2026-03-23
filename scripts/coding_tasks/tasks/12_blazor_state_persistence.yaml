@@ -1,0 +1,56 @@
+name: blazor_state_persistence
+category: blazor
+weight: 1
+template: blazor_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - blazor_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. An `IUserService` interface with method: Task<string> GetCurrentUserNameAsync()
+  2. A `UserProfileBase` class inheriting from `ComponentBase` that:
+     - Has a property `[SupplyParameterFromPersistentComponentState] public string? UserName { get; set; }`
+     - Injects `IUserService` via `[Inject]`
+     - Overrides `OnInitializedAsync`: if UserName is null, fetches the username from the service and assigns it
+     - The UserName property is publicly readable
+
+  Return only valid C# code in a single file.
+test_code: |
+  using Bunit;
+  using NSubstitute;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public class UserProfileTests : TestContext
+  {
+      [Fact]
+      public async Task WhenPersistentStateProvided_ServiceIsNotCalled()
+      {
+          var service = Substitute.For<IUserService>();
+          Services.AddSingleton(service);
+
+          var cut = RenderComponent<UserProfileBase>(p =>
+              p.Add(x => x.UserName, "CachedUser"));
+
+          await service.DidNotReceive().GetCurrentUserNameAsync();
+          Assert.Equal("CachedUser", cut.Instance.UserName);
+      }
+
+      [Fact]
+      public async Task WhenNoPersistentState_ServiceIsCalled()
+      {
+          var service = Substitute.For<IUserService>();
+          service.GetCurrentUserNameAsync().Returns("FetchedUser");
+          Services.AddSingleton(service);
+
+          var cut = RenderComponent<UserProfileBase>();
+          await cut.InvokeAsync(() => Task.CompletedTask);
+
+          await service.Received(1).GetCurrentUserNameAsync();
+          Assert.Equal("FetchedUser", cut.Instance.UserName);
+      }
+  }
