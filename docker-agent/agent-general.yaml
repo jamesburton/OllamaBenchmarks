@@ -1,0 +1,33 @@
+# General-Purpose Agent — fast 5/5 quality model for everyday tasks.
+#
+# Uses glm-4.7-flash: 43.16 tok/s, 5/5 quality — best balanced model on Framework.
+#
+# Start Ollama first:  docker compose -f docker-compose.yaml up -d
+# Run agent:           docker agent run agent-general.yaml
+
+providers:
+  ollama:
+    api_type: openai_chatcompletions
+    base_url: http://localhost:11434/v1
+
+models:
+  default:
+    provider: ollama
+    model: glm-4.7-flash
+    max_tokens: 8192
+    temperature: 0.7
+
+agents:
+  root:
+    model: default
+    description: General-purpose assistant using the fastest 5/5 quality local model
+    instruction: |
+      You are a helpful, knowledgeable assistant. Be concise and accurate.
+      When asked to perform tasks, use available tools effectively.
+    toolsets:
+      - type: filesystem
+      - type: shell
+      - type: think
+      - type: fetch
+    add_date: true
+    add_environment_info: true

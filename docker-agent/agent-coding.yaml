@@ -1,0 +1,68 @@
+# Coding Agent — uses the best balanced 5/5 quality models from Framework benchmarks.
+#
+# Top picks (all 5/5 quality on our suite):
+#   glm-4.7-flash      43.16 tok/s  — fastest perfect-quality model
+#   qwen3.5:35b-a3b    39.90 tok/s  — MoE, excellent speed
+#   qwen3-coder-next   32.55 tok/s  — purpose-built for code
+#   nemotron-cascade-2  27.83 tok/s  — cascade architecture
+#
+# Start Ollama first:  docker compose -f docker-compose.yaml up -d
+# Run agent:           docker agent run agent-coding.yaml
+
+providers:
+  ollama:
+    api_type: openai_chatcompletions
+    base_url: http://localhost:11434/v1
+
+models:
+  coder:
+    provider: ollama
+    model: qwen3-coder-next
+    max_tokens: 8192
+    temperature: 0
+
+  fast:
+    provider: ollama
+    model: glm-4.7-flash
+    max_tokens: 8192
+    temperature: 0
+
+  reasoning:
+    provider: ollama
+    model: qwen3.5:35b-a3b
+    max_tokens: 8192
+    temperature: 0.3
+
+agents:
+  root:
+    model: coder
+    description: Expert coding assistant using locally-benchmarked Ollama models
+    instruction: |
+      You are an expert software developer. You write clean, efficient,
+      well-tested code. Explain your reasoning when making design decisions.
+
+      You have access to the filesystem and shell. Read existing code before
+      making changes. Prefer editing existing files over creating new ones.
+    toolsets:
+      - type: filesystem
+      - type: shell
+      - type: think
+      - type: todo
+    sub_agents:
+      - reviewer
+    add_date: true
+    add_environment_info: true
+    fallback:
+      models:
+        - fast
+      retries: 1
+
+  reviewer:
+    model: reasoning
+    description: Reviews code for correctness, style, and potential issues
+    instruction: |
+      You are a senior code reviewer. Examine code for bugs, security issues,
+      performance problems, and style violations. Be specific and actionable.
+    toolsets:
+      - type: filesystem
+      - type: think

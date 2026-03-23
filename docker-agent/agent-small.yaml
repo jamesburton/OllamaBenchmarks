@@ -1,0 +1,42 @@
+# Lightweight Agent — smallest 5/5 quality models for constrained environments.
+#
+# For machines with limited VRAM or when running multiple models simultaneously.
+#
+# Model picks (all 5/5 quality, low VRAM):
+#   qwen3.5:4b          17.55 tok/s   ~3GB model
+#   granite4:7b-a1b-h   26.91 tok/s   MoE, ~1B active params
+#   qwen3:8b            16.64 tok/s   ~5GB model
+#
+# Start Ollama first:  docker compose -f docker-compose.yaml up -d
+# Run agent:           docker agent run agent-small.yaml
+
+providers:
+  ollama:
+    api_type: openai_chatcompletions
+    base_url: http://localhost:11434/v1
+
+models:
+  small:
+    provider: ollama
+    model: granite4:7b-a1b-h
+    max_tokens: 4096
+    temperature: 0
+
+agents:
+  root:
+    model: small
+    description: Lightweight coding assistant using small high-quality models
+    instruction: |
+      You are a helpful coding assistant. Be concise — you are a small model
+      so focus on precision over verbosity. Write correct code and give
+      short, actionable answers.
+    toolsets:
+      - type: filesystem
+      - type: shell
+      - type: think
+    add_environment_info: true
+    fallback:
+      models:
+        - ollama/qwen3.5:4b
+        - ollama/qwen3:8b
+      retries: 1

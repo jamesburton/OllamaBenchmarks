@@ -1,0 +1,93 @@
+# Multi-Agent Team — specialized agents using top benchmark performers.
+#
+# Model selection rationale (all 5/5 quality on Framework):
+#   Coordinator:  glm-4.7-flash        43.16 tok/s  fast routing & delegation
+#   Coder:        qwen3-coder-next     32.55 tok/s  purpose-built for code
+#   Analyst:      qwen3.5:35b-a3b      39.90 tok/s  strong reasoning (MoE)
+#   Writer:       nemotron-cascade-2   27.83 tok/s  cascade arch, good prose
+#
+# Start Ollama first:  docker compose -f docker-compose.yaml up -d
+# Run agent:           docker agent run agent-multi.yaml
+
+providers:
+  ollama:
+    api_type: openai_chatcompletions
+    base_url: http://localhost:11434/v1
+
+models:
+  fast:
+    provider: ollama
+    model: glm-4.7-flash
+    max_tokens: 8192
+    temperature: 0
+
+  coder:
+    provider: ollama
+    model: qwen3-coder-next
+    max_tokens: 8192
+    temperature: 0
+
+  analyst:
+    provider: ollama
+    model: qwen3.5:35b-a3b
+    max_tokens: 8192
+    temperature: 0.3
+
+  writer:
+    provider: ollama
+    model: nemotron-cascade-2
+    max_tokens: 8192
+    temperature: 0.7
+
+agents:
+  root:
+    model: fast
+    description: Coordinator that delegates to specialist agents
+    instruction: |
+      You are a project coordinator. Analyze user requests and delegate to
+      the right specialist:
+      - developer: for code writing, debugging, refactoring
+      - analyst: for architecture, analysis, complex reasoning
+      - writer: for documentation, explanations, technical writing
+
+      Synthesize results from specialists into a coherent response.
+    toolsets:
+      - type: think
+      - type: todo
+    sub_agents:
+      - developer
+      - analyst
+      - writer
+
+  developer:
+    model: coder
+    description: Writes, debugs, and refactors code
+    instruction: |
+      You are an expert developer. Write clean, efficient code.
+      Always read existing code before making changes.
+      Run tests after modifications when possible.
+    toolsets:
+      - type: filesystem
+      - type: shell
+      - type: think
+
+  analyst:
+    model: analyst
+    description: Analyzes architecture, designs solutions, reasons about complex problems
+    instruction: |
+      You are a senior software architect. Analyze codebases, identify patterns,
+      design solutions, and reason through complex technical problems.
+      Be thorough and consider trade-offs.
+    toolsets:
+      - type: filesystem
+      - type: think
+
+  writer:
+    model: writer
+    description: Writes documentation, explanations, and technical content
+    instruction: |
+      You are a technical writer. Produce clear, well-structured documentation,
+      READMEs, and explanations. Match the tone and conventions of the project.
+    toolsets:
+      - type: filesystem
+      - type: think
