@@ -1,0 +1,65 @@
+name: aspnet_oneof_controller
+category: aspnet
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - oneof.md
+  - aspnet_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Create an ASP.NET Core 10 controller `UsersController` with:
+  - GET /api/users/{id} that calls IUserService.GetByIdAsync(int id)
+  - The service returns OneOf<User, NotFound, ValidationError>
+  - Map User to 200 OK, NotFound to 404, ValidationError to 400 with message
+  - Use record types for NotFound and ValidationError
+  - Include the User record with Id, Name, Email properties
+  - Include the IUserService interface
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.AspNetCore.Mvc;
+  using NSubstitute;
+  using OneOf;
+
+  public class UsersControllerTests
+  {
+      [Fact]
+      public async Task Get_ExistingUser_Returns200()
+      {
+          var service = Substitute.For<IUserService>();
+          service.GetByIdAsync(1).Returns(
+              OneOf<User, NotFound, ValidationError>.FromT0(
+                  new User { Id = 1, Name = "Alice", Email = "a@b.com" }));
+          var controller = new UsersController(service);
+          var result = await controller.Get(1);
+          result.Should().BeOfType<OkObjectResult>();
+      }
+
+      [Fact]
+      public async Task Get_MissingUser_Returns404()
+      {
+          var service = Substitute.For<IUserService>();
+          service.GetByIdAsync(99).Returns(
+              OneOf<User, NotFound, ValidationError>.FromT1(new NotFound()));
+          var controller = new UsersController(service);
+          var result = await controller.Get(99);
+          result.Should().BeOfType<NotFoundResult>();
+      }
+
+      [Fact]
+      public async Task Get_InvalidId_Returns400()
+      {
+          var service = Substitute.For<IUserService>();
+          service.GetByIdAsync(-1).Returns(
+              OneOf<User, NotFound, ValidationError>.FromT2(
+                  new ValidationError("ID must be positive")));
+          var controller = new UsersController(service);
+          var result = await controller.Get(-1);
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

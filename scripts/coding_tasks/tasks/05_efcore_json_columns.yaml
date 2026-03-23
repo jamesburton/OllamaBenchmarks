@@ -1,0 +1,69 @@
+name: efcore_json_columns
+category: efcore
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - efcore_10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. An `Address` complex type class with properties: string Street, string City, string PostCode
+  2. A `Company` entity class with properties: int Id, string Name, Address HeadquartersAddress
+  3. A `CompanyDbContext` class inheriting DbContext with DbSet<Company>.
+     Include a constructor accepting DbContextOptions<CompanyDbContext>.
+     In OnModelCreating, configure HeadquartersAddress as a JSON column.
+  4. A static class `CompanyQueries` with a static method
+     `FindCompaniesByCity(CompanyDbContext db, string city)` that queries
+     companies where HeadquartersAddress.City matches the given city parameter.
+     Return a List<Company>.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.EntityFrameworkCore;
+
+  public class JsonColumnTests
+  {
+      private static CompanyDbContext CreateContext()
+      {
+          var options = new DbContextOptionsBuilder<CompanyDbContext>()
+              .UseInMemoryDatabase("TestDb_" + Guid.NewGuid())
+              .Options;
+          return new CompanyDbContext(options);
+      }
+
+      [Fact]
+      public void FindByCity_ReturnsMatchingCompanies()
+      {
+          using var db = CreateContext();
+          db.Companies.AddRange(
+              new Company { Id = 1, Name = "Acme", HeadquartersAddress = new Address { Street = "1 Main St", City = "London", PostCode = "EC1A" } },
+              new Company { Id = 2, Name = "Globex", HeadquartersAddress = new Address { Street = "2 High St", City = "Manchester", PostCode = "M1 1AA" } },
+              new Company { Id = 3, Name = "Initech", HeadquartersAddress = new Address { Street = "3 Park Ave", City = "London", PostCode = "SW1A" } });
+          db.SaveChanges();
+
+          var results = CompanyQueries.FindCompaniesByCity(db, "London");
+
+          results.Should().HaveCount(2);
+          results.Select(c => c.Name).Should().Contain("Acme");
+          results.Select(c => c.Name).Should().Contain("Initech");
+      }
+
+      [Fact]
+      public void FindByCity_NoMatch_ReturnsEmpty()
+      {
+          using var db = CreateContext();
+          db.Companies.Add(
+              new Company { Id = 1, Name = "Acme", HeadquartersAddress = new Address { Street = "1 Main St", City = "London", PostCode = "EC1A" } });
+          db.SaveChanges();
+
+          var results = CompanyQueries.FindCompaniesByCity(db, "Paris");
+
+          results.Should().HaveCount(0);
+      }
+  }

@@ -1,0 +1,81 @@
+name: aspnet_validation_endpoint
+category: aspnet
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - aspnet_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate the following in a single C# file:
+
+  1. A `CreateOrderRequest` record with these validated properties:
+     - [Required] string Name
+     - [Range(0.01, 10000)] decimal Price
+     - [Range(1, 999)] int Quantity
+
+  2. An `OrderService` class with a method `CreateOrder(CreateOrderRequest request)` that
+     returns the request as a confirmed order (just return the request for simplicity).
+
+  3. A static class `OrderEndpoints` with a method
+     `MapOrderEndpoints(this WebApplication app)` that maps POST /api/orders,
+     accepting a CreateOrderRequest, validating it, and returning the order via OrderService.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using System.ComponentModel.DataAnnotations;
+  using AwesomeAssertions;
+
+  public class CreateOrderRequestValidationTests
+  {
+      [Fact]
+      public void ValidRequest_PassesValidation()
+      {
+          var request = new CreateOrderRequest
+          {
+              Name = "Widget",
+              Price = 9.99m,
+              Quantity = 5
+          };
+          var context = new ValidationContext(request);
+          var results = new List<ValidationResult>();
+          var isValid = Validator.TryValidateObject(request, context, results, true);
+          isValid.Should().BeTrue();
+          results.Should().HaveCount(0);
+      }
+
+      [Fact]
+      public void MissingName_FailsValidation()
+      {
+          var request = new CreateOrderRequest
+          {
+              Name = null!,
+              Price = 9.99m,
+              Quantity = 5
+          };
+          var context = new ValidationContext(request);
+          var results = new List<ValidationResult>();
+          var isValid = Validator.TryValidateObject(request, context, results, true);
+          isValid.Should().BeFalse();
+          results.Should().HaveCountGreaterThan(0);
+      }
+
+      [Fact]
+      public void NegativePrice_FailsValidation()
+      {
+          var request = new CreateOrderRequest
+          {
+              Name = "Widget",
+              Price = -5.00m,
+              Quantity = 5
+          };
+          var context = new ValidationContext(request);
+          var results = new List<ValidationResult>();
+          var isValid = Validator.TryValidateObject(request, context, results, true);
+          isValid.Should().BeFalse();
+          results.Should().HaveCountGreaterThan(0);
+      }
+  }

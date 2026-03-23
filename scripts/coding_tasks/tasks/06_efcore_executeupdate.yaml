@@ -1,0 +1,67 @@
+name: efcore_executeupdate
+category: efcore
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - efcore_10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `Product` entity class with properties: int Id, string Name, decimal Price, string Category, DateTime LastModified
+  2. A `ProductDbContext` class inheriting DbContext with DbSet<Product>.
+     Include a constructor accepting DbContextOptions<ProductDbContext>.
+  3. A static class `ProductOperations` with an async static method
+     `ApplyDiscount(ProductDbContext db, string category, decimal discountPct)`
+     that uses ExecuteUpdateAsync to bulk update all products in the given category:
+     - Set Price = Price * (1 - discountPct)
+     - Set LastModified = DateTime.UtcNow
+     Return the number of rows affected (int).
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.EntityFrameworkCore;
+
+  public class ExecuteUpdateTests
+  {
+      private static ProductDbContext CreateContext()
+      {
+          var options = new DbContextOptionsBuilder<ProductDbContext>()
+              .UseInMemoryDatabase("TestDb_" + Guid.NewGuid())
+              .Options;
+          return new ProductDbContext(options);
+      }
+
+      [Fact]
+      public async Task ApplyDiscount_UpdatesCorrectCategory()
+      {
+          using var db = CreateContext();
+          var before = DateTime.UtcNow.AddDays(-1);
+          db.Products.AddRange(
+              new Product { Id = 1, Name = "Laptop", Price = 1000m, Category = "Electronics", LastModified = before },
+              new Product { Id = 2, Name = "Phone", Price = 500m, Category = "Electronics", LastModified = before },
+              new Product { Id = 3, Name = "Tablet", Price = 300m, Category = "Electronics", LastModified = before },
+              new Product { Id = 4, Name = "Novel", Price = 20m, Category = "Books", LastModified = before },
+              new Product { Id = 5, Name = "Textbook", Price = 80m, Category = "Books", LastModified = before });
+          await db.SaveChangesAsync();
+
+          var affected = await ProductOperations.ApplyDiscount(db, "Electronics", 0.10m);
+
+          affected.Should().Be(3);
+
+          // Reload entities to check updated values
+          var electronics = await db.Products.Where(p => p.Category == "Electronics").ToListAsync();
+          electronics.First(p => p.Id == 1).Price.Should().Be(900m);
+          electronics.First(p => p.Id == 2).Price.Should().Be(450m);
+          electronics.First(p => p.Id == 3).Price.Should().Be(270m);
+
+          var books = await db.Products.Where(p => p.Category == "Books").ToListAsync();
+          books.First(p => p.Id == 4).Price.Should().Be(20m);
+          books.First(p => p.Id == 5).Price.Should().Be(80m);
+      }
+  }

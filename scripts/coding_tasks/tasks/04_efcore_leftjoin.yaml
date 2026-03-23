@@ -1,0 +1,61 @@
+name: efcore_leftjoin
+category: efcore
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - efcore_10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `Customer` entity class with properties: int Id, string Name, string Email
+  2. An `Order` entity class with properties: int Id, int CustomerId, decimal Total, DateTime OrderDate
+  3. An `AppDbContext` class inheriting DbContext with DbSet<Order> and DbSet<Customer>.
+     Include a constructor accepting DbContextOptions<AppDbContext>.
+  4. A record `OrderDto(int OrderId, decimal Total, string CustomerName)`
+  5. A static class `OrderQueries` with a static method
+     `GetOrdersWithCustomers(AppDbContext db)` that uses EF Core 10's `.LeftJoin()`
+     to join Orders with Customers on CustomerId == Id, projecting to OrderDto.
+     If no customer matches, CustomerName should be "Unknown".
+     Return a List<OrderDto>.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.EntityFrameworkCore;
+
+  public class LeftJoinTests
+  {
+      private static AppDbContext CreateContext()
+      {
+          var options = new DbContextOptionsBuilder<AppDbContext>()
+              .UseInMemoryDatabase("TestDb_" + Guid.NewGuid())
+              .Options;
+          return new AppDbContext(options);
+      }
+
+      [Fact]
+      public void LeftJoin_ReturnsAllOrders_WithCustomerNames()
+      {
+          using var db = CreateContext();
+          db.Customers.AddRange(
+              new Customer { Id = 1, Name = "Alice", Email = "alice@test.com" },
+              new Customer { Id = 2, Name = "Bob", Email = "bob@test.com" });
+          db.Orders.AddRange(
+              new Order { Id = 1, CustomerId = 1, Total = 100m, OrderDate = DateTime.UtcNow },
+              new Order { Id = 2, CustomerId = 2, Total = 200m, OrderDate = DateTime.UtcNow },
+              new Order { Id = 3, CustomerId = 999, Total = 50m, OrderDate = DateTime.UtcNow });
+          db.SaveChanges();
+
+          var results = OrderQueries.GetOrdersWithCustomers(db);
+
+          results.Should().HaveCount(3);
+          results.First(r => r.OrderId == 1).CustomerName.Should().Be("Alice");
+          results.First(r => r.OrderId == 2).CustomerName.Should().Be("Bob");
+          results.First(r => r.OrderId == 3).CustomerName.Should().Be("Unknown");
+      }
+  }
