@@ -1,0 +1,22 @@
+name: smoke_test
+category: test
+weight: 1
+template: test_project
+max_tokens: 1024
+num_ctx: 4096
+references: []
+prompt: |
+  Write a C# static class with a method:
+  public static int Add(int a, int b) => a + b;
+  Return only the code.
+test_code: |
+  public class SmokeTests
+  {
+      [Fact]
+      public void Add_ReturnsSum()
+      {
+          Assert.Equal(5, Calculator.Add(2, 3));
+          Assert.Equal(0, Calculator.Add(-1, 1));
+          Assert.Equal(-3, Calculator.Add(-1, -2));
+      }
+  }
