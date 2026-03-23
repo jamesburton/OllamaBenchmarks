@@ -1,0 +1,99 @@
+name: xunit_awesome_nsubstitute
+category: xunit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - xunit_v3.md
+  - nsubstitute.md
+  - awesome_assertions.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Given these interfaces and class:
+
+  ```csharp
+  public interface IUserRepository
+  {
+      Task<User?> GetByIdAsync(int id);
+      Task SaveAsync(User user);
+  }
+
+  public interface IEmailService
+  {
+      Task SendWelcomeAsync(string email);
+  }
+
+  public record User
+  {
+      public int Id { get; init; }
+      public string Name { get; init; } = "";
+      public string Email { get; init; } = "";
+  }
+
+  public class NotificationService(IUserRepository repo, IEmailService email)
+  {
+      public async Task NotifyUserAsync(int userId)
+      {
+          var user = await repo.GetByIdAsync(userId)
+              ?? throw new InvalidOperationException("User not found");
+          await email.SendWelcomeAsync(user.Email);
+      }
+  }
+  ```
+
+  Write xUnit v3 tests for NotificationService:
+  - Mock IUserRepository and IEmailService with NSubstitute
+  - Test happy path: user found, email sent with correct address
+  - Test user not found: throws InvalidOperationException
+  - Verify .Received() calls on mocks
+  - Use AwesomeAssertions .Should() for assertions
+
+  Include the interfaces, User record, and NotificationService class at the top of the file.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationServiceMetaTests
+  {
+      [Fact]
+      public async Task NotifyUser_WhenUserExists_SendsEmail()
+      {
+          var repo = Substitute.For<IUserRepository>();
+          var emailSvc = Substitute.For<IEmailService>();
+          repo.GetByIdAsync(1).Returns(new User { Id = 1, Name = "Alice", Email = "alice@test.com" });
+
+          var sut = new NotificationService(repo, emailSvc);
+          await sut.NotifyUserAsync(1);
+
+          await emailSvc.Received(1).SendWelcomeAsync("alice@test.com");
+      }
+
+      [Fact]
+      public async Task NotifyUser_WhenUserNotFound_Throws()
+      {
+          var repo = Substitute.For<IUserRepository>();
+          var emailSvc = Substitute.For<IEmailService>();
+          repo.GetByIdAsync(99).Returns((User?)null);
+
+          var sut = new NotificationService(repo, emailSvc);
+
+          Func<Task> act = () => sut.NotifyUserAsync(99);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task NotifyUser_WhenUserNotFound_DoesNotSendEmail()
+      {
+          var repo = Substitute.For<IUserRepository>();
+          var emailSvc = Substitute.For<IEmailService>();
+          repo.GetByIdAsync(99).Returns((User?)null);
+
+          var sut = new NotificationService(repo, emailSvc);
+
+          try { await sut.NotifyUserAsync(99); } catch { }
+
+          await emailSvc.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+      }
+  }

@@ -1,0 +1,48 @@
+name: xunit_assembly_fixture
+category: xunit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - xunit_v3.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate the following in a single C# file:
+
+  1. A SharedCounter class that implements IAsyncLifetime (ValueTask return types, NOT Task):
+     - Has a private int counter field
+     - InitializeAsync sets counter to 0 and returns default
+     - DisposeAsync returns default
+     - Has an IncrementAndGet() method that increments and returns the counter (use Interlocked.Increment)
+
+  2. Register it with: [assembly: AssemblyFixture(typeof(SharedCounter))]
+
+  3. Two test classes that both inject SharedCounter via constructor:
+     - FirstCounterTests with a [Fact] that calls IncrementAndGet() and asserts the result is > 0
+     - SecondCounterTests with a [Fact] that uses TestContext.Current.GetFixture<SharedCounter>() instead of constructor injection, calls IncrementAndGet() and asserts the result is > 0
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class SharedCounterMetaTests
+  {
+      [Fact]
+      public void SharedCounter_IncrementAndGet_ReturnsPositiveInt()
+      {
+          var counter = new SharedCounter();
+          var result = counter.IncrementAndGet();
+          result.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task SharedCounter_ImplementsIAsyncLifetime()
+      {
+          var counter = new SharedCounter();
+          await counter.InitializeAsync();
+          var result = counter.IncrementAndGet();
+          result.Should().Be(1);
+          await counter.DisposeAsync();
+      }
+  }

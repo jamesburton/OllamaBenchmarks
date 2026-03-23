@@ -1,0 +1,84 @@
+name: linq_complex_query
+category: linq
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. A Sale record: (string Product, string Category, decimal Amount, DateOnly Date)
+
+  2. A CategorySummary record: (string Category, decimal TotalAmount, decimal AverageAmount, int Count)
+
+  3. A static class SalesAnalyzer with a static method:
+     List<CategorySummary> SummarizeByCategory(IEnumerable<Sale> sales)
+     that:
+     - Groups sales by Category using LINQ method syntax
+     - For each group, computes TotalAmount (sum), AverageAmount (average), and Count
+     - Orders by TotalAmount descending
+     - Returns a List<CategorySummary>
+
+  Use LINQ method syntax (GroupBy, Select, OrderByDescending).
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class SalesAnalyzerTests
+  {
+      private static readonly List<Sale> TestSales =
+      [
+          new("Widget A", "Electronics", 100m, new DateOnly(2026, 1, 1)),
+          new("Widget B", "Electronics", 200m, new DateOnly(2026, 1, 2)),
+          new("Widget C", "Electronics", 150m, new DateOnly(2026, 1, 3)),
+          new("Book A", "Books", 25m, new DateOnly(2026, 1, 1)),
+          new("Book B", "Books", 30m, new DateOnly(2026, 1, 2)),
+          new("Shirt A", "Clothing", 50m, new DateOnly(2026, 1, 1)),
+          new("Shirt B", "Clothing", 75m, new DateOnly(2026, 1, 2)),
+          new("Shirt C", "Clothing", 60m, new DateOnly(2026, 1, 3)),
+      ];
+
+      [Fact]
+      public void SummarizeByCategory_ReturnsCorrectCount()
+      {
+          var result = SalesAnalyzer.SummarizeByCategory(TestSales);
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void SummarizeByCategory_OrderedByTotalDescending()
+      {
+          var result = SalesAnalyzer.SummarizeByCategory(TestSales);
+          result[0].Category.Should().Be("Electronics");
+          result[0].TotalAmount.Should().Be(450m);
+      }
+
+      [Fact]
+      public void SummarizeByCategory_CorrectAverages()
+      {
+          var result = SalesAnalyzer.SummarizeByCategory(TestSales);
+          var electronics = result.First(r => r.Category == "Electronics");
+          electronics.AverageAmount.Should().Be(150m);
+          electronics.Count.Should().Be(3);
+      }
+
+      [Fact]
+      public void SummarizeByCategory_BooksAndClothing()
+      {
+          var result = SalesAnalyzer.SummarizeByCategory(TestSales);
+          var clothing = result.First(r => r.Category == "Clothing");
+          clothing.TotalAmount.Should().Be(185m);
+          clothing.Count.Should().Be(3);
+
+          var books = result.First(r => r.Category == "Books");
+          books.TotalAmount.Should().Be(55m);
+          books.Count.Should().Be(2);
+      }
+
+      [Fact]
+      public void SummarizeByCategory_EmptyInput_ReturnsEmpty()
+      {
+          var result = SalesAnalyzer.SummarizeByCategory([]);
+          result.Should().BeEmpty();
+      }
+  }

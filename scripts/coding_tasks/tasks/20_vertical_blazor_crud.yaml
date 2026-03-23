@@ -1,0 +1,84 @@
+name: vertical_blazor_crud
+category: vertical
+weight: 2
+template: blazor_project
+max_tokens: 8192
+num_ctx: 12288
+references:
+  - blazor_net10.md
+  - xunit_v3.md
+  - nsubstitute.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a complete todo list feature in a single C# file:
+
+  1. TodoItem record with properties: int Id, string Title, bool IsCompleted
+
+  2. ITodoService interface with methods:
+     - Task<List<TodoItem>> GetAllAsync()
+     - Task<TodoItem> AddAsync(string title)
+     - Task DeleteAsync(int id)
+     - Task ToggleAsync(int id)
+
+  3. TodoService implementation using an in-memory List<TodoItem>:
+     - GetAllAsync returns a copy of the list
+     - AddAsync creates a new TodoItem with auto-incremented Id, adds it, returns it
+     - DeleteAsync removes the item with the given Id
+     - ToggleAsync flips the IsCompleted flag of the item with the given Id
+
+  4. TodoListBase : ComponentBase code-behind class with:
+     - [Inject] public ITodoService TodoService { get; set; }
+     - public List<TodoItem> Todos { get; set; } = new()
+     - public string NewTitle { get; set; } = ""
+     - protected override async Task OnInitializedAsync() that loads todos
+     - public async Task AddTodo() that adds a todo with NewTitle, clears NewTitle, reloads list
+     - public async Task DeleteTodo(int id) that deletes and reloads list
+     - public async Task ToggleTodo(int id) that toggles and reloads list
+
+  5. xUnit v3 tests for TodoService:
+     - Test AddAsync creates item with correct title
+     - Test DeleteAsync removes item
+     - Test ToggleAsync flips IsCompleted
+
+  6. bUnit test for TodoListBase:
+     - Mock ITodoService with NSubstitute
+     - Render component and verify it calls GetAllAsync on init
+
+  Use AwesomeAssertions .Should() for assertions.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class VerticalBlazorMetaTests
+  {
+      [Fact]
+      public async Task TodoService_AddAsync_CreatesItem()
+      {
+          var service = new TodoService();
+          var item = await service.AddAsync("Test Todo");
+          item.Title.Should().Be("Test Todo");
+          item.IsCompleted.Should().BeFalse();
+          item.Id.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task TodoService_DeleteAsync_RemovesItem()
+      {
+          var service = new TodoService();
+          var item = await service.AddAsync("To Delete");
+          await service.DeleteAsync(item.Id);
+          var all = await service.GetAllAsync();
+          all.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task TodoService_ToggleAsync_FlipsCompleted()
+      {
+          var service = new TodoService();
+          var item = await service.AddAsync("To Toggle");
+          await service.ToggleAsync(item.Id);
+          var all = await service.GetAllAsync();
+          all.First().IsCompleted.Should().BeTrue();
+      }
+  }

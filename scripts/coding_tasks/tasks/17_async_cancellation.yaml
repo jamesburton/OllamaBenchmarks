@@ -1,0 +1,92 @@
+name: async_cancellation
+category: linq
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. An interface IDataSource with:
+     Task<IReadOnlyList<string>> FetchBatchAsync(int batchNumber, CancellationToken ct);
+
+  2. A class DataProcessor with:
+     async IAsyncEnumerable<string> ProcessAllBatchesAsync(
+         IDataSource source,
+         [EnumeratorCancellation] CancellationToken ct = default)
+     that:
+     - Fetches batches starting from 0, incrementing
+     - Stops when a batch returns empty
+     - Yields each item from each batch
+     - Checks ct.IsCancellationRequested between batches (throw if cancelled)
+     - Uses ConfigureAwait(false) on awaits
+
+  Include the necessary using statements (System.Runtime.CompilerServices for EnumeratorCancellation).
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class DataProcessorTests
+  {
+      [Fact]
+      public async Task ProcessAllBatches_YieldsAllItems()
+      {
+          var source = Substitute.For<IDataSource>();
+          source.FetchBatchAsync(0, Arg.Any<CancellationToken>())
+              .Returns(new List<string> { "a", "b" } as IReadOnlyList<string>);
+          source.FetchBatchAsync(1, Arg.Any<CancellationToken>())
+              .Returns(new List<string> { "c" } as IReadOnlyList<string>);
+          source.FetchBatchAsync(2, Arg.Any<CancellationToken>())
+              .Returns(new List<string>() as IReadOnlyList<string>);
+
+          var processor = new DataProcessor();
+          var results = new List<string>();
+          await foreach (var item in processor.ProcessAllBatchesAsync(source))
+          {
+              results.Add(item);
+          }
+
+          results.Should().HaveCount(3);
+          results.Should().BeEquivalentTo(new[] { "a", "b", "c" });
+      }
+
+      [Fact]
+      public async Task ProcessAllBatches_CancellationStopsProcessing()
+      {
+          var source = Substitute.For<IDataSource>();
+          source.FetchBatchAsync(0, Arg.Any<CancellationToken>())
+              .Returns(new List<string> { "a", "b" } as IReadOnlyList<string>);
+          source.FetchBatchAsync(1, Arg.Any<CancellationToken>())
+              .Returns(new List<string> { "c" } as IReadOnlyList<string>);
+
+          var cts = new CancellationTokenSource();
+          var processor = new DataProcessor();
+          var results = new List<string>();
+
+          await foreach (var item in processor.ProcessAllBatchesAsync(source, cts.Token))
+          {
+              results.Add(item);
+              if (results.Count == 2) cts.Cancel();
+          }
+
+          // After cancellation, batch 1 should not have been fetched
+          await source.DidNotReceive().FetchBatchAsync(1, Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task ProcessAllBatches_EmptySource_YieldsNothing()
+      {
+          var source = Substitute.For<IDataSource>();
+          source.FetchBatchAsync(0, Arg.Any<CancellationToken>())
+              .Returns(new List<string>() as IReadOnlyList<string>);
+
+          var processor = new DataProcessor();
+          var results = new List<string>();
+          await foreach (var item in processor.ProcessAllBatchesAsync(source))
+          {
+              results.Add(item);
+          }
+
+          results.Should().BeEmpty();
+      }
+  }
