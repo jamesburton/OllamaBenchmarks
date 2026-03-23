@@ -7,12 +7,14 @@ description: Run the Ollama benchmark harness in this repository, capture host m
 
 Use this skill to benchmark a machine with the repository harness and keep the cross-system comparison artifacts current.
 
+After benchmarking, use the companion `ollama-docker-agent-deploy` skill to select the best models and deploy them as Docker Agent configurations.
+
 ## Workflow
 
 1. Inspect `results/` and confirm whether the `*-current.json` artifacts already exist for the machine you are working on.
 2. If the artifacts are missing or stale, run:
-   - `.\scripts\benchmark_throughput_resource.ps1 -Models @(...) -OutputPath .\results\throughput-resource-current.json`
-   - `python .\scripts\benchmark_quality.py --models ... --output .\results\quality-current.json`
+   - `.\scripts\benchmark_throughput_resource.ps1 -Models @(...) -CheckpointDir results`
+   - `python .\scripts\benchmark_quality.py --models ... --output .\results\quality-current.json --checkpoint-dir results`
    - `.\scripts\benchmark_backend.ps1 -Model <lead-model> -OutputPath .\results\backend-comparison-current.json`
    - `python .\scripts\benchmark_sweep.py --model <lead-model> --output .\results\optimization-sweep-current.json`
    - Run the backend comparison and option sweep sequentially for very large models; do not overlap them when a model already pushes system memory or VRAM limits.
