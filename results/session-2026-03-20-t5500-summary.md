@@ -40,6 +40,7 @@
 | qwen3.5:35b-a3b-q2_k_l | llama-server only (old build, no qwen35) |
 | omnicoder:9b-q4_k_m | llama-server only (old build) |
 | nemotron-3-nano:30b | Too large for 12GB VRAM + 36GB RAM |
+| nemotron-cascade-2 | MoE 30B-A3B needs 22.6 GiB; only 22.4 available. All quants >=18 GB. Crashes Ollama on load |
 | jacob-ebey/phi4-tools | 0/5 quality, duplicate blob |
 | lfm2.5-thinking:latest | 0/5 quality |
 

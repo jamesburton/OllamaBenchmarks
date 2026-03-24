@@ -104,6 +104,7 @@
     "qwen3.5:9b": "T5500 champion tier: 38.87 tok/s, 5/5 quality, 8.2GB VRAM, PPL 3.89 on Ollama 0.18.1.",
     "qwen3.5:4b": "T5500 best value: 55.66 tok/s, 5/5 quality, 5.73GB VRAM, PPL 4.62 on Ollama 0.18.1.",
     "qwen3:8b": "T5500: 48.65 tok/s, 5/5 quality on Ollama 0.18.1. Failed on 0.18.0.",
-    "cogito:14b": "T5500 best PPL: 34.36 tok/s, 5/5 quality, 9.05GB VRAM, PPL 3.47."
+    "cogito:14b": "T5500 best PPL: 34.36 tok/s, 5/5 quality, 9.05GB VRAM, PPL 3.47.",
+    "nemotron-cascade-2": "T5500: cannot load. MoE 30B-A3B model needs 22.6 GiB system memory; T5500 has 36GB RAM + 12GB VRAM but only ~22.4 GiB available after OS/CUDA overhead. Even smallest HF quant (IQ1_S) is 18GB due to MoE floor. Crashes Ollama service on load attempt. Strix-only (5/5, 27.83 tok/s there)."
   }
 }
