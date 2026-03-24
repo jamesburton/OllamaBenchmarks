@@ -77,23 +77,29 @@ def call_ollama(
     max_tokens: int = 4096,
     num_ctx: int = 12288,
     seed: int = 42,
-    timeout: int = 120,
+    timeout: int = 300,
 ) -> str:
-    """POST to Ollama OpenAI-compatible endpoint. Returns generated text.
+    """POST to Ollama native /api/chat endpoint. Returns generated text.
 
+    Uses native API (not /v1/chat/completions) for reliability with long prompts.
     Returns empty string on timeout or connection error (does not crash).
     """
     options = sampling_options(model)
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": max_tokens,
-        "temperature": options["temperature"],
-        "seed": seed,
+        "stream": False,
+        "options": {
+            "num_predict": max_tokens,
+            "num_ctx": num_ctx,
+            "temperature": options["temperature"],
+            "top_p": options["top_p"],
+            "seed": seed,
+        },
     }
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
-        "http://127.0.0.1:11434/v1/chat/completions",
+        "http://127.0.0.1:11434/api/chat",
         data=data,
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -101,8 +107,13 @@ def call_ollama(
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-        return body["choices"][0]["message"]["content"]
-    except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError):
+        content = body.get("message", {}).get("content", "")
+        # Strip thinking tags if present (some models use <think>...</think>)
+        if "<think>" in content:
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+        return content
+    except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+        print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
         return ""
 
 
