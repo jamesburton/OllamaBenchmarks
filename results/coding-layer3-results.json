@@ -1,0 +1,259 @@
+{
+  "benchmark": "coding",
+  "run_started_at": "2026-03-24T15:38:32.674377+00:00",
+  "run_finished_at": "2026-03-24T15:46:32.188338+00:00",
+  "models": [
+    "ministral-3:14b"
+  ],
+  "results": [
+    {
+      "model": "ministral-3:14b",
+      "benchmark": "coding",
+      "run_started_at": "2026-03-24T15:38:42.149981+00:00",
+      "run_finished_at": "2026-03-24T15:46:32.177529+00:00",
+      "layer3_results": [
+        {
+          "task": "aspnet_oneof_controller",
+          "category": "aspnet",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 55.36,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\aspnet_oneof_controller.cs"
+        },
+        {
+          "task": "aspnet_validation_endpoint",
+          "category": "aspnet",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 9.38,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\aspnet_validation_endpoint.cs"
+        },
+        {
+          "task": "aspnet_service_di",
+          "category": "aspnet",
+          "weight": 1,
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 8.89,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\aspnet_service_di.cs"
+        },
+        {
+          "task": "efcore_leftjoin",
+          "category": "efcore",
+          "weight": 1,
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 9.95,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\efcore_leftjoin.cs"
+        },
+        {
+          "task": "efcore_json_columns",
+          "category": "efcore",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 0,
+          "tests_total": 2,
+          "generation_time_s": 10.03,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\efcore_json_columns.cs"
+        },
+        {
+          "task": "efcore_executeupdate",
+          "category": "efcore",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 0,
+          "tests_total": 1,
+          "generation_time_s": 7.59,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\efcore_executeupdate.cs"
+        },
+        {
+          "task": "masstransit_consumer",
+          "category": "masstransit",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 8.31,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\masstransit_consumer.cs"
+        },
+        {
+          "task": "masstransit_statemachine",
+          "category": "masstransit",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 13.84,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\masstransit_statemachine.cs"
+        },
+        {
+          "task": "masstransit_test_harness",
+          "category": "masstransit",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 16.26,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\masstransit_test_harness.cs"
+        },
+        {
+          "task": "blazor_interactive_component",
+          "category": "blazor",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 4.78,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\blazor_interactive_component.cs"
+        },
+        {
+          "task": "blazor_streaming_render",
+          "category": "blazor",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 5.83,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\blazor_streaming_render.cs"
+        },
+        {
+          "task": "blazor_state_persistence",
+          "category": "blazor",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 4.77,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\blazor_state_persistence.cs"
+        },
+        {
+          "task": "xunit_v3_test_generation",
+          "category": "xunit",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 43.88,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\xunit_v3_test_generation.cs"
+        },
+        {
+          "task": "xunit_awesome_nsubstitute",
+          "category": "xunit",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 18.84,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\xunit_awesome_nsubstitute.cs"
+        },
+        {
+          "task": "xunit_assembly_fixture",
+          "category": "xunit",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 9.02,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\xunit_assembly_fixture.cs"
+        },
+        {
+          "task": "linq_complex_query",
+          "category": "linq",
+          "weight": 1,
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 5.86,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\linq_complex_query.cs"
+        },
+        {
+          "task": "async_cancellation",
+          "category": "linq",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 3,
+          "generation_time_s": 6.48,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\async_cancellation.cs"
+        },
+        {
+          "task": "vertical_order_api",
+          "category": "vertical",
+          "weight": 2,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 51.69,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\vertical_order_api.cs"
+        },
+        {
+          "task": "vertical_saga_workflow",
+          "category": "vertical",
+          "weight": 2,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 30.72,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\vertical_saga_workflow.cs"
+        },
+        {
+          "task": "vertical_blazor_crud",
+          "category": "vertical",
+          "weight": 2,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 37.89,
+          "generated_code_path": "results\\coding-generated\\ministral-3_14b\\vertical_blazor_crud.cs"
+        }
+      ],
+      "layer3_weighted_score": 0.13043478260869565
+    }
+  ]
+}
