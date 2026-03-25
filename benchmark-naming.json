@@ -1,0 +1,69 @@
+{
+  "convention": {
+    "description": "Naming rules for benchmark result files, model slugs, and machine identifiers.",
+    "model_slug_rules": [
+      "Strip ':latest' suffix (it is the implicit default tag)",
+      "Replace ':' with '_' (tag separator becomes underscore)",
+      "Replace '/' with '_' (namespace separator becomes underscore)",
+      "Replace any remaining non-word chars (except . and -) with '_'",
+      "Preserve case (do not lowercase)",
+      "Examples: 'glm-4.7-flash:latest' -> 'glm-4.7-flash', 'qwen3.5:35b-a3b' -> 'qwen3.5_35b-a3b'"
+    ],
+    "machine_slug_rules": [
+      "Format: '{hostname_lower}-{label}' where label is YYYYMMDD or descriptive tag",
+      "Hostname from collect_host_info.py host_slug field (lowercase)",
+      "Examples: 'framework-20260322', 'strix-20260311', 't5500-20260311-xeon3060'"
+    ],
+    "result_file_rules": [
+      "Per-model checkpoints: '{benchmark}-{model_slug}.json'",
+      "Aggregate files: '{benchmark}-current.json'",
+      "System archives: 'results/systems/{machine_slug}/'",
+      "Coding sidecar: 'results/coding-generated/{model_slug}/{task_name}.cs'",
+      "Benchmark prefixes: throughput-resource, quality, backend-comparison, optimization-sweep, coding, multimodal"
+    ],
+    "benchmark_result_keys": [
+      "Every result JSON must include: 'model', 'benchmark', 'run_started_at', 'run_finished_at'",
+      "run_started_at/run_finished_at use datetime.now(timezone.utc).isoformat() -> '+00:00' suffix",
+      "Machine-specific results should include 'host_slug' when archiving",
+      "Per-model checkpoint files merge layers (coding-{slug}.json has layer1/2/3 keys)"
+    ]
+  },
+  "known_aliases": {
+    "_description": "Maps legacy or alternative model identifiers to their canonical slug. Use this to match old results to new naming.",
+    "model_aliases": {
+      "glm-4.7-flash:latest": "glm-4.7-flash",
+      "glm-4.7-flash_latest": "glm-4.7-flash",
+      "qwen3-coder-next:latest": "qwen3-coder-next",
+      "qwen3-coder-next_latest": "qwen3-coder-next",
+      "qwen3.5:latest": "qwen3.5",
+      "qwen3.5_latest": "qwen3.5",
+      "nemotron-3-nano:latest": "nemotron-3-nano",
+      "nemotron-3-nano_latest": "nemotron-3-nano",
+      "nemotron-3-super:latest": "nemotron-3-super",
+      "nemotron-3-super_latest": "nemotron-3-super",
+      "nemotron-cascade-2:latest": "nemotron-cascade-2",
+      "phi4-mini:latest": "phi4-mini",
+      "phi4-mini_latest": "phi4-mini",
+      "mistral-small:latest": "mistral-small",
+      "mistral-small_latest": "mistral-small",
+      "lfm2.5-thinking:latest": "lfm2.5-thinking",
+      "lfm2.5-thinking_latest": "lfm2.5-thinking",
+      "MichelRosselli/GLM-4.5-Air:latest": "MichelRosselli_GLM-4.5-Air",
+      "MichelRosselli_GLM-4.5-Air_latest": "MichelRosselli_GLM-4.5-Air",
+      "zac/phi4-tools:latest": "zac_phi4-tools",
+      "zac_phi4-tools_latest": "zac_phi4-tools",
+      "jacob-ebey/phi4-tools:latest": "jacob-ebey_phi4-tools",
+      "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M": "hf.co_bartowski_Tesslate_OmniCoder-9B-GGUF_Q4_K_M",
+      "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M": "hf.co_bartowski_nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF_Q4_K_M",
+      "nemotron-nano-9b-v2_q4_k_m": "hf.co_bartowski_nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF_Q4_K_M",
+      "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M": "hf.co_unsloth_GLM-4.7-Flash-REAP-23B-A3B-GGUF_Q4_K_M",
+      "GLM-4.7-Flash-REAP-23B-A3B_q4_k_m": "hf.co_unsloth_GLM-4.7-Flash-REAP-23B-A3B-GGUF_Q4_K_M"
+    },
+    "machine_aliases": {
+      "FRAMEWORK": "framework",
+      "Framework": "framework",
+      "STRIX": "strix",
+      "T5500": "t5500"
+    }
+  }
+}
