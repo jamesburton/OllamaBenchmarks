@@ -1,0 +1,153 @@
+{
+  "model": "minicpm-v:8b",
+  "benchmark": "multimodal",
+  "run_started_at": "2026-03-25T23:50:42.083567+00:00",
+  "run_finished_at": "2026-03-25T23:52:45.765062+00:00",
+  "results": [
+    {
+      "task": "ocr_code",
+      "category": "ocr",
+      "score": 0.8154,
+      "passed": true,
+      "response_excerpt": "```java\npublic static int Add(int a, int b)\n{\n    return a + b;\n}\n```",
+      "generation_time_s": 72.19
+    },
+    {
+      "task": "ocr_mixed_fonts",
+      "category": "ocr",
+      "score": 0.8194,
+      "passed": true,
+      "response_excerpt": "**Title:**\nQuarterly Report\n\n**Body Text:**\nRevenue increased by 15% compared to the previous quarter.\nNet profit margins remained stable at 22%.",
+      "generation_time_s": 1.69
+    },
+    {
+      "task": "ocr_numbers",
+      "category": "ocr",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "12 45 78 \n23 56 89 \n34 67 91 \n48 72 35",
+      "generation_time_s": 1.39
+    },
+    {
+      "task": "ocr_handwriting_style",
+      "category": "ocr",
+      "score": 0.7414,
+      "passed": false,
+      "response_excerpt": "**Body Text:**\nThe quick brown fox jumps over the lazy dog",
+      "generation_time_s": 1.12
+    },
+    {
+      "task": "doc_invoice",
+      "category": "document",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "```\nINVOICE\n\nCompany: Acme Corp  \nDate: 2025-03-15  \n\nDescription        Qty    Price  \nWidget A          10     $5.00   \nWidget B          5      $12.50  \nService Fee       1      $25.00  \n\nTotal:   ...",
+      "generation_time_s": 2.81
+    },
+    {
+      "task": "doc_table",
+      "category": "document",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "{'header': ['Name', 'Age', 'City'], 'rows': [['Alice', '30', 'New York'], ['Bob', '25', 'London'], ['Carol', '35', 'Tokyo'], ['Dave', '28', 'Paris'], ['Eve', '32', 'Berlin']]}",
+      "generation_time_s": 2.0
+    },
+    {
+      "task": "doc_form",
+      "category": "document",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "The fields in the registration form are as follows:\n\n1. Name: Alice\n2. Email: alice@test.com\n3. Role: Developer\n\nThese details have been extracted by examining each section of the image where informat...",
+      "generation_time_s": 2.08
+    },
+    {
+      "task": "chart_bar",
+      "category": "chart",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "The labels and values for each bar in the chart are as follows:\n\n- Q1: Revenue $25M\n- Q2: Revenue $40M\n- Q3: Revenue $35M\n- Q4: Revenue $50M\n\nThese bars represent quarterly revenue figures measured in...",
+      "generation_time_s": 2.56
+    },
+    {
+      "task": "chart_pie",
+      "category": "chart",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "The segments in the pie chart are labeled as follows:\n\n- Desktop: 55%\n- Tablet: 15%\n- Mobile: 30%",
+      "generation_time_s": 1.91
+    },
+    {
+      "task": "chart_line",
+      "category": "chart",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "The data points from the line chart are as follows:\n\n- Month 1: Sales = 10 units\n- Month 2: Sales = 25 units\n- Month 3: Sales = 20 units\n- Month 4: Sales = 35 units\n- Month 5: Sales = 30 units",
+      "generation_time_s": 2.48
+    },
+    {
+      "task": "vqa_shapes",
+      "category": "vqa",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "There are three shapes in the image. The colors of the shapes are as follows:\n- Circle: Red\n- Square: Blue\n- Triangle: Green\n\nThe shapes listed with their corresponding labels are:\n1. A red circle lab...",
+      "generation_time_s": 1.95
+    },
+    {
+      "task": "vqa_layout",
+      "category": "vqa",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "The layout of the UI wireframe includes several distinct sections:\n\n1. **Header / Navigation Bar**:\n   - Located at the top, it appears to be a fixed header or navigation bar.\n\n2. **Sidebar**:\n   - Po...",
+      "generation_time_s": 3.86
+    },
+    {
+      "task": "vqa_diagram",
+      "category": "vqa",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "The steps in the given flowchart, listed in order from top to bottom:\n\n1. Start\n2. Process\n3. Decision\n4. End\n\nThis sequence represents a typical workflow starting with an initial action or event (\"St...",
+      "generation_time_s": 2.47
+    },
+    {
+      "task": "code_ui_buttons",
+      "category": "code",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here is an example of how you can recreate the Action Panel using HTML and CSS:\n\n```html\n\n<!DOCTYPE html>\n\n<html>\n\n<head>\n\n    <title>Action Panel</title>\n\n    <!-- Styling for the action panel -->\n\n ...",
+      "generation_time_s": 9.5
+    },
+    {
+      "task": "code_class_diagram",
+      "category": "code",
+      "score": 0.8571,
+      "passed": true,
+      "response_excerpt": "Here is the C# code for the `UserProfile` class based on the provided UML class diagram:\n\n```csharp\npublic class UserProfile\n{\n    private string _name;\n    private string _email;\n    private int _age...",
+      "generation_time_s": 8.72
+    },
+    {
+      "task": "math_equation",
+      "category": "math",
+      "score": 0.0,
+      "passed": false,
+      "response_excerpt": "The equation shown in the image is:\n\n\\[ \\int_{0}^{1} x^2 \\, dx = \\frac{1}{3} \\]\n\nThis integral represents the area under the curve \\(x^2\\) from 0 to 1. The result of this integral calculation is that ...",
+      "generation_time_s": 2.42
+    },
+    {
+      "task": "math_expression",
+      "category": "math",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "The given system of equations is:\n\n1) \\(2x + 3y = 7\\)\n2) \\(x - y = 1\\)\n\nTo solve this system, we can use either substitution or elimination methods.\n\nLet's use the substitution method:\n\nFrom equation ...",
+      "generation_time_s": 4.51
+    }
+  ],
+  "category_scores": {
+    "ocr": 0.844,
+    "document": 1.0,
+    "chart": 1.0,
+    "vqa": 1.0,
+    "code": 0.9285,
+    "math": 0.5
+  },
+  "overall_score": 0.8961
+}

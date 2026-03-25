@@ -1,0 +1,153 @@
+{
+  "model": "ministral-3:14b",
+  "benchmark": "multimodal",
+  "run_started_at": "2026-03-25T23:06:37.998350+00:00",
+  "run_finished_at": "2026-03-25T23:13:11.724268+00:00",
+  "results": [
+    {
+      "task": "ocr_code",
+      "category": "ocr",
+      "score": 0.791,
+      "passed": false,
+      "response_excerpt": "```csharp\npublic static int Add(int a, int b)\n{\n    return a + b;\n}\n```",
+      "generation_time_s": 22.25
+    },
+    {
+      "task": "ocr_mixed_fonts",
+      "category": "ocr",
+      "score": 0.7195,
+      "passed": false,
+      "response_excerpt": "Here is the full text from the image:\n\n---\n**Quarterly Report**\n\nRevenue increased by 15% compared to the previous quarter.\nNet profit margins remained stable at 22%.",
+      "generation_time_s": 7.25
+    },
+    {
+      "task": "ocr_numbers",
+      "category": "ocr",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "12 45 78 23 56 89 34 67 91 48 72 35",
+      "generation_time_s": 8.78
+    },
+    {
+      "task": "ocr_handwriting_style",
+      "category": "ocr",
+      "score": 0.5443,
+      "passed": false,
+      "response_excerpt": "The text in the image reads:\n\n**\"The quick brown fox jumps over the lazy dog.\"**",
+      "generation_time_s": 4.97
+    },
+    {
+      "task": "doc_invoice",
+      "category": "document",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here is the extracted and structured information from the invoice:\n\n---\n**Company Name:** Acme Corp\n**Date:** 2025-03-15\n\n**Line Items:**\n- **Description:** Widget A\n  **Quantity:** 10\n  **Price:** $5...",
+      "generation_time_s": 21.83
+    },
+    {
+      "task": "doc_table",
+      "category": "document",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here is the extracted data from the table, including headers, with each row's values listed individually:\n\n1. **Headers**:\n   - Name\n   - Age\n   - City\n\n2. **Rows**:\n   - Alice, 30, New York\n   - Bob,...",
+      "generation_time_s": 28.19
+    },
+    {
+      "task": "doc_form",
+      "category": "document",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here are the extracted field names and their filled-in values from the form:\n\n1. **Name**: Alice\n2. **Email**: alice@test.com\n3. **Role**: Developer",
+      "generation_time_s": 9.2
+    },
+    {
+      "task": "chart_bar",
+      "category": "chart",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here are the details from the bar chart:\n\n1. **Q1**: Revenue is **$25 million**\n2. **Q2**: Revenue is **$40 million**\n3. **Q3**: Revenue is **$35 million**\n4. **Q4**: Revenue is **$50 million**",
+      "generation_time_s": 14.3
+    },
+    {
+      "task": "chart_pie",
+      "category": "chart",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here are the segments of the pie chart along with their labels and percentages:\n\n1. **Desktop** - 55%\n2. **Mobile** - 30%\n3. **Tablet** - 15%",
+      "generation_time_s": 12.97
+    },
+    {
+      "task": "chart_line",
+      "category": "chart",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here are the data points from the line chart, with their corresponding **x** (Month) and **y** (Sales in units) values:\n\n1. **Month 1**: x = 1, y = 10\n2. **Month 2**: x = 2, y = 25\n3. **Month 3**: x =...",
+      "generation_time_s": 23.48
+    },
+    {
+      "task": "vqa_shapes",
+      "category": "vqa",
+      "score": 0.8333,
+      "passed": true,
+      "response_excerpt": "In this image, there are **three shapes**:\n\n1. The shapes are:\n   - A **circle**\n   - A **square**\n   - A **triangle**\n\n2. The **circle** is colored **red**.",
+      "generation_time_s": 8.91
+    },
+    {
+      "task": "vqa_layout",
+      "category": "vqa",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "This UI wireframe depicts a **basic webpage layout** divided into three primary sections:\n\n1. **Header / Navigation Bar**:\n   - Located at the top of the page.\n   - This section typically contains the...",
+      "generation_time_s": 43.84
+    },
+    {
+      "task": "vqa_diagram",
+      "category": "vqa",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here are the steps in the flowchart, listed in order:\n\n1. **Start**: The beginning of the process.\n2. **Process**: A step where some action or set of actions is performed.\n3. **Decision**: A point whe...",
+      "generation_time_s": 14.58
+    },
+    {
+      "task": "code_ui_buttons",
+      "category": "code",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here's the HTML code to recreate the UI with the three buttons shown in the image, including appropriate styling:\n\n```html\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta ...",
+      "generation_time_s": 88.28
+    },
+    {
+      "task": "code_class_diagram",
+      "category": "code",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "Here's the C# class generated from the provided UML class diagram:\n\n```csharp\npublic class UserProfile\n{\n    // Properties\n    public string Name { get; set; }\n    public string Email { get; set; }\n  ...",
+      "generation_time_s": 35.88
+    },
+    {
+      "task": "math_equation",
+      "category": "math",
+      "score": 0.0,
+      "passed": false,
+      "response_excerpt": "The image shows the definite integral of \\( x^2 \\) from 0 to 1.\n\nThe equation is:\n\\[\n\\int_{0}^{1} x^2 \\, dx\n\\]\n\nThe result of this integral, as shown in the image, is:\n\\[\n\\frac{1}{3}\n\\]",
+      "generation_time_s": 9.67
+    },
+    {
+      "task": "math_expression",
+      "category": "math",
+      "score": 1.0,
+      "passed": true,
+      "response_excerpt": "The system of equations shown is:\n\n1. \\( 2x + 3y = 7 \\)\n2. \\( x - y = 1 \\)\n\nTo solve for \\( x \\) and \\( y \\), we can use the substitution or elimination method. Here, I'll use the substitution method....",
+      "generation_time_s": 39.34
+    }
+  ],
+  "category_scores": {
+    "ocr": 0.7637,
+    "document": 1.0,
+    "chart": 1.0,
+    "vqa": 0.9444,
+    "code": 1.0,
+    "math": 0.5
+  },
+  "overall_score": 0.8758
+}
