@@ -1,0 +1,33 @@
+using System;
+using MassTransit;
+
+namespace MassTransitExample
+{
+    public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
+
+    public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
+
+    public class SubmitOrderConsumer : IConsumer<SubmitOrder>
+    {
+        public async Task Consume(ConsumeContext<SubmitOrder> context)
+        {
+            var message = context.Message;
+            await context.Publish(new OrderSubmitted(message.OrderId, DateTime.UtcNow));
+        }
+    }
+
+    public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
+    {
+        public SubmitOrderConsumerDefinition() : base(4)
+        {
+        }
+
+        protected override void ConfigureConsumer(
+            IReceiveEndpointConfigurator ep,
+            IConsumerConfigurator<SubmitOrderConsumer> consumer,
+            IRegistrationContext ctx)
+        {
+            ep.UseMessageRetry(r => r.Interval(3, 1000));
+        }
+    }
+}

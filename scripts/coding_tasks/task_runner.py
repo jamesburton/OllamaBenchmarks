@@ -77,7 +77,7 @@ def call_ollama(
     max_tokens: int = 4096,
     num_ctx: int = 12288,
     seed: int = 42,
-    timeout: int = 300,
+    timeout: int = 600,
 ) -> str:
     """POST to Ollama native /api/chat endpoint. Returns generated text.
 
