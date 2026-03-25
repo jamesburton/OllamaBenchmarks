@@ -1,100 +1,100 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-03-25T12:05:15.235356+00:00",
-  "run_finished_at": "2026-03-25T12:57:28.578222+00:00",
+  "run_started_at": "2026-03-25T18:56:08.434853+00:00",
+  "run_finished_at": "2026-03-25T21:02:53.547675+00:00",
   "models": [
-    "qwen3-coder-next"
+    "nemotron-cascade-2"
   ],
   "results": [
     {
-      "model": "qwen3-coder-next",
+      "model": "nemotron-cascade-2",
       "benchmark": "coding",
-      "run_started_at": "2026-03-25T12:05:15.235356+00:00",
-      "run_finished_at": "2026-03-25T12:57:28.569111+00:00",
+      "run_started_at": "2026-03-25T18:56:16.161339+00:00",
+      "run_finished_at": "2026-03-25T21:02:53.537228+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
           "category": "aspnet",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 600.06,
-          "generated_code_path": null
+          "generation_time_s": 340.45,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\aspnet_oneof_controller.cs"
         },
         {
           "task": "aspnet_validation_endpoint",
           "category": "aspnet",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 600.02,
-          "generated_code_path": null
+          "generation_time_s": 349.55,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\aspnet_validation_endpoint.cs"
         },
         {
           "task": "aspnet_service_di",
           "category": "aspnet",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 600.0,
-          "generated_code_path": null
+          "generation_time_s": 117.67,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\aspnet_service_di.cs"
         },
         {
           "task": "efcore_leftjoin",
           "category": "efcore",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 600.0,
-          "generated_code_path": null
+          "generation_time_s": 214.09,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\efcore_leftjoin.cs"
         },
         {
           "task": "efcore_json_columns",
           "category": "efcore",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 600.01,
-          "generated_code_path": null
+          "generation_time_s": 205.59,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\efcore_json_columns.cs"
         },
         {
           "task": "efcore_executeupdate",
           "category": "efcore",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 129.8,
-          "generated_code_path": null
+          "generation_time_s": 335.95,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\efcore_executeupdate.cs"
         },
         {
           "task": "masstransit_consumer",
           "category": "masstransit",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
-          "generated_code_path": null
+          "generation_time_s": 174.47,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\masstransit_consumer.cs"
         },
         {
           "task": "masstransit_statemachine",
@@ -105,7 +105,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         },
         {
@@ -117,7 +117,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.01,
           "generated_code_path": null
         },
         {
@@ -125,36 +125,36 @@
           "category": "blazor",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
-          "generated_code_path": null
+          "generation_time_s": 127.47,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\blazor_interactive_component.cs"
         },
         {
           "task": "blazor_streaming_render",
           "category": "blazor",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
-          "generated_code_path": null
+          "generation_time_s": 221.64,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\blazor_streaming_render.cs"
         },
         {
           "task": "blazor_state_persistence",
           "category": "blazor",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.03,
-          "generated_code_path": null
+          "generation_time_s": 544.5,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\blazor_state_persistence.cs"
         },
         {
           "task": "xunit_v3_test_generation",
@@ -165,7 +165,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         },
         {
@@ -177,7 +177,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         },
         {
@@ -185,36 +185,36 @@
           "category": "xunit",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
-          "generated_code_path": null
+          "generation_time_s": 412.58,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\xunit_assembly_fixture.cs"
         },
         {
           "task": "linq_complex_query",
           "category": "linq",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
-          "generated_code_path": null
+          "generation_time_s": 121.3,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
           "category": "linq",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
-          "generated_code_path": null
+          "generation_time_s": 220.19,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\async_cancellation.cs"
         },
         {
           "task": "vertical_order_api",
@@ -225,7 +225,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
+          "generation_time_s": 600.0,
           "generated_code_path": null
         },
         {
@@ -233,12 +233,12 @@
           "category": "vertical",
           "weight": 2,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
-          "generated_code_path": null
+          "generation_time_s": 546.88,
+          "generated_code_path": "results\\coding-generated\\nemotron-cascade-2\\vertical_saga_workflow.cs"
         },
         {
           "task": "vertical_blazor_crud",
@@ -249,7 +249,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         }
       ],
