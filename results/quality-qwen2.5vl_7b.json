@@ -1,0 +1,57 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-03-25T21:56:21.684236+00:00",
+  "run_finished_at": "2026-03-25T22:05:02.824115+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-qwen2.5vl_7b.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-03-25T21:56:33.836822+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26220",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 22,
+    "total_memory_gb": 95.47,
+    "python_version": "3.12.2",
+    "ollama_version": "ollama version is 0.17.1",
+    "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7026",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "qwen2.5vl:7b"
+  ],
+  "results": [
+    {
+      "model": "qwen2.5vl:7b",
+      "coding_pass": 2,
+      "coding_total": 2,
+      "tool_pass": 0,
+      "tool_total": 2,
+      "agentic_pass": 0,
+      "agentic_total": 1,
+      "score": 2,
+      "score_max": 5
+    }
+  ]
+}

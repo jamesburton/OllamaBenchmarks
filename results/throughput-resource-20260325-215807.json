@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-25T21:58:07.5698783+00:00",
+    "run_finished_at":  "2026-03-25T22:04:34.5703200+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260325-215807.json",
+    "host":  "FRAMEWORK",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "FRAMEWORK"
+                     },
+    "models":  [
+                   "qwen2.5vl:7b"
+               ],
+    "completed_models":  [
+                             "qwen2.5vl:7b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "qwen2.5vl:7b",
+                        "eval_count":  192,
+                        "eval_s":  42.214,
+                        "toks_per_s":  4.55,
+                        "total_s":  44.908,
+                        "load_s":  0.352,
+                        "cpu_avg_pct":  16.7,
+                        "cpu_peak_pct":  16.7,
+                        "ram_peak_gb":  9.11,
+                        "gpu_util_avg":  0,
+                        "gpu_util_peak":  0,
+                        "gpu_mem_peak_gb":  7.16,
+                        "ollama_ps":  "qwen2.5vl:7b size=16.37GB vram=0GB ctx=32768 quant=Q4_K_M"
+                    }
+                ]
+}

@@ -1,0 +1,32 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-25T21:56:27.2399082+00:00",
+    "run_finished_at":  "2026-03-25T21:56:27.7561058+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-qwen2.5vl_7b_minicpm-v_8b.json",
+    "host":  "FRAMEWORK",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "FRAMEWORK"
+                     },
+    "models":  [
+                   "qwen2.5vl:7b,minicpm-v:8b"
+               ],
+    "completed_models":  [
+
+                         ],
+    "failed_models":  [
+                          {
+                              "model":  "qwen2.5vl:7b,minicpm-v:8b",
+                              "error":  "The remote server returned an error: (404) Not Found."
+                          }
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+
+                ]
+}

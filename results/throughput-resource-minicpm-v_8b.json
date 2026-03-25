@@ -1,0 +1,34 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-25T21:58:10.0451687+00:00",
+    "run_finished_at":  "2026-03-25T22:05:22.7631716+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-minicpm-v_8b.json",
+    "host":  "FRAMEWORK",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "FRAMEWORK"
+                     },
+    "models":  [
+                   "minicpm-v:8b"
+               ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "minicpm-v:8b",
+                        "eval_count":  192,
+                        "eval_s":  2.714,
+                        "toks_per_s":  70.74,
+                        "total_s":  23.409,
+                        "load_s":  1.059,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  8.88,
+                        "gpu_util_avg":  0,
+                        "gpu_util_peak":  0,
+                        "gpu_mem_peak_gb":  7.17,
+                        "ollama_ps":  "minicpm-v:8b size=7.41GB vram=7.41GB ctx=32768 quant=Q4_0"
+                    }
+                ]
+}
