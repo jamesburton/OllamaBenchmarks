@@ -224,7 +224,7 @@ def run_task(
 
     try:
         # Determine generation timeout
-        gen_timeout = 300 if weight >= 2 else 120
+        gen_timeout = 600 if weight >= 2 else 600
 
         # Call Ollama and measure time
         t0 = time.monotonic()

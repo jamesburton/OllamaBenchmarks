@@ -1,8 +1,8 @@
 {
   "model": "qwen3-coder-next",
   "benchmark": "coding",
-  "run_started_at": "2026-03-24T15:33:05.734246+00:00",
-  "run_finished_at": "2026-03-24T15:33:06.112659+00:00",
+  "run_started_at": "2026-03-25T12:05:15.235356+00:00",
+  "run_finished_at": "2026-03-25T12:57:28.569111+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
@@ -13,7 +13,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.11,
+      "generation_time_s": 600.06,
       "generated_code_path": null
     },
     {
@@ -25,7 +25,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.02,
+      "generation_time_s": 600.02,
       "generated_code_path": null
     },
     {
@@ -37,7 +37,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.01,
+      "generation_time_s": 600.0,
       "generated_code_path": null
     },
     {
@@ -49,7 +49,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.02,
+      "generation_time_s": 600.0,
       "generated_code_path": null
     },
     {
@@ -61,7 +61,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.0,
+      "generation_time_s": 600.01,
       "generated_code_path": null
     },
     {
@@ -73,7 +73,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.0,
+      "generation_time_s": 129.8,
       "generated_code_path": null
     },
     {
@@ -85,7 +85,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.0,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -109,7 +109,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.01,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -121,7 +121,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.02,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -133,7 +133,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.02,
+      "generation_time_s": 0.0,
       "generated_code_path": null
     },
     {
@@ -145,7 +145,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.0,
+      "generation_time_s": 0.03,
       "generated_code_path": null
     },
     {
@@ -157,7 +157,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.0,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -181,7 +181,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.02,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -193,7 +193,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.01,
+      "generation_time_s": 0.0,
       "generated_code_path": null
     },
     {
@@ -205,7 +205,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.02,
+      "generation_time_s": 0.0,
       "generated_code_path": null
     },
     {
@@ -217,7 +217,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.01,
+      "generation_time_s": 0.0,
       "generated_code_path": null
     },
     {
@@ -229,7 +229,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.0,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -241,9 +241,10 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 0.0,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     }
   ],
-  "layer3_weighted_score": 0.0
+  "layer3_weighted_score": 0.0,
+  "composite_score": 0.0
 }

@@ -1,0 +1,84 @@
+{
+  "benchmark": "coding",
+  "scoring": {
+    "layer1_weight": 0.15,
+    "layer2_weight": 0.25,
+    "layer3_weight": 0.6,
+    "description": "EvalPlus HumanEval+ (Python) / MultiPL-E C# / Custom .NET 10 Suite"
+  },
+  "run_finished_at": "2026-03-25T12:59:13.789971+00:00",
+  "results": [
+    {
+      "rank": 1,
+      "model": "cogito:14b",
+      "composite_score": 0.078261,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.13043478260869565
+    },
+    {
+      "rank": 2,
+      "model": "ministral-3:14b",
+      "composite_score": 0.078261,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.13043478260869565
+    },
+    {
+      "rank": 3,
+      "model": "qwen3:14b",
+      "composite_score": 0.052174,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.08695652173913043
+    },
+    {
+      "rank": 4,
+      "model": "qwen3.5",
+      "composite_score": 0.026087,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.043478260869565216
+    },
+    {
+      "rank": 5,
+      "model": "qwen3.5:9b",
+      "composite_score": 0.026087,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.043478260869565216
+    },
+    {
+      "rank": 6,
+      "model": "granite4:7b-a1b-h",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    },
+    {
+      "rank": 7,
+      "model": "qwen3-coder-next",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    },
+    {
+      "rank": 8,
+      "model": "qwen3.5:4b",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    },
+    {
+      "rank": 9,
+      "model": "qwen3:8b",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    }
+  ]
+}
