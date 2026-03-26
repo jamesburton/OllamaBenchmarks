@@ -19,16 +19,16 @@ prompt: |
      It must support object-initializer syntax like `new CreateOrderRequest { Name = "Widget", Price = 9.99m, Quantity = 5 }`.
      The validation attributes must be from `System.ComponentModel.DataAnnotations` and must work with `Validator.TryValidateObject`.
 
-  2. An `OrderService` class with a method `CreateOrder(CreateOrderRequest request)` that
-     returns the request as a confirmed order (just return the request for simplicity).
+  2. An `OrderService` class with a method `ValidateAndCreate(CreateOrderRequest request)` that:
+     - Validates the request using `Validator.TryValidateObject` with `validateAllProperties: true`
+     - If validation fails, throws an `ArgumentException` with details of the first validation error
+     - If validation passes, returns the request as a confirmed order
 
-  3. A static class `OrderEndpoints` with a method
-     `MapOrderEndpoints(this WebApplication app)` that maps POST /api/orders,
-     accepting a CreateOrderRequest, validating it, and returning the order via OrderService.
-
-  Important: Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
-
-  Include `using Microsoft.AspNetCore.Builder;` and `using Microsoft.AspNetCore.Http;` at the top of the file.
+  IMPORTANT constraints:
+  - Do NOT generate any endpoint mapping code, WebApplication, IEndpointRouteBuilder, or MapPost calls.
+  - Do NOT use `using Microsoft.AspNetCore.Builder;` or `using Microsoft.AspNetCore.Http;`.
+  - Only include `using System.ComponentModel.DataAnnotations;` at the top.
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
 
   Return only valid C# code in a single file.
 test_code: |

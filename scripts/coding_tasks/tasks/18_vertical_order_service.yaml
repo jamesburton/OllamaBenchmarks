@@ -1,0 +1,135 @@
+name: vertical_order_service
+category: vertical
+weight: 2
+template: test_project
+max_tokens: 8192
+num_ctx: 12288
+references:
+  - oneof.md
+  - xunit_v3.md
+  - nsubstitute.md
+  - awesome_assertions.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a complete order service vertical slice in a single C# file:
+
+  1. An `OrderItem` class with public get/set properties: string ProductName, int Quantity, decimal UnitPrice
+  2. An `Order` class with public get/set properties: int Id, string CustomerName, List<OrderItem> Items, decimal Total, DateTime CreatedAt
+  3. A `CreateOrderRequest` class with public get/set properties: string CustomerName, List<OrderItem> Items
+  4. A `ValidationError` class with a public get/set property: string Message
+  5. An `IOrderRepository` interface with methods:
+     - void Save(Order order)
+     - Order? GetById(int id)
+  6. An `OrderService` class that:
+     - Takes `IOrderRepository` as a constructor parameter
+     - Has a method: `OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)` that:
+       - Returns a ValidationError with message "Customer name is required" if CustomerName is null or empty
+       - Returns a ValidationError with message "At least one item is required" if Items is null or empty
+       - Otherwise creates an Order, calculates Total as sum of (Quantity * UnitPrice) for each item, sets CreatedAt to DateTime.UtcNow, calls repository.Save(order), and returns the Order
+
+  IMPORTANT constraints:
+  - Include `using OneOf;` at the top of the file.
+  - Do NOT add any other using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  - Do NOT wrap code in a namespace.
+  - Do NOT use EF Core or any database context. Use the IOrderRepository interface for persistence.
+  - OrderItem and Order must be classes (not records) with public get/set properties so they can be instantiated with object initializer syntax.
+  - CreateOrderRequest must be a class (not a record) with public get/set properties.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using OneOf;
+
+  public class VerticalOrderServiceMetaTests
+  {
+      [Fact]
+      public void OrderItem_HasRequiredProperties()
+      {
+          var item = new OrderItem { ProductName = "Widget", Quantity = 2, UnitPrice = 10m };
+          item.ProductName.Should().Be("Widget");
+          item.Quantity.Should().Be(2);
+          item.UnitPrice.Should().Be(10m);
+      }
+
+      [Fact]
+      public void CreateOrderRequest_CanBeInstantiated()
+      {
+          var request = new CreateOrderRequest
+          {
+              CustomerName = "Alice",
+              Items = [new OrderItem { ProductName = "Widget", Quantity = 1, UnitPrice = 25m }]
+          };
+          request.CustomerName.Should().Be("Alice");
+      }
+
+      [Fact]
+      public void CreateOrder_ValidRequest_ReturnsOrder()
+      {
+          var repo = Substitute.For<IOrderRepository>();
+          var sut = new OrderService(repo);
+          var request = new CreateOrderRequest
+          {
+              CustomerName = "Alice",
+              Items = [new OrderItem { ProductName = "Widget", Quantity = 2, UnitPrice = 10m }]
+          };
+
+          var result = sut.CreateOrder(request);
+
+          result.IsT0.Should().BeTrue();
+          var order = result.AsT0;
+          order.CustomerName.Should().Be("Alice");
+          order.Total.Should().Be(20m);
+          repo.Received(1).Save(Arg.Any<Order>());
+      }
+
+      [Fact]
+      public void CreateOrder_EmptyName_ReturnsValidationError()
+      {
+          var repo = Substitute.For<IOrderRepository>();
+          var sut = new OrderService(repo);
+          var request = new CreateOrderRequest
+          {
+              CustomerName = "",
+              Items = [new OrderItem { ProductName = "Widget", Quantity = 1, UnitPrice = 10m }]
+          };
+
+          var result = sut.CreateOrder(request);
+
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Message.Should().Be("Customer name is required");
+      }
+
+      [Fact]
+      public void CreateOrder_NoItems_ReturnsValidationError()
+      {
+          var repo = Substitute.For<IOrderRepository>();
+          var sut = new OrderService(repo);
+          var request = new CreateOrderRequest
+          {
+              CustomerName = "Alice",
+              Items = new List<OrderItem>()
+          };
+
+          var result = sut.CreateOrder(request);
+
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Message.Should().Be("At least one item is required");
+      }
+
+      [Fact]
+      public void CreateOrder_ValidRequest_DoesNotCallRepoOnValidationError()
+      {
+          var repo = Substitute.For<IOrderRepository>();
+          var sut = new OrderService(repo);
+          var request = new CreateOrderRequest
+          {
+              CustomerName = "",
+              Items = new List<OrderItem>()
+          };
+
+          sut.CreateOrder(request);
+
+          repo.DidNotReceive().Save(Arg.Any<Order>());
+      }
+  }

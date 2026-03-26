@@ -1,13 +1,11 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 public class CreateOrderRequest
 {
     [Required]
-    public string Name { get; set; } = string.Empty;
+    public string? Name { get; set; }
 
-    [Range(0.01m, 10000)]
+    [Range(0.01, 10000)]
     public decimal Price { get; set; }
 
     [Range(1, 999)]
@@ -16,33 +14,20 @@ public class CreateOrderRequest
 
 public class OrderService
 {
-    public CreateOrderRequest CreateOrder(CreateOrderRequest request)
+    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        return request;
-    }
-}
+        var context = new ValidationContext(request) { MemberName = "request" };
+        var validationResults = new List<ValidationResult>();
 
-public static class OrderEndpoints
-{
-    public static IEndpointRouteBuilder MapOrderEndpoints(this WebApplication app)
-    {
-        app.MapPost("/api/orders", async (CreateOrderRequest request, OrderService orderService) =>
+        if (!Validator.TryValidateObject(request, context, validationResults, validateAllProperties: true))
         {
-            var validationContext = new ValidationContext(request) { MemberName = string.Empty };
-            var validationResults = new List<ValidationResult>();
-            bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, true);
-
-            if (!isValid)
+            var firstError = validationResults.FirstOrDefault();
+            if (firstError != null)
             {
-                return Results.ValidationProblem(validationResults.ToDictionary(
-                    r => r.MemberNames.FirstOrDefault() ?? string.Empty,
-                    r => r.ErrorMessage));
+                throw new ArgumentException(firstError.ErrorMessage);
             }
+        }
 
-            var order = orderService.CreateOrder(request);
-            return Results.Ok(order);
-        });
-
-        return app;
+        return request;
     }
 }

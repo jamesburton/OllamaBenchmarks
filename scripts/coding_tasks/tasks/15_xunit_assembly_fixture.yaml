@@ -18,9 +18,7 @@ prompt: |
      - DisposeAsync returns default
      - Has an IncrementAndGet() method that increments and returns the counter (use Interlocked.Increment)
 
-  2. Register it with: [assembly: AssemblyFixture(typeof(SharedCounter))]
-
-  3. Two test classes that both inject SharedCounter via constructor:
+  2. Two test classes that both inject SharedCounter via constructor:
      - FirstCounterTests with a [Fact] that calls IncrementAndGet() and asserts the result is > 0
      - SecondCounterTests with a [Fact] that uses TestContext.Current.GetFixture<SharedCounter>() instead of constructor injection, calls IncrementAndGet() and asserts the result is > 0
 
@@ -28,10 +26,12 @@ prompt: |
   - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute. The only using you may need is `using System.Threading;` for Interlocked.
   - Do NOT use `Xunit.Abstractions` — it does not exist in xUnit v3. Use `Xunit` namespace only.
   - Do NOT wrap code in a namespace.
-  - The `[assembly: AssemblyFixture(typeof(SharedCounter))]` attribute MUST appear at the very top of the file, BEFORE any class or record declarations.
+  - Do NOT include `[assembly: AssemblyFixture(...)]` — it is already provided separately.
 
   Return only valid C# code in a single file.
 test_code: |
+  [assembly: AssemblyFixture(typeof(SharedCounter))]
+
   public class SharedCounterMetaTests
   {
       [Fact]

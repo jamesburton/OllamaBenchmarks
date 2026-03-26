@@ -1,7 +1,5 @@
 using System.Threading;
 
-[assembly: AssemblyFixture(typeof(SharedCounter))]
-
 public class SharedCounter : IAsyncLifetime
 {
     private int _counter;
@@ -23,12 +21,19 @@ public class SharedCounter : IAsyncLifetime
     }
 }
 
-public class FirstCounterTests(SharedCounter counter)
+public class FirstCounterTests
 {
+    private readonly SharedCounter _counter;
+
+    public FirstCounterTests(SharedCounter counter)
+    {
+        _counter = counter;
+    }
+
     [Fact]
     public void Test()
     {
-        var result = counter.IncrementAndGet();
+        var result = _counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }

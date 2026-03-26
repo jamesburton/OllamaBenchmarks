@@ -1,0 +1,103 @@
+name: blazor_cascading_auth
+category: blazor
+weight: 1
+template: blazor_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - blazor_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. An `IUserService` interface with method: `Task<string> GetDisplayNameAsync(string userId)`
+  2. A `UserDashboard` class inheriting from `ComponentBase` that:
+     - Has a cascading parameter: `[CascadingParameter] public Task<AuthenticationState> AuthState { get; set; }`
+     - Has an injected service: `[Inject] public IUserService UserService { get; set; }`
+     - Has a public `string? DisplayName { get; set; }` property
+     - Has a public `bool IsAuthenticated { get; set; }` property
+     - Overrides `OnInitializedAsync`:
+       - Awaits AuthState to get the AuthenticationState
+       - Checks if `authState.User.Identity?.IsAuthenticated == true`
+       - If authenticated, sets IsAuthenticated = true, gets the user's name claim via `authState.User.Identity.Name`, calls `UserService.GetDisplayNameAsync(name)` and assigns the result to DisplayName
+       - If not authenticated, sets IsAuthenticated = false and DisplayName = "Guest"
+
+  IMPORTANT constraints:
+  - The class must be `public class UserDashboard` — NOT abstract, NOT sealed.
+  - Do NOT place any types in a namespace — put everything in the global namespace.
+  - Include `using Microsoft.AspNetCore.Components;` and `using Microsoft.AspNetCore.Components.Authorization;` at the top of the file.
+  - Use `[Inject]` and `[CascadingParameter]` as public properties with public get and set.
+  Return only valid C# code in a single file.
+test_code: |
+  using Bunit;
+  using NSubstitute;
+  using Microsoft.AspNetCore.Components.Authorization;
+  using Microsoft.Extensions.DependencyInjection;
+  using System.Security.Claims;
+
+  public class UserDashboardTests : Bunit.TestContext
+  {
+      private static Task<AuthenticationState> CreateAuthState(bool authenticated, string? name = null)
+      {
+          ClaimsIdentity identity;
+          if (authenticated && name != null)
+          {
+              identity = new ClaimsIdentity(
+                  new[] { new Claim(ClaimTypes.Name, name) },
+                  "TestAuth");
+          }
+          else
+          {
+              identity = new ClaimsIdentity();
+          }
+          var principal = new ClaimsPrincipal(identity);
+          return Task.FromResult(new AuthenticationState(principal));
+      }
+
+      [Fact]
+      public void WhenAuthenticated_DisplaysUserName()
+      {
+          var userService = Substitute.For<IUserService>();
+          userService.GetDisplayNameAsync("alice").Returns(Task.FromResult("Alice Smith"));
+          Services.AddSingleton(userService);
+
+          var authState = CreateAuthState(true, "alice");
+
+          var cut = RenderComponent<UserDashboard>(p =>
+              p.Add(x => x.AuthState, authState));
+
+          Assert.True(cut.Instance.IsAuthenticated);
+          Assert.Equal("Alice Smith", cut.Instance.DisplayName);
+      }
+
+      [Fact]
+      public void WhenNotAuthenticated_DisplaysGuest()
+      {
+          var userService = Substitute.For<IUserService>();
+          Services.AddSingleton(userService);
+
+          var authState = CreateAuthState(false);
+
+          var cut = RenderComponent<UserDashboard>(p =>
+              p.Add(x => x.AuthState, authState));
+
+          Assert.False(cut.Instance.IsAuthenticated);
+          Assert.Equal("Guest", cut.Instance.DisplayName);
+      }
+
+      [Fact]
+      public async Task WhenNotAuthenticated_ServiceIsNotCalled()
+      {
+          var userService = Substitute.For<IUserService>();
+          Services.AddSingleton(userService);
+
+          var authState = CreateAuthState(false);
+
+          var cut = RenderComponent<UserDashboard>(p =>
+              p.Add(x => x.AuthState, authState));
+
+          await userService.DidNotReceive().GetDisplayNameAsync(Arg.Any<string>());
+      }
+  }

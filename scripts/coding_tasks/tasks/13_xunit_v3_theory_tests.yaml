@@ -1,0 +1,108 @@
+name: xunit_v3_theory_tests
+category: xunit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - xunit_v3.md
+  - awesome_assertions.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Given this class:
+
+  ```csharp
+  public class StringProcessor
+  {
+      public string Truncate(string input, int maxLength)
+      {
+          if (input is null) return "";
+          return input.Length <= maxLength ? input : input[..maxLength] + "...";
+      }
+
+      public int CountWords(string input)
+      {
+          if (string.IsNullOrWhiteSpace(input)) return 0;
+          return input.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+      }
+
+      public bool IsPalindrome(string input)
+      {
+          if (string.IsNullOrEmpty(input)) return false;
+          var cleaned = input.ToLowerInvariant().Replace(" ", "");
+          return cleaned.SequenceEqual(cleaned.Reverse());
+      }
+  }
+  ```
+
+  Write comprehensive xUnit v3 tests for StringProcessor using:
+  - [Theory] with [InlineData] for parameterized tests covering each method
+  - Test Truncate with: null input, empty string, string shorter than max, string equal to max, string longer than max
+  - Test CountWords with: null, empty string, single word, multiple words, extra spaces
+  - Test IsPalindrome with: null, empty string, single character, palindrome, non-palindrome, palindrome with mixed case
+
+  Include the StringProcessor class at the top of the file.
+
+  IMPORTANT constraints:
+  - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  - Do NOT wrap code in a namespace.
+  - CRITICAL: Only use int, string, and bool types in [InlineData] attribute arguments. Do NOT use decimal, float, or double in InlineData.
+  - Use `[InlineData(null)]` to test null string inputs (not `[InlineData("")]` for null).
+  - Use AwesomeAssertions .Should() for assertions (e.g., `result.Should().Be(expected)`).
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class StringProcessorMetaTests
+  {
+      private readonly StringProcessor _sut = new();
+
+      [Fact]
+      public void Truncate_NullInput_ReturnsEmpty()
+      {
+          _sut.Truncate(null!, 5).Should().Be("");
+      }
+
+      [Fact]
+      public void Truncate_ShortString_ReturnsSame()
+      {
+          _sut.Truncate("Hi", 10).Should().Be("Hi");
+      }
+
+      [Fact]
+      public void Truncate_LongString_Truncates()
+      {
+          _sut.Truncate("Hello World", 5).Should().Be("Hello...");
+      }
+
+      [Fact]
+      public void CountWords_Null_ReturnsZero()
+      {
+          _sut.CountWords(null!).Should().Be(0);
+      }
+
+      [Fact]
+      public void CountWords_MultipleWords_ReturnsCount()
+      {
+          _sut.CountWords("one two three").Should().Be(3);
+      }
+
+      [Fact]
+      public void IsPalindrome_Null_ReturnsFalse()
+      {
+          _sut.IsPalindrome(null!).Should().BeFalse();
+      }
+
+      [Fact]
+      public void IsPalindrome_ValidPalindrome_ReturnsTrue()
+      {
+          _sut.IsPalindrome("racecar").Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsPalindrome_NonPalindrome_ReturnsFalse()
+      {
+          _sut.IsPalindrome("hello").Should().BeFalse();
+      }
+  }

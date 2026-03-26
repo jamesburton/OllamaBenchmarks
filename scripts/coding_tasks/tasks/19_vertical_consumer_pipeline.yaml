@@ -1,0 +1,92 @@
+name: vertical_consumer_pipeline
+category: vertical
+weight: 2
+template: test_project
+max_tokens: 8192
+num_ctx: 12288
+references:
+  - masstransit_v8.md
+  - xunit_v3.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a complete two-stage consumer pipeline in a single C# file:
+
+  1. Message records (all using positional record syntax):
+     - `PlaceOrder` with properties: Guid OrderId, string CustomerName
+     - `OrderPlaced` with properties: Guid OrderId, string CustomerName
+     - `CustomerNotified` with properties: Guid OrderId, string NotificationMessage
+
+  2. A `PlaceOrderConsumer` class implementing `IConsumer<PlaceOrder>` that:
+     - In its Consume method, publishes an `OrderPlaced` event with the OrderId and CustomerName from the incoming message
+
+  3. A `NotifyCustomerConsumer` class implementing `IConsumer<OrderPlaced>` that:
+     - In its Consume method, publishes a `CustomerNotified` event with the OrderId from the incoming message and a NotificationMessage of $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}"
+
+  4. xUnit v3 tests:
+     - A test that publishes a PlaceOrder message and verifies that the PlaceOrderConsumer consumed it and published an OrderPlaced event
+     - A test that verifies the full pipeline: publish PlaceOrder and assert both OrderPlaced and CustomerNotified are eventually consumed/published
+
+  IMPORTANT constraints:
+  - MassTransit requires all message types to be in a namespace. Place all message types and consumer classes inside `namespace Contracts;` (file-scoped).
+  - Add `global using Contracts;` at the very top of the file so the types are accessible without explicit using statements from other files.
+  - Include `using MassTransit;` BEFORE the `namespace Contracts;` declaration.
+  - Use positional record syntax (e.g. `public record PlaceOrder(Guid OrderId, string CustomerName);`).
+  - For tests, add `using MassTransit;`, `using MassTransit.Testing;`, and `using Microsoft.Extensions.DependencyInjection;` outside the namespace.
+  - Do NOT wrap the test class in a namespace — only the messages and consumers go in the Contracts namespace.
+  - Use `AddMassTransitTestHarness` with `cfg.AddConsumer<PlaceOrderConsumer>()` and `cfg.AddConsumer<NotifyCustomerConsumer>()`.
+  - Use `harness.Consumed.Any<T>()` and `harness.Published.Any<T>()` for assertions.
+  - Do NOT use `Xunit.Abstractions` — it does not exist in xUnit v3.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using MassTransit;
+  using MassTransit.Testing;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public class VerticalConsumerPipelineMetaTests
+  {
+      [Fact]
+      public async Task PlaceOrderConsumer_PublishesOrderPlaced()
+      {
+          await using var provider = new ServiceCollection()
+              .AddMassTransitTestHarness(cfg =>
+              {
+                  cfg.AddConsumer<PlaceOrderConsumer>();
+                  cfg.AddConsumer<NotifyCustomerConsumer>();
+              })
+              .BuildServiceProvider(true);
+
+          var harness = provider.GetRequiredService<ITestHarness>();
+          await harness.Start();
+
+          var orderId = Guid.NewGuid();
+          await harness.Bus.Publish(new PlaceOrder(orderId, "Alice"));
+
+          Assert.True(await harness.Consumed.Any<PlaceOrder>());
+          Assert.True(await harness.Published.Any<OrderPlaced>());
+      }
+
+      [Fact]
+      public async Task FullPipeline_PlaceOrder_ProducesCustomerNotified()
+      {
+          await using var provider = new ServiceCollection()
+              .AddMassTransitTestHarness(cfg =>
+              {
+                  cfg.AddConsumer<PlaceOrderConsumer>();
+                  cfg.AddConsumer<NotifyCustomerConsumer>();
+              })
+              .BuildServiceProvider(true);
+
+          var harness = provider.GetRequiredService<ITestHarness>();
+          await harness.Start();
+
+          var orderId = Guid.NewGuid();
+          await harness.Bus.Publish(new PlaceOrder(orderId, "Bob"));
+
+          Assert.True(await harness.Consumed.Any<PlaceOrder>());
+          Assert.True(await harness.Published.Any<OrderPlaced>());
+          Assert.True(await harness.Published.Any<CustomerNotified>());
+      }
+  }
