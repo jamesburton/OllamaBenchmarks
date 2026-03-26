@@ -30,19 +30,32 @@ prompt: |
   2. A PaymentProcessed event is published with the correct OrderId
   3. Use `Assert.Multiple` to check both assertions in a single test
 
-  Include the consumer code above in your file so it compiles standalone.
+  IMPORTANT constraints:
+  - Do NOT include the consumer code (ProcessPayment, PaymentProcessed, ProcessPaymentConsumer) in your output — it is already provided in a separate file.
+  - Do NOT use a namespace — place your test class in the global namespace.
+  - Do NOT use `using Xunit;` or `using Xunit.Abstractions;` — xUnit v3 types are available via implicit usings.
+  - You MUST include `using MassTransit;`, `using MassTransit.Testing;`, and `using Microsoft.Extensions.DependencyInjection;`.
+  - Do NOT redeclare the consumer types — they exist in a separate file.
+  - Use `await harness.Consumed.Any<T>()` and `await harness.Published.Any<T>()` (these return `Task<bool>`).
+  - Build test harness with: `new ServiceCollection().AddMassTransitTestHarness(cfg => { cfg.AddConsumer<ProcessPaymentConsumer>(); }).BuildServiceProvider(true);`
+  - Call `await harness.Start();` before publishing.
+  - `Assert.Multiple` does NOT support async lambdas. Await each harness check individually first, store results in local variables, then pass sync assertions to Assert.Multiple.
   Return only valid C# code in a single file.
 test_code: |
+  global using Contracts;
   using MassTransit;
   using MassTransit.Testing;
   using Microsoft.Extensions.DependencyInjection;
 
-  public record ProcessPayment(Guid OrderId, decimal Amount);
-  public record PaymentProcessed(Guid OrderId, string TransactionId);
-  public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
+  namespace Contracts
   {
-      public async Task Consume(ConsumeContext<ProcessPayment> context)
+      public record ProcessPayment(Guid OrderId, decimal Amount);
+      public record PaymentProcessed(Guid OrderId, string TransactionId);
+      public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
       {
-          await context.Publish(new PaymentProcessed(context.Message.OrderId, Guid.NewGuid().ToString()));
+          public async Task Consume(ConsumeContext<ProcessPayment> context)
+          {
+              await context.Publish(new PaymentProcessed(context.Message.OrderId, Guid.NewGuid().ToString()));
+          }
       }
   }

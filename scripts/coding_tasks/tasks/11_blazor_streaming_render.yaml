@@ -12,21 +12,26 @@ prompt: |
 
   Generate a single C# file containing:
 
-  1. A `WeatherForecast` record with properties: DateOnly Date, int TemperatureC, string Summary
-  2. An `IWeatherService` interface with method: Task<WeatherForecast[]> GetForecastsAsync()
+  1. A `WeatherForecast` record with properties: DateOnly Date, int TemperatureC, string Summary (use `string` not `string?`)
+  2. An `IWeatherService` interface with method: `Task<WeatherForecast[]> GetForecastsAsync()`
   3. A `WeatherPageBase` class inheriting from `ComponentBase` that:
      - Is marked with the `[StreamRendering]` attribute
-     - Injects `IWeatherService` via `[Inject]`
-     - Has a public `Forecasts` property of type `WeatherForecast[]?` (null initially)
+     - Injects `IWeatherService` via `[Inject]` as a public property
+     - Has a public `Forecasts` property of type `WeatherForecast[]?` with both getter and setter (null initially)
      - Overrides `OnInitializedAsync` to load forecasts from the service into the Forecasts property
 
+  IMPORTANT constraints:
+  - The class must be `public class WeatherPageBase` — NOT abstract, NOT sealed.
+  - Use positional record syntax: `public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);`
+  - Do NOT place any types in a namespace — put everything in the global namespace.
+  - Include `using Microsoft.AspNetCore.Components;` at the top of the file.
   Return only valid C# code in a single file.
 test_code: |
   using Bunit;
   using NSubstitute;
   using Microsoft.Extensions.DependencyInjection;
 
-  public class WeatherPageTests : TestContext
+  public class WeatherPageTests : Bunit.TestContext
   {
       [Fact]
       public void InitialRender_ForecastsAreNull()

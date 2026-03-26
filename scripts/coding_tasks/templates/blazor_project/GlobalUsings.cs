@@ -2,3 +2,4 @@ global using Xunit;
 global using AwesomeAssertions;
 global using NSubstitute;
 global using Bunit;
+global using Microsoft.AspNetCore.Components;

@@ -12,20 +12,24 @@ prompt: |
 
   Generate a single C# file containing:
 
-  1. An `IUserService` interface with method: Task<string> GetCurrentUserNameAsync()
+  1. An `IUserService` interface with method: `Task<string> GetCurrentUserNameAsync()`
   2. A `UserProfileBase` class inheriting from `ComponentBase` that:
-     - Has a property `[SupplyParameterFromPersistentComponentState] public string? UserName { get; set; }`
-     - Injects `IUserService` via `[Inject]`
+     - Has a property `[SupplyParameterFromPersistentComponentState] public string? UserName { get; set; }` (public getter AND setter)
+     - Injects `IUserService` via `[Inject]` as a public property (not protected)
      - Overrides `OnInitializedAsync`: if UserName is null, fetches the username from the service and assigns it
      - The UserName property is publicly readable
 
+  IMPORTANT constraints:
+  - The class must be `public class UserProfileBase` — NOT abstract, NOT sealed.
+  - Do NOT place any types in a namespace — put everything in the global namespace.
+  - Include `using Microsoft.AspNetCore.Components;` at the top of the file.
   Return only valid C# code in a single file.
 test_code: |
   using Bunit;
   using NSubstitute;
   using Microsoft.Extensions.DependencyInjection;
 
-  public class UserProfileTests : TestContext
+  public class UserProfileTests : Bunit.TestContext
   {
       [Fact]
       public async Task WhenPersistentStateProvided_ServiceIsNotCalled()

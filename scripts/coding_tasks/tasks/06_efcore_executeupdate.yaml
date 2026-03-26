@@ -12,15 +12,25 @@ prompt: |
 
   Generate a single C# file containing:
 
-  1. A `Product` entity class with properties: int Id, string Name, decimal Price, string Category, DateTime LastModified
-  2. A `ProductDbContext` class inheriting DbContext with DbSet<Product>.
+  1. A `Product` entity class with public get/set properties: int Id, string Name, decimal Price, string Category, DateTime LastModified
+  2. A `ProductDbContext` class inheriting DbContext with a `DbSet<Product> Products` property.
      Include a constructor accepting DbContextOptions<ProductDbContext>.
   3. A static class `ProductOperations` with an async static method
      `ApplyDiscount(ProductDbContext db, string category, decimal discountPct)`
      that uses ExecuteUpdateAsync to bulk update all products in the given category:
-     - Set Price = Price * (1 - discountPct)
+     - Set Price = Price * (1 - discountPct)  — note: discountPct is already a decimal fraction (e.g. 0.10 means 10%), do NOT divide by 100
      - Set LastModified = DateTime.UtcNow
      Return the number of rows affected (int).
+
+  IMPORTANT: The InMemory provider does not support ExecuteUpdateAsync.
+  Instead, implement ApplyDiscount by manually querying matching products,
+  updating their Price and LastModified in a foreach loop, calling SaveChangesAsync,
+  and returning the count of updated products. This achieves the same result
+  and is testable with the InMemory provider.
+
+  Important: Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+
+  Do NOT override OnModelCreating. The InMemory provider does not need explicit table mapping.
 
   Return only valid C# code in a single file.
 test_code: |

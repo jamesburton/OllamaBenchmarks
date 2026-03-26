@@ -45,10 +45,12 @@ def run_evalplus(model: str, dataset: str) -> float:
         sys.executable, "-m", "evalplus.evaluate",
         "--model", model,
         "--dataset", dataset,
-        "--backend", "ollama",
+        "--backend", "openai",
         "--base-url", "http://localhost:11434/v1",
         "--greedy",
     ]
+    # Note: evalplus uses signal.SIGALRM which is Linux-only.
+    # On Windows, this will fail. Run Layer 1 in WSL or Docker instead.
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=7200)
     except subprocess.TimeoutExpired:

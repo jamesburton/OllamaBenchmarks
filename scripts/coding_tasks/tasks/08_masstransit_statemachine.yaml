@@ -17,17 +17,23 @@ prompt: |
      - string CurrentState
      - DateTime OrderDate
      - DateTime? AcceptedAt
-  2. Event records:
+  2. Event records (use positional record syntax):
      - `OrderSubmitted` with Guid OrderId and DateTime OrderDate
      - `OrderAccepted` with Guid OrderId and DateTime AcceptedAt
      - `OrderCompleted` with Guid OrderId
   3. An `OrderStateMachine` class extending `MassTransitStateMachine<OrderState>` with:
-     - States: Submitted, Accepted, Completed
-     - Events: OrderSubmitted (correlated by OrderId), OrderAccepted (correlated by OrderId), OrderCompleted (correlated by OrderId)
-     - Initially: When OrderSubmitted → set OrderDate, TransitionTo Submitted
-     - During Submitted: When OrderAccepted → set AcceptedAt, TransitionTo Accepted
-     - During Accepted: When OrderCompleted → Finalize
+     - States: Submitted, Accepted, Completed (as `public State` properties)
+     - Events as `public Event<T>` properties for each event record
+     - In the constructor, call `InstanceState(x => x.CurrentState)`
+     - Configure event correlation using `Event(() => ..., x => x.CorrelateById(m => m.Message.OrderId))` for each event
+     - Initially: When event → set OrderDate, TransitionTo Submitted
+     - During Submitted: When event → set AcceptedAt, TransitionTo Accepted
+     - During Accepted: When event → Finalize
      - Call SetCompletedWhenFinalized()
+
+  IMPORTANT: MassTransit requires all message types to be in a namespace. Place all types inside `namespace Contracts;` (file-scoped). Also add `global using Contracts;` at the top of the file so the types are accessible without explicit using statements from other files. Do NOT use `SetCorrelationId` — use `Event(() => ..., x => x.CorrelateById(...))` to configure correlation.
+
+  Use `.Then(context => { context.Saga.PropertyName = value; })` to set saga properties in state transitions. Do NOT use `.Set()` — it does not exist on EventActivityBinder.
 
   Return only valid C# code in a single file.
 test_code: |
@@ -64,6 +70,6 @@ test_code: |
 
           var sagaHarness = harness.GetSagaStateMachineHarness<OrderStateMachine, OrderState>();
           Assert.True(await sagaHarness.Created.Any(x => x.CorrelationId == orderId));
-          Assert.False(await sagaHarness.Exists(orderId, x => x.Submitted));
+          Assert.Null(await sagaHarness.Exists(orderId, x => x.Submitted));
       }
   }

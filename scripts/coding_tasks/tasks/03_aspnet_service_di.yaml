@@ -13,11 +13,11 @@ prompt: |
   Generate a single C# file containing:
 
   1. An `IOrderRepository` interface (empty, marker interface is fine)
-  2. An `OrderRepository` class implementing `IOrderRepository`
+  2. An `OrderRepository` class implementing `IOrderRepository` — must have a parameterless constructor (no constructor dependencies)
   3. An `IOrderService` interface (empty, marker interface is fine)
-  4. An `OrderService` class implementing `IOrderService`
+  4. An `OrderService` class implementing `IOrderService` — must have a parameterless constructor (no constructor dependencies)
   5. An `IEmailNotifier` interface (empty, marker interface is fine)
-  6. An `EmailNotifier` class implementing `IEmailNotifier`
+  6. An `EmailNotifier` class implementing `IEmailNotifier` — must have a parameterless constructor (no constructor dependencies)
   7. An `OrderSettings` class with properties: string WarehouseCode, int MaxRetries
   8. A static class `ServiceCollectionExtensions` with an extension method
      `AddOrderServices(this IServiceCollection services, IConfiguration config)` that:
@@ -25,6 +25,8 @@ prompt: |
      - Registers IOrderService → OrderService as scoped
      - Registers IEmailNotifier → EmailNotifier as transient
      - Binds OrderSettings from config section "Orders" using the options pattern
+
+  Important: Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
 
   Return only valid C# code in a single file.
 test_code: |

@@ -46,7 +46,13 @@ prompt: |
      - Mock ITodoService with NSubstitute
      - Render component and verify it calls GetAllAsync on init
 
-  Use AwesomeAssertions .Should() for assertions.
+  Use AwesomeAssertions .Should() for assertions (NOT FluentAssertions — the package is called AwesomeAssertions).
+
+  IMPORTANT constraints:
+  - You may add `using Microsoft.AspNetCore.Components;` if needed. Do NOT add any other using statements. The project already has global usings for Xunit, AwesomeAssertions, NSubstitute, and Bunit.
+  - Do NOT wrap code in a namespace.
+  - In bUnit tests, use `Bunit.TestContext` (fully qualified) to avoid ambiguity with `Xunit.TestContext`.
+  - TodoService must use an instance field (not static) for the auto-increment ID counter, so each new TodoService instance starts IDs from 1.
 
   Return only valid C# code in a single file.
 test_code: |

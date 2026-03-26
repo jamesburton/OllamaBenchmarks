@@ -20,6 +20,12 @@ prompt: |
      - Sets ConcurrentMessageLimit = 4 in the constructor
      - In ConfigureConsumer, calls `ep.UseMessageRetry(r => r.Interval(3, 1000))`
 
+  IMPORTANT: MassTransit requires all message types to be in a namespace. Place all types inside `namespace Contracts;` (file-scoped). Also add `global using Contracts;` at the top of the file so the types are accessible without explicit using statements from other files.
+
+  Include `using MassTransit;` BEFORE the `namespace Contracts;` declaration.
+
+  Use positional record syntax (e.g. `public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);`).
+
   Return only valid C# code in a single file.
 test_code: |
   using MassTransit;

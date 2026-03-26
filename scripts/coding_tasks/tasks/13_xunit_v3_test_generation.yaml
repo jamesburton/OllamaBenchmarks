@@ -33,6 +33,11 @@ prompt: |
 
   Include the OrderService class at the top of the file.
 
+  IMPORTANT constraints:
+  - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  - Do NOT wrap code in a namespace.
+  - CRITICAL: `decimal` literals (like `0.25m`, `0.5m`) are NOT valid C# attribute arguments and cause CS0182. Use `double` literals instead (e.g., `0.25` not `0.25m`) and cast to decimal in the method body if needed. Alternatively, use [MemberData] with a static property for decimal test data.
+
   Return only valid C# code in a single file.
 test_code: |
   public class OrderServiceMetaTests

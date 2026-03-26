@@ -19,6 +19,14 @@ prompt: |
   - Include the User record with Id, Name, Email properties
   - Include the IUserService interface
 
+  Important implementation details:
+  - The controller action method must be named `Get` (not `GetById` or `GetUser`).
+  - `User` must be a class (not a positional record) with public get/set properties so it supports object-initializer syntax like `new User { Id = 1, Name = "Alice", Email = "a@b.com" }`.
+  - `NotFound` must be a record with a parameterless constructor (e.g. `public record NotFound;` with no constructor parameters).
+  - `ValidationError` must be a record that accepts a single `string Message` parameter: `public record ValidationError(string Message);`
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - The `Get` method must be async: `public async Task<IActionResult> Get(int id)`
+
   Return only valid C# code in a single file.
 test_code: |
   using AwesomeAssertions;

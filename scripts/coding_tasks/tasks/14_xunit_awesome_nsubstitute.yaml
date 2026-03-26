@@ -53,6 +53,11 @@ prompt: |
 
   Include the interfaces, User record, and NotificationService class at the top of the file.
 
+  IMPORTANT constraints:
+  - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  - Do NOT wrap code in a namespace.
+  - When asserting exceptions, use a simple pattern like: `await act.Should().ThrowAsync<InvalidOperationException>();` — do NOT chain `.Which` or `.Where` after ThrowAsync.
+
   Return only valid C# code in a single file.
 test_code: |
   public class NotificationServiceMetaTests

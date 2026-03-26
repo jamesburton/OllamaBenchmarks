@@ -44,6 +44,13 @@ prompt: |
   Use MassTransit.Testing namespace for test harness.
   Use cfg.AddSagaStateMachine<OrderFulfillmentStateMachine, OrderFulfillmentState>().InMemoryRepository() for registration.
 
+  IMPORTANT constraints:
+  - Do NOT use `Xunit.Abstractions` — it does not exist in xUnit v3. Do NOT inject ITestOutputHelper.
+  - Do NOT add using statements for Xunit (already available via global usings). You may add `using MassTransit;` and `using MassTransit.Testing;`.
+  - Do NOT wrap code in a namespace.
+  - Message records (OrderPlaced, PaymentReceived, OrderShipped, OrderCompleted) must have a settable OrderId property, so they can be instantiated with object initializer syntax: `new OrderPlaced { OrderId = id }`. Use `record` with `{ Guid OrderId { get; init; } }` body syntax, NOT positional record syntax.
+  - Do NOT override ConfigureStateMachine — it does not exist. Do NOT use IStateMachineSagaDefinition. Correlate events in the constructor using `Event(() => EventProp, x => x.CorrelateById(m => m.Message.OrderId))` for each event. Use `.Then(context => { context.Saga.Prop = val; })` to set saga properties.
+
   Return only valid C# code in a single file.
 test_code: |
   public class VerticalSagaMetaTests

@@ -39,6 +39,14 @@ prompt: |
   Use AwesomeAssertions .Should() for assertions.
   Use [ApiController] and [Route("api/[controller]")] attributes.
 
+  Mark `OrderItem` as an owned entity by adding the `[Owned]` attribute from `System.ComponentModel.DataAnnotations.Schema`. Include `using System.ComponentModel.DataAnnotations.Schema;` at the top.
+
+  IMPORTANT constraints:
+  - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, NSubstitute, and has OneOf, EF Core, and ASP.NET available.
+  - Do NOT wrap code in a namespace.
+  - OrderItem must be a class (not a positional record) with public get/set properties so it can be instantiated with object initializer syntax: `new OrderItem { ProductName = "X", Quantity = 1, UnitPrice = 10m }`.
+  - CreateOrderRequest must be a class (not a positional record) with public get/set properties so it can be instantiated with object initializer syntax: `new CreateOrderRequest { CustomerName = "Alice", Items = new List<OrderItem> { ... } }`.
+
   Return only valid C# code in a single file.
 test_code: |
   public class VerticalOrderApiMetaTests

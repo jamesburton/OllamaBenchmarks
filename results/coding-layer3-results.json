@@ -1,29 +1,28 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-03-25T21:56:46.395704+00:00",
-  "run_finished_at": "2026-03-25T22:50:01.773184+00:00",
+  "run_started_at": "2026-03-26T01:17:19.197459+00:00",
+  "run_finished_at": "2026-03-26T01:26:02.393805+00:00",
   "models": [
-    "qwen2.5vl:7b",
-    "minicpm-v:8b"
+    "qwen3-coder-next"
   ],
   "results": [
     {
-      "model": "qwen2.5vl:7b",
+      "model": "qwen3-coder-next",
       "benchmark": "coding",
-      "run_started_at": "2026-03-25T21:57:03.826568+00:00",
-      "run_finished_at": "2026-03-25T22:42:05.467551+00:00",
+      "run_started_at": "2026-03-26T01:17:19.197780+00:00",
+      "run_finished_at": "2026-03-26T01:26:02.390962+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
           "category": "aspnet",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 221.69,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\aspnet_oneof_controller.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 135.08,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_oneof_controller.cs"
         },
         {
           "task": "aspnet_validation_endpoint",
@@ -34,365 +33,116 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 329.05,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\aspnet_validation_endpoint.cs"
+          "generation_time_s": 10.39,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_validation_endpoint.cs"
         },
         {
           "task": "aspnet_service_di",
           "category": "aspnet",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 105.89,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\aspnet_service_di.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 8.21,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_service_di.cs"
         },
         {
           "task": "efcore_leftjoin",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 108.8,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\efcore_leftjoin.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 10.14,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_leftjoin.cs"
         },
         {
           "task": "efcore_json_columns",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 64.45,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\efcore_json_columns.cs"
-        },
-        {
-          "task": "efcore_executeupdate",
-          "category": "efcore",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 45.98,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\efcore_executeupdate.cs"
-        },
-        {
-          "task": "masstransit_consumer",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 67.72,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\masstransit_consumer.cs"
-        },
-        {
-          "task": "masstransit_statemachine",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 71.41,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\masstransit_statemachine.cs"
-        },
-        {
-          "task": "masstransit_test_harness",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 108.06,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\masstransit_test_harness.cs"
-        },
-        {
-          "task": "blazor_interactive_component",
-          "category": "blazor",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 23.38,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\blazor_interactive_component.cs"
-        },
-        {
-          "task": "blazor_streaming_render",
-          "category": "blazor",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 46.7,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\blazor_streaming_render.cs"
-        },
-        {
-          "task": "blazor_state_persistence",
-          "category": "blazor",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 18.81,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\blazor_state_persistence.cs"
-        },
-        {
-          "task": "xunit_v3_test_generation",
-          "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 600.02,
-          "generated_code_path": null
-        },
-        {
-          "task": "xunit_awesome_nsubstitute",
-          "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 103.01,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\xunit_awesome_nsubstitute.cs"
-        },
-        {
-          "task": "xunit_assembly_fixture",
-          "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 52.56,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\xunit_assembly_fixture.cs"
-        },
-        {
-          "task": "linq_complex_query",
-          "category": "linq",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 33.56,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\linq_complex_query.cs"
-        },
-        {
-          "task": "async_cancellation",
-          "category": "linq",
-          "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
           "build_success": true,
           "tests_passed": 2,
-          "tests_total": 3,
-          "generation_time_s": 28.97,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\async_cancellation.cs"
-        },
-        {
-          "task": "vertical_order_api",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 301.69,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\vertical_order_api.cs"
-        },
-        {
-          "task": "vertical_saga_workflow",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 151.89,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\vertical_saga_workflow.cs"
-        },
-        {
-          "task": "vertical_blazor_crud",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 145.05,
-          "generated_code_path": "results\\coding-generated\\qwen2.5vl_7b\\vertical_blazor_crud.cs"
-        }
-      ],
-      "layer3_weighted_score": 0.0
-    },
-    {
-      "model": "minicpm-v:8b",
-      "benchmark": "coding",
-      "run_started_at": "2026-03-25T22:42:05.473655+00:00",
-      "run_finished_at": "2026-03-25T22:50:01.768183+00:00",
-      "layer3_results": [
-        {
-          "task": "aspnet_oneof_controller",
-          "category": "aspnet",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 17.25,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_oneof_controller.cs"
-        },
-        {
-          "task": "aspnet_validation_endpoint",
-          "category": "aspnet",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 9.41,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_validation_endpoint.cs"
-        },
-        {
-          "task": "aspnet_service_di",
-          "category": "aspnet",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 14.5,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_service_di.cs"
-        },
-        {
-          "task": "efcore_leftjoin",
-          "category": "efcore",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 5.88,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_leftjoin.cs"
-        },
-        {
-          "task": "efcore_json_columns",
-          "category": "efcore",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 4.81,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_json_columns.cs"
+          "tests_total": 2,
+          "generation_time_s": 8.78,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_json_columns.cs"
         },
         {
           "task": "efcore_executeupdate",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 4.28,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_executeupdate.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 9.59,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_executeupdate.cs"
         },
         {
           "task": "masstransit_consumer",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 4.8,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_consumer.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 7.64,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_consumer.cs"
         },
         {
           "task": "masstransit_statemachine",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 9.27,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_statemachine.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 13.67,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_statemachine.cs"
         },
         {
           "task": "masstransit_test_harness",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 3.58,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_test_harness.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 9.65,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_test_harness.cs"
         },
         {
           "task": "blazor_interactive_component",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 3.05,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_interactive_component.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 5.09,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_interactive_component.cs"
         },
         {
           "task": "blazor_streaming_render",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 3.11,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_streaming_render.cs"
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 5.46,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_streaming_render.cs"
         },
         {
           "task": "blazor_state_persistence",
@@ -403,8 +153,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.3,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_state_persistence.cs"
+          "generation_time_s": 4.94,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_state_persistence.cs"
         },
         {
           "task": "xunit_v3_test_generation",
@@ -415,20 +165,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 70.56,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_v3_test_generation.cs"
+          "generation_time_s": 47.71,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_v3_test_generation.cs"
         },
         {
           "task": "xunit_awesome_nsubstitute",
           "category": "xunit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 6.77,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_awesome_nsubstitute.cs"
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 17.3,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_awesome_nsubstitute.cs"
         },
         {
           "task": "xunit_assembly_fixture",
@@ -439,32 +189,32 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 4.5,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_assembly_fixture.cs"
+          "generation_time_s": 7.9,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_assembly_fixture.cs"
         },
         {
           "task": "linq_complex_query",
           "category": "linq",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 4.98,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\linq_complex_query.cs"
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 4.95,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
           "category": "linq",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 2.91,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\async_cancellation.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 5.55,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\async_cancellation.cs"
         },
         {
           "task": "vertical_order_api",
@@ -475,8 +225,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 38.62,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_order_api.cs"
+          "generation_time_s": 54.57,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\vertical_order_api.cs"
         },
         {
           "task": "vertical_saga_workflow",
@@ -487,23 +237,23 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 70.42,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_saga_workflow.cs"
+          "generation_time_s": 27.55,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\vertical_saga_workflow.cs"
         },
         {
           "task": "vertical_blazor_crud",
           "category": "vertical",
           "weight": 2,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 150.06,
-          "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_blazor_crud.cs"
+          "build_success": true,
+          "tests_passed": 7,
+          "tests_total": 7,
+          "generation_time_s": 33.54,
+          "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\vertical_blazor_crud.cs"
         }
       ],
-      "layer3_weighted_score": 0.0
+      "layer3_weighted_score": 0.6521739130434783
     }
   ]
 }

@@ -19,10 +19,18 @@ prompt: |
      - Fetches batches starting from 0, incrementing
      - Stops when a batch returns empty
      - Yields each item from each batch
-     - Checks ct.IsCancellationRequested between batches (throw if cancelled)
+     - Checks ct.IsCancellationRequested between batches (yield break if cancelled — do NOT throw)
      - Uses ConfigureAwait(false) on awaits
 
-  Include the necessary using statements (System.Runtime.CompilerServices for EnumeratorCancellation).
+  Include only the using statement for System.Runtime.CompilerServices (for EnumeratorCancellation). Do NOT add other using statements — the project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  Do NOT wrap code in a namespace.
+
+  IMPORTANT: The cancellation check (ct.IsCancellationRequested) must happen BEFORE calling FetchBatchAsync for each batch, not after. The loop structure should be:
+  1. Check cancellation → yield break if cancelled (do NOT throw OperationCanceledException)
+  2. Fetch batch
+  3. Break if empty
+  4. Yield items
+  This ensures that if cancellation is requested while yielding items from batch N, batch N+1 is never fetched and enumeration stops gracefully.
 
   Return only valid C# code in a single file.
 test_code: |

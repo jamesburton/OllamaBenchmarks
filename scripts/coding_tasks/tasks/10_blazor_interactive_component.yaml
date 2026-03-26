@@ -15,17 +15,21 @@ prompt: |
   1. A `CounterBase` class inheriting from `Microsoft.AspNetCore.Components.ComponentBase`
   2. A `[Parameter] public int InitialCount { get; set; }` property
   3. A `[Parameter] public EventCallback<int> OnCountChanged { get; set; }` property
-  4. A private `currentCount` field that is initialized to InitialCount in OnInitialized
-  5. An `IncrementCount` method that increments currentCount and invokes OnCountChanged with the new value
-  6. A public `CurrentCount` property that returns currentCount (for test access)
+  4. A private `currentCount` field that is initialized to InitialCount in `OnInitialized`
+  5. A public `IncrementCount` method that increments `currentCount` and invokes `OnCountChanged` with the new value
+  6. A public `CurrentCount` read-only property (getter only) that returns `currentCount` (for test access)
 
-  The class should be public. Make IncrementCount public so it can be called from tests.
+  IMPORTANT constraints:
+  - The class must be `public class CounterBase` — NOT abstract, NOT sealed.
+  - Do NOT place the class in a namespace — put it in the global namespace.
+  - `IncrementCount` must return `async Task` (not void) since it awaits `OnCountChanged.InvokeAsync(currentCount)`.
+  - Include `using Microsoft.AspNetCore.Components;` at the top of the file.
   Return only valid C# code in a single file.
 test_code: |
   using Bunit;
   using Microsoft.AspNetCore.Components;
 
-  public class CounterTests : TestContext
+  public class CounterTests : Bunit.TestContext
   {
       [Fact]
       public void Counter_StartsAtInitialCount()

@@ -27,6 +27,7 @@
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
     "qwen3.5:35b-a3b-q2_k_l",
+    "RogerBen/qwen3.5-35b-opus-distill",
     "rnj-1:8b",
     "zac/phi4-tools"
   ],
@@ -39,6 +40,7 @@
     "ministral-3:14b",
     "phi4-mini",
     "qwen3.5",
+    "RogerBen/qwen3.5-35b-opus-distill",
     "rnj-1:8b",
     "zac/phi4-tools"
   ],
@@ -68,6 +70,7 @@
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
     "qwen3.5:35b-a3b-q2_k_l",
+    "RogerBen/qwen3.5-35b-opus-distill",
     "rnj-1:8b",
     "zac/phi4-tools",
     "codellama:70b",

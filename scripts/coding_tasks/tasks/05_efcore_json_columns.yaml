@@ -12,15 +12,19 @@ prompt: |
 
   Generate a single C# file containing:
 
-  1. An `Address` complex type class with properties: string Street, string City, string PostCode
-  2. A `Company` entity class with properties: int Id, string Name, Address HeadquartersAddress
-  3. A `CompanyDbContext` class inheriting DbContext with DbSet<Company>.
+  1. An `Address` class with public get/set properties: string Street, string City, string PostCode.
+     Do NOT use the [ComplexType] attribute or [Owned] attribute on Address.
+  2. A `Company` entity class with public get/set properties: int Id, string Name, Address HeadquartersAddress
+  3. A `CompanyDbContext` class inheriting DbContext with a `DbSet<Company> Companies` property.
      Include a constructor accepting DbContextOptions<CompanyDbContext>.
-     In OnModelCreating, configure HeadquartersAddress as a JSON column.
+     In OnModelCreating, configure HeadquartersAddress as an owned JSON column using:
+     `builder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });`
   4. A static class `CompanyQueries` with a static method
      `FindCompaniesByCity(CompanyDbContext db, string city)` that queries
      companies where HeadquartersAddress.City matches the given city parameter.
-     Return a List<Company>.
+     Return a `List<Company>`.
+
+  Important: Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
 
   Return only valid C# code in a single file.
 test_code: |

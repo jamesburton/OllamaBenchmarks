@@ -23,6 +23,65 @@ from coding_tasks.task_runner import (
     setup_template_cache,
 )
 from coding_tasks.code_extractor import extract_csharp
+from coding_tasks.task_runner import sampling_options
+
+
+# ---------------------------------------------------------------------------
+# Completion-mode generation (fill-in-the-middle for MultiPL-E)
+# ---------------------------------------------------------------------------
+
+def _call_ollama_complete(
+    model: str,
+    prompt: str,
+    max_tokens: int = 2048,
+    num_ctx: int = 4096,
+    seed: int = 42,
+    timeout: int = 120,
+    stop_tokens: list[str] | None = None,
+) -> str:
+    """Use /api/generate (completion mode) for fill-in-the-middle generation.
+
+    Unlike call_ollama (chat mode), this sends the prompt as a raw prefix and
+    the model continues from where the prompt left off, without repeating it.
+    """
+    import re
+    import urllib.request
+
+    options = sampling_options(model)
+    payload: dict = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        "raw": True,
+        "options": {
+            "num_predict": max_tokens,
+            "num_ctx": num_ctx,
+            "temperature": options["temperature"],
+            "top_p": options["top_p"],
+            "seed": seed,
+        },
+    }
+    if stop_tokens:
+        payload["options"]["stop"] = stop_tokens
+
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        "http://127.0.0.1:11434/api/generate",
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+        content = body.get("response", "")
+        # Strip thinking tags if present
+        if "<think>" in content:
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+        return content
+    except (urllib.error.URLError, OSError, TimeoutError) as exc:
+        print(f"    [complete] Error: {type(exc).__name__}: {exc}")
+        return ""
 
 
 # ---------------------------------------------------------------------------
@@ -91,26 +150,29 @@ def run_problem(
     """
     prompt: str = problem.get("prompt", "")
     tests: str = problem.get("tests", "")
+    stop_tokens: list[str] = problem.get("stop_tokens") or ["\n    }\n"]
 
-    # 1. Generate code
-    raw_response = call_ollama(
+    # 1. Generate code using completion mode (fill-in-the-middle)
+    raw_response = _call_ollama_complete(
         model,
         prompt,
         max_tokens=2048,
         num_ctx=4096,
         seed=42,
-        timeout=60,
+        timeout=120,
+        stop_tokens=stop_tokens,
     )
 
     if not raw_response:
         return False, "Ollama returned empty response"
 
-    generated = extract_csharp(raw_response)
-    if not generated:
-        # Fall back to raw response — the model may have replied without fences
-        generated = raw_response.strip()
+    # For completion mode, the response IS the function body — no extraction needed.
+    # Only strip markdown fences if the model wrapped it.
+    generated = raw_response
+    if "```" in generated:
+        generated = extract_csharp(generated) or raw_response.strip()
 
-    # 2. Build Program.cs: generated code + tests + PASS sentinel
+    # 2. Build Program.cs: prompt + completion + tests (fill-in-the-middle)
     program_cs = _build_program_cs(prompt, generated, tests)
 
     # 3. Copy template to a temp dir
@@ -154,28 +216,60 @@ def run_problem(
 def _build_program_cs(prompt: str, generated_code: str, tests: str) -> str:
     """Assemble a standalone Program.cs from generated code + test assertions.
 
+    MultiPL-E datasets use a fill-in-the-middle format where:
+    - ``prompt`` is the start of the C# file (usings, class, method signature)
+    - the model generates the function body (the completion)
+    - ``tests`` closes the method and provides Main with Debug.Assert calls
+
     Strategy:
-    - If generated_code already contains a top-level class / namespace, use it
-      as-is and append tests in a static Main.
-    - Otherwise wrap everything in a minimal top-level-statements file.
+    1. If the generated code already contains the class/using structure from the
+       prompt, treat it as a standalone file and append tests via _wrap_tests_in_main.
+    2. If tests already contain a Main method (MultiPL-E native format), use the
+       fill-in-the-middle assembly: prompt + completion + tests + PASS sentinel.
+    3. Otherwise fall back to wrapping generated code with tests.
     """
     # Normalise line endings
     generated_code = generated_code.replace("\r\n", "\n").strip()
     tests = tests.replace("\r\n", "\n").strip()
+    prompt = prompt.replace("\r\n", "\n").rstrip()
 
-    # Check whether the generated code already has a class wrapper
+    # Detect if tests already contain a Main entry point (MultiPL-E native format)
+    tests_have_main = "static void Main" in tests or "public static void Main" in tests
+
+    # Check whether the generated code already has the class/using wrapper
     has_class = any(
         tok in generated_code
         for tok in ("class ", "namespace ", "using ")
     )
 
-    if has_class:
-        # Append a Main that runs the test assertions then prints PASS
+    if tests_have_main and not has_class:
+        # MultiPL-E fill-in-the-middle: prompt + completion + tests
+        # The tests already close Main(} and class(}).
+        # Inject PASS sentinel just before the final two closing braces.
+        tests_with_pass = _inject_pass_sentinel(tests)
         program = (
-            generated_code
-            + "\n\n"
-            + _wrap_tests_in_main(tests)
+            prompt
+            + "\n"
+            + generated_code
+            + "\n"
+            + tests_with_pass
         )
+    elif has_class:
+        if tests_have_main:
+            # Model repeated the full structure; concatenate with PASS
+            tests_with_pass = _inject_pass_sentinel(tests)
+            program = (
+                generated_code
+                + "\n"
+                + tests_with_pass
+            )
+        else:
+            # Standalone generated code + separate test assertions
+            program = (
+                generated_code
+                + "\n\n"
+                + _wrap_tests_in_main(tests)
+            )
     else:
         # Wrap everything: generated code is the function body, tests run inline
         program = (
@@ -183,10 +277,28 @@ def _build_program_cs(prompt: str, generated_code: str, tests: str) -> str:
             + generated_code
             + "\n\n"
             + tests
-            + "\n\nConsole.WriteLine(\"PASS\");\n"
+            + '\n\nConsole.WriteLine("PASS");\n'
         )
 
     return program
+
+
+def _inject_pass_sentinel(tests: str) -> str:
+    """Inject a PASS print statement before the final closing braces in MultiPL-E tests.
+
+    MultiPL-E tests end with ``}\\n\\n}\\n`` (closing Main, then closing class).
+    We insert a Console.WriteLine("PASS") just before the Main closing brace.
+    """
+    # Find the last assertion line and insert PASS after it
+    lines = tests.rstrip().splitlines()
+    # Walk backwards to find the pattern: '}' (close Main), '', '}' (close class)
+    insert_idx = len(lines)
+    for i in range(len(lines) - 1, -1, -1):
+        if lines[i].strip().startswith("Debug.Assert") or lines[i].strip().startswith("//"):
+            insert_idx = i + 1
+            break
+    lines.insert(insert_idx, '    System.Console.WriteLine("PASS");')
+    return "\n".join(lines) + "\n"
 
 
 def _wrap_tests_in_main(tests: str) -> str:

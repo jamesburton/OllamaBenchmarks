@@ -24,6 +24,12 @@ prompt: |
      - FirstCounterTests with a [Fact] that calls IncrementAndGet() and asserts the result is > 0
      - SecondCounterTests with a [Fact] that uses TestContext.Current.GetFixture<SharedCounter>() instead of constructor injection, calls IncrementAndGet() and asserts the result is > 0
 
+  IMPORTANT constraints:
+  - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute. The only using you may need is `using System.Threading;` for Interlocked.
+  - Do NOT use `Xunit.Abstractions` — it does not exist in xUnit v3. Use `Xunit` namespace only.
+  - Do NOT wrap code in a namespace.
+  - The `[assembly: AssemblyFixture(typeof(SharedCounter))]` attribute MUST appear at the very top of the file, BEFORE any class or record declarations.
+
   Return only valid C# code in a single file.
 test_code: |
   public class SharedCounterMetaTests
