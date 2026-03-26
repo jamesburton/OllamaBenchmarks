@@ -1,5 +1,6 @@
 using System;
-using System.Data.Entity;
+using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,21 +15,25 @@ public class Product
 
 public class ProductDbContext : DbContext
 {
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
-
     public DbSet<Product> Products { get; set; }
+
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
+    {
+    }
 }
 
 public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        var affectedRows = await db.Products
-            .Where(p => p.Category == category)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(p => p.Price, p => p.Price * (1 - discountPct))
-                .SetProperty(p => p.LastModified, DateTime.UtcNow));
+        var products = await db.Products.Where(p => p.Category == category).ToListAsync();
 
-        return affectedRows;
+        foreach (var product in products)
+        {
+            product.Price *= (1 - discountPct);
+            product.LastModified = DateTime.UtcNow;
+        }
+
+        return await db.SaveChangesAsync();
     }
 }

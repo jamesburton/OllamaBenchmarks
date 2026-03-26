@@ -1,50 +1,43 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Data.EntityCore;
 
-namespace YourNamespace
+public class Address
 {
-    [ComplexType]
-    public class Address
+    public string Street { get; set; }
+    public string City { get; set; }
+    public string PostCode { get; set; }
+}
+
+public class Company
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public Address HeadquartersAddress { get; set; }
+}
+
+public class CompanyDbContext : DbContext
+{
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
     {
-        public string Street { get; set; }
-        public string City { get; set; }
-        public string PostCode { get; set; }
     }
 
-    public class Company
+    public DbSet<Company> Companies { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public Address HeadquartersAddress { get; set; }
+        builder.Entity<Company>()
+            .OwnsOne(c => c.HeadquartersAddress, b =>
+            {
+                b.ToJson();
+            });
     }
+}
 
-    public class CompanyDbContext : DbContext
+public static class CompanyQueries
+{
+    public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
-
-        public DbSet<Company> Companies { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            builder.Entity<Company>()
-                .Property(c => c.HeadquartersAddress)
-                .HasJsonConversion();
-        }
-    }
-
-    public static class CompanyQueries
-    {
-        public static async Task<List<Company>> FindCompaniesByCity(CompanyDbContext db, string city)
-        {
-            return await db.Companies
-                .Where(c => c.HeadquartersAddress?.City == city)
-                .ToListAsync();
-        }
+        return db.Companies.Where(c => c.HeadquartersAddress?.City == city).ToList();
     }
 }

@@ -1,7 +1,3 @@
-using NSubstitute;
-using AwesomeAssertions;
-using Xunit;
-
 public interface IUserRepository
 {
     Task<User?> GetByIdAsync(int id);
@@ -33,25 +29,26 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 public class NotificationServiceTests
 {
     [Fact]
-    public async Task NotifyUserAsync_HappyPath_SendsEmailWithCorrectAddress()
+    public async Task NotifyUserAsync_UserFound_SendsEmail()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
         var email = Substitute.For<IEmailService>();
 
-        var user = new User { Id = 1, Name = "John", Email = "john@example.com" };
-        repo.GetByIdAsync(1).Returns(user);
+        var expectedUser = new User { Id = 1, Name = "John", Email = "john@example.com" };
+        repo.GetByIdAsync(1).Returns(expectedUser);
+
+        var sut = new NotificationService(repo, email);
 
         // Act
-        var service = new NotificationService(repo, email);
-        await service.NotifyUserAsync(1);
+        await sut.NotifyUserAsync(1);
 
         // Assert
         await email.Received().SendWelcomeAsync("john@example.com");
     }
 
     [Fact]
-    public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
+    public async Task NotifyUserAsync_UserNotFound_ThrowsException()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
@@ -59,10 +56,12 @@ public class NotificationServiceTests
 
         repo.GetByIdAsync(1).Returns((User?)null);
 
-        // Act & Assert
-        var service = new NotificationService(repo, email);
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => service.NotifyUserAsync(1)
-        );
+        var sut = new NotificationService(repo, email);
+
+        // Act
+        var act = async () => await sut.NotifyUserAsync(1);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>();
     }
 }

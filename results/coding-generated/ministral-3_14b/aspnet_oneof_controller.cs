@@ -2,7 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using OneOf;
 using OneOf.AspNetCore;
 
-namespace YourNamespace.Controllers;
+public record NotFound;
+public record ValidationError(string Message);
+
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+}
+
+public interface IUserService
+{
+    Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
+}
 
 [ApiController]
 [Route("api/users")]
@@ -16,28 +29,13 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> Get(int id)
     {
         var result = await _userService.GetByIdAsync(id);
-
         return result.Match<IActionResult>(
             user => Ok(user),
             _ => NotFound(),
-            error => BadRequest(error.Message)
+            err => BadRequest(err.Message)
         );
     }
 }
-
-public interface IUserService
-{
-    Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
-}
-
-[GenerateOneOf]
-public partial class GetUserResult : OneOf<User, NotFound, ValidationError> { }
-
-public record User(int Id, string Name, string Email);
-
-public record NotFound();
-
-public record ValidationError(string Message);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.DateOnly;
 
 public record Sale(
     string Product,
@@ -23,10 +24,10 @@ public static class SalesAnalyzer
         return sales
             .GroupBy(s => s.Category)
             .Select(g => new CategorySummary(
-                g.Key,
-                g.Sum(s => s.Amount),
-                g.Average(s => s.Amount),
-                g.Count()
+                Category: g.Key,
+                TotalAmount: g.Sum(s => s.Amount),
+                AverageAmount: g.Average(s => s.Amount),
+                Count: g.Count()
             ))
             .OrderByDescending(c => c.TotalAmount)
             .ToList();

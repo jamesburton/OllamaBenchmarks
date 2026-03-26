@@ -1,8 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 public class Address
 {
     public string Street { get; set; }
@@ -25,15 +20,10 @@ public class CompanyDbContext : DbContext
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.Entity<Company>()
-            .OwnsOne(c => c.HeadquartersAddress, a =>
-            {
-                a.Property(p => p.Street).HasColumnType("nvarchar(max)");
-                a.Property(p => p.City).HasColumnType("nvarchar(max)");
-                a.Property(p => p.PostCode).HasColumnType("nvarchar(max)");
-            });
+        builder.Entity<Company>()
+            .OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
     }
 }
 

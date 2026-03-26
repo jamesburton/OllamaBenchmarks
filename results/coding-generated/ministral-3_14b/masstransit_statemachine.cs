@@ -1,9 +1,10 @@
-using MassTransit;
-using System;
+global using Contracts;
 
-public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
-public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
-public record OrderCompleted(Guid OrderId);
+namespace Contracts;
+
+file record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+file record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+file record OrderCompleted(Guid OrderId);
 
 public class OrderState : SagaStateMachineInstance
 {
@@ -27,29 +28,28 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     {
         InstanceState(x => x.CurrentState);
 
-        Event(() => OrderSubmitted, x => x.CorrelateById(context => context.Message.OrderId));
-        Event(() => OrderAccepted, x => x.CorrelateById(context => context.Message.OrderId));
-        Event(() => OrderCompleted, x => x.CorrelateById(context => context.Message.OrderId));
+        Event(() => OrderSubmitted,
+            x => x.CorrelateById(m => m.Message.OrderId)
+                .Then(context => { context.Saga.OrderDate = context.Message.OrderDate; }));
+
+        Event(() => OrderAccepted,
+            x => x.CorrelateById(m => m.Message.OrderId)
+                .Then(context => { context.Saga.AcceptedAt = context.Message.AcceptedAt; }));
+
+        Event(() => OrderCompleted,
+            x => x.CorrelateById(m => m.Message.OrderId));
 
         Initially(
             When(OrderSubmitted)
-                .Then(context =>
-                {
-                    context.Instance.OrderDate = context.Message.OrderDate;
-                })
                 .TransitionTo(Submitted));
 
         During(Submitted,
             When(OrderAccepted)
-                .Then(context =>
-                {
-                    context.Instance.AcceptedAt = context.Message.AcceptedAt;
-                })
                 .TransitionTo(Accepted));
 
         During(Accepted,
             When(OrderCompleted)
-                .TransitionTo(Completed));
+                .Finalize());
 
         SetCompletedWhenFinalized();
     }

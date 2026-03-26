@@ -1,13 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using NSubstitute;
-using Xunit;
-using Bunit;
-using FluentAssertions;
-using FluentAssertions.Execution;
 
 public record TodoItem(int Id, string Title, bool IsCompleted);
 
@@ -50,13 +41,13 @@ public class TodoService : ITodoService
 
 public class TodoListBase : ComponentBase
 {
-    [Inject] public ITodoService TodoService { get; set; } = default!;
+    [Inject] public ITodoService TodoService { get; set; }
     public List<TodoItem> Todos { get; set; } = new();
     public string NewTitle { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
-        Todos = (await TodoService.GetAllAsync()) ?? new();
+        Todos = (await TodoService.GetAllAsync()).ToList();
     }
 
     public async Task AddTodo()
@@ -65,66 +56,55 @@ public class TodoListBase : ComponentBase
         {
             await TodoService.AddAsync(NewTitle);
             NewTitle = "";
-            Todos = (await TodoService.GetAllAsync()) ?? new();
+            Todos = (await TodoService.GetAllAsync()).ToList();
         }
     }
 
     public async Task DeleteTodo(int id)
     {
         await TodoService.DeleteAsync(id);
-        Todos = (await TodoService.GetAllAsync()) ?? new();
+        Todos = (await TodoService.GetAllAsync()).ToList();
     }
 
     public async Task ToggleTodo(int id)
     {
         await TodoService.ToggleAsync(id);
-        Todos = (await TodoService.GetAllAsync()) ?? new();
+        Todos = (await TodoService.GetAllAsync()).ToList();
     }
 }
 
 public class TodoServiceTests
 {
-    private readonly TodoService _service = new();
-
     [Fact]
     public async Task AddAsync_CreatesItemWithCorrectTitle()
     {
-        // Act
-        var result = await _service.AddAsync("Test Todo");
+        var service = new TodoService();
+        var todo = await service.AddAsync("Test Title");
 
-        // Assert
-        result.Should().NotBeNull();
-        result.Title.Should().Be("Test Todo");
-        result.IsCompleted.Should().BeFalse();
+        todo.Should().NotBeNull();
+        todo.Title.Should().Be("Test Title");
+        todo.IsCompleted.Should().BeFalse();
     }
 
     [Fact]
     public async Task DeleteAsync_RemovesItem()
     {
-        // Arrange
-        var todo = await _service.AddAsync("Todo to delete");
+        var service = new TodoService();
+        var todo = await service.AddAsync("Test Title");
+        await service.DeleteAsync(todo.Id);
 
-        // Act
-        await _service.DeleteAsync(todo.Id);
-
-        // Assert
-        var allTodos = await _service.GetAllAsync();
-        allTodos.Should().NotContain(t => t.Id == todo.Id);
+        (await service.GetAllAsync()).Should().BeEmpty();
     }
 
     [Fact]
     public async Task ToggleAsync_FlipsIsCompleted()
     {
-        // Arrange
-        var todo = await _service.AddAsync("Toggleable Todo");
+        var service = new TodoService();
+        var todo = await service.AddAsync("Test Title");
         todo.IsCompleted.Should().BeFalse();
 
-        // Act
-        await _service.ToggleAsync(todo.Id);
-
-        // Assert
-        var updatedTodo = (await _service.GetAllAsync()).First(t => t.Id == todo.Id);
-        updatedTodo.IsCompleted.Should().BeTrue();
+        await service.ToggleAsync(todo.Id);
+        (await service.GetAllAsync()).First().IsCompleted.Should().BeTrue();
     }
 }
 
@@ -133,42 +113,13 @@ public class TodoListBaseTests
     [Fact]
     public async Task OnInitializedAsync_CallsGetAllAsync()
     {
-        // Arrange
-        var ctx = new TestContext();
+        var ctx = Bunit.TestContext.Create();
         var service = Substitute.For<ITodoService>();
         service.GetAllAsync().Returns(new List<TodoItem> { new(1, "Test", false) });
 
-        var cut = ctx.RenderComponent<TodoListBase>(p =>
-            p.Add(x => x.TodoService, service));
+        var cut = ctx.RenderComponent<TodoListBase>(p => p.Add(x => x.TodoService, service));
 
-        // Act
-        await cut.WaitForNextRender();
-
-        // Assert
-        await service.Received(1).GetAllAsync();
-        cut.Instance.Todos.Should().HaveCount(1);
-    }
-
-    [Fact]
-    public async Task AddTodo_CallsAddAsyncAndReloadsList()
-    {
-        // Arrange
-        var ctx = new TestContext();
-        var service = Substitute.For<ITodoService>();
-        service.GetAllAsync().Returns(new List<TodoItem>());
-        service.AddAsync(Arg.Any<string>()).Returns(new TodoItem(1, "New Todo", false));
-
-        var cut = ctx.RenderComponent<TodoListBase>(p =>
-            p.Add(x => x.TodoService, service));
-
-        cut.Instance.NewTitle = "New Todo";
-
-        // Act
-        await cut.Instance.AddTodo();
-
-        // Assert
-        await service.Received(1).AddAsync("New Todo");
-        await service.Received(2).GetAllAsync();
-        cut.Instance.NewTitle.Should().BeEmpty();
+        await cut.WaitForAssert(() => cut.Instance.Todos.Should().NotBeEmpty());
+        await cut.WaitForAssert(() => service.Received(1).GetAllAsync());
     }
 }

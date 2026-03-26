@@ -1,7 +1,3 @@
-using xunit.v3;
-using NSubstitute;
-using AwesomeAssertions;
-
 public interface IUserRepository
 {
     Task<User?> GetByIdAsync(int id);
@@ -33,14 +29,14 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 public class NotificationServiceTests
 {
     [Fact]
-    public async Task TestNotifyUserAsync_HappyPath()
+    public async Task NotifyUserAsync_HappyPath_UserFoundAndEmailSent()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
         var email = Substitute.For<IEmailService>();
         var service = new NotificationService(repo, email);
 
-        var user = new User { Id = 1, Name = "Test", Email = "test@example.com" };
+        var user = new User { Id = 1, Email = "test@example.com" };
         repo.GetByIdAsync(1).Returns(user);
 
         // Act
@@ -48,11 +44,11 @@ public class NotificationServiceTests
 
         // Assert
         await email.Received().SendWelcomeAsync("test@example.com");
-        repo.Received().GetByIdAsync(1);
+        await repo.Received().GetByIdAsync(1);
     }
 
     [Fact]
-    public async Task TestNotifyUserAsync_UserNotFound()
+    public async Task NotifyUserAsync_UserNotFound_ThrowsException()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
@@ -61,9 +57,10 @@ public class NotificationServiceTests
 
         repo.GetByIdAsync(2).Returns((User?)null);
 
-        // Act & Assert
-        var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => service.NotifyUserAsync(2));
-        ex.Message.Should().Be("User not found");
-        await email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+        // Act
+        var act = async () => await service.NotifyUserAsync(2);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>();
     }
 }

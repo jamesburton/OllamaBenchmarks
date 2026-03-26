@@ -8,6 +8,9 @@ public interface IOrderRepository
 
 public class OrderRepository : IOrderRepository
 {
+    public OrderRepository()
+    {
+    }
 }
 
 public interface IOrderService
@@ -16,6 +19,9 @@ public interface IOrderService
 
 public class OrderService : IOrderService
 {
+    public OrderService()
+    {
+    }
 }
 
 public interface IEmailNotifier
@@ -24,6 +30,9 @@ public interface IEmailNotifier
 
 public class EmailNotifier : IEmailNotifier
 {
+    public EmailNotifier()
+    {
+    }
 }
 
 public class OrderSettings

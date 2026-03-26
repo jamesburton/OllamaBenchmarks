@@ -1,6 +1,4 @@
-using System.Threading.Tasks;
-using Xunit;
-using Xunit.Sdk;
+using System.Threading;
 
 public class SharedCounter : IAsyncLifetime
 {
@@ -19,11 +17,9 @@ public class SharedCounter : IAsyncLifetime
 
     public int IncrementAndGet()
     {
-        return System.Threading.Interlocked.Increment(ref _counter);
+        return Interlocked.Increment(ref _counter);
     }
 }
-
-[assembly: AssemblyFixture(typeof(SharedCounter))]
 
 public class FirstCounterTests
 {

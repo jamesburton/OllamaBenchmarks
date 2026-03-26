@@ -1,42 +1,42 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 
-namespace DataProcessingNamespace
+public interface IDataSource
 {
-    public interface IDataSource
-    {
-        Task<IReadOnlyList<string>> FetchBatchAsync(int batchNumber, CancellationToken ct);
-    }
+    Task<IReadOnlyList<string>> FetchBatchAsync(int batchNumber, CancellationToken ct);
+}
 
-    public class DataProcessor
+public class DataProcessor
+{
+    public async IAsyncEnumerable<string> ProcessAllBatchesAsync(IDataSource source,
+        [EnumeratorCancellation]CancellationToken ct = default)
     {
-        public async IAsyncEnumerable<string> ProcessAllBatchesAsync(IDataSource source,
-            [EnumeratorCancellation] CancellationToken ct = default)
+        int batchNumber = 0;
+        while (!ct.IsCancellationRequested)
         {
-            int batchNumber = 0;
-            while (true)
+            try
             {
                 var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
-                if (batch == null || batch.Count == 0)
+                if (batch == null || !batch.Any())
                 {
-                    break;
+                    yield break;
                 }
 
                 foreach (var item in batch)
                 {
-                    if (ct.IsCancellationRequested)
-                    {
-                        throw new OperationCanceledException(ct);
-                    }
                     yield return item;
                 }
-
-                batchNumber++;
             }
+            catch (OperationCanceledException)
+            {
+                // This block is technically unnecessary due to the cancellation check before fetching
+                // but included for completeness as per your instructions.
+            }
+            finally
+            {
+                ct.ThrowIfCancellationRequested();
+            }
+
+            batchNumber++;
         }
     }
 }

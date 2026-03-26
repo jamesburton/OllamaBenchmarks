@@ -1,45 +1,31 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
 
-var services = ServiceCollectionExtensions.AddServices(services);
-var app = WebApplication.CreateBuilder(args).Build();
-
-app.MapOrderEndpoints();
-
-app.Run();
-
-public static class ServiceCollectionExtensions
+public class CreateOrderRequest
 {
-    public static IServiceCollection AddServices(this IServiceCollection services)
-    {
-        services.AddScoped<IOrderService, OrderService>();
-        return services;
-    }
+    [Required]
+    public string Name { get; set; }
+
+    [Range(0.01, 10000, ErrorMessage = "Price must be between 0.01 and 10000")]
+    public decimal Price { get; set; }
+
+    [Range(1, 999, ErrorMessage = "Quantity must be between 1 and 999")]
+    public int Quantity { get; set; }
 }
 
-public record CreateOrderRequest(
-    [Required] string Name,
-    [Range(0.01m, 10000m)] decimal Price,
-    [Range(1, 999)] int Quantity);
-
-public interface IOrderService
+public class OrderService
 {
-    CreateOrderRequest CreateOrder(CreateOrderRequest request);
-}
-
-public class OrderService : IOrderService
-{
-    public CreateOrderRequest CreateOrder(CreateOrderRequest request)
+    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
+        var validationContext = new ValidationContext(request);
+        var validationResults = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, true);
+
+        if (!isValid)
+        {
+            var firstError = validationResults[0];
+            throw new ArgumentException(firstError.ErrorMessage, nameof(request));
+        }
+
         return request;
-    }
-}
-
-public static class OrderEndpoints
-{
-    public static void MapOrderEndpoints(this WebApplication app)
-    {
-        app.MapPost("/api/orders", ([FromBody] CreateOrderRequest request, IOrderService orderService) =>
-            Results.Ok(orderService.CreateOrder(request)));
     }
 }

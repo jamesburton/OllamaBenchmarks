@@ -1,10 +1,9 @@
-using System;
 using MassTransit;
+global using Contracts;
 
-namespace MassTransitExample
+namespace Contracts
 {
     public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
-
     public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
 
     public class SubmitOrderConsumer : IConsumer<SubmitOrder>
@@ -18,8 +17,9 @@ namespace MassTransitExample
 
     public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
     {
-        public SubmitOrderConsumerDefinition() : base(4)
+        public SubmitOrderConsumerDefinition()
         {
+            ConcurrentMessageLimit = 4;
         }
 
         protected override void ConfigureConsumer(

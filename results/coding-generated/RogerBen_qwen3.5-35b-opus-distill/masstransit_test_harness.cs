@@ -1,53 +1,28 @@
 using MassTransit;
 using MassTransit.Testing;
-using Xunit;
-using Xunit.v3;
+using Microsoft.Extensions.DependencyInjection;
 
-public record ProcessPayment(Guid OrderId, decimal Amount);
-public record PaymentProcessed(Guid OrderId, string TransactionId);
-
-public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
+public class ProcessPaymentConsumerTests
 {
-    public async Task Consume(ConsumeContext<ProcessPayment> context)
-    {
-        await context.Publish(new PaymentProcessed(context.Message.OrderId, Guid.NewGuid().ToString()));
-    }
-}
-
-public class ProcessPaymentConsumerTests : IAsyncLifetime
-{
-    private ITestHarness _harness;
-    private IBus _bus;
-
-    public async ValueTask InitializeAsync()
-    {
-        var collection = new ServiceCollection();
-        collection.AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>());
-        var provider = collection.BuildServiceProvider();
-
-        _harness = provider.GetRequiredService<ITestHarness>();
-        _bus = _harness.Bus;
-
-        await _harness.Start();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _harness.Stop();
-    }
-
     [Fact]
     public async Task ProcessPayment_WhenCalled_ShouldPublishPaymentProcessed()
     {
-        var orderId = Guid.NewGuid();
-        var amount = 100.50m;
+        var services = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg => { cfg.AddConsumer<ProcessPaymentConsumer>(); })
+            .BuildServiceProvider(true);
 
-        await _bus.Publish(new ProcessPayment(orderId, amount));
+        var harness = services.GetRequiredService<ITestHarness>();
+        await harness.Start();
+
+        await harness.Bus.Publish(new ProcessPayment(Guid.NewGuid(), 100.00m));
+
+        var consumed = await harness.Consumed.Any<ProcessPayment>();
+        var published = await harness.Published.Any<PaymentProcessed>();
 
         Assert.Multiple(() =>
         {
-            Assert.True(await _harness.Consumed.Any<ProcessPayment>(), "ProcessPayment message should be consumed");
-            Assert.True(await _harness.Consumed.Any<PaymentProcessed>(), "PaymentProcessed event should be published");
+            Assert.True(consumed);
+            Assert.True(published);
         });
     }
 }

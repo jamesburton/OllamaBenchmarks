@@ -1,0 +1,52 @@
+{
+  "benchmark": "coding",
+  "scoring": {
+    "layer1_weight": 0.15,
+    "layer2_weight": 0.25,
+    "layer3_weight": 0.6,
+    "description": "EvalPlus HumanEval+ (Python) / MultiPL-E C# / Custom .NET 10 Suite"
+  },
+  "run_finished_at": "2026-03-26T05:44:28.804132+00:00",
+  "results": [
+    {
+      "rank": 1,
+      "model": "gemma3:12b",
+      "composite_score": 0.078261,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.13043478260869565
+    },
+    {
+      "rank": 2,
+      "model": "qwen3.5:9b",
+      "composite_score": 0.026087,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.043478260869565216
+    },
+    {
+      "rank": 3,
+      "model": "minicpm-v:8b",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    },
+    {
+      "rank": 4,
+      "model": "nemotron-cascade-2",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    },
+    {
+      "rank": 5,
+      "model": "qwen2.5vl:7b",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    }
+  ]
+}

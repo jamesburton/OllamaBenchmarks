@@ -72,14 +72,12 @@ public class ConsumerPipelineTests
 
         Assert.True(await harness.Consumed.Any<PlaceOrder>());
         Assert.True(await harness.Published.Any<OrderPlaced>());
-        Assert.True(await harness.Consumed.Any<OrderPlaced>());
         Assert.True(await harness.Published.Any<CustomerNotified>());
 
         // Verify the CustomerNotified message content
-        var notifiedMessages = await harness.Published.GetConsumedMessagesAsync<CustomerNotified>();
-        var notifiedMessage = notifiedMessages.FirstOrDefault();
-        Assert.NotNull(notifiedMessage);
-        Assert.Equal($"Order {orderId} confirmed for {customerName}", notifiedMessage.Context.Message.NotificationMessage);
+        var notifiedMessages = await harness.Published.GetMessages<CustomerNotified>();
+        Assert.Single(notifiedMessages);
+        Assert.Equal($"Order {orderId} confirmed for {customerName}", notifiedMessages.First().Context.Message.NotificationMessage);
 
         await harness.Stop();
     }

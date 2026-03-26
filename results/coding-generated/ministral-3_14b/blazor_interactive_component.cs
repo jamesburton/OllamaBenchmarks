@@ -10,8 +10,6 @@ public class CounterBase : ComponentBase
 
     private int currentCount;
 
-    public int CurrentCount => currentCount;
-
     protected override void OnInitialized()
     {
         currentCount = InitialCount;
@@ -22,4 +20,6 @@ public class CounterBase : ComponentBase
         currentCount++;
         await OnCountChanged.InvokeAsync(currentCount);
     }
+
+    public int CurrentCount => currentCount;
 }

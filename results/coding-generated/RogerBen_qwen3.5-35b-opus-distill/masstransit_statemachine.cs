@@ -1,12 +1,11 @@
-using System;
-using MassTransit;
+global using Contracts;
 
-// Event records
+namespace Contracts;
+
 public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
 public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
 public record OrderCompleted(Guid OrderId);
 
-// Saga state machine instance
 public class OrderState : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
@@ -15,7 +14,6 @@ public class OrderState : SagaStateMachineInstance
     public DateTime? AcceptedAt { get; set; }
 }
 
-// State machine
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
     public State Submitted { get; private set; }
@@ -28,34 +26,26 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     public OrderStateMachine()
     {
-        // Define states
-        Submitted = SetState("Submitted");
-        Accepted = SetState("Accepted");
-        Completed = SetState("Completed");
+        InstanceState(x => x.CurrentState);
 
-        // Define events
-        OrderSubmitted = Event<OrderSubmitted>();
-        OrderAccepted = Event<OrderAccepted>();
-        OrderCompleted = Event<OrderCompleted>();
+        OrderSubmitted = Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId));
+        OrderAccepted = Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId));
+        OrderCompleted = Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId));
 
-        // Configure initial state
         Initially(
             When(OrderSubmitted)
-                .Set(s => s.OrderDate = Context.Message.OrderDate)
+                .Then(context => { context.Saga.OrderDate = context.Message.OrderDate; })
                 .TransitionTo(Submitted));
 
-        // Configure Submitted state
         During(Submitted,
             When(OrderAccepted)
-                .Set(s => s.AcceptedAt = Context.Message.AcceptedAt)
+                .Then(context => { context.Saga.AcceptedAt = context.Message.AcceptedAt; })
                 .TransitionTo(Accepted));
 
-        // Configure Accepted state
         During(Accepted,
             When(OrderCompleted)
                 .Finalize());
 
-        // Set completed when finalized
         SetCompletedWhenFinalized();
     }
 }

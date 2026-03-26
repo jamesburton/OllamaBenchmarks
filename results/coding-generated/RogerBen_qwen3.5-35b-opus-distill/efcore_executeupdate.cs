@@ -1,7 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
-
 public class Product
 {
     public int Id { get; set; }
@@ -25,10 +21,18 @@ public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        return await db.Products
+        var products = await db.Products
             .Where(p => p.Category == category)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(p => p.Price, p => p.Price * (1 - discountPct))
-                .SetProperty(p => p.LastModified, DateTime.UtcNow));
+            .ToListAsync();
+
+        foreach (var product in products)
+        {
+            product.Price *= (1 - discountPct);
+            product.LastModified = DateTime.UtcNow;
+        }
+
+        await db.SaveChangesAsync();
+
+        return products.Count;
     }
 }

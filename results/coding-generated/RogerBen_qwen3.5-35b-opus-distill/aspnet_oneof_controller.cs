@@ -1,7 +1,5 @@
-using OneOf;
 using Microsoft.AspNetCore.Mvc;
-
-namespace UsersApi;
+using OneOf;
 
 // Service interface
 public interface IUserService
@@ -9,18 +7,21 @@ public interface IUserService
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
-// User record
-public record User(int Id, string Name, string Email);
+// User class (not record) - must support object initializer
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+}
 
-// NotFound record
-public record NotFound(string Message = "User not found");
+// NotFound record - parameterless constructor
+public record NotFound;
 
-// ValidationError record
+// ValidationError record - single string parameter
 public record ValidationError(string Message);
 
 // Controller
-[ApiController]
-[Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -30,15 +31,15 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetUser(int id)
+    [HttpGet("api/users/{id}")]
+    public async Task<IActionResult> Get(int id)
     {
         var result = await _userService.GetByIdAsync(id);
 
         return result.Match<IActionResult>(
-            user    => Ok(user),
-            notFound => NotFound(),
-            err     => BadRequest(err.Message)
+            user => Ok(user),
+            _ => NotFound(),
+            err => BadRequest(err.Message)
         );
     }
 }

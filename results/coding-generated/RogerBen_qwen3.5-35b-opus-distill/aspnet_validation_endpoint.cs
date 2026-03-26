@@ -1,38 +1,34 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc;
 
-// 1. CreateOrderRequest record with validation attributes
-public record CreateOrderRequest
+public class CreateOrderRequest
 {
     [Required]
-    public string Name { get; init; }
+    public string Name { get; set; }
 
     [Range(0.01, 10000)]
-    public decimal Price { get; init; }
+    public decimal Price { get; set; }
 
     [Range(1, 999)]
-    public int Quantity { get; init; }
+    public int Quantity { get; set; }
 }
 
-// 2. OrderService class
 public class OrderService
 {
-    public CreateOrderRequest CreateOrder(CreateOrderRequest request)
+    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        // Return the request as a confirmed order (simplified)
-        return request;
-    }
-}
+        var validationContext = new ValidationContext(request);
+        var validationResults = new List<ValidationResult>();
 
-// 3. OrderEndpoints static class
-public static class OrderEndpoints
-{
-    public static void MapOrderEndpoints(this WebApplication app)
-    {
-        app.MapPost("/api/orders", (CreateOrderRequest request, OrderService orderService) =>
+        if (!Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true))
         {
-            var order = orderService.CreateOrder(request);
-            return Results.Ok(order);
-        });
+            var firstError = validationResults.FirstOrDefault();
+            if (firstError != null)
+            {
+                throw new ArgumentException($"Validation failed: {firstError.ErrorMessage}");
+            }
+            throw new ArgumentException("Validation failed without specific error message.");
+        }
+
+        return request;
     }
 }

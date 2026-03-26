@@ -1,7 +1,8 @@
-using System;
-using System.Threading.Tasks;
+global using Contracts;
+
 using MassTransit;
-using MassTransit.Consumption;
+
+file-scoped namespace Contracts;
 
 public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
 

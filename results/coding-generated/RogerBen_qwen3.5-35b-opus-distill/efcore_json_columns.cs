@@ -1,8 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-
-[ComplexType]
 public class Address
 {
     public string Street { get; set; }
@@ -19,17 +14,16 @@ public class Company
 
 public class CompanyDbContext : DbContext
 {
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
+    public DbSet<Company> Companies { get; set; }
+
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
+        : base(options)
     {
     }
 
-    public DbSet<Company> Companies { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.Entity<Company>()
-            .Property(c => c.HeadquartersAddress)
-            .HasJsonConversion();
+        builder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
     }
 }
 

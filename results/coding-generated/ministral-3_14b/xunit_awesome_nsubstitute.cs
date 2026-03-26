@@ -1,9 +1,3 @@
-using Xunit;
-using NSubstitute;
-using AwesomeAssertions;
-using System;
-using System.Threading.Tasks;
-
 public interface IUserRepository
 {
     Task<User?> GetByIdAsync(int id);
@@ -34,52 +28,55 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 
 public class NotificationServiceTests
 {
-    private readonly IUserRepository _repo = Substitute.For<IUserRepository>();
-    private readonly IEmailService _email = Substitute.For<IEmailService>();
-    private readonly NotificationService _service;
-
-    public NotificationServiceTests()
-    {
-        _service = new NotificationService(_repo, _email);
-    }
-
     [Fact]
-    public async Task NotifyUserAsync_WhenUserFound_SendsWelcomeEmail()
+    public async Task NotifyUserAsync_SendsWelcomeEmail_WhenUserFound()
     {
         // Arrange
-        var user = new User { Id = 1, Email = "test@example.com" };
-        _repo.GetByIdAsync(1).Returns(user);
+        var repo = Substitute.For<IUserRepository>();
+        var email = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, email);
+
+        var testUser = new User { Id = 1, Email = "test@example.com" };
+        repo.GetByIdAsync(1).Returns(testUser);
 
         // Act
-        await _service.NotifyUserAsync(1);
+        await service.NotifyUserAsync(1);
 
         // Assert
-        await _email.Received(1).SendWelcomeAsync("test@example.com");
+        await email.Received(1).SendWelcomeAsync(testUser.Email);
     }
 
     [Fact]
-    public async Task NotifyUserAsync_WhenUserNotFound_ThrowsInvalidOperationException()
+    public async Task NotifyUserAsync_ThrowsInvalidOperationException_WhenUserNotFound()
     {
         // Arrange
-        _repo.GetByIdAsync(1).Returns((User?)null);
+        var repo = Substitute.For<IUserRepository>();
+        var email = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, email);
+
+        repo.GetByIdAsync(1).Returns((User?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.NotifyUserAsync(1))
-            .Should().HaveMessage("User not found");
+        await service.NotifyUserAsync(1)
+            .Should().ThrowAsync<InvalidOperationException>();
     }
 
     [Fact]
     public async Task NotifyUserAsync_VerifiesCorrectMethodCalls()
     {
         // Arrange
-        var user = new User { Id = 1, Email = "test@example.com" };
-        _repo.GetByIdAsync(1).Returns(user);
+        var repo = Substitute.For<IUserRepository>();
+        var email = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, email);
+
+        var testUser = new User { Id = 1, Email = "test@example.com" };
+        repo.GetByIdAsync(1).Returns(testUser);
 
         // Act
-        await _service.NotifyUserAsync(1);
+        await service.NotifyUserAsync(1);
 
         // Assert
-        await _repo.Received(1).GetByIdAsync(1);
-        await _email.Received(1).SendWelcomeAsync(Arg.Is<string>(email => email == "test@example.com"));
+        repo.Received(1).GetByIdAsync(1);
+        email.Received(1).SendWelcomeAsync(testUser.Email);
     }
 }

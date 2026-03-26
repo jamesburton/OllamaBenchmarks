@@ -1,7 +1,3 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-
 public class CounterBase : ComponentBase
 {
     [Parameter]
@@ -17,10 +13,10 @@ public class CounterBase : ComponentBase
         currentCount = InitialCount;
     }
 
-    public void IncrementCount()
+    public async Task IncrementCount()
     {
         currentCount++;
-        OnCountChanged.InvokeAsync(currentCount);
+        await OnCountChanged.InvokeAsync(currentCount);
     }
 
     public int CurrentCount => currentCount;

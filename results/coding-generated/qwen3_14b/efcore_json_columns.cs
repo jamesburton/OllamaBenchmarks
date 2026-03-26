@@ -1,7 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-
-[ComplexType]
 public class Address
 {
     public string Street { get; set; }
@@ -25,11 +21,14 @@ public class CompanyDbContext : DbContext
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.Entity<Company>()
-            .Property(c => c.HeadquartersAddress)
-            .HasJsonConversion();
+        base.OnModelCreating(builder);
+
+        builder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b =>
+        {
+            b.ToJson();
+        });
     }
 }
 

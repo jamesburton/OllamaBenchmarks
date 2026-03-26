@@ -1,32 +1,22 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+[Required]
+public string Name { get; set; }
 
-public record CreateOrderRequest(string Name, decimal Price, int Quantity);
+[Range(0.01m, 10000)]
+public decimal Price { get; set; }
+
+[Range(1, 999)]
+public int Quantity { get; set; }
+}
 
 public class OrderService
 {
-    public CreateOrderRequest CreateOrder(CreateOrderRequest request)
+    public Order CreateOrder(CreateOrderRequest request)
     {
-        // For simplicity, just return the request as confirmed order
-        return request;
-    }
-}
-
-public static class OrderEndpoints
-{
-    public static void MapOrderEndpoints(this WebApplication app)
-    {
-        app.MapPost("/api/orders", async (CreateOrderRequest request, IApplicationBuilder appBuilder) =>
+        if (!Validator.TryValidateObject(request, new ValidationContext(request), true))
         {
-            var orderService = appBuilder.ApplicationServices.GetRequiredService<OrderService>();
-            var confirmedOrder = orderService.CreateOrder(request);
+            throw new ArgumentException(Validator.Message);
+        }
 
-            // Return the confirmed order
-            return Results.Ok(confirmedOrder);
-        });
+        return request;
     }
 }

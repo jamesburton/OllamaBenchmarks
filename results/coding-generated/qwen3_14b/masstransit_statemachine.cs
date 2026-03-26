@@ -1,61 +1,55 @@
-using MassTransit;
-using System;
+global using Contracts;
 
-namespace MassTransitExample
+namespace Contracts;
+
+public class OrderState : SagaStateMachineInstance
 {
-    public class OrderState : SagaStateMachineInstance
+    public Guid CorrelationId { get; set; }
+    public string CurrentState { get; set; }
+    public DateTime OrderDate { get; set; }
+    public DateTime? AcceptedAt { get; set; }
+}
+
+record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+record OrderCompleted(Guid OrderId);
+
+public class OrderStateMachine : MassTransitStateMachine<OrderState>
+{
+    public State Submitted { get; private set; }
+    public State Accepted { get; private set; }
+    public State Completed { get; private set; }
+
+    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
+    public Event<OrderAccepted> OrderAccepted { get; private set; }
+    public Event<OrderCompleted> OrderCompleted { get; private set; }
+
+    public OrderStateMachine()
     {
-        public Guid CorrelationId { get; set; }
-        public string CurrentState { get; set; }
-        public DateTime OrderDate { get; set; }
-        public DateTime? AcceptedAt { get; set; }
-    }
+        InstanceState(x => x.CurrentState);
 
-    public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
-    public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
-    public record OrderCompleted(Guid OrderId);
+        OrderSubmitted = DefineEvent<OrderSubmitted>();
+        OrderAccepted = DefineEvent<OrderAccepted>();
+        OrderCompleted = DefineEvent<OrderCompleted>();
 
-    public class OrderStateMachine : MassTransitStateMachine<OrderState>
-    {
-        public State Submitted { get; private set; }
-        public State Accepted { get; private set; }
-        public State Completed { get; private set; }
+        OrderSubmitted.CorrelateById(context => context.Message.OrderId);
+        OrderAccepted.CorrelateById(context => context.Message.OrderId);
+        OrderCompleted.CorrelateById(context => context.Message.OrderId);
 
-        public Event<OrderSubmitted> OrderSubmitted { get; private set; }
-        public Event<OrderAccepted> OrderAccepted { get; private set; }
-        public Event<OrderCompleted> OrderCompleted { get; private set; }
+        Initially(
+            When(OrderSubmitted)
+                .Then(context => context.Saga.OrderDate = context.Message.OrderDate)
+                .TransitionTo(Submitted));
 
-        public OrderStateMachine()
-        {
-            Submitted = new State("Submitted");
-            Accepted = new State("Accepted");
-            Completed = new State("Completed");
+        During(Submitted,
+            When(OrderAccepted)
+                .Then(context => context.Saga.AcceptedAt = context.Message.AcceptedAt)
+                .TransitionTo(Accepted));
 
-            OrderSubmitted = new Event<OrderSubmitted>("OrderSubmitted");
-            OrderAccepted = new Event<OrderAccepted>("OrderAccepted");
-            OrderCompleted = new Event<OrderCompleted>("OrderCompleted");
+        During(Accepted,
+            When(OrderCompleted)
+                .Finalize());
 
-            Initially(
-                When(OrderSubmitted)
-                    .Then(context =>
-                    {
-                        context.Instance.OrderDate = context.Message.OrderDate;
-                    })
-                    .TransitionTo(Submitted));
-
-            During(Submitted,
-                When(OrderAccepted)
-                    .Then(context =>
-                    {
-                        context.Instance.AcceptedAt = context.Message.AcceptedAt;
-                    })
-                    .TransitionTo(Accepted));
-
-            During(Accepted,
-                When(OrderCompleted)
-                    .Finalize());
-
-            SetCompletedWhenFinalized();
-        }
+        SetCompletedWhenFinalized();
     }
 }

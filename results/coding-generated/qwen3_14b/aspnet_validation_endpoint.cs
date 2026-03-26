@@ -1,34 +1,34 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http.Results;
 
-public record CreateOrderRequest
+public class CreateOrderRequest
 {
     [Required]
-    public string Name { get; init; }
+    public string Name { get; set; }
 
-    [Range(0.01m, 10000m)]
-    public decimal Price { get; init; }
+    [Range(0.01, 10000)]
+    public decimal Price { get; set; }
 
     [Range(1, 999)]
-    public int Quantity { get; init; }
+    public int Quantity { get; set; }
 }
 
 public class OrderService
 {
-    public CreateOrderRequest CreateOrder(CreateOrderRequest request)
+    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        return request;
-    }
-}
+        var context = new ValidationContext(request);
+        var results = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(request, context, results, true);
 
-public static class OrderEndpoints
-{
-    public static void MapOrderEndpoints(this WebApplication app)
-    {
-        app.MapPost("/api/orders", (CreateOrderRequest request, OrderService service) =>
+        if (!isValid)
         {
-            var order = service.CreateOrder(request);
-            return Results.Ok(order);
-        });
+            var firstError = results.FirstOrDefault();
+            if (firstError != null)
+            {
+                throw new ArgumentException(firstError.ErrorMessage);
+            }
+        }
+
+        return request;
     }
 }
