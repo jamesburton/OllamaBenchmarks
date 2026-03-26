@@ -1,0 +1,1151 @@
+{
+  "model": "qwen3:14b",
+  "benchmark": "tooluse",
+  "run_started_at": "2026-03-26T00:27:34.033732+00:00",
+  "run_finished_at": "2026-03-26T01:14:52.807779+00:00",
+  "results": [
+    {
+      "task": "az_01_create_workitem",
+      "category": "az_devops",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "az_workitem_create",
+          "arguments": {
+            "project": "MyApp",
+            "type": "Bug",
+            "title": "Login page broken"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "az_workitem_create",
+            "arguments": {
+              "project": "MyApp",
+              "type": "Bug",
+              "title": "Login page broken"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 49.2
+    },
+    {
+      "task": "az_02_update_workitem",
+      "category": "az_devops",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "az_workitem_update",
+          "arguments": {
+            "id": 1234,
+            "state": "Active",
+            "assigned_to": "james@test.com"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "az_workitem_update",
+            "arguments": {
+              "id": 1234,
+              "state": "Active",
+              "assigned_to": "james@test.com"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 55.75
+    },
+    {
+      "task": "az_03_query_workitems",
+      "category": "az_devops",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "az_workitem_query",
+          "arguments": {
+            "project": "MyApp",
+            "type": "Bug",
+            "state": "Active"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "az_workitem_query",
+            "arguments": {
+              "project": "MyApp",
+              "type": "Bug",
+              "state": "Active"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 39.88
+    },
+    {
+      "task": "az_04_create_pr",
+      "category": "az_devops",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "az_pr_create",
+          "arguments": {
+            "source_branch": "feature-auth",
+            "target_branch": "main",
+            "title": "Add authentication"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "az_pr_create",
+            "arguments": {
+              "target_branch": "main",
+              "title": "Add authentication",
+              "source_branch": "feature-auth"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 39.53
+    },
+    {
+      "task": "az_05_list_prs",
+      "category": "az_devops",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "az_pr_list",
+          "arguments": {
+            "repository": "MyApp",
+            "status": "active"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "az_pr_list",
+            "arguments": {
+              "repository": "MyApp",
+              "status": "active"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 85.98
+    },
+    {
+      "task": "az_06_run_pipeline",
+      "category": "az_devops",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "az_pipeline_run",
+          "arguments": {
+            "project": "MyApp",
+            "pipeline_name": "CI",
+            "branch": "main"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "az_pipeline_run",
+            "arguments": {
+              "project": "MyApp",
+              "pipeline_name": "CI",
+              "branch": "main"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 72.5
+    },
+    {
+      "task": "az_07_add_comment",
+      "category": "az_devops",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "az_pr_comment",
+          "arguments": {
+            "id": 42,
+            "comment": "LGTM"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "az_pr_comment",
+            "arguments": {
+              "id": 42,
+              "comment": "LGTM",
+              "project": "YourProjectName",
+              "repository": "YourRepositoryName"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 63.48
+    },
+    {
+      "task": "az_08_multi_step",
+      "category": "az_devops",
+      "score": 0.6,
+      "tool_selection": 0.5,
+      "param_accuracy": 0.5,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "az_workitem_create",
+          "arguments": {
+            "project": "MyApp",
+            "type": "Bug",
+            "title": "API timeout"
+          }
+        },
+        {
+          "name": "az_workitem_update",
+          "arguments": {
+            "assigned_to": "james@test.com",
+            "priority": 1
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "az_workitem_create",
+            "arguments": {
+              "type": "Bug",
+              "title": "API timeout",
+              "assigned_to": "james@test.com",
+              "priority": 1,
+              "project": "MyApp"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 40.48
+    },
+    {
+      "task": "fs_01_read_file",
+      "category": "filesystem",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "read_file",
+          "arguments": {
+            "path": "README.md"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "read_file",
+            "arguments": {
+              "path": "README.md"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 31.66
+    },
+    {
+      "task": "fs_02_write_file",
+      "category": "filesystem",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "write_file",
+          "arguments": {
+            "path": "config.json",
+            "content": "{\"debug\": true}"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "write_file",
+            "arguments": {
+              "path": "config.json",
+              "content": "{\"debug\": true}",
+              "append": false
+            }
+          }
+        }
+      ],
+      "generation_time_s": 40.0
+    },
+    {
+      "task": "fs_03_list_dir",
+      "category": "filesystem",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "list_directory",
+          "arguments": {
+            "path": "src"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "list_directory",
+            "arguments": {
+              "path": "src"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 33.8
+    },
+    {
+      "task": "fs_04_search",
+      "category": "filesystem",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "glob_search",
+          "arguments": {
+            "pattern": "**/*.ts"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "glob_search",
+            "arguments": {
+              "pattern": "**/*.ts",
+              "path": "."
+            }
+          }
+        }
+      ],
+      "generation_time_s": 69.41
+    },
+    {
+      "task": "fs_05_grep",
+      "category": "filesystem",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "grep_search",
+          "arguments": {
+            "pattern": "TODO",
+            "glob": "*.py"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "grep_search",
+            "arguments": {
+              "glob": "*.py",
+              "pattern": "TODO",
+              "path": "."
+            }
+          }
+        }
+      ],
+      "generation_time_s": 69.25
+    },
+    {
+      "task": "fs_06_move",
+      "category": "filesystem",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "move_file",
+          "arguments": {
+            "source": "old-config.json",
+            "destination": "backup/old-config.json"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "move_file",
+            "arguments": {
+              "source": "old-config.json",
+              "destination": "backup/old-config.json"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 39.8
+    },
+    {
+      "task": "fs_07_delete",
+      "category": "filesystem",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "delete_path",
+          "arguments": {
+            "path": "temp"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "delete_path",
+            "arguments": {
+              "path": "temp",
+              "recursive": true
+            }
+          }
+        }
+      ],
+      "generation_time_s": 40.8
+    },
+    {
+      "task": "fs_08_multi_step",
+      "category": "filesystem",
+      "score": 0.5,
+      "tool_selection": 0.5,
+      "param_accuracy": 0.5,
+      "no_hallucination": 0.5,
+      "expected_calls": [
+        {
+          "name": "read_file",
+          "arguments": {
+            "path": "package.json"
+          }
+        },
+        {
+          "name": "copy_file",
+          "arguments": {
+            "source": "package.json",
+            "destination": "package.json.bak"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "read_file",
+            "arguments": {
+              "path": "package.json"
+            }
+          }
+        },
+        {
+          "function": {
+            "name": "write_file",
+            "arguments": {
+              "path": "package.json.bak",
+              "content": "{{read_file_content}}",
+              "append": false
+            }
+          }
+        }
+      ],
+      "generation_time_s": 64.7
+    },
+    {
+      "task": "git_01_status",
+      "category": "git",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "git_status",
+          "arguments": {}
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "git_status",
+            "arguments": {}
+          }
+        }
+      ],
+      "generation_time_s": 19.28
+    },
+    {
+      "task": "git_02_diff_staged",
+      "category": "git",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "git_diff",
+          "arguments": {
+            "staged": true
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "git_diff",
+            "arguments": {
+              "staged": true
+            }
+          }
+        }
+      ],
+      "generation_time_s": 22.25
+    },
+    {
+      "task": "git_03_log_recent",
+      "category": "git",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "git_log",
+          "arguments": {
+            "limit": 5
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "git_log",
+            "arguments": {
+              "limit": 5
+            }
+          }
+        }
+      ],
+      "generation_time_s": 22.75
+    },
+    {
+      "task": "git_04_create_branch",
+      "category": "git",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "git_create_branch",
+          "arguments": {
+            "name": "feature-auth",
+            "base": "main"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "git_create_branch",
+            "arguments": {
+              "base": "main",
+              "name": "feature-auth"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 27.83
+    },
+    {
+      "task": "git_05_commit",
+      "category": "git",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "git_commit",
+          "arguments": {
+            "message": "fix: resolve login bug"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "git_commit",
+            "arguments": {
+              "message": "fix: resolve login bug"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 37.73
+    },
+    {
+      "task": "git_06_stash",
+      "category": "git",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "git_stash",
+          "arguments": {
+            "message": "WIP auth"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "git_stash",
+            "arguments": {
+              "action": "push",
+              "message": "WIP auth"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 45.89
+    },
+    {
+      "task": "git_07_cherry_pick",
+      "category": "git",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "git_cherry_pick",
+          "arguments": {
+            "commit": "abc1234"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "git_cherry_pick",
+            "arguments": {
+              "commit": "abc1234"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 33.41
+    },
+    {
+      "task": "git_08_multi_step",
+      "category": "git",
+      "score": 0.0,
+      "tool_selection": 0.0,
+      "param_accuracy": 0.0,
+      "no_hallucination": 0.0,
+      "expected_calls": [
+        {
+          "name": "git_create_branch",
+          "arguments": {
+            "name": "feature-x"
+          }
+        },
+        {
+          "name": "git_checkout",
+          "arguments": {
+            "branch": "feature-x"
+          }
+        }
+      ],
+      "actual_calls": [],
+      "generation_time_s": 95.16
+    },
+    {
+      "task": "shell_01_run",
+      "category": "shell",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "run_command",
+          "arguments": {
+            "command": "npm install"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "run_command",
+            "arguments": {
+              "cwd": ".",
+              "command": "npm install"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 28.09
+    },
+    {
+      "task": "shell_02_check_version",
+      "category": "shell",
+      "score": 0.7,
+      "tool_selection": 1.0,
+      "param_accuracy": 0.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "run_command",
+          "arguments": {
+            "command": "node --version"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "run_command",
+            "arguments": {
+              "command": "node -v"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 48.2
+    },
+    {
+      "task": "shell_03_find_process",
+      "category": "shell",
+      "score": 0.0,
+      "tool_selection": 0.0,
+      "param_accuracy": 0.0,
+      "no_hallucination": 0.0,
+      "expected_calls": [
+        {
+          "name": "run_command",
+          "arguments": {}
+        }
+      ],
+      "actual_calls": [],
+      "generation_time_s": 91.27
+    },
+    {
+      "task": "shell_04_disk_space",
+      "category": "shell",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "run_command",
+          "arguments": {}
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "run_command",
+            "arguments": {
+              "command": "df -h"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 33.09
+    },
+    {
+      "task": "shell_05_env_var",
+      "category": "shell",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "get_env_var",
+          "arguments": {
+            "name": "HOME"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "get_env_var",
+            "arguments": {
+              "name": "HOME"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 21.14
+    },
+    {
+      "task": "shell_06_kill_process",
+      "category": "shell",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "kill_process",
+          "arguments": {
+            "pid": 1234
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "kill_process",
+            "arguments": {
+              "pid": 1234
+            }
+          }
+        }
+      ],
+      "generation_time_s": 20.08
+    },
+    {
+      "task": "shell_07_pipe",
+      "category": "shell",
+      "score": 0.0,
+      "tool_selection": 0.0,
+      "param_accuracy": 0.0,
+      "no_hallucination": 0.0,
+      "expected_calls": [
+        {
+          "name": "run_command",
+          "arguments": {}
+        }
+      ],
+      "actual_calls": [],
+      "generation_time_s": 79.94
+    },
+    {
+      "task": "shell_08_multi_step",
+      "category": "shell",
+      "score": 0.0,
+      "tool_selection": 0.0,
+      "param_accuracy": 0.0,
+      "no_hallucination": 0.0,
+      "expected_calls": [
+        {
+          "name": "check_port",
+          "arguments": {
+            "port": 8080
+          }
+        },
+        {
+          "name": "kill_process",
+          "arguments": {}
+        }
+      ],
+      "actual_calls": [],
+      "generation_time_s": 93.48
+    },
+    {
+      "task": "web_01_fetch",
+      "category": "web",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "http_fetch",
+          "arguments": {
+            "url": "https://example.com"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "http_fetch",
+            "arguments": {
+              "url": "https://example.com"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 40.2
+    },
+    {
+      "task": "web_02_fetch_json",
+      "category": "web",
+      "score": 0.85,
+      "tool_selection": 1.0,
+      "param_accuracy": 0.5,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "http_fetch",
+          "arguments": {
+            "url": "https://api.example.com/users",
+            "accept": "application/json"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "http_fetch",
+            "arguments": {
+              "url": "https://api.example.com/users"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 34.64
+    },
+    {
+      "task": "web_03_post",
+      "category": "web",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "http_post",
+          "arguments": {
+            "url": "https://api.example.com/users",
+            "body": {
+              "name": "Alice"
+            }
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "http_post",
+            "arguments": {
+              "url": "https://api.example.com/users",
+              "body": {
+                "name": "Alice"
+              },
+              "content_type": "application/json"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 38.3
+    },
+    {
+      "task": "web_04_extract_links",
+      "category": "web",
+      "score": 0.0,
+      "tool_selection": 0.0,
+      "param_accuracy": 0.0,
+      "no_hallucination": 0.0,
+      "expected_calls": [
+        {
+          "name": "extract_links",
+          "arguments": {
+            "url": "https://example.com"
+          }
+        }
+      ],
+      "actual_calls": [],
+      "generation_time_s": 80.2
+    },
+    {
+      "task": "web_05_headers",
+      "category": "web",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "http_fetch",
+          "arguments": {
+            "url": "https://api.example.com",
+            "headers": {
+              "Authorization": "Bearer abc123"
+            }
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "http_fetch",
+            "arguments": {
+              "url": "https://api.example.com",
+              "headers": {
+                "Authorization": "Bearer abc123"
+              }
+            }
+          }
+        }
+      ],
+      "generation_time_s": 45.66
+    },
+    {
+      "task": "web_06_search",
+      "category": "web",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "web_search",
+          "arguments": {
+            "query": "Ollama tool calling docs"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "web_search",
+            "arguments": {
+              "query": "Ollama tool calling docs",
+              "num_results": 5
+            }
+          }
+        }
+      ],
+      "generation_time_s": 23.34
+    },
+    {
+      "task": "web_07_parse_html",
+      "category": "web",
+      "score": 0.65,
+      "tool_selection": 1.0,
+      "param_accuracy": 0.5,
+      "no_hallucination": 0.0,
+      "expected_calls": [
+        {
+          "name": "parse_html",
+          "arguments": {
+            "url": "https://example.com",
+            "selector": "title"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "http_fetch",
+            "arguments": {
+              "url": "https://example.com",
+              "accept": "text/html"
+            }
+          }
+        },
+        {
+          "function": {
+            "name": "parse_html",
+            "arguments": {
+              "html": "<response from http_fetch>",
+              "selector": "title",
+              "attribute": "text"
+            }
+          }
+        }
+      ],
+      "generation_time_s": 79.31
+    },
+    {
+      "task": "web_08_download",
+      "category": "web",
+      "score": 1.0,
+      "tool_selection": 1.0,
+      "param_accuracy": 1.0,
+      "no_hallucination": 1.0,
+      "expected_calls": [
+        {
+          "name": "download_file",
+          "arguments": {
+            "url": "https://example.com/data.csv",
+            "destination": "local-data.csv"
+          }
+        }
+      ],
+      "actual_calls": [
+        {
+          "function": {
+            "name": "download_file",
+            "arguments": {
+              "url": "https://example.com/data.csv",
+              "destination": "local-data.csv",
+              "overwrite": false
+            }
+          }
+        }
+      ],
+      "generation_time_s": 76.73
+    }
+  ],
+  "category_scores": {
+    "az_devops": 0.95,
+    "filesystem": 0.9375,
+    "git": 0.875,
+    "shell": 0.5875,
+    "web": 0.8125
+  },
+  "overall_score": 0.8325
+}
