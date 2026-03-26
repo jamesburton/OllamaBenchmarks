@@ -10,24 +10,36 @@ public class ProcessPaymentConsumerTests
         var orderId = Guid.NewGuid();
         var amount = 100.0m;
 
-        var serviceProvider = new ServiceCollection()
+        var provider = new ServiceCollection()
             .AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>())
             .BuildServiceProvider(true);
 
-        using var scope = serviceProvider.CreateScope();
-        var harness = scope.ServiceProvider.GetRequiredService<ITestHarness>();
-
+        using var harness = provider.GetRequiredService<ITestHarness>();
         await harness.Start();
 
         await harness.InputQueueSendEndpoint.Send<ProcessPayment>(new ProcessPayment(orderId, amount));
 
-        bool paymentProcessedReceived = await harness.Consumed.Any<ProcessPayment>();
-        bool paymentEventPublished = await harness.Published.Any<PaymentProcessed>(x => x.OrderId == orderId);
+        bool paymentProcessedReceived = false;
+        bool paymentPublishedCorrectly = false;
 
-        Assert.Multiple(() =>
+        try
         {
-            Assert.True(paymentProcessedReceived, "The consumer did not receive the ProcessPayment message.");
-            Assert.True(paymentEventPublished, "The PaymentProcessed event was not published with the correct OrderId.");
-        });
+            paymentProcessedReceived = await harness.Consumed.Any<ProcessPayment>();
+            var publishedEvent = await harness.Published.Any<PaymentProcessed>();
+
+            if (publishedEvent)
+            {
+                var paymentProcessedMessage = await harness.Published.Get<PaymentProcessed>(0);
+                paymentPublishedCorrectly = paymentProcessedMessage.OrderId == orderId;
+            }
+        }
+        finally
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.True(paymentProcessedReceived, "The ProcessPayment message was not consumed.");
+                Assert.True(paymentPublishedCorrectly, "The PaymentProcessed event was not published with the correct OrderId.");
+            });
+        }
     }
 }

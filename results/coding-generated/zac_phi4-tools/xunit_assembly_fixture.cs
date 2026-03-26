@@ -1,4 +1,4 @@
-[assembly: Xunit.AssemblyFixture(typeof(SharedCounter))]
+using System.Threading;
 
 public class SharedCounter : IAsyncLifetime
 {
@@ -31,7 +31,7 @@ public class FirstCounterTests
     }
 
     [Fact]
-    public void TestIncrementAndGet_ShouldReturnGreaterThanZero()
+    public void TestIncrementAndGet()
     {
         var result = _sharedCounter.IncrementAndGet();
         Assert.True(result > 0);
@@ -41,7 +41,7 @@ public class FirstCounterTests
 public class SecondCounterTests
 {
     [Fact]
-    public void TestIncrementAndGet_UsingTestContext_ShouldReturnGreaterThanZero()
+    public void TestIncrementAndGetUsingTestContext()
     {
         var sharedCounter = TestContext.Current.GetFixture<SharedCounter>();
         var result = sharedCounter.IncrementAndGet();

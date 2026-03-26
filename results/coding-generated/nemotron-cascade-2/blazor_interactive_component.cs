@@ -1,30 +1,28 @@
-using System;
 using Microsoft.AspNetCore.Components;
 
-namespace MyApp.Components
+public class CounterBase : ComponentBase
 {
-    public class CounterBase : ComponentBase
+    [Parameter]
+    public int InitialCount { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnCountChanged { get; set; }
+
+    private int currentCount;
+
+    protected override void OnInitialized()
     {
-        private int currentCount;
+        currentCount = InitialCount;
+    }
 
-        [Parameter]
-        public int InitialCount { get; set; }
+    public async Task IncrementCount()
+    {
+        currentCount++;
+        await OnCountChanged.InvokeAsync(currentCount);
+    }
 
-        [Parameter]
-        public EventCallback<int> OnCountChanged { get; set; }
-
-        protected override void OnInitialized()
-        {
-            currentCount = InitialCount;
-        }
-
-        public void IncrementCount()
-        {
-            currentCount++;
-            // Ensure the event is raised inside the Blazor render context
-            _ = OnCountChanged.InvokeAsync(currentCount);
-        }
-
-        public int CurrentCount => currentCount;
+    public int CurrentCount
+    {
+        get { return currentCount; }
     }
 }

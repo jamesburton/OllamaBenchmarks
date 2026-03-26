@@ -1,55 +1,23 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using System;
 
-namespace MyApp.Components;
-
-/// <summary>
-/// Represents a single weather forecast entry.
-/// </summary>
+[global::Microsoft.AspNetCore.Components.Web.Rendering.StreamRenderingAttribute]
 public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
 
-/// <summary>
-/// Service contract for retrieving weather forecast data.
-/// </summary>
 public interface IWeatherService
 {
-    /// <summary>
-    /// Retrieves an array of weather forecasts.
-    /// </summary>
     Task<WeatherForecast[]> GetForecastsAsync();
 }
 
-/// <summary>
-/// Base class for a weather page that uses streaming server‑side rendering.
-/// </summary>
-[StreamRendering]
 public class WeatherPageBase : ComponentBase
 {
-    /// <summary>
-    /// Injected service used to obtain forecast data.
-    /// </summary>
-    [Inject]
-    private IWeatherService? WeatherService { get; set; }
+    [Inject] public IWeatherService WeatherService { get; set; } = default!;
 
-    /// <summary>
-    /// The forecasts loaded from the service. Null until initialization completes.
-    /// </summary>
-    public WeatherForecast[]? Forecasts { get; private set; }
+    public WeatherForecast[]? Forecasts { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        if (WeatherService is not null)
-        {
-            Forecasts = await WeatherService.GetForecastsAsync();
-        }
-        else
-        {
-            // Service not provided – fallback to an empty array.
-            Forecasts = Array.Empty<WeatherForecast>();
-        }
-
+        Forecasts = await WeatherService.GetForecastsAsync();
         await base.OnInitializedAsync();
     }
 }

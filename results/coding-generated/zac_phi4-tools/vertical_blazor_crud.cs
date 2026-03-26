@@ -105,7 +105,9 @@ public class TodoServiceTests
         var title = "New Task";
         var item = await service.AddAsync(title);
 
+        item.Should().NotBeNull();
         item.Title.Should().Be(title);
+        item.IsCompleted.Should().BeFalse();
     }
 
     [Fact]
@@ -116,7 +118,7 @@ public class TodoServiceTests
         await service.DeleteAsync(1);
 
         var items = await service.GetAllAsync();
-        items.Count.Should().Be(0);
+        items.Should().NotContain(x => x.Id == 1);
     }
 
     [Fact]
@@ -124,11 +126,13 @@ public class TodoServiceTests
     {
         var service = new TodoService();
         await service.AddAsync("Task 1");
+        var itemBeforeToggle = (await service.GetAllAsync()).First();
 
         await service.ToggleAsync(1);
-        var item = (await service.GetAllAsync()).First();
+        var itemAfterToggle = (await service.GetAllAsync()).First();
 
-        item.IsCompleted.Should().BeTrue();
+        itemBeforeToggle.IsCompleted.Should().BeFalse();
+        itemAfterToggle.IsCompleted.Should().BeTrue();
     }
 }
 

@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
-    // Asynchronous GET method to retrieve a user by ID
+    // GET /api/users/{id}
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {

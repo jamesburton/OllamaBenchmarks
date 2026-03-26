@@ -245,5 +245,6 @@
       "generated_code_path": "results\\coding-generated\\cogito_8b\\vertical_blazor_crud.cs"
     }
   ],
-  "layer3_weighted_score": 0.21739130434782608
+  "layer3_weighted_score": 0.21739130434782608,
+  "composite_score": 0.130435
 }

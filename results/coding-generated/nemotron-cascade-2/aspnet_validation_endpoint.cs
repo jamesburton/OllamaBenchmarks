@@ -1,50 +1,35 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Register the OrderService for DI (scoped per request)
-builder.Services.AddScoped<OrderService>();
-
-var app = builder.Build();
-
-app.MapOrderEndpoints();
-
-app.Run();
-
-// ---------------------------
-// Domain model
-public record CreateOrderRequest(
-    [Required] string Name,
-    [Range(0.01, 10000)] decimal Price,
-    [Range(1, 999)] int Quantity
-);
-
-// Service layer
-public class OrderService
+public class CreateOrderRequest
 {
-    public CreateOrderRequest CreateOrder(CreateOrderRequest request)
-    {
-        // In a real implementation you would persist the order.
-        // Here we simply return the validated request as a confirmed order.
-        return request;
-    }
+    [Required]
+    public string Name { get; set; }
+
+    [Range(0.01, 10000)]
+    public decimal Price { get; set; }
+
+    [Range(1, 999)]
+    public int Quantity { get; set; }
 }
 
-// Endpoint mapping helper
-public static class OrderEndpoints
+public class OrderService
 {
-    public static void MapOrderEndpoints(this WebApplication app)
+    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        // Minimal API automatically validates the request based on data annotations.
-        app.MapPost("/api/orders", (CreateOrderRequest request, OrderService service) =>
+        var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(request);
+        var validationResults = new System.Collections.Generic.List<System.ComponentModel.DataAnnotations.ValidationResult>();
+        bool isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(request, validationContext, validationResults, true);
+        if (!isValid)
         {
-            var order = service.CreateOrder(request);
-            return Results.Ok(order);
-        })
-        .Accepts<CreateOrderRequest>("application/json")
-        .Produces<CreateOrderRequest>(200);
+            System.ComponentModel.DataAnnotations.ValidationResult? firstError = null;
+            foreach (var result in validationResults)
+            {
+                firstError = result;
+                break;
+            }
+            var errorMessage = firstError?.ErrorMessage ?? "Invalid request.";
+            throw new System.ArgumentException($"Validation failed: {errorMessage}", nameof(request));
+        }
+        return request;
     }
 }

@@ -1,58 +1,50 @@
-using System;
 using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 
-[assembly: AssemblyFixture(typeof(SharedCounter))]
-
-namespace SharedCounterTests
+public class SharedCounter : IAsyncLifetime
 {
-    public class SharedCounter : IAsyncLifetime
+    private int _counter;
+
+    public ValueTask InitializeAsync()
     {
-        private int _counter;
-
-        public ValueTask InitializeAsync()
-        {
-            _counter = 0;
-            return default;
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            return default;
-        }
-
-        public int IncrementAndGet()
-        {
-            return Interlocked.Increment(ref _counter);
-        }
+        _counter = 0;
+        return default;
     }
 
-    public class FirstCounterTests
+    public ValueTask DisposeAsync()
     {
-        private readonly SharedCounter _counter;
-
-        public FirstCounterTests(SharedCounter counter)
-        {
-            _counter = counter;
-        }
-
-        [Fact]
-        public void Increment_ReturnsPositive()
-        {
-            var result = _counter.IncrementAndGet();
-            Assert.True(result > 0);
-        }
+        return default;
     }
 
-    public class SecondCounterTests
+    public int IncrementAndGet()
     {
-        [Fact]
-        public void Increment_ReturnsPositive()
-        {
-            var fixture = TestContext.Current.GetFixture<SharedCounter>();
-            var result = fixture.IncrementAndGet();
-            Assert.True(result > 0);
-        }
+        return Interlocked.Increment(ref _counter);
+    }
+}
+
+public class FirstCounterTests
+{
+    private readonly SharedCounter _counter;
+
+    public FirstCounterTests(SharedCounter counter)
+    {
+        _counter = counter;
+    }
+
+    [Fact]
+    public void Increment_Returns_Positive()
+    {
+        var result = _counter.IncrementAndGet();
+        Assert.True(result > 0);
+    }
+}
+
+public class SecondCounterTests
+{
+    [Fact]
+    public void Increment_Returns_Positive_Using_TestContext()
+    {
+        var counter = TestContext.Current.GetFixture<SharedCounter>();
+        var result = counter.IncrementAndGet();
+        Assert.True(result > 0);
     }
 }

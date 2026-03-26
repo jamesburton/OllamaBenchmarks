@@ -1,30 +1,28 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-03-26T02:48:47.486400+00:00",
-  "run_finished_at": "2026-03-26T03:36:00.522646+00:00",
+  "run_started_at": "2026-03-26T18:00:58.133026+00:00",
+  "run_finished_at": "2026-03-26T18:29:00.939998+00:00",
   "models": [
-    "zac/phi4-tools",
-    "rnj-1:8b",
-    "cogito:8b"
+    "trinity-mini:Q4_K_M"
   ],
   "results": [
     {
-      "model": "zac/phi4-tools",
+      "model": "trinity-mini:Q4_K_M",
       "benchmark": "coding",
-      "run_started_at": "2026-03-26T02:49:05.168479+00:00",
-      "run_finished_at": "2026-03-26T03:15:35.250738+00:00",
+      "run_started_at": "2026-03-26T18:00:58.133510+00:00",
+      "run_finished_at": "2026-03-26T18:29:00.939306+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
           "category": "aspnet",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 135.8,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\aspnet_oneof_controller.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 98.54,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_oneof_controller.cs"
         },
         {
           "task": "aspnet_validation_endpoint",
@@ -35,257 +33,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 79.03,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\aspnet_validation_endpoint.cs"
-        },
-        {
-          "task": "aspnet_service_di",
-          "category": "aspnet",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 74.92,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\aspnet_service_di.cs"
-        },
-        {
-          "task": "efcore_leftjoin",
-          "category": "efcore",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 63.64,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\efcore_leftjoin.cs"
-        },
-        {
-          "task": "efcore_json_columns",
-          "category": "efcore",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 2,
-          "tests_total": 2,
-          "generation_time_s": 88.72,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\efcore_json_columns.cs"
-        },
-        {
-          "task": "efcore_executeupdate",
-          "category": "efcore",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 1,
-          "tests_total": 1,
-          "generation_time_s": 59.41,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\efcore_executeupdate.cs"
-        },
-        {
-          "task": "masstransit_consumer",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 1,
-          "tests_total": 1,
-          "generation_time_s": 50.48,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\masstransit_consumer.cs"
-        },
-        {
-          "task": "masstransit_statemachine",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 63.3,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\masstransit_statemachine.cs"
-        },
-        {
-          "task": "masstransit_test_harness",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 59.45,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\masstransit_test_harness.cs"
-        },
-        {
-          "task": "blazor_interactive_component",
-          "category": "blazor",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 44.97,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\blazor_interactive_component.cs"
-        },
-        {
-          "task": "blazor_streaming_render",
-          "category": "blazor",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 2,
-          "tests_total": 2,
-          "generation_time_s": 37.56,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\blazor_streaming_render.cs"
-        },
-        {
-          "task": "blazor_state_persistence",
-          "category": "blazor",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 34.09,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\blazor_state_persistence.cs"
-        },
-        {
-          "task": "xunit_v3_test_generation",
-          "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 108.03,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\xunit_v3_test_generation.cs"
-        },
-        {
-          "task": "xunit_awesome_nsubstitute",
-          "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 59.77,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\xunit_awesome_nsubstitute.cs"
-        },
-        {
-          "task": "xunit_assembly_fixture",
-          "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 59.08,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\xunit_assembly_fixture.cs"
-        },
-        {
-          "task": "linq_complex_query",
-          "category": "linq",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 5,
-          "tests_total": 5,
-          "generation_time_s": 87.42,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\linq_complex_query.cs"
-        },
-        {
-          "task": "async_cancellation",
-          "category": "linq",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 39.08,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\async_cancellation.cs"
-        },
-        {
-          "task": "vertical_order_api",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 118.66,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\vertical_order_api.cs"
-        },
-        {
-          "task": "vertical_saga_workflow",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 87.95,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\vertical_saga_workflow.cs"
-        },
-        {
-          "task": "vertical_blazor_crud",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 94.05,
-          "generated_code_path": "results\\coding-generated\\zac_phi4-tools\\vertical_blazor_crud.cs"
-        }
-      ],
-      "layer3_weighted_score": 0.391304347826087
-    },
-    {
-      "model": "rnj-1:8b",
-      "benchmark": "coding",
-      "run_started_at": "2026-03-26T03:15:35.257227+00:00",
-      "run_finished_at": "2026-03-26T03:27:40.780506+00:00",
-      "layer3_results": [
-        {
-          "task": "aspnet_oneof_controller",
-          "category": "aspnet",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 29.94,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\aspnet_oneof_controller.cs"
-        },
-        {
-          "task": "aspnet_validation_endpoint",
-          "category": "aspnet",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 27.19,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\aspnet_validation_endpoint.cs"
+          "generation_time_s": 79.11,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_validation_endpoint.cs"
         },
         {
           "task": "aspnet_service_di",
@@ -296,8 +45,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 22.12,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\aspnet_service_di.cs"
+          "generation_time_s": 78.42,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_service_di.cs"
         },
         {
           "task": "efcore_leftjoin",
@@ -308,32 +57,32 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 43.39,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\efcore_leftjoin.cs"
+          "generation_time_s": 78.85,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_leftjoin.cs"
         },
         {
           "task": "efcore_json_columns",
           "category": "efcore",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 2,
-          "tests_total": 2,
-          "generation_time_s": 27.41,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\efcore_json_columns.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 78.74,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_json_columns.cs"
         },
         {
           "task": "efcore_executeupdate",
           "category": "efcore",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 1,
-          "tests_total": 1,
-          "generation_time_s": 23.14,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\efcore_executeupdate.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 78.43,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_executeupdate.cs"
         },
         {
           "task": "masstransit_consumer",
@@ -344,8 +93,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 36.62,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\masstransit_consumer.cs"
+          "generation_time_s": 7.38,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_consumer.cs"
         },
         {
           "task": "masstransit_statemachine",
@@ -356,8 +105,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 30.62,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\masstransit_statemachine.cs"
+          "generation_time_s": 78.65,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_statemachine.cs"
         },
         {
           "task": "masstransit_test_harness",
@@ -368,35 +117,35 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 26.01,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\masstransit_test_harness.cs"
+          "generation_time_s": 79.96,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_test_harness.cs"
         },
         {
           "task": "blazor_interactive_component",
           "category": "blazor",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 27.34,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\blazor_interactive_component.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 78.65,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_interactive_component.cs"
         },
         {
           "task": "blazor_streaming_render",
           "category": "blazor",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 2,
-          "tests_total": 2,
-          "generation_time_s": 22.05,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\blazor_streaming_render.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 16.27,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_streaming_render.cs"
         },
         {
-          "task": "blazor_state_persistence",
+          "task": "blazor_cascading_auth",
           "category": "blazor",
           "weight": 1,
           "passed": false,
@@ -404,11 +153,11 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 35.22,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\blazor_state_persistence.cs"
+          "generation_time_s": 78.48,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_cascading_auth.cs"
         },
         {
-          "task": "xunit_v3_test_generation",
+          "task": "xunit_v3_theory_tests",
           "category": "xunit",
           "weight": 1,
           "passed": false,
@@ -416,105 +165,24 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 43.59,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\xunit_v3_test_generation.cs"
+          "generation_time_s": 80.88,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_v3_theory_tests.cs"
         },
         {
           "task": "xunit_awesome_nsubstitute",
           "category": "xunit",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 27.11,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\xunit_awesome_nsubstitute.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 80.38,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_awesome_nsubstitute.cs"
         },
         {
           "task": "xunit_assembly_fixture",
           "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 26.72,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\xunit_assembly_fixture.cs"
-        },
-        {
-          "task": "linq_complex_query",
-          "category": "linq",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 5,
-          "tests_total": 5,
-          "generation_time_s": 38.73,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\linq_complex_query.cs"
-        },
-        {
-          "task": "async_cancellation",
-          "category": "linq",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 24.95,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\async_cancellation.cs"
-        },
-        {
-          "task": "vertical_order_api",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 41.53,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\vertical_order_api.cs"
-        },
-        {
-          "task": "vertical_saga_workflow",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 51.25,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\vertical_saga_workflow.cs"
-        },
-        {
-          "task": "vertical_blazor_crud",
-          "category": "vertical",
-          "weight": 2,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 39.72,
-          "generated_code_path": "results\\coding-generated\\rnj-1_8b\\vertical_blazor_crud.cs"
-        }
-      ],
-      "layer3_weighted_score": 0.34782608695652173
-    },
-    {
-      "model": "cogito:8b",
-      "benchmark": "coding",
-      "run_started_at": "2026-03-26T03:27:40.787499+00:00",
-      "run_finished_at": "2026-03-26T03:36:00.515577+00:00",
-      "layer3_results": [
-        {
-          "task": "aspnet_oneof_controller",
-          "category": "aspnet",
           "weight": 1,
           "passed": false,
           "harness_error": null,
@@ -522,202 +190,34 @@
           "tests_passed": 0,
           "tests_total": 0,
           "generation_time_s": 15.27,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\aspnet_oneof_controller.cs"
-        },
-        {
-          "task": "aspnet_validation_endpoint",
-          "category": "aspnet",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 19.83,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\aspnet_validation_endpoint.cs"
-        },
-        {
-          "task": "aspnet_service_di",
-          "category": "aspnet",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 16.8,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\aspnet_service_di.cs"
-        },
-        {
-          "task": "efcore_leftjoin",
-          "category": "efcore",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 19.42,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\efcore_leftjoin.cs"
-        },
-        {
-          "task": "efcore_json_columns",
-          "category": "efcore",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 17.88,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\efcore_json_columns.cs"
-        },
-        {
-          "task": "efcore_executeupdate",
-          "category": "efcore",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 17.03,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\efcore_executeupdate.cs"
-        },
-        {
-          "task": "masstransit_consumer",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 17.41,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\masstransit_consumer.cs"
-        },
-        {
-          "task": "masstransit_statemachine",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 22.16,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\masstransit_statemachine.cs"
-        },
-        {
-          "task": "masstransit_test_harness",
-          "category": "masstransit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 17.42,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\masstransit_test_harness.cs"
-        },
-        {
-          "task": "blazor_interactive_component",
-          "category": "blazor",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 15.84,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\blazor_interactive_component.cs"
-        },
-        {
-          "task": "blazor_streaming_render",
-          "category": "blazor",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 2,
-          "tests_total": 2,
-          "generation_time_s": 10.44,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\blazor_streaming_render.cs"
-        },
-        {
-          "task": "blazor_state_persistence",
-          "category": "blazor",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 9.8,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\blazor_state_persistence.cs"
-        },
-        {
-          "task": "xunit_v3_test_generation",
-          "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 90.45,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\xunit_v3_test_generation.cs"
-        },
-        {
-          "task": "xunit_awesome_nsubstitute",
-          "category": "xunit",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 22.75,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\xunit_awesome_nsubstitute.cs"
-        },
-        {
-          "task": "xunit_assembly_fixture",
-          "category": "xunit",
-          "weight": 1,
-          "passed": true,
-          "harness_error": null,
-          "build_success": true,
-          "tests_passed": 4,
-          "tests_total": 4,
-          "generation_time_s": 17.62,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\xunit_assembly_fixture.cs"
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_assembly_fixture.cs"
         },
         {
           "task": "linq_complex_query",
           "category": "linq",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 5,
-          "tests_total": 5,
-          "generation_time_s": 14.36,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\linq_complex_query.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 78.0,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
           "category": "linq",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 12.58,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\async_cancellation.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 78.33,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\async_cancellation.cs"
         },
         {
-          "task": "vertical_order_api",
+          "task": "vertical_order_service",
           "category": "vertical",
           "weight": 2,
           "passed": false,
@@ -725,11 +225,11 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 34.42,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\vertical_order_api.cs"
+          "generation_time_s": 166.51,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\vertical_order_service.cs"
         },
         {
-          "task": "vertical_saga_workflow",
+          "task": "vertical_consumer_pipeline",
           "category": "vertical",
           "weight": 2,
           "passed": false,
@@ -737,8 +237,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 25.62,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\vertical_saga_workflow.cs"
+          "generation_time_s": 165.24,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\vertical_consumer_pipeline.cs"
         },
         {
           "task": "vertical_blazor_crud",
@@ -749,11 +249,11 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 29.2,
-          "generated_code_path": "results\\coding-generated\\cogito_8b\\vertical_blazor_crud.cs"
+          "generation_time_s": 166.75,
+          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\vertical_blazor_crud.cs"
         }
       ],
-      "layer3_weighted_score": 0.21739130434782608
+      "layer3_weighted_score": 0.0
     }
   ]
 }
