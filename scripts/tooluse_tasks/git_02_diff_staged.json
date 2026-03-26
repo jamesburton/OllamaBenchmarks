@@ -1,0 +1,15 @@
+{
+  "name": "git_02_diff_staged",
+  "category": "git",
+  "description": "Show staged changes",
+  "prompt": "Show me what's staged for commit.",
+  "tool_names": ["git_status", "git_diff", "git_log", "git_add", "git_commit", "git_reset"],
+  "expected_calls": [
+    {"name": "git_diff", "arguments": {"staged": true}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

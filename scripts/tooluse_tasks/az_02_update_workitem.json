@@ -1,0 +1,15 @@
+{
+  "name": "az_02_update_workitem",
+  "category": "az_devops",
+  "description": "Update work item state and assignee",
+  "prompt": "Move work item 1234 to state Active and assign to james@test.com.",
+  "tool_names": ["az_workitem_create", "az_workitem_update", "az_workitem_query", "az_workitem_show", "az_pr_list", "az_pipeline_list"],
+  "expected_calls": [
+    {"name": "az_workitem_update", "arguments": {"id": 1234, "state": "Active", "assigned_to": "james@test.com"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

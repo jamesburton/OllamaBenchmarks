@@ -1,0 +1,15 @@
+{
+  "name": "git_01_status",
+  "category": "git",
+  "description": "Ask for repository status",
+  "prompt": "Check the current git status of this repository.",
+  "tool_names": ["git_status", "git_diff", "git_log", "git_add", "git_commit", "git_push"],
+  "expected_calls": [
+    {"name": "git_status", "arguments": {}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

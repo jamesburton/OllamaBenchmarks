@@ -1,0 +1,15 @@
+{
+  "name": "web_07_parse_html",
+  "category": "web",
+  "description": "Extract the page title from a URL",
+  "prompt": "Extract the page title from https://example.com.",
+  "tool_names": ["http_fetch", "http_post", "extract_links", "parse_html", "web_search", "download_file"],
+  "expected_calls": [
+    {"name": "parse_html", "arguments": {"url": "https://example.com", "selector": "title"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

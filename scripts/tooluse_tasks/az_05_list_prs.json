@@ -1,0 +1,15 @@
+{
+  "name": "az_05_list_prs",
+  "category": "az_devops",
+  "description": "List open pull requests",
+  "prompt": "List open pull requests in MyApp repo.",
+  "tool_names": ["az_pr_create", "az_pr_list", "az_pr_show", "az_pr_comment", "az_pr_approve", "az_workitem_query"],
+  "expected_calls": [
+    {"name": "az_pr_list", "arguments": {"repository": "MyApp", "status": "active"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

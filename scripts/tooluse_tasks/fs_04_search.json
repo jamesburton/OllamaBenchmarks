@@ -1,0 +1,15 @@
+{
+  "name": "fs_04_search",
+  "category": "filesystem",
+  "description": "Find all TypeScript files",
+  "prompt": "Find all TypeScript files in the project.",
+  "tool_names": ["read_file", "write_file", "list_directory", "glob_search", "grep_search", "delete_path"],
+  "expected_calls": [
+    {"name": "glob_search", "arguments": {"pattern": "**/*.ts"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

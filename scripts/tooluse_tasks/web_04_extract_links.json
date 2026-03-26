@@ -1,0 +1,15 @@
+{
+  "name": "web_04_extract_links",
+  "category": "web",
+  "description": "Extract all links from a webpage",
+  "prompt": "Get all links from https://example.com.",
+  "tool_names": ["http_fetch", "http_post", "extract_links", "parse_html", "web_search", "download_file"],
+  "expected_calls": [
+    {"name": "extract_links", "arguments": {"url": "https://example.com"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

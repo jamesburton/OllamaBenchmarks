@@ -1,0 +1,15 @@
+{
+  "name": "web_08_download",
+  "category": "web",
+  "description": "Download a file and save locally (multi-step)",
+  "prompt": "Download the file at https://example.com/data.csv and save it as local-data.csv.",
+  "tool_names": ["http_fetch", "http_post", "extract_links", "parse_html", "web_search", "download_file"],
+  "expected_calls": [
+    {"name": "download_file", "arguments": {"url": "https://example.com/data.csv", "destination": "local-data.csv"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

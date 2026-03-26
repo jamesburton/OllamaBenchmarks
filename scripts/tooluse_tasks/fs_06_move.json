@@ -1,0 +1,15 @@
+{
+  "name": "fs_06_move",
+  "category": "filesystem",
+  "description": "Move a file to a backup location",
+  "prompt": "Move old-config.json to backup/old-config.json.",
+  "tool_names": ["read_file", "write_file", "list_directory", "move_file", "copy_file", "delete_path"],
+  "expected_calls": [
+    {"name": "move_file", "arguments": {"source": "old-config.json", "destination": "backup/old-config.json"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

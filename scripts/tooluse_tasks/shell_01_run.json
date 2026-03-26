@@ -1,0 +1,15 @@
+{
+  "name": "shell_01_run",
+  "category": "shell",
+  "description": "Run npm install",
+  "prompt": "Run 'npm install' in the current directory.",
+  "tool_names": ["run_command", "get_env_var", "set_env_var", "kill_process", "check_port"],
+  "expected_calls": [
+    {"name": "run_command", "arguments": {"command": "npm install"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "git_05_commit",
+  "category": "git",
+  "description": "Commit staged changes with a specific message",
+  "prompt": "Commit the staged changes with message 'fix: resolve login bug'.",
+  "tool_names": ["git_status", "git_diff", "git_add", "git_commit", "git_push", "git_log"],
+  "expected_calls": [
+    {"name": "git_commit", "arguments": {"message": "fix: resolve login bug"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

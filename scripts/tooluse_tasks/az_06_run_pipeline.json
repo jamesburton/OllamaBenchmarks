@@ -1,0 +1,15 @@
+{
+  "name": "az_06_run_pipeline",
+  "category": "az_devops",
+  "description": "Run a CI pipeline",
+  "prompt": "Run the CI pipeline for the main branch in project MyApp.",
+  "tool_names": ["az_pipeline_run", "az_pipeline_list", "az_pr_create", "az_pr_list", "az_workitem_create", "az_workitem_query"],
+  "expected_calls": [
+    {"name": "az_pipeline_run", "arguments": {"project": "MyApp", "pipeline_name": "CI", "branch": "main"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "az_03_query_workitems",
+  "category": "az_devops",
+  "description": "Find all active bugs in a project",
+  "prompt": "Find all active bugs in MyApp project.",
+  "tool_names": ["az_workitem_create", "az_workitem_update", "az_workitem_query", "az_workitem_show", "az_pr_list", "az_pipeline_list"],
+  "expected_calls": [
+    {"name": "az_workitem_query", "arguments": {"project": "MyApp", "type": "Bug", "state": "Active"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

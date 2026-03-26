@@ -1,0 +1,15 @@
+{
+  "name": "web_06_search",
+  "category": "web",
+  "description": "Search the web for information",
+  "prompt": "Search the web for 'Ollama tool calling docs'.",
+  "tool_names": ["http_fetch", "http_post", "extract_links", "parse_html", "web_search", "download_file"],
+  "expected_calls": [
+    {"name": "web_search", "arguments": {"query": "Ollama tool calling docs"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

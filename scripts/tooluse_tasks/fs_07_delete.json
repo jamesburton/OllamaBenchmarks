@@ -1,0 +1,15 @@
+{
+  "name": "fs_07_delete",
+  "category": "filesystem",
+  "description": "Delete a directory",
+  "prompt": "Delete the temp directory.",
+  "tool_names": ["read_file", "write_file", "list_directory", "move_file", "copy_file", "delete_path"],
+  "expected_calls": [
+    {"name": "delete_path", "arguments": {"path": "temp"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

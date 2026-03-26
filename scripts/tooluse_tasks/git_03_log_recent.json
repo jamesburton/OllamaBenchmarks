@@ -1,0 +1,15 @@
+{
+  "name": "git_03_log_recent",
+  "category": "git",
+  "description": "Show the last 5 commits",
+  "prompt": "Show the last 5 commits.",
+  "tool_names": ["git_status", "git_diff", "git_log", "git_commit", "git_checkout", "git_push"],
+  "expected_calls": [
+    {"name": "git_log", "arguments": {"limit": 5}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

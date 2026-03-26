@@ -1,0 +1,15 @@
+{
+  "name": "az_04_create_pr",
+  "category": "az_devops",
+  "description": "Create a pull request",
+  "prompt": "Create a PR from feature-auth to main with title 'Add authentication'.",
+  "tool_names": ["az_pr_create", "az_pr_list", "az_pr_show", "az_pr_comment", "az_pr_approve", "az_workitem_create"],
+  "expected_calls": [
+    {"name": "az_pr_create", "arguments": {"source_branch": "feature-auth", "target_branch": "main", "title": "Add authentication"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

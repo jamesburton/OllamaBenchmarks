@@ -1,0 +1,15 @@
+{
+  "name": "shell_05_env_var",
+  "category": "shell",
+  "description": "Get the value of HOME environment variable",
+  "prompt": "Get the value of the HOME environment variable.",
+  "tool_names": ["run_command", "get_env_var", "set_env_var", "kill_process", "check_port"],
+  "expected_calls": [
+    {"name": "get_env_var", "arguments": {"name": "HOME"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

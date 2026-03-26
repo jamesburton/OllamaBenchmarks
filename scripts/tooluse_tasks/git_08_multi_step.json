@@ -1,0 +1,16 @@
+{
+  "name": "git_08_multi_step",
+  "category": "git",
+  "description": "Create a branch and switch to it (multi-step)",
+  "prompt": "Create branch feature-x and switch to it.",
+  "tool_names": ["git_create_branch", "git_checkout", "git_status", "git_merge", "git_push", "git_pull", "git_log"],
+  "expected_calls": [
+    {"name": "git_create_branch", "arguments": {"name": "feature-x"}},
+    {"name": "git_checkout", "arguments": {"branch": "feature-x"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

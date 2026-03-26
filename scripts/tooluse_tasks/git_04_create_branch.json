@@ -1,0 +1,15 @@
+{
+  "name": "git_04_create_branch",
+  "category": "git",
+  "description": "Create a new branch from main",
+  "prompt": "Create a new branch called feature-auth from main.",
+  "tool_names": ["git_status", "git_create_branch", "git_checkout", "git_merge", "git_push", "git_pull"],
+  "expected_calls": [
+    {"name": "git_create_branch", "arguments": {"name": "feature-auth", "base": "main"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

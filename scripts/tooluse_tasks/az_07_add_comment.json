@@ -1,0 +1,15 @@
+{
+  "name": "az_07_add_comment",
+  "category": "az_devops",
+  "description": "Add a comment to a pull request",
+  "prompt": "Add a comment 'LGTM' to PR #42.",
+  "tool_names": ["az_pr_comment", "az_pr_approve", "az_pr_show", "az_pr_list", "az_pr_create", "az_workitem_update"],
+  "expected_calls": [
+    {"name": "az_pr_comment", "arguments": {"id": 42, "comment": "LGTM"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

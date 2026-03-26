@@ -1,0 +1,15 @@
+{
+  "name": "git_07_cherry_pick",
+  "category": "git",
+  "description": "Cherry-pick a specific commit",
+  "prompt": "Cherry-pick commit abc1234.",
+  "tool_names": ["git_cherry_pick", "git_merge", "git_rebase", "git_log", "git_diff", "git_reset"],
+  "expected_calls": [
+    {"name": "git_cherry_pick", "arguments": {"commit": "abc1234"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "shell_06_kill_process",
+  "category": "shell",
+  "description": "Kill a process by PID",
+  "prompt": "Kill process with PID 1234.",
+  "tool_names": ["run_command", "get_env_var", "set_env_var", "kill_process", "check_port"],
+  "expected_calls": [
+    {"name": "kill_process", "arguments": {"pid": 1234}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

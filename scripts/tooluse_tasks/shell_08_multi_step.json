@@ -1,0 +1,16 @@
+{
+  "name": "shell_08_multi_step",
+  "category": "shell",
+  "description": "Check if port is in use, then kill the process (multi-step)",
+  "prompt": "Check if port 8080 is in use, if so kill the process using it.",
+  "tool_names": ["run_command", "get_env_var", "set_env_var", "kill_process", "check_port"],
+  "expected_calls": [
+    {"name": "check_port", "arguments": {"port": 8080}},
+    {"name": "kill_process", "arguments": {}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "web_01_fetch",
+  "category": "web",
+  "description": "Fetch content from a URL",
+  "prompt": "Fetch the content of https://example.com.",
+  "tool_names": ["http_fetch", "http_post", "extract_links", "parse_html", "web_search", "download_file"],
+  "expected_calls": [
+    {"name": "http_fetch", "arguments": {"url": "https://example.com"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

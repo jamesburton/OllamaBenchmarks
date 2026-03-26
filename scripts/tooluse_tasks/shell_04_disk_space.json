@@ -1,0 +1,15 @@
+{
+  "name": "shell_04_disk_space",
+  "category": "shell",
+  "description": "Check available disk space",
+  "prompt": "Check how much disk space is available.",
+  "tool_names": ["run_command", "get_env_var", "set_env_var", "kill_process", "check_port"],
+  "expected_calls": [
+    {"name": "run_command", "arguments": {}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

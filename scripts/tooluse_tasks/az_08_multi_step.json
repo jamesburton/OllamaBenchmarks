@@ -1,0 +1,16 @@
+{
+  "name": "az_08_multi_step",
+  "category": "az_devops",
+  "description": "Create a bug, assign it, and set priority (multi-step)",
+  "prompt": "Create a bug 'API timeout' in project MyApp, assign it to me (james@test.com), and set priority to 1.",
+  "tool_names": ["az_workitem_create", "az_workitem_update", "az_workitem_query", "az_workitem_show", "az_pr_create", "az_pipeline_run"],
+  "expected_calls": [
+    {"name": "az_workitem_create", "arguments": {"project": "MyApp", "type": "Bug", "title": "API timeout"}},
+    {"name": "az_workitem_update", "arguments": {"assigned_to": "james@test.com", "priority": 1}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

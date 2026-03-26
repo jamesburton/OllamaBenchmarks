@@ -1,0 +1,704 @@
+{
+  "git_status": {
+    "type": "function",
+    "function": {
+      "name": "git_status",
+      "description": "Show the working tree status",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "short": {"type": "boolean", "description": "Give output in short format"},
+          "branch": {"type": "boolean", "description": "Show branch and tracking info"}
+        }
+      }
+    }
+  },
+  "git_diff": {
+    "type": "function",
+    "function": {
+      "name": "git_diff",
+      "description": "Show changes between commits, commit and working tree, etc.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "staged": {"type": "boolean", "description": "Show staged (cached) changes"},
+          "file": {"type": "string", "description": "Specific file to diff"},
+          "commit": {"type": "string", "description": "Compare against a specific commit"}
+        }
+      }
+    }
+  },
+  "git_log": {
+    "type": "function",
+    "function": {
+      "name": "git_log",
+      "description": "Show commit logs",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "limit": {"type": "integer", "description": "Maximum number of commits to show"},
+          "oneline": {"type": "boolean", "description": "Show each commit on a single line"},
+          "author": {"type": "string", "description": "Filter commits by author"},
+          "since": {"type": "string", "description": "Show commits after date"}
+        }
+      }
+    }
+  },
+  "git_commit": {
+    "type": "function",
+    "function": {
+      "name": "git_commit",
+      "description": "Record changes to the repository",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "message": {"type": "string", "description": "Commit message"},
+          "all": {"type": "boolean", "description": "Automatically stage modified and deleted files"},
+          "amend": {"type": "boolean", "description": "Amend the previous commit"}
+        },
+        "required": ["message"]
+      }
+    }
+  },
+  "git_add": {
+    "type": "function",
+    "function": {
+      "name": "git_add",
+      "description": "Add file contents to the staging area",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "files": {"type": "array", "items": {"type": "string"}, "description": "Files to add"},
+          "all": {"type": "boolean", "description": "Add all changes"}
+        }
+      }
+    }
+  },
+  "git_create_branch": {
+    "type": "function",
+    "function": {
+      "name": "git_create_branch",
+      "description": "Create a new branch",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "description": "Name of the new branch"},
+          "base": {"type": "string", "description": "Base branch or commit to branch from"}
+        },
+        "required": ["name"]
+      }
+    }
+  },
+  "git_checkout": {
+    "type": "function",
+    "function": {
+      "name": "git_checkout",
+      "description": "Switch branches or restore working tree files",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "branch": {"type": "string", "description": "Branch to switch to"},
+          "create": {"type": "boolean", "description": "Create the branch if it does not exist"},
+          "file": {"type": "string", "description": "File to restore"}
+        }
+      }
+    }
+  },
+  "git_merge": {
+    "type": "function",
+    "function": {
+      "name": "git_merge",
+      "description": "Join two or more development histories together",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "branch": {"type": "string", "description": "Branch to merge into current branch"},
+          "no_ff": {"type": "boolean", "description": "Create a merge commit even for fast-forward"},
+          "message": {"type": "string", "description": "Merge commit message"}
+        },
+        "required": ["branch"]
+      }
+    }
+  },
+  "git_stash": {
+    "type": "function",
+    "function": {
+      "name": "git_stash",
+      "description": "Stash changes in the working directory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "message": {"type": "string", "description": "Description of the stash"},
+          "action": {"type": "string", "description": "Stash action: push, pop, list, apply, drop"}
+        }
+      }
+    }
+  },
+  "git_cherry_pick": {
+    "type": "function",
+    "function": {
+      "name": "git_cherry_pick",
+      "description": "Apply changes from an existing commit",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "commit": {"type": "string", "description": "Commit hash to cherry-pick"},
+          "no_commit": {"type": "boolean", "description": "Apply changes without committing"}
+        },
+        "required": ["commit"]
+      }
+    }
+  },
+  "git_push": {
+    "type": "function",
+    "function": {
+      "name": "git_push",
+      "description": "Update remote refs along with associated objects",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "remote": {"type": "string", "description": "Remote name (default: origin)"},
+          "branch": {"type": "string", "description": "Branch to push"},
+          "force": {"type": "boolean", "description": "Force push"},
+          "set_upstream": {"type": "boolean", "description": "Set upstream tracking"}
+        }
+      }
+    }
+  },
+  "git_pull": {
+    "type": "function",
+    "function": {
+      "name": "git_pull",
+      "description": "Fetch and integrate changes from a remote repository",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "remote": {"type": "string", "description": "Remote name"},
+          "branch": {"type": "string", "description": "Branch to pull"},
+          "rebase": {"type": "boolean", "description": "Rebase instead of merge"}
+        }
+      }
+    }
+  },
+  "git_reset": {
+    "type": "function",
+    "function": {
+      "name": "git_reset",
+      "description": "Reset current HEAD to the specified state",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "commit": {"type": "string", "description": "Commit to reset to"},
+          "mode": {"type": "string", "description": "Reset mode: soft, mixed, hard"},
+          "file": {"type": "string", "description": "Unstage a specific file"}
+        }
+      }
+    }
+  },
+  "git_rebase": {
+    "type": "function",
+    "function": {
+      "name": "git_rebase",
+      "description": "Reapply commits on top of another base tip",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "branch": {"type": "string", "description": "Branch to rebase onto"},
+          "abort": {"type": "boolean", "description": "Abort the current rebase"},
+          "continue_rebase": {"type": "boolean", "description": "Continue after resolving conflicts"}
+        }
+      }
+    }
+  },
+  "az_workitem_create": {
+    "type": "function",
+    "function": {
+      "name": "az_workitem_create",
+      "description": "Create a new work item in Azure DevOps",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "project": {"type": "string", "description": "Project name"},
+          "type": {"type": "string", "description": "Work item type: Bug, Task, User Story, Feature, Epic"},
+          "title": {"type": "string", "description": "Title of the work item"},
+          "description": {"type": "string", "description": "Detailed description"},
+          "assigned_to": {"type": "string", "description": "Email of the assignee"},
+          "priority": {"type": "integer", "description": "Priority level (1-4)"},
+          "tags": {"type": "string", "description": "Comma-separated tags"}
+        },
+        "required": ["project", "type", "title"]
+      }
+    }
+  },
+  "az_workitem_update": {
+    "type": "function",
+    "function": {
+      "name": "az_workitem_update",
+      "description": "Update an existing work item in Azure DevOps",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "description": "Work item ID"},
+          "state": {"type": "string", "description": "New state: New, Active, Resolved, Closed"},
+          "assigned_to": {"type": "string", "description": "Email of the assignee"},
+          "priority": {"type": "integer", "description": "Priority level (1-4)"},
+          "title": {"type": "string", "description": "Updated title"},
+          "description": {"type": "string", "description": "Updated description"},
+          "tags": {"type": "string", "description": "Comma-separated tags"}
+        },
+        "required": ["id"]
+      }
+    }
+  },
+  "az_workitem_query": {
+    "type": "function",
+    "function": {
+      "name": "az_workitem_query",
+      "description": "Query work items using WIQL or filters",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "project": {"type": "string", "description": "Project name"},
+          "type": {"type": "string", "description": "Filter by work item type"},
+          "state": {"type": "string", "description": "Filter by state"},
+          "assigned_to": {"type": "string", "description": "Filter by assignee"},
+          "wiql": {"type": "string", "description": "Raw WIQL query string"}
+        },
+        "required": ["project"]
+      }
+    }
+  },
+  "az_workitem_show": {
+    "type": "function",
+    "function": {
+      "name": "az_workitem_show",
+      "description": "Show details of a specific work item",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "description": "Work item ID"}
+        },
+        "required": ["id"]
+      }
+    }
+  },
+  "az_pr_create": {
+    "type": "function",
+    "function": {
+      "name": "az_pr_create",
+      "description": "Create a pull request in Azure DevOps",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "project": {"type": "string", "description": "Project name"},
+          "repository": {"type": "string", "description": "Repository name"},
+          "source_branch": {"type": "string", "description": "Source branch"},
+          "target_branch": {"type": "string", "description": "Target branch"},
+          "title": {"type": "string", "description": "PR title"},
+          "description": {"type": "string", "description": "PR description"},
+          "reviewers": {"type": "array", "items": {"type": "string"}, "description": "Reviewer emails"}
+        },
+        "required": ["source_branch", "target_branch", "title"]
+      }
+    }
+  },
+  "az_pr_list": {
+    "type": "function",
+    "function": {
+      "name": "az_pr_list",
+      "description": "List pull requests in Azure DevOps",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "project": {"type": "string", "description": "Project name"},
+          "repository": {"type": "string", "description": "Repository name"},
+          "status": {"type": "string", "description": "Filter by status: active, completed, abandoned, all"},
+          "creator": {"type": "string", "description": "Filter by creator email"}
+        }
+      }
+    }
+  },
+  "az_pr_show": {
+    "type": "function",
+    "function": {
+      "name": "az_pr_show",
+      "description": "Show details of a specific pull request",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "description": "Pull request ID"},
+          "project": {"type": "string", "description": "Project name"},
+          "repository": {"type": "string", "description": "Repository name"}
+        },
+        "required": ["id"]
+      }
+    }
+  },
+  "az_pr_comment": {
+    "type": "function",
+    "function": {
+      "name": "az_pr_comment",
+      "description": "Add a comment to a pull request",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "description": "Pull request ID"},
+          "comment": {"type": "string", "description": "Comment text"},
+          "project": {"type": "string", "description": "Project name"},
+          "repository": {"type": "string", "description": "Repository name"}
+        },
+        "required": ["id", "comment"]
+      }
+    }
+  },
+  "az_pr_approve": {
+    "type": "function",
+    "function": {
+      "name": "az_pr_approve",
+      "description": "Approve a pull request",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "description": "Pull request ID"},
+          "project": {"type": "string", "description": "Project name"},
+          "repository": {"type": "string", "description": "Repository name"}
+        },
+        "required": ["id"]
+      }
+    }
+  },
+  "az_pipeline_run": {
+    "type": "function",
+    "function": {
+      "name": "az_pipeline_run",
+      "description": "Run a pipeline in Azure DevOps",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "project": {"type": "string", "description": "Project name"},
+          "pipeline_name": {"type": "string", "description": "Name of the pipeline"},
+          "branch": {"type": "string", "description": "Branch to run the pipeline on"},
+          "parameters": {"type": "object", "description": "Pipeline parameters"}
+        },
+        "required": ["project", "pipeline_name"]
+      }
+    }
+  },
+  "az_pipeline_list": {
+    "type": "function",
+    "function": {
+      "name": "az_pipeline_list",
+      "description": "List pipelines in Azure DevOps",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "project": {"type": "string", "description": "Project name"},
+          "status": {"type": "string", "description": "Filter by status"}
+        },
+        "required": ["project"]
+      }
+    }
+  },
+  "read_file": {
+    "type": "function",
+    "function": {
+      "name": "read_file",
+      "description": "Read the contents of a file",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string", "description": "Path to the file"},
+          "encoding": {"type": "string", "description": "File encoding (default: utf-8)"},
+          "line_start": {"type": "integer", "description": "Start reading from this line number"},
+          "line_end": {"type": "integer", "description": "Stop reading at this line number"}
+        },
+        "required": ["path"]
+      }
+    }
+  },
+  "write_file": {
+    "type": "function",
+    "function": {
+      "name": "write_file",
+      "description": "Write content to a file, creating it if it does not exist",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string", "description": "Path to the file"},
+          "content": {"type": "string", "description": "Content to write"},
+          "encoding": {"type": "string", "description": "File encoding (default: utf-8)"},
+          "append": {"type": "boolean", "description": "Append instead of overwrite"}
+        },
+        "required": ["path", "content"]
+      }
+    }
+  },
+  "list_directory": {
+    "type": "function",
+    "function": {
+      "name": "list_directory",
+      "description": "List files and directories in a path",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string", "description": "Directory path to list"},
+          "recursive": {"type": "boolean", "description": "List recursively"},
+          "include_hidden": {"type": "boolean", "description": "Include hidden files"}
+        },
+        "required": ["path"]
+      }
+    }
+  },
+  "glob_search": {
+    "type": "function",
+    "function": {
+      "name": "glob_search",
+      "description": "Search for files matching a glob pattern",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pattern": {"type": "string", "description": "Glob pattern (e.g. **/*.ts)"},
+          "path": {"type": "string", "description": "Base directory to search from"}
+        },
+        "required": ["pattern"]
+      }
+    }
+  },
+  "grep_search": {
+    "type": "function",
+    "function": {
+      "name": "grep_search",
+      "description": "Search file contents for a pattern",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pattern": {"type": "string", "description": "Regex pattern to search for"},
+          "path": {"type": "string", "description": "Directory or file to search in"},
+          "glob": {"type": "string", "description": "Only search files matching this glob (e.g. *.py)"},
+          "case_insensitive": {"type": "boolean", "description": "Case-insensitive search"}
+        },
+        "required": ["pattern"]
+      }
+    }
+  },
+  "move_file": {
+    "type": "function",
+    "function": {
+      "name": "move_file",
+      "description": "Move or rename a file or directory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source": {"type": "string", "description": "Source path"},
+          "destination": {"type": "string", "description": "Destination path"},
+          "overwrite": {"type": "boolean", "description": "Overwrite if destination exists"}
+        },
+        "required": ["source", "destination"]
+      }
+    }
+  },
+  "copy_file": {
+    "type": "function",
+    "function": {
+      "name": "copy_file",
+      "description": "Copy a file or directory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "source": {"type": "string", "description": "Source path"},
+          "destination": {"type": "string", "description": "Destination path"},
+          "overwrite": {"type": "boolean", "description": "Overwrite if destination exists"}
+        },
+        "required": ["source", "destination"]
+      }
+    }
+  },
+  "delete_path": {
+    "type": "function",
+    "function": {
+      "name": "delete_path",
+      "description": "Delete a file or directory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string", "description": "Path to delete"},
+          "recursive": {"type": "boolean", "description": "Delete directories recursively"}
+        },
+        "required": ["path"]
+      }
+    }
+  },
+  "http_fetch": {
+    "type": "function",
+    "function": {
+      "name": "http_fetch",
+      "description": "Fetch content from a URL via HTTP GET",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "url": {"type": "string", "description": "URL to fetch"},
+          "headers": {"type": "object", "description": "HTTP headers to include"},
+          "accept": {"type": "string", "description": "Accept header value"},
+          "timeout": {"type": "integer", "description": "Request timeout in seconds"}
+        },
+        "required": ["url"]
+      }
+    }
+  },
+  "http_post": {
+    "type": "function",
+    "function": {
+      "name": "http_post",
+      "description": "Send an HTTP POST request",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "url": {"type": "string", "description": "URL to post to"},
+          "body": {"type": "object", "description": "JSON body to send"},
+          "headers": {"type": "object", "description": "HTTP headers to include"},
+          "content_type": {"type": "string", "description": "Content-Type header"}
+        },
+        "required": ["url", "body"]
+      }
+    }
+  },
+  "extract_links": {
+    "type": "function",
+    "function": {
+      "name": "extract_links",
+      "description": "Extract all links from an HTML page",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "url": {"type": "string", "description": "URL of the page to extract links from"},
+          "html": {"type": "string", "description": "Raw HTML content to extract links from"},
+          "filter_domain": {"type": "string", "description": "Only return links from this domain"}
+        }
+      }
+    }
+  },
+  "parse_html": {
+    "type": "function",
+    "function": {
+      "name": "parse_html",
+      "description": "Parse HTML content and extract specific elements",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "url": {"type": "string", "description": "URL to fetch and parse"},
+          "html": {"type": "string", "description": "Raw HTML to parse"},
+          "selector": {"type": "string", "description": "CSS selector to extract"},
+          "attribute": {"type": "string", "description": "Element attribute to return"}
+        }
+      }
+    }
+  },
+  "web_search": {
+    "type": "function",
+    "function": {
+      "name": "web_search",
+      "description": "Search the web for information",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "description": "Search query"},
+          "num_results": {"type": "integer", "description": "Number of results to return"}
+        },
+        "required": ["query"]
+      }
+    }
+  },
+  "download_file": {
+    "type": "function",
+    "function": {
+      "name": "download_file",
+      "description": "Download a file from a URL and save it locally",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "url": {"type": "string", "description": "URL to download from"},
+          "destination": {"type": "string", "description": "Local path to save the file"},
+          "overwrite": {"type": "boolean", "description": "Overwrite if file exists"}
+        },
+        "required": ["url", "destination"]
+      }
+    }
+  },
+  "run_command": {
+    "type": "function",
+    "function": {
+      "name": "run_command",
+      "description": "Execute a shell command",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "command": {"type": "string", "description": "Command to execute"},
+          "cwd": {"type": "string", "description": "Working directory"},
+          "timeout": {"type": "integer", "description": "Timeout in seconds"},
+          "env": {"type": "object", "description": "Environment variables to set"}
+        },
+        "required": ["command"]
+      }
+    }
+  },
+  "get_env_var": {
+    "type": "function",
+    "function": {
+      "name": "get_env_var",
+      "description": "Get the value of an environment variable",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "description": "Environment variable name"}
+        },
+        "required": ["name"]
+      }
+    }
+  },
+  "set_env_var": {
+    "type": "function",
+    "function": {
+      "name": "set_env_var",
+      "description": "Set an environment variable",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "description": "Environment variable name"},
+          "value": {"type": "string", "description": "Value to set"}
+        },
+        "required": ["name", "value"]
+      }
+    }
+  },
+  "kill_process": {
+    "type": "function",
+    "function": {
+      "name": "kill_process",
+      "description": "Kill a running process by PID",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "pid": {"type": "integer", "description": "Process ID to kill"},
+          "signal": {"type": "string", "description": "Signal to send (default: SIGTERM)"},
+          "force": {"type": "boolean", "description": "Force kill (SIGKILL)"}
+        },
+        "required": ["pid"]
+      }
+    }
+  },
+  "check_port": {
+    "type": "function",
+    "function": {
+      "name": "check_port",
+      "description": "Check if a network port is in use",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "port": {"type": "integer", "description": "Port number to check"},
+          "host": {"type": "string", "description": "Host to check (default: localhost)"}
+        },
+        "required": ["port"]
+      }
+    }
+  }
+}

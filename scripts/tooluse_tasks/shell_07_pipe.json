@@ -1,0 +1,15 @@
+{
+  "name": "shell_07_pipe",
+  "category": "shell",
+  "description": "List files and filter for .py extension",
+  "prompt": "List files and filter for .py extension.",
+  "tool_names": ["run_command", "get_env_var", "set_env_var", "kill_process", "check_port"],
+  "expected_calls": [
+    {"name": "run_command", "arguments": {}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

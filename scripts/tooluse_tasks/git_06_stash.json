@@ -1,0 +1,15 @@
+{
+  "name": "git_06_stash",
+  "category": "git",
+  "description": "Stash current changes with a message",
+  "prompt": "Stash the current changes with message 'WIP auth'.",
+  "tool_names": ["git_status", "git_stash", "git_diff", "git_add", "git_commit", "git_reset"],
+  "expected_calls": [
+    {"name": "git_stash", "arguments": {"message": "WIP auth"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

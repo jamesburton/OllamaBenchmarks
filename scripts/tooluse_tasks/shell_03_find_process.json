@@ -1,0 +1,15 @@
+{
+  "name": "shell_03_find_process",
+  "category": "shell",
+  "description": "Find running Node processes",
+  "prompt": "Find any running Node processes.",
+  "tool_names": ["run_command", "get_env_var", "set_env_var", "kill_process", "check_port"],
+  "expected_calls": [
+    {"name": "run_command", "arguments": {}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "az_01_create_workitem",
+  "category": "az_devops",
+  "description": "Create a bug work item",
+  "prompt": "Create a bug in project MyApp titled 'Login page broken'.",
+  "tool_names": ["az_workitem_create", "az_workitem_update", "az_workitem_query", "az_workitem_show", "az_pr_create", "az_pipeline_run"],
+  "expected_calls": [
+    {"name": "az_workitem_create", "arguments": {"project": "MyApp", "type": "Bug", "title": "Login page broken"}}
+  ],
+  "scoring": {
+    "tool_selection_weight": 0.5,
+    "param_accuracy_weight": 0.3,
+    "no_hallucination_weight": 0.2
+  }
+}
