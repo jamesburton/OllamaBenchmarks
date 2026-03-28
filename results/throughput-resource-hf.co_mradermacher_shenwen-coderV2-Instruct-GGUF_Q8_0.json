@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-28T17:29:13.6643063+00:00",
+    "run_finished_at":  "2026-03-28T17:29:20.0945995+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-hf.co_mradermacher_shenwen-coderV2-Instruct-GGUF_Q8_0.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:Q8_0"
+               ],
+    "completed_models":  [
+                             "hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:Q8_0"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:Q8_0",
+                        "eval_count":  192,
+                        "eval_s":  0.808,
+                        "toks_per_s":  237.6,
+                        "total_s":  1.009,
+                        "load_s":  0.078,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  1,
+                        "gpu_util_avg":  0,
+                        "gpu_util_peak":  0,
+                        "gpu_mem_peak_gb":  1.48,
+                        "ollama_ps":  "hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:Q8_0 size=1.8GB vram=1.8GB ctx=32768 quant=unknown"
+                    }
+                ]
+}

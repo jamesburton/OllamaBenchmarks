@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-28T17:31:04.3657017+00:00",
+    "run_finished_at":  "2026-03-28T17:31:10.5870451+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-hf.co_xhxlb_IQuest-Coder-V1-7B-Instruct-GGUF_Q4_K_M.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M"
+               ],
+    "completed_models":  [
+                             "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M",
+                        "eval_count":  150,
+                        "eval_s":  3.411,
+                        "toks_per_s":  43.97,
+                        "total_s":  3.521,
+                        "load_s":  0.031,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  5.57,
+                        "gpu_util_avg":  79.6,
+                        "gpu_util_peak":  79.6,
+                        "gpu_mem_peak_gb":  13.2,
+                        "ollama_ps":  "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M size=21.36GB vram=21.36GB ctx=131072 quant=unknown"
+                    }
+                ]
+}
