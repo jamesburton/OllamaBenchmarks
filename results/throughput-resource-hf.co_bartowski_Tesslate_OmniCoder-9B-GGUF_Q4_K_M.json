@@ -1,0 +1,34 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-22T13:50:03.7408826+00:00",
+    "run_finished_at":  "2026-03-22T13:50:12.5749063+00:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-hf.co_bartowski_Tesslate_OmniCoder-9B-GGUF_Q4_K_M.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M"
+               ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M",
+                        "eval_count":  143,
+                        "eval_s":  5.273,
+                        "toks_per_s":  27.12,
+                        "total_s":  5.666,
+                        "load_s":  0.131,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  1.13,
+                        "gpu_util_avg":  87.6,
+                        "gpu_util_peak":  87.6,
+                        "gpu_mem_peak_gb":  16,
+                        "ollama_ps":  "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M size=15.56GB vram=15.56GB ctx=262144 quant=unknown"
+                    }
+                ]
+}
