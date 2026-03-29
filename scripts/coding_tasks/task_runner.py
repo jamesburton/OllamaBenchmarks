@@ -108,6 +108,10 @@ def call_ollama(
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             body = json.loads(resp.read().decode("utf-8"))
         content = body.get("message", {}).get("content", "")
+        # Fall back to thinking field for models using Ollama's native thinking mode
+        # (e.g., IQuest-Coder puts all output in message.thinking, content is empty)
+        if not content:
+            content = body.get("message", {}).get("thinking", "")
         # Strip thinking tags if present (some models use <think>...</think>)
         if "<think>" in content:
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()

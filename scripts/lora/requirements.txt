@@ -1,0 +1,27 @@
+# LoRA fine-tuning dependencies for IQuest-Coder-V1-7B
+# Tested on Linux with CUDA 12.x and RTX 3060 12GB
+
+# Core training stack
+torch>=2.4.0
+transformers>=4.46.0
+accelerate>=1.2.0
+datasets>=3.0.0
+peft>=0.14.0
+trl>=0.14.0
+bitsandbytes>=0.45.0
+
+# Unsloth (preferred fast path — install separately if architecture is supported)
+# pip install unsloth
+# Note: IQuest-Coder-V1-7B uses a custom 'iquestcoder' architecture.
+# Unsloth may not support it. The training script falls back to PEFT+TRL automatically.
+
+# GGUF export
+llama-cpp-python>=0.3.0
+
+# Data generation
+pyyaml>=6.0
+
+# Utilities
+safetensors>=0.4.0
+sentencepiece>=0.2.0
+protobuf>=4.25.0

@@ -375,7 +375,11 @@ def run_model(model: str) -> dict:
                     "options": {**general_options, "num_predict": 220, "seed": 42},
                 },
             )
-            code = extract_code(response.get("response", ""))
+            raw_text = response.get("response", "")
+            # Fall back to thinking field for native-thinking models
+            if not raw_text:
+                raw_text = response.get("thinking", "")
+            code = extract_code(raw_text)
             if run_python_asserts(code, asserts):
                 row["coding_pass"] += 1
         except Exception:
