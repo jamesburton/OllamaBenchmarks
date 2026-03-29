@@ -1,8 +1,8 @@
 {
   "benchmark": "quality",
   "run_started_at": "2026-03-29T12:26:21.976171+00:00",
-  "run_finished_at": "2026-03-29T12:26:35.556342+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-hf.co_xhxlb_IQuest-Coder-V1-7B-Instruct-GGUF_Q4_K_M.json",
+  "run_finished_at": "2026-03-29T12:26:35.559567+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-20260329-122621.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
     "captured_at": "2026-03-29T12:26:22.516695+00:00",
@@ -34,6 +34,11 @@
   "models": [
     "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M"
   ],
+  "completed_models": [
+    "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
       "model": "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M",
