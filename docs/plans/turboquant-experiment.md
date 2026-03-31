@@ -1,7 +1,7 @@
 # TurboQuant KV Cache Experiment Plan
 
-**Date:** 2026-03-29
-**Goal:** Test TurboQuant KV cache quantization for parallel inference on Strix
+**Date:** 2026-03-30
+**Goal:** Test TurboQuant KV cache quantization for parallel inference on Strix + large MoE models on Framework
 
 ---
 
@@ -102,7 +102,95 @@ GRUB_CMDLINE_LINUX_DEFAULT="amdgpu.gttsize=117760"
 is the primary control. Some users report success with OLLAMA_GPU_MEMORY
 override on Ollama 0.18+.
 
-## Recommended Test Sequence
+## Framework: Mistral-Small-4 Q4_K_M via TurboQuant
+
+**Machine:** Framework laptop, 96GB RAM + 12GB VRAM (RTX 3060)
+
+### Why TurboQuant is needed
+
+Mistral-Small-4 is a 119B MoE (128 experts, 4 active, 6.5B active/token).
+The Q4_K_M GGUF is 72.6GB — fits in 96GB RAM, but KV cache at FP16 adds
+8-15GB+ at long contexts, pushing past the memory ceiling.
+
+With TQ3 KV cache (~4.9x compression), KV drops to ~2-3GB, giving ~17GB
+headroom for OS, CUDA, and inference buffers.
+
+### Memory budget
+
+| Component             | Without TQ | With TQ3 |
+|-----------------------|------------|----------|
+| Model weights (Q4_K_M)| 72.6 GB   | 72.6 GB  |
+| KV cache (8K ctx)     | ~8 GB     | ~1.6 GB  |
+| KV cache (32K ctx)    | ~15 GB    | ~3 GB    |
+| OS + CUDA overhead    | ~5 GB     | ~5 GB    |
+| **Total (32K ctx)**   | **~93 GB**| **~81 GB** |
+
+### Preferred fork
+
+Use `spiritbuun/llama-cpp-turboquant-cuda` — explicit CUDA kernel support,
+275 stars, better fit for RTX 3060 than the Vulkan-oriented TheTom fork.
+
+### Build steps (Framework)
+
+```powershell
+# Prerequisites: Visual Studio 2022 Build Tools + CMake + CUDA Toolkit
+cd C:\Development
+git clone https://github.com/spiritbuun/llama-cpp-turboquant-cuda.git
+cd llama-cpp-turboquant-cuda
+cmake -B build -DGGML_CUDA=ON
+cmake --build build --config Release -j
+```
+
+### Download model
+
+```bash
+# bartowski Q4_K_M split files (~72.6GB total)
+# Download from: https://huggingface.co/bartowski/mistralai_Mistral-Small-4-119B-2603-GGUF
+# Place in a models directory, e.g. C:\Models\
+```
+
+### Run
+
+```bash
+./build/bin/llama-server \
+  -m C:/Models/Mistral-Small-4-119B-2603-Q4_K_M.gguf \
+  --cache-type-k tq3 --cache-type-v tq3 \
+  -ngl 10 \
+  --host 0.0.0.0 --port 8080
+```
+
+- `-ngl 10`: offload ~10 layers to RTX 3060 (12GB VRAM) for acceleration
+- Bulk of model stays in system RAM
+- Adjust `-ngl` up/down based on observed VRAM usage
+
+### Fallback: without TurboQuant
+
+If the TurboQuant fork has issues, standard llama-server with `q4_0` KV cache
+is available now and gives ~4x compression (similar to TQ4):
+
+```bash
+llama-server \
+  -m C:/Models/Mistral-Small-4-119B-2603-Q4_K_M.gguf \
+  --cache-type-k q4_0 --cache-type-v q4_0 \
+  -ngl 10 \
+  --host 0.0.0.0 --port 8080
+```
+
+### Benchmark plan
+
+1. Build spiritbuun/llama-cpp-turboquant-cuda with CUDA on Framework
+2. Download Mistral-Small-4 Q4_K_M from bartowski
+3. Run llama-server with TQ3 KV cache, -ngl 10
+4. Quick quality check: 5-question suite
+5. Throughput test: tok/s at 8K and 32K context
+6. Compare vs Q3_K_M (54.6GB) to see if Q4_K_M quality uplift justifies the tighter fit
+7. If TQ fork fails, fall back to standard llama-server with q4_0 KV cache
+
+---
+
+## Strix: Parallel Inference via TurboQuant
+
+### Recommended Test Sequence
 
 1. Try `OLLAMA_KV_CACHE_TYPE=q4_0` first (available now, ~4x compression)
 2. Install VS 2022 Build Tools + CMake on Strix
