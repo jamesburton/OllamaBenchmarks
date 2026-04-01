@@ -1,16 +1,16 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-03-29T12:42:40.110242+00:00",
-  "run_finished_at": "2026-03-29T12:56:01.985085+00:00",
+  "run_started_at": "2026-04-01T10:13:10.312401+00:00",
+  "run_finished_at": "2026-04-01T10:19:38.451396+00:00",
   "models": [
-    "hf.co/xhxlb/IQuest-Coder-V1-14B-Instruct-GGUF:Q4_K_M"
+    "nemotron-3-nano:4b"
   ],
   "results": [
     {
-      "model": "hf.co/xhxlb/IQuest-Coder-V1-14B-Instruct-GGUF:Q4_K_M",
+      "model": "nemotron-3-nano:4b",
       "benchmark": "coding",
-      "run_started_at": "2026-03-29T12:42:40.110914+00:00",
-      "run_finished_at": "2026-03-29T12:56:01.984460+00:00",
+      "run_started_at": "2026-04-01T10:13:10.312401+00:00",
+      "run_finished_at": "2026-04-01T10:19:38.445027+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
@@ -21,20 +21,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 44.12,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\aspnet_oneof_controller.cs"
+          "generation_time_s": 15.7,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\aspnet_oneof_controller.cs"
         },
         {
           "task": "aspnet_validation_endpoint",
           "category": "aspnet",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 30.45,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\aspnet_validation_endpoint.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 12.45,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\aspnet_validation_endpoint.cs"
         },
         {
           "task": "aspnet_service_di",
@@ -45,8 +45,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 30.38,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\aspnet_service_di.cs"
+          "generation_time_s": 8.67,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\aspnet_service_di.cs"
         },
         {
           "task": "efcore_leftjoin",
@@ -57,8 +57,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 42.87,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\efcore_leftjoin.cs"
+          "generation_time_s": 13.7,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\efcore_leftjoin.cs"
         },
         {
           "task": "efcore_json_columns",
@@ -69,20 +69,20 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 36.46,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\efcore_json_columns.cs"
+          "generation_time_s": 11.06,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\efcore_json_columns.cs"
         },
         {
           "task": "efcore_executeupdate",
           "category": "efcore",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 1,
-          "tests_total": 1,
-          "generation_time_s": 33.45,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\efcore_executeupdate.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 17.39,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\efcore_executeupdate.cs"
         },
         {
           "task": "masstransit_consumer",
@@ -93,8 +93,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 25.43,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\masstransit_consumer.cs"
+          "generation_time_s": 9.16,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\masstransit_consumer.cs"
         },
         {
           "task": "masstransit_statemachine",
@@ -105,8 +105,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 44.32,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\masstransit_statemachine.cs"
+          "generation_time_s": 20.48,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\masstransit_statemachine.cs"
         },
         {
           "task": "masstransit_test_harness",
@@ -117,35 +117,11 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 33.28,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\masstransit_test_harness.cs"
+          "generation_time_s": 20.17,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\masstransit_test_harness.cs"
         },
         {
           "task": "blazor_interactive_component",
-          "category": "blazor",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 2.5,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\blazor_interactive_component.cs"
-        },
-        {
-          "task": "blazor_streaming_render",
-          "category": "blazor",
-          "weight": 1,
-          "passed": false,
-          "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 13.77,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\blazor_streaming_render.cs"
-        },
-        {
-          "task": "blazor_cascading_auth",
           "category": "blazor",
           "weight": 1,
           "passed": true,
@@ -153,8 +129,32 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 27.88,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\blazor_cascading_auth.cs"
+          "generation_time_s": 8.19,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\blazor_interactive_component.cs"
+        },
+        {
+          "task": "blazor_streaming_render",
+          "category": "blazor",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 2,
+          "generation_time_s": 9.69,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\blazor_streaming_render.cs"
+        },
+        {
+          "task": "blazor_cascading_auth",
+          "category": "blazor",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 11.67,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\blazor_cascading_auth.cs"
         },
         {
           "task": "xunit_v3_theory_tests",
@@ -165,20 +165,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 51.83,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\xunit_v3_theory_tests.cs"
+          "generation_time_s": 32.56,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\xunit_v3_theory_tests.cs"
         },
         {
           "task": "xunit_awesome_nsubstitute",
           "category": "xunit",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 6,
-          "tests_total": 6,
-          "generation_time_s": 74.87,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\xunit_awesome_nsubstitute.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 21.56,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\xunit_awesome_nsubstitute.cs"
         },
         {
           "task": "xunit_assembly_fixture",
@@ -189,8 +189,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 31.45,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\xunit_assembly_fixture.cs"
+          "generation_time_s": 12.61,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\xunit_assembly_fixture.cs"
         },
         {
           "task": "linq_complex_query",
@@ -201,32 +201,32 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 31.09,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\linq_complex_query.cs"
+          "generation_time_s": 5.36,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
           "category": "linq",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 16.47,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\async_cancellation.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 18.2,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\async_cancellation.cs"
         },
         {
           "task": "vertical_order_service",
           "category": "vertical",
           "weight": 2,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 6,
-          "tests_total": 6,
-          "generation_time_s": 34.65,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\vertical_order_service.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 12.81,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\vertical_order_service.cs"
         },
         {
           "task": "vertical_consumer_pipeline",
@@ -237,8 +237,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 67.87,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\vertical_consumer_pipeline.cs"
+          "generation_time_s": 27.12,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\vertical_consumer_pipeline.cs"
         },
         {
           "task": "vertical_blazor_crud",
@@ -249,11 +249,11 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 88.88,
-          "generated_code_path": "results\\coding-generated\\hf.co_xhxlb_IQuest-Coder-V1-14B-Instruct-GGUF_Q4_K_M\\vertical_blazor_crud.cs"
+          "generation_time_s": 38.97,
+          "generated_code_path": "results\\coding-generated\\nemotron-3-nano_4b\\vertical_blazor_crud.cs"
         }
       ],
-      "layer3_weighted_score": 0.30434782608695654
+      "layer3_weighted_score": 0.13043478260869565
     }
   ]
 }
