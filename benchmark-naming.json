@@ -62,8 +62,28 @@
     "machine_aliases": {
       "FRAMEWORK": "framework",
       "Framework": "framework",
+      "FRAMEWORK-NOGPU": "framework-nogpu",
       "STRIX": "strix",
       "T5500": "t5500"
+    },
+    "machine_profiles": {
+      "framework": {
+        "description": "Framework laptop with RTX 3060 eGPU",
+        "ram_gb": 96,
+        "gpu": "RTX 3060 12GB",
+        "gpu_vram_gb": 12,
+        "cpu": "Intel Core Ultra 7 155H (22 threads)",
+        "ollama_env": {}
+      },
+      "framework-nogpu": {
+        "description": "Framework laptop without eGPU (CPU-only inference)",
+        "ram_gb": 96,
+        "gpu": null,
+        "gpu_vram_gb": 0,
+        "cpu": "Intel Core Ultra 7 155H (22 threads)",
+        "ollama_env": {"OLLAMA_NUM_GPU": "0"},
+        "notes": "Use num_gpu:0 in API options or OLLAMA_NUM_GPU=0 env var to force CPU-only. Tests portability when eGPU dock is disconnected."
+      }
     }
   }
 }
