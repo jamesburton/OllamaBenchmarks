@@ -114,6 +114,7 @@
     "qwen3:8b": "T5500: 48.65 tok/s, 5/5 quality on Ollama 0.18.1. Failed on 0.18.0.",
     "cogito:14b": "T5500 best PPL: 34.36 tok/s, 5/5 quality, 9.05GB VRAM, PPL 3.47.",
     "mistral-small-4": "119B MoE (128 experts, 4 active, 6.5B active/token). Not yet on Ollama library — use llama-server with bartowski GGUF. Framework (96GB RAM + 12GB VRAM): Q3_K_M (54.6GB) is the sweet spot; Q4_K_M (72.6GB) fits tight; IQ4_XS (63.8GB) is a good middle ground. T5500 (36GB RAM + 12GB VRAM): only IQ1 quants fit, too lossy to be meaningful.",
+    "nemotron-3-nano:4b": "Framework GPU champion (v2): 84.3 tok/s, 5/5, ~3GB VRAM, 0.41s load, 256K context. Beats cogito:8b on all metrics. TurboQuant TQ3 needed to use full 256K context (9.6GB KV at 256K would exceed 12GB without it).",
     "nemotron-cascade-2": "T5500: cannot load. MoE 30B-A3B model needs 22.6 GiB system memory; T5500 has 36GB RAM + 12GB VRAM but only ~22.4 GiB available after OS/CUDA overhead. Even smallest HF quant (IQ1_S) is 18GB due to MoE floor. Crashes Ollama service on load attempt. Strix-only (5/5, 27.83 tok/s there).",
     "sam860/LFM2:2.6b": "Framework GPU: 52.1 tok/s (via LFM2-2.6b-tools), 3/5 quality. Framework No-GPU: 2.9 tok/s. Template fix in models/LFM2-2.6b-tools.Modelfile raises tool_pass 0→1/2.",
     "gemma3:12b": "Framework GPU: 36.1 tok/s (via gemma3-12b-tools), 4/5 quality. Framework No-GPU: 1.7 tok/s. Default Ollama template lacks tool handling (2/5, tool 0/2). Template fix in models/gemma3-12b-tools.Modelfile raises to 4/5. Applies to all gemma3 sizes.",
