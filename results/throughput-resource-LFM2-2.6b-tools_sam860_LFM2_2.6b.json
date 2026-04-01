@@ -1,0 +1,32 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-03-31T02:09:42.9387702+01:00",
+    "run_finished_at":  "2026-03-31T02:09:43.3210076+01:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-LFM2-2.6b-tools_sam860_LFM2_2.6b.json",
+    "host":  "FRAMEWORK",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "FRAMEWORK"
+                     },
+    "models":  [
+                   "LFM2-2.6b-tools,sam860/LFM2:2.6b"
+               ],
+    "completed_models":  [
+
+                         ],
+    "failed_models":  [
+                          {
+                              "model":  "LFM2-2.6b-tools,sam860/LFM2:2.6b",
+                              "error":  "The remote server returned an error: (404) Not Found."
+                          }
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+
+                ]
+}
