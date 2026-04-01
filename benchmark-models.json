@@ -119,7 +119,7 @@
     "gemma3:12b": "Framework GPU: 36.1 tok/s (via gemma3-12b-tools), 4/5 quality. Framework No-GPU: 1.7 tok/s. Default Ollama template lacks tool handling (2/5, tool 0/2). Template fix in models/gemma3-12b-tools.Modelfile raises to 4/5. Applies to all gemma3 sizes.",
     "cogito:8b": "Framework GPU champion: 61.6 tok/s, 5/5 quality, 4.9GB VRAM — fits fully in 12GB RTX 3060. Framework No-GPU: 2.5 tok/s. Best balance of quality and speed with eGPU.",
     "cogito:14b": "Framework: 4.3 tok/s GPU (partial offload — 9GB exceeds VRAM headroom), 5/5 quality. Framework No-GPU: 2.4 tok/s. Barely faster with GPU due to partial offload; T5500 best PPL: 34.36 tok/s, 5/5, 9.05GB VRAM.",
-    "ministral-3:14b": "Framework No-GPU: 3.2 tok/s — fastest CPU-only option of tested models despite being 9.1GB. T5500: 5/5 quality.",
+    "ministral-3:14b": "Framework GPU: 3.0 tok/s, No-GPU: 3.2 tok/s — GPU offload overhead actually hurts at this size (9.1GB exceeds 12GB VRAM headroom). Fastest CPU-only option of tested models. T5500: 5/5 quality.",
     "rnj-1:8b": "Framework GPU: 51.7 tok/s, 5.1GB VRAM. Framework No-GPU: 2.8 tok/s."
   }
 }
