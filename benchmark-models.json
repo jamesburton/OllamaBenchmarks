@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-01T00:00:00.000000+00:00",
+  "updated_at": "2026-04-02T00:00:00.000000+00:00",
   "slug_convention": "The :latest tag is the default for any model and MUST be omitted from model names and slugs. Only explicit non-default tags (e.g. :14b, :q8_0, :bf16) are included.",
   "benchmark_suite": [
     "cogito:8b",
@@ -7,6 +7,11 @@
     "gemma3:4b",
     "gemma3:12b",
     "gemma3:27b",
+    "gemma4",
+    "gemma4:e2b",
+    "gemma4:26b",
+    "gemma4:31b",
+    "gemma4:26b-a4b-it-q8_0",
     "glm-4.7-flash",
     "glm-4.7-flash:bf16",
     "granite4:7b-a1b-h",
@@ -29,6 +34,7 @@
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
     "qwen3.5:35b-a3b-q2_k_l",
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
     "RogerBen/qwen3.5-35b-opus-distill",
     "rnj-1:8b",
     "zac/phi4-tools"
@@ -43,6 +49,10 @@
     "phi4-mini",
     "qwen3.5",
     "RogerBen/qwen3.5-35b-opus-distill",
+    "gemma4",
+    "gemma4:e2b",
+    "gemma4:26b",
+    "gemma4:31b",
     "rnj-1:8b",
     "zac/phi4-tools"
   ],
@@ -52,6 +62,11 @@
     "gemma3:4b",
     "gemma3:12b",
     "gemma3:27b",
+    "gemma4",
+    "gemma4:e2b",
+    "gemma4:26b",
+    "gemma4:31b",
+    "gemma4:26b-a4b-it-q8_0",
     "glm-4.7-flash",
     "glm-4.7-flash:bf16",
     "granite4:7b-a1b-h",
@@ -74,6 +89,7 @@
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
     "qwen3.5:35b-a3b-q2_k_l",
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
     "RogerBen/qwen3.5-35b-opus-distill",
     "rnj-1:8b",
     "zac/phi4-tools",
@@ -82,6 +98,9 @@
   ],
   "missing_from_local": [
     "gemma3:4b",
+    "gemma4",
+    "gemma4:26b-a4b-it-q8_0",
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
     "gemma3:12b",
     "gemma3:27b",
     "glm-4.7-flash",
@@ -121,6 +140,11 @@
     "cogito:8b": "Framework GPU champion: 61.6 tok/s, 5/5 quality, 4.9GB VRAM — fits fully in 12GB RTX 3060. Framework No-GPU: 2.5 tok/s. Best balance of quality and speed with eGPU.",
     "cogito:14b": "Framework: 4.3 tok/s GPU (partial offload — 9GB exceeds VRAM headroom), 5/5 quality. Framework No-GPU: 2.4 tok/s. Barely faster with GPU due to partial offload; T5500 best PPL: 34.36 tok/s, 5/5, 9.05GB VRAM.",
     "ministral-3:14b": "Framework GPU: 3.0 tok/s, No-GPU: 3.2 tok/s — GPU offload overhead actually hurts at this size (9.1GB exceeds 12GB VRAM headroom). Fastest CPU-only option of tested models. T5500: 5/5 quality.",
-    "rnj-1:8b": "Framework GPU: 51.7 tok/s, 5.1GB VRAM. Framework No-GPU: 2.8 tok/s."
+    "rnj-1:8b": "Framework GPU: 51.7 tok/s, 5.1GB VRAM. Framework No-GPU: 2.8 tok/s.",
+    "gemma4": "Framework GPU: 15.32 tok/s, 4/5 quality, 6.0GB VRAM, 0.48s load. MoE e4b (9.6GB model). Coding L3: 9/20 (0.435) — 2nd best on Framework. Tools work natively (no template fix needed unlike gemma3). Requires Ollama 0.20.0-rc1+.",
+    "gemma4:e2b": "Framework GPU speed champion: 89.12 tok/s, 4/5 quality, 9.09GB VRAM (fully GPU, Q4_K_M), 0.47s load. MoE 2.3B effective. Coding L3: 4/20 (0.217). Beats nemotron-3-nano:4b on speed (84.3) with same quality tier.",
+    "gemma4:26b": "Framework: 8.81 tok/s, 5/5 quality, 10.7GB VRAM (partial offload — 22.9GB model). Coding L3: 12/20 (0.565) — tied #1 on Framework (lost 2 to timeouts, could be 14/20). MoE 3.8B active/25.2B total. Best coding model in gemma4 family.",
+    "gemma4:31b": "Framework: 1.51 tok/s, 5/5 quality, 11.1GB VRAM (partial offload — 34.9GB dense model, 25GB RAM peak). Too slow for coding L3 on Framework. Better suited for Strix (64GB RAM) or machines with >24GB VRAM.",
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0": "Framework: fails to load on Ollama 0.20.0-rc1 (qwen3.5 arch blob error). Via llama-server (llama.cpp b8645 CUDA 12.4): 14.7 tok/s, 3/5 quality (coding 0/2, tools 2/2, agentic 1/1), 9.77GB VRAM. Coding L3 not available (requires Ollama native API). Reasoning distill based on qwen3.5:9b."
   }
 }

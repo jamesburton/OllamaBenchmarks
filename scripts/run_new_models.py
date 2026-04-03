@@ -7,9 +7,8 @@ import sys
 import datetime
 
 MODELS = [
-    "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M",
-    "hf.co/xhxlb/IQuest-Coder-V1-14B-Instruct-GGUF:Q4_K_M",
-    "hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:Q8_0",
+    "gemma4",
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
 ]
 
 RESULTS_DIR = "results"

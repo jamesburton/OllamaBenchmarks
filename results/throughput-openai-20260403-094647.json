@@ -1,0 +1,59 @@
+{
+  "benchmark": "throughput_openai",
+  "run_started_at": "2026-04-03T09:46:47.237579+00:00",
+  "run_finished_at": "2026-04-03T09:47:06.348323+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-openai-20260403-094647.json",
+  "base_url": "http://127.0.0.1:8081",
+  "host_details": {
+    "captured_at": "2026-04-03T09:46:51.884651+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26220",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 22,
+    "total_memory_gb": 95.47,
+    "python_version": "3.12.2",
+    "ollama_version": "ollama version is 0.20.0-rc1",
+    "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7026",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0"
+  ],
+  "results": [
+    {
+      "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
+      "completion_tokens": 192,
+      "toks_per_s": 14.7,
+      "total_s": 13.058,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 8.35,
+      "gpu_util_avg": 13.0,
+      "gpu_util_peak": 13.0,
+      "gpu_mem_peak_gb": 9.77,
+      "response_preview": ""
+    }
+  ]
+}
