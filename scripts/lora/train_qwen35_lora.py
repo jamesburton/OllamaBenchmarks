@@ -24,11 +24,13 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_TRAINING_DATA = SCRIPT_DIR / "training_data_1k.jsonl"
-DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "output" / "qwen35-9b-csharp-lora"
-DEFAULT_MERGED_DIR = SCRIPT_DIR / "output" / "qwen35-9b-csharp-merged"
-DEFAULT_GGUF_DIR = SCRIPT_DIR / "output" / "qwen35-9b-csharp-gguf"
+DEFAULT_OUTPUT_DIR = SCRIPT_DIR / "output" / "cogito-8b-csharp-lora"
+DEFAULT_MERGED_DIR = SCRIPT_DIR / "output" / "cogito-8b-csharp-merged"
+DEFAULT_GGUF_DIR = SCRIPT_DIR / "output" / "cogito-8b-csharp-gguf"
 
-BASE_MODEL = "unsloth/Qwen3.5-9B"  # Unsloth's pre-optimised variant
+# Qwen3.5-9B segfaults on Windows (GatedDeltaNet needs triton which is broken).
+# Using cogito-8B instead: Llama 3.1 arch, 5/5 quality, 61.6 tok/s on Framework.
+BASE_MODEL = "deepcogito/cogito-v1-preview-llama-8B"
 
 # LoRA config — conservative rank for 1K dataset to avoid overfitting
 LORA_R = 32
@@ -164,8 +166,7 @@ def try_unsloth(args, examples, load_in_4bit: bool):
         save_total_limit=2,
         fp16=use_fp16,
         bf16=use_bf16,
-        max_seq_length=args.max_seq_length,
-        dataset_text_field=None,
+        max_length=args.max_seq_length,
         optim="adamw_8bit",
         seed=42,
         report_to="none",
@@ -222,7 +223,10 @@ def train_peft_trl(args, examples, load_in_4bit: bool):
     else:
         load_kwargs["torch_dtype"] = torch.bfloat16
 
-    load_kwargs["device_map"] = "auto"
+    # Use sequential device map to keep all layers on GPU if they fit,
+    # spilling to CPU only for embeddings/lm_head. This avoids gradient
+    # device mismatches during backprop.
+    load_kwargs["device_map"] = {"": "cuda:0"}
     load_kwargs["attn_implementation"] = "eager"
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -237,6 +241,8 @@ def train_peft_trl(args, examples, load_in_4bit: bool):
         model = prepare_model_for_kbit_training(
             model, use_gradient_checkpointing=True
         )
+    else:
+        model.gradient_checkpointing_enable()
 
     lora_config = LoraConfig(
         r=args.lora_r,
@@ -274,8 +280,7 @@ def train_peft_trl(args, examples, load_in_4bit: bool):
         save_total_limit=2,
         fp16=use_fp16,
         bf16=use_bf16,
-        max_seq_length=args.max_seq_length,
-        dataset_text_field=None,
+        max_length=args.max_seq_length,
         gradient_checkpointing=True,
         gradient_checkpointing_kwargs={"use_reentrant": False},
         optim="paged_adamw_8bit",
@@ -285,7 +290,7 @@ def train_peft_trl(args, examples, load_in_4bit: bool):
     )
 
     trainer = SFTTrainer(
-        model=model, tokenizer=tokenizer, train_dataset=dataset,
+        model=model, processing_class=tokenizer, train_dataset=dataset,
         args=training_args, formatting_func=formatting_func,
     )
 
@@ -329,8 +334,8 @@ def export_gguf(merged_dir: Path):
     """Convert merged model to GGUF Q4_K_M for Ollama."""
     gguf_dir = DEFAULT_GGUF_DIR
     gguf_dir.mkdir(parents=True, exist_ok=True)
-    gguf_path = gguf_dir / "qwen35-9b-csharp-Q4_K_M.gguf"
-    f16_path = gguf_dir / "qwen35-9b-csharp-f16.gguf"
+    gguf_path = gguf_dir / "cogito-8b-csharp-Q4_K_M.gguf"
+    f16_path = gguf_dir / "cogito-8b-csharp-f16.gguf"
 
     print(f"\n=== Exporting to GGUF Q4_K_M ===")
 
@@ -411,7 +416,7 @@ SYSTEM "{SYSTEM_PROMPT}"
 """
     modelfile_path.write_text(content, encoding="utf-8")
     print(f"\nOllama Modelfile: {modelfile_path}")
-    print(f"Import: cd {gguf_path.parent} && ollama create qwen35-9b-csharp -f Modelfile")
+    print(f"Import: cd {gguf_path.parent} && ollama create cogito-8b-csharp -f Modelfile")
 
 
 def main():
@@ -433,14 +438,15 @@ def main():
         ]
 
     trained = False
+    # bitsandbytes 4-bit segfaults on Windows with this model.
+    # Force fp16 LoRA with CPU/GPU split — proven to work.
+    strategies = [(False, "fp16 LoRA (CPU/GPU split)")]
+
     for load_in_4bit, label in strategies:
         print(f"\n{'='*60}")
         print(f"Attempting: {label}")
         print(f"{'='*60}")
         try:
-            trained = try_unsloth(args, examples, load_in_4bit)
-            if trained:
-                break
             train_peft_trl(args, examples, load_in_4bit)
             trained = True
             break
@@ -472,9 +478,9 @@ def main():
 
     print("\n=== All done ===")
     print("\nNext steps:")
-    print("  1. Import to Ollama: ollama create qwen35-9b-csharp -f Modelfile")
-    print("  2. Benchmark: python scripts/benchmark_coding.py --models qwen35-9b-csharp --layers 3")
-    print("  3. Quality: python scripts/benchmark_quality.py --models qwen35-9b-csharp")
+    print("  1. Import to Ollama: ollama create cogito-8b-csharp -f Modelfile")
+    print("  2. Benchmark: python scripts/benchmark_coding.py --models cogito-8b-csharp --layers 3")
+    print("  3. Quality: python scripts/benchmark_quality.py --models cogito-8b-csharp")
 
 
 if __name__ == "__main__":
