@@ -1,44 +1,19 @@
-using System;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-
-interface IOrderRepository { }
-
-class OrderRepository : IOrderRepository
-{
-    public OrderRepository()
-    {
-    }
-
-    public OrderSettings Settings { get; }
-    public OrderRepository(OrderSettings settings) => Settings = settings;
+public class OrderRepository : IOrderRepository {
 }
 
-interface IOrderService { }
-
-class OrderService : IOrderService
-{
-    public OrderService() => Settings = OrderSettings.Default;
-    public OrderSettings Settings { get; }
-    public static OrderSettings Default => new OrderSettings();
+public class OrderService : IOrderService {
 }
 
-interface IEmailNotifier { }
-
-class EmailNotifier : IEmailNotifier
-{
-    public EmailNotifier() => Settings = OrderSettings.Default;
-    public OrderSettings Settings { get; }
-    public static OrderSettings Default => new OrderSettings();
+public class EmailNotifier : IEmailNotifier {
 }
 
-class OrderSettings
+public class OrderSettings
 {
-    public string WarehouseCode { get; set; } = "";
-    public int MaxRetries { get; set; } = 3;
+    public string WarehouseCode { get; set; }
+    public int MaxRetries { get; set; }
 }
 
-public static class ServiceCollectionExtensions
+static class ServiceCollectionExtensions
 {
     public static void AddOrderServices(this IServiceCollection services, IConfiguration config)
     {

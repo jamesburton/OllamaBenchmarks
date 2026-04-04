@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 public class Product
@@ -11,29 +17,22 @@ public class Product
 
 public class ProductDbContext : DbContext
 {
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
-
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) {}
     public DbSet<Product> Products { get; set; }
 }
 
-public partial class ProductOperations
+public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        var list = await db.Products
-            .Where(p => p.Category == category)
-            .ToListAsync();
-
-        var count = list.Count;
-
-        foreach (var p in list)
-        {
-            p.Price = p.Price * (1 - discountPct);
-            p.LastModified = DateTime.UtcNow;
-        }
-
-        await db.SaveChangesAsync();
-
-        return count;
+        bool changed = false;
+        await db.Products.Where(p => p.Category == category)
+            .ForEachAsync(async (p) =>
+            {
+                changed = true;
+                p.Price = p.Price * (1 - discountPct);
+                p.LastModified = DateTime.UtcNow;
+            });
+        return changed ? 1 : 0;
     }
 }

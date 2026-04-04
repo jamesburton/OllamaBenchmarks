@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public record Sale(string Product, string Category, decimal Amount, DateOnly Date);
-public record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
+record Sale(string Product, string Category, decimal Amount, DateOnly Date);
+
+record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
 
 public static class SalesAnalyzer
 {
@@ -11,13 +12,11 @@ public static class SalesAnalyzer
     {
         return sales
             .GroupBy(s => s.Category)
-            .Select(g => new CategorySummary
-            {
-                Category = g.Key,
-                TotalAmount = g.Sum(s => s.Amount),
-                AverageAmount = g.Average(),
-                Count = g.Count()
-            })
+            .Select(g => new CategorySummary(
+                Category: g.Key,
+                TotalAmount: g.Sum(s => s.Amount),
+                AverageAmount: g.Average(),
+                Count: g.Count()))
             .OrderByDescending(cs => cs.TotalAmount)
             .ToList();
     }

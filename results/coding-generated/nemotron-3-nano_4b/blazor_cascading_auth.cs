@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Threading.Tasks;
 
 public interface IUserService
 {
@@ -9,25 +8,29 @@ public interface IUserService
 
 public class UserDashboard : ComponentBase
 {
-    [CascadingParameter] public Task<AuthenticationState> AuthState { get; set; }
-    [Inject] public IUserService UserService { get; set; }
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    [Inject]
+    public IUserService UserService { get; set; }
+
     public string? DisplayName { get; set; }
+
     public bool IsAuthenticated { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedAsync()
     {
-        var auth = await AuthState.Value;
-        IsAuthenticated = auth.User?.Identity?.IsAuthenticated == true;
-        if (IsAuthenticated)
+        var authState = await AuthState;
+        if (authState.User?.Identity?.IsAuthenticated == true)
         {
-            var name = auth.User?.Identity?.Name;
-            if (!string.IsNullOrEmpty(name))
-            {
-                DisplayName = await UserService.GetDisplayNameAsync(name);
-            }
+            IsAuthenticated = true;
+            DisplayName = authState.User.Identity.Name;
+            var nameDisplay = await UserService.GetDisplayNameAsync(DisplayName ?? string.Empty);
+            this.DisplayName = nameDisplay;
         }
         else
         {
+            IsAuthenticated = false;
             DisplayName = "Guest";
         }
     }

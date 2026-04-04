@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 public class Customer
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 }
 
 public class Order
@@ -19,8 +21,7 @@ public class Order
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options) { }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Customer> Customers => Set<Customer>();
@@ -28,16 +29,19 @@ public class AppDbContext : DbContext
 
 public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
-static class OrderQueries
+public static class OrderQueries
 {
-    public static List<OrderDto> GetOrdersWithCustomers(DbContext db)
+    public static async Task<List<OrderDto>> GetOrdersWithCustomersAsync(AppDbContext db)
     {
-        return db.Orders
-            .LeftJoin(
-                db.Customers,
-                o => o.CustomerId,
-                c => c.Id,
-                (o, c) => new OrderDto(o.Id, o.Total, c?.Name ?? "Unknown"))
-            .ToList();
+        return await db.Orders
+                        .LeftJoin(
+                            db.Customers,
+                            order => order.CustomerId,
+                            customer => customer.Id,
+                            (order, customer) => new OrderDto(
+                                OrderId = order.Id,
+                                Total = order.Total,
+                                CustomerName = customer == null ? "Unknown" : customer.Name))
+                        .ToListAsync();
     }
 }

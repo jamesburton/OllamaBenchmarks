@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Components;
 
-// 1. TodoItem record
 public record TodoItem(int Id, string Title, bool IsCompleted);
 
-// 2. ITodoService interface
 public interface ITodoService
 {
     Task<List<TodoItem>> GetAllAsync();
@@ -12,7 +10,6 @@ public interface ITodoService
     Task ToggleAsync(int id);
 }
 
-// 3. TodoService implementation
 public class TodoService : ITodoService
 {
     private readonly List<TodoItem> _items = new();
@@ -39,16 +36,16 @@ public class TodoService : ITodoService
     public Task ToggleAsync(int id)
     {
         var item = _items.FirstOrDefault(i => i.Id == id);
-        if (item != null)
+        if (item != default)
         {
+            item = item with { IsCompleted = !item.IsCompleted };
             _items.Remove(item);
-            _items.Add(item with { IsCompleted = !item.IsCompleted });
+            _items.Add(item);
         }
         return Task.CompletedTask;
     }
 }
 
-// 4. TodoListBase component code-behind
 public partial class TodoListBase : ComponentBase
 {
     [Inject] public ITodoService TodoService { get; set; } = default!;
@@ -84,7 +81,50 @@ public partial class TodoListBase : ComponentBase
     }
 }
 
-// 5. xUnit v3 tests for TodoService
+public partial class TodoListBase
+{
+    protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+    {
+        builder.OpenElement(0, "h2");
+        builder.AddContent(1, "Todo List");
+        builder.CloseElement();
+
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(3, "class", "input-group");
+        builder.OpenElement(4, "input");
+        builder.AddAttribute(5, "type", "text");
+        builder.AddAttribute(6, "value", Microsoft.AspNetCore.Components.CompilerServices.RuntimeHelpers.TypeCheck(NewTitle));
+        builder.AddAttribute(7, "oninput", EventCallback.Factory.CreateBinder<string>(this, __value => NewTitle = __value, NewTitle));
+        builder.AddAttribute(8, "placeholder", "New todo...");
+        builder.CloseElement();
+        builder.OpenElement(9, "button");
+        builder.AddAttribute(10, "onclick", EventCallback.Factory.Create(this, AddTodo));
+        builder.AddContent(11, "Add");
+        builder.CloseElement();
+        builder.CloseElement();
+
+        builder.OpenElement(12, "ul");
+        foreach (var todo in Todos)
+        {
+            builder.OpenElement(13, "li");
+            builder.AddAttribute(14, "class", todo.IsCompleted ? "completed" : "");
+            builder.OpenElement(15, "span");
+            builder.AddContent(16, todo.Title);
+            builder.CloseElement();
+            builder.OpenElement(17, "button");
+            builder.AddAttribute(18, "onclick", EventCallback.Factory.Create<int>(this, id => ToggleTodo(todo.Id)));
+            builder.AddContent(19, todo.IsCompleted ? "Undo" : "Complete");
+            builder.CloseElement();
+            builder.OpenElement(20, "button");
+            builder.AddAttribute(21, "onclick", EventCallback.Factory.Create<int>(this, id => DeleteTodo(todo.Id)));
+            builder.AddContent(22, "Delete");
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        builder.CloseElement();
+    }
+}
+
 public class TodoServiceTests
 {
     [Fact]
@@ -133,12 +173,11 @@ public class TodoServiceTests
         await service.ToggleAsync(item.Id);
 
         // Assert
-        var updatedItems = await service.GetAllAsync();
-        updatedItems[0].IsCompleted.Should().BeTrue();
+        var updatedItem = (await service.GetAllAsync()).First(i => i.Id == item.Id);
+        updatedItem.IsCompleted.Should().BeTrue();
     }
 }
 
-// 6. bUnit test for TodoListBase
 public class TodoListBaseTests
 {
     [Fact]
@@ -152,6 +191,26 @@ public class TodoListBaseTests
         };
         mockService.GetAllAsync().Returns(Task.FromResult(initialTodos));
 
+        var component = new TodoListBase();
+        component.TodoService = mockService;
+
+        // Act
+        await component.OnInitializedAsync();
+
+        // Assert
+        mockService.Received().GetAllAsync();
+        component.Todos.Count.Should().Be(1);
+        component.Todos[0].Title.Should().Be("Test Todo");
+    }
+
+    [Fact]
+    public async Task RenderComponent_CallsGetAllAsyncOnInitialization()
+    {
+        // Arrange
+        var mockService = NSubstitute.Substitute.For<ITodoService>();
+        var initialTodos = new List<TodoItem>();
+        mockService.GetAllAsync().Returns(Task.FromResult(initialTodos));
+
         var ctx = new Bunit.TestContext();
         ctx.Services.AddSingleton<ITodoService>(mockService);
 
@@ -159,6 +218,6 @@ public class TodoListBaseTests
         var cut = ctx.RenderComponent<TodoListBase>();
 
         // Assert
-        await mockService.Received().GetAllAsync();
+        mockService.Received().GetAllAsync();
     }
 }

@@ -20,41 +20,51 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 {
     public async Task NotifyUserAsync(int userId)
     {
-        var user = await repo.GetByIdAsync(userId) ??
-                     throw new InvalidOperationException("User not found");
+        var user = await repo.GetByIdAsync(userId)
+            ?? throw new InvalidOperationException("User not found");
         await email.SendWelcomeAsync(user.Email);
     }
 }
 
-public class NotificationTests
+public class NotificationServiceTests
 {
-    [Fact]
-    public async Task HappyPath_EmpsMailSent()
+    private Substitute.IContainer _c;
+
+    public NotificationServiceTests()
     {
-        var repo = Substitute.For<IUserRepository>();
-        var email = Substitute.For<IEmailService>();
-        var sut = new NotificationService(repo, email);
-        int userId = 42;
-        var user = new User { Id = userId, Name = "Tester", Email = "test@example.com" };
-        repo.GetByIdAsync(userId).Returns(user);
-        email.SendWelcomeAsync("test@example.com").Returns(Task.CompletedTask);
-        var act = () => sut.NotifyUserAsync(userId);
-        await act.Should().BeVoid();
-        repo.Received().GetUserByIdAsync(userId);
-        email.Received().SendWelcomeAsync(Arg.Any<string>()).Returns(Task.CompletedTask);
+        _c = Substitute.NewContainer()
+            .For<IUserRepository>(Substitute.For<IUserRepository>())
+            .For<IEmailService>(Substitute.For<IEmailService>());
     }
 
     [Fact]
-    public async Task UserNotFound_ThrowsInvalidOperationException()
+    public async Task HappyPath_SendEmailWhenUserExists()
     {
-        var repo = Substitute.For<IUserRepository>();
-        var email = Substitute.For<IEmailService>();
-        var sut = new NotificationService(repo, email);
-        int userId = 99;
-        repo.GetByIdAsync(userId).Returns(Task.CompletedTask);
-        email.Received().SendWelcomeAsync(Arg.Any<string>()).Returns(Task.CompletedTask);
-        var act = () => sut.NotifyUserAsync(userId);
-        await act.Should().ThrowAsync<InvalidOperationException>();
-        repo.Received().GetUserByIdAsync(userId);
+        var repo = _c.For<IUserRepository>();
+        repo.GetByIdAsync(1).Returns(new User { Id = 1, Name = "Alice", Email = "alice@example.com" });
+
+        var email = _c.For<IEmailService>();
+        email.SendWelcomeAsync("alice@example.com").Returns();
+
+        var svc = new NotificationService(repo, email);
+        await svc.NotifyUserAsync(1).Should().NotThrow();
+
+        Expect(repo).Received()
+            .Call<NotificationService>((c, arg) => arg.Arg<int>() == 1, (c, a) => a);
+        Expect(email).ReturnedOnce((sub, args) => args.Arg<string>() == "alice@example.com");
+    }
+
+    [Fact]
+    public async Task NotFound_ThrowsInvalidOperationException()
+    {
+        var repo = _c.For<IUserRepository>();
+        repo.GetByIdAsync(99).Returns((User?)null);
+
+        var email = _c.For<IEmailService>();
+        var svc = new NotificationService(repo, email);
+
+        await svc.NotifyUserAsync(99).Should().ThrowAsync<InvalidOperationException>();
+
+        repo.Received().GetByIdAsync(99);
     }
 }

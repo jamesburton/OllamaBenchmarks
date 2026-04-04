@@ -1,32 +1,32 @@
 {
   "model": "LFM2-2.6b-tools",
   "benchmark": "coding",
-  "run_started_at": "2026-04-04T17:42:02.880967+00:00",
-  "run_finished_at": "2026-04-04T17:52:09.754286+00:00",
+  "run_started_at": "2026-04-04T18:37:44.833872+00:00",
+  "run_finished_at": "2026-04-04T19:26:57.666249+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
       "category": "aspnet",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 24.99,
-      "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\aspnet_oneof_controller.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 600.04,
+      "generated_code_path": null
     },
     {
       "task": "aspnet_validation_endpoint",
       "category": "aspnet",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 17.68,
-      "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\aspnet_validation_endpoint.cs"
+      "generation_time_s": 600.0,
+      "generated_code_path": null
     },
     {
       "task": "aspnet_service_di",
@@ -37,7 +37,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 17.83,
+      "generation_time_s": 61.29,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\aspnet_service_di.cs"
     },
     {
@@ -49,7 +49,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 31.64,
+      "generation_time_s": 28.51,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\efcore_leftjoin.cs"
     },
     {
@@ -61,7 +61,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 32.45,
+      "generation_time_s": 40.2,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\efcore_json_columns.cs"
     },
     {
@@ -73,7 +73,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 15.84,
+      "generation_time_s": 18.38,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\efcore_executeupdate.cs"
     },
     {
@@ -85,7 +85,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 12.92,
+      "generation_time_s": 14.63,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\masstransit_consumer.cs"
     },
     {
@@ -97,7 +97,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 28.49,
+      "generation_time_s": 34.29,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\masstransit_statemachine.cs"
     },
     {
@@ -109,7 +109,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 20.78,
+      "generation_time_s": 25.64,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\masstransit_test_harness.cs"
     },
     {
@@ -121,7 +121,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 9.42,
+      "generation_time_s": 9.84,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\blazor_interactive_component.cs"
     },
     {
@@ -133,7 +133,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 45.56,
+      "generation_time_s": 40.2,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\blazor_streaming_render.cs"
     },
     {
@@ -145,7 +145,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 18.13,
+      "generation_time_s": 14.73,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\blazor_cascading_auth.cs"
     },
     {
@@ -157,7 +157,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 48.67,
+      "generation_time_s": 46.49,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\xunit_v3_theory_tests.cs"
     },
     {
@@ -169,7 +169,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 37.32,
+      "generation_time_s": 33.91,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\xunit_awesome_nsubstitute.cs"
     },
     {
@@ -181,7 +181,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 18.28,
+      "generation_time_s": 16.14,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\xunit_assembly_fixture.cs"
     },
     {
@@ -193,20 +193,20 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 17.67,
+      "generation_time_s": 15.95,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\linq_complex_query.cs"
     },
     {
       "task": "async_cancellation",
-      "category": "linq",
+      "category": "async",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 22.46,
-      "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\async_cancellation.cs"
+      "generation_time_s": 600.0,
+      "generated_code_path": null
     },
     {
       "task": "vertical_order_service",
@@ -217,7 +217,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 58.91,
+      "generation_time_s": 108.5,
       "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\vertical_order_service.cs"
     },
     {
@@ -225,26 +225,25 @@
       "category": "vertical",
       "weight": 2,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 33.48,
-      "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\vertical_consumer_pipeline.cs"
+      "generation_time_s": 4.39,
+      "generated_code_path": null
     },
     {
       "task": "vertical_blazor_crud",
       "category": "vertical",
       "weight": 2,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 54.3,
-      "generated_code_path": "results\\coding-generated\\LFM2-2.6b-tools\\vertical_blazor_crud.cs"
+      "generation_time_s": 600.01,
+      "generated_code_path": null
     }
   ],
-  "layer3_weighted_score": 0.08695652173913043,
-  "composite_score": 0.052174
+  "layer3_weighted_score": 0.043478260869565216
 }

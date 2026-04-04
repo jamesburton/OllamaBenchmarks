@@ -7,27 +7,17 @@ public interface IDataSource
 
 public class DataProcessor
 {
-    public async IAsyncEnumerable<string> ProcessAllBatchesAsync(
-        IDataSource source,
-        [EnumeratorCancellation] CancellationToken ct = default)
+    public async IAsyncEnumerable<string> ProcessAllBatchesAsync(IDataSource source, [EnumeratorCancellation] CancellationToken ct = default)
     {
-        int batchNumber = 0;
-
+        int batch = 0;
         while (!ct.IsCancellationRequested)
         {
-            if (ct.IsCancellationRequested)
-            {
-                yield break;
-            }
+            var batchResult = await source.FetchBatchAsync(batch, ct).ConfigureAwait(false);
+            if (batchResult.Count == 0) break;
 
-            var batch = await source.FetchBatchAsync(batchNumber++, ct).ConfigureAwait(false);
-            if (batch.Count == 0)
-            {
-                yield break;
-            }
+            foreach (var item in batchResult) yield return item;
 
-            foreach (var item in batch)
-                yield return item;
+            batch++;
         }
     }
 }
