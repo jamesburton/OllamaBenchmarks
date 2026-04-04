@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-04-02T11:23:04.993884+00:00",
-  "run_finished_at": "2026-04-02T11:23:56.280285+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-gemma3-12b-tools.json",
+  "run_started_at": "2026-04-02T11:20:28.748727+00:00",
+  "run_finished_at": "2026-04-02T11:20:46.622379+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-20260402-112028.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-04-02T11:23:06.349187+00:00",
+    "captured_at": "2026-04-02T11:20:29.566733+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -32,18 +32,23 @@
     ]
   },
   "models": [
-    "gemma3-12b-tools"
+    "nemotron-3-nano:4b"
   ],
+  "completed_models": [
+    "nemotron-3-nano:4b"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
-      "model": "gemma3-12b-tools",
+      "model": "nemotron-3-nano:4b",
       "coding_pass": 2,
       "coding_total": 2,
       "tool_pass": 2,
       "tool_total": 2,
-      "agentic_pass": 0,
+      "agentic_pass": 1,
       "agentic_total": 1,
-      "score": 4,
+      "score": 5,
       "score_max": 5
     }
   ]

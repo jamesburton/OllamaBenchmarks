@@ -1,8 +1,8 @@
 {
   "benchmark": "quality",
   "run_started_at": "2026-04-02T11:23:04.993884+00:00",
-  "run_finished_at": "2026-04-02T11:23:56.280285+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-gemma3-12b-tools.json",
+  "run_finished_at": "2026-04-02T11:23:56.282165+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-20260402-112304.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
     "captured_at": "2026-04-02T11:23:06.349187+00:00",
@@ -34,6 +34,11 @@
   "models": [
     "gemma3-12b-tools"
   ],
+  "completed_models": [
+    "gemma3-12b-tools"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
       "model": "gemma3-12b-tools",

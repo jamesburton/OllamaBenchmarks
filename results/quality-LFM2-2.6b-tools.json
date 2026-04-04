@@ -1,27 +1,35 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-31T01:04:26.034241+00:00",
-  "run_finished_at": "2026-03-31T01:05:50.482039+00:00",
+  "run_started_at": "2026-04-02T11:21:16.233201+00:00",
+  "run_finished_at": "2026-04-02T11:22:32.531309+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-LFM2-2.6b-tools.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-31T01:05:37.248584+00:00",
-    "hostname": "Framework",
-    "host_slug": "framework",
+    "captured_at": "2026-04-02T11:21:17.297250+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
     "os": {
       "system": "Windows",
       "release": "11",
-      "version": "10.0.26220",
+      "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": null,
-    "model": null,
-    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
-    "logical_cpu_count": 22,
-    "total_memory_gb": null,
-    "python_version": "3.12.2",
-    "ollama_version": "ollama version is 0.17.1",
-    "gpus": []
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.18.2",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
   },
   "models": [
     "LFM2-2.6b-tools"

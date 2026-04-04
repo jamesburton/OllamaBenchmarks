@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-04-02T12:20:56.7919296+01:00",
+    "run_finished_at":  "2026-04-02T12:21:05.9795281+01:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-nemotron-3-nano_4b.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "nemotron-3-nano:4b"
+               ],
+    "completed_models":  [
+                             "nemotron-3-nano:4b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "nemotron-3-nano:4b",
+                        "eval_count":  192,
+                        "eval_s":  5.302,
+                        "toks_per_s":  36.21,
+                        "total_s":  5.812,
+                        "load_s":  0.294,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  1.1,
+                        "gpu_util_avg":  107.1,
+                        "gpu_util_peak":  107.1,
+                        "gpu_mem_peak_gb":  13.16,
+                        "ollama_ps":  "nemotron-3-nano:4b size=9.41GB vram=9.41GB ctx=262144 quant=Q4_K_M"
+                    }
+                ]
+}

@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-04-02T12:19:56.9144757+01:00",
+    "run_finished_at":  "2026-04-02T12:20:04.8438231+01:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-sam860_LFM2_2.6b.json",
+    "host":  "STRIX",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "STRIX"
+                     },
+    "models":  [
+                   "sam860/LFM2:2.6b"
+               ],
+    "completed_models":  [
+                             "sam860/LFM2:2.6b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "sam860/LFM2:2.6b",
+                        "eval_count":  178,
+                        "eval_s":  4.143,
+                        "toks_per_s":  42.97,
+                        "total_s":  4.225,
+                        "load_s":  0.043,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  0.91,
+                        "gpu_util_avg":  51.2,
+                        "gpu_util_peak":  51.2,
+                        "gpu_mem_peak_gb":  4.96,
+                        "ollama_ps":  "sam860/LFM2:2.6b size=4.17GB vram=4.17GB ctx=128000 quant=unknown"
+                    }
+                ]
+}
