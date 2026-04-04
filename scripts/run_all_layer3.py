@@ -11,37 +11,42 @@ import sys
 import datetime
 
 MODELS = [
-    # Tier 1: Top quality scorers (5/5 quality), most likely to do well
-    "qwen3.5",              # 9b, champion tier
-    "qwen3.5:4b",           # best value
-    "cogito:14b",           # best PPL
-    "qwen3:8b",             # strong quality
-    "qwen3:14b",            # larger qwen3
-    # Tier 2: Coding-focused models
-    "qwen3-coder-next",     # 51GB frontier (already done but re-run for clean data)
-    "qwen3-coder:30b",
-    # Tier 3: Other strong models
-    "RogerBen/qwen3.5-35b-opus-distill",
-    "phi4-mini",
-    "ministral-3:14b",
-    "granite4:7b-a1b-h",
-    "granite4:32b-a9b-h",
-    "devstral-small-2:24b-instruct-2512-q8_0",
-    "glm-4.7-flash",
-    "nemotron-3-nano",
-    # Tier 4: Larger / slower models
-    "lfm2:24b",
-    "qwen3.5:35b-a3b",
-    "qwen3.5:122b-a10b",
-    "nemotron-3-nano:30b-a3b-q8_0",
-    "llama4:16x17b",
+    # Tier 1: Top scorers on L3 (skip frontier, already validating separately)
     "gpt-oss:120b",
+    "qwen3-coder:30b",
     "nemotron-3-super",
-    # Tier 5: Specialty / experimental
+    "RogerBen/qwen3.5-35b-opus-distill",
     "zac/phi4-tools",
     "mistral-small",
-    "ingu627/exaone4.0:32b",
     "gpt-oss:20b",
+    # Tier 2: Strong mid-range
+    "gemma4",
+    "gemma3-12b-tools",
+    "glm-4.7-flash",
+    "qwen3:14b",
+    "devstral-small-2:24b-instruct-2512-q8_0",
+    "nemotron-3-nano:30b-a3b-q8_0",
+    "llama4:16x17b",
+    # Tier 3: Mid-pack
+    "ministral-3:14b",
+    "nemotron-3-nano",
+    "lfm2:24b",
+    "nemotron-cascade-2",
+    "ingu627/exaone4.0:32b",
+    "granite4:32b-a9b-h",
+    "qwen3:8b",
+    # Tier 4: Smaller / weaker
+    "granite4:7b-a1b-h",
+    "qwen3.5",
+    "qwen3.5:4b",
+    "nemotron-3-nano:4b",
+    "phi4-mini",
+    "hf.co/xhxlb/IQuest-Coder-V1-14B-Instruct-GGUF:Q4_K_M",
+    "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M",
+    # Tier 5: Thinking-mode / experimental
+    "qwen3.5:35b-a3b",
+    "qwen3.5:122b-a10b",
+    "LFM2-2.6b-tools",
     "lfm2.5-thinking:1.2b",
     "omnicoder:9b-q4_k_m",
     "nemotron-cascade-2",
