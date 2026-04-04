@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-02T00:00:00.000000+00:00",
+  "updated_at": "2026-04-03T00:00:00.000000+00:00",
   "slug_convention": "The :latest tag is the default for any model and MUST be omitted from model names and slugs. Only explicit non-default tags (e.g. :14b, :q8_0, :bf16) are included.",
   "benchmark_suite": [
     "cogito:8b",
@@ -37,7 +37,13 @@
     "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
     "RogerBen/qwen3.5-35b-opus-distill",
     "rnj-1:8b",
-    "zac/phi4-tools"
+    "zac/phi4-tools",
+    "devstral-small-2",
+    "nemotron-3-super",
+    "glm-5:cloud",
+    "minimax-m2.7:cloud",
+    "cogito-2.1:671b-cloud",
+    "deepseek-v3.2:cloud"
   ],
   "local_installed": [
     "cogito:8b",
@@ -94,7 +100,13 @@
     "rnj-1:8b",
     "zac/phi4-tools",
     "codellama:70b",
-    "ministral-3:14b"
+    "ministral-3:14b",
+    "devstral-small-2",
+    "nemotron-3-super",
+    "glm-5:cloud",
+    "minimax-m2.7:cloud",
+    "cogito-2.1:671b-cloud",
+    "deepseek-v3.2:cloud"
   ],
   "missing_from_local": [
     "gemma3:4b",
@@ -144,7 +156,13 @@
     "gemma4": "Framework GPU: 15.32 tok/s, 4/5 quality, 6.0GB VRAM, 0.48s load. MoE e4b (9.6GB model). Coding L3: 9/20 (0.435) — 2nd best on Framework. Tools work natively (no template fix needed unlike gemma3). Requires Ollama 0.20.0-rc1+.",
     "gemma4:e2b": "Framework GPU speed champion: 89.12 tok/s, 4/5 quality, 9.09GB VRAM (fully GPU, Q4_K_M), 0.47s load. MoE 2.3B effective. Coding L3: 4/20 (0.217). Beats nemotron-3-nano:4b on speed (84.3) with same quality tier.",
     "gemma4:26b": "Framework: 8.81 tok/s, 5/5 quality, 10.7GB VRAM (partial offload — 22.9GB model). Coding L3: 12/20 (0.565) — tied #1 on Framework (lost 2 to timeouts, could be 14/20). MoE 3.8B active/25.2B total. Best coding model in gemma4 family.",
-    "gemma4:31b": "Framework: 1.51 tok/s, 5/5 quality, 11.1GB VRAM (partial offload — 34.9GB dense model, 25GB RAM peak). Too slow for coding L3 on Framework. Better suited for Strix (64GB RAM) or machines with >24GB VRAM.",
+    "gemma4:31b": "Framework: 1.51 tok/s, 5/5 quality, 11.1GB VRAM (partial offload — 34.9GB dense model, 25GB RAM peak). Too slow for coding L3 on Framework. Strix candidate (128GB unified memory).",
+    "devstral-small-2": "24B coding/SE agent model (Mistral). Strix candidate — fits comfortably in 128GB unified memory.",
+    "nemotron-3-super": "120B MoE (12B active). 87GB model — Strix candidate (128GB unified memory with dynamic allocation).",
+    "glm-5:cloud": "Ollama cloud (provider: Zhipu AI). 744B total / 40B active MoE. 198K context. Coding L3: 18/20 (0.913) — new overall champion. Only failed masstransit_test_harness and xunit_assembly_fixture.",
+    "minimax-m2.7:cloud": "Ollama cloud (provider: MiniMax). Latest M2-series. Coding L3: 14/20 (0.652). Strong on ASP.NET/EF Core/Blazor basics, weaker on vertical integration tasks.",
+    "cogito-2.1:671b-cloud": "Ollama cloud (provider: Essential AI). 671B, MIT-licensed. Coding L3: 13/20 (0.652). Interesting failure pattern — fails some basics (aspnet_oneof, efcore_json) but passes harder tasks (masstransit_test_harness, vertical_blazor_crud).",
+    "deepseek-v3.2:cloud": "Ollama cloud (provider: DeepSeek). Coding L3: 16/20 (0.826) — #2 cloud model. Strong across the board, only failed aspnet_service_di, masstransit_statemachine, masstransit_test_harness, xunit_assembly_fixture.",
     "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0": "Framework: fails to load on Ollama 0.20.0-rc1 (qwen3.5 arch blob error). Via llama-server (llama.cpp b8645 CUDA 12.4): 14.7 tok/s, 3/5 quality (coding 0/2, tools 2/2, agentic 1/1), 9.77GB VRAM. Coding L3 not available (requires Ollama native API). Reasoning distill based on qwen3.5:9b."
   }
 }
