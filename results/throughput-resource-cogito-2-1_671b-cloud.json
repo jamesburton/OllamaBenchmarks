@@ -1,0 +1,43 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-04-04T18:13:54.5356782+01:00",
+    "run_finished_at":  "2026-04-04T18:14:32.4069451+01:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-cogito-2-1_671b-cloud.json",
+    "host":  "FRAMEWORK",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "FRAMEWORK"
+                     },
+    "models":  [
+                   "cogito-2.1:671b-cloud"
+               ],
+    "completed_models":  [
+                             "cogito-2.1:671b-cloud"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+                    {
+                        "model":  "cogito-2.1:671b-cloud",
+                        "eval_count":  192,
+                        "eval_s":  0,
+                        "toks_per_s":  0,
+                        "total_s":  4.111,
+                        "load_s":  0,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  0.11,
+                        "gpu_util_avg":  0,
+                        "gpu_util_peak":  0,
+                        "gpu_mem_peak_gb":  0,
+                        "ollama_ps":  null
+                    }
+                ]
+}

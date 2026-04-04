@@ -8,6 +8,27 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+function Invoke-OllamaWithRetry {
+  param(
+    [string]$Uri,
+    [string]$Body,
+    [int]$MaxRetries = 5
+  )
+  for ($attempt = 0; $attempt -lt $MaxRetries; $attempt++) {
+    try {
+      return Invoke-RestMethod -Uri $Uri -Method Post -ContentType "application/json" -Body $Body
+    } catch {
+      if ($_.Exception.Response.StatusCode -eq 429 -and $attempt -lt ($MaxRetries - 1)) {
+        $wait = [math]::Min(30 * [math]::Pow(2, $attempt), 300)
+        Write-Host "    [429 rate-limited] waiting ${wait}s (attempt $($attempt+1)/$MaxRetries)"
+        Start-Sleep -Seconds $wait
+        continue
+      }
+      throw
+    }
+  }
+}
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 function Get-HostDetails {
@@ -47,7 +68,7 @@ function Invoke-OllamaGenerate {
     }
   } | ConvertTo-Json -Depth 8 -Compress
 
-  Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/generate" -Method Post -ContentType "application/json" -Body $body
+  Invoke-OllamaWithRetry -Uri "http://127.0.0.1:11434/api/generate" -Body $body
 }
 
 function Get-OllamaPsLine {
@@ -241,7 +262,20 @@ foreach ($model in $Models) {
 
     $job = Start-Job -ScriptBlock {
       param($json)
-      Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/generate" -Method Post -ContentType "application/json" -Body $json | ConvertTo-Json -Depth 10 -Compress
+      $maxRetries = 5
+      for ($attempt = 0; $attempt -lt $maxRetries; $attempt++) {
+        try {
+          $result = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/generate" -Method Post -ContentType "application/json" -Body $json
+          return $result | ConvertTo-Json -Depth 10 -Compress
+        } catch {
+          if ($_.Exception.Response.StatusCode -eq 429 -and $attempt -lt ($maxRetries - 1)) {
+            $wait = [math]::Min(30 * [math]::Pow(2, $attempt), 300)
+            Start-Sleep -Seconds $wait
+            continue
+          }
+          throw
+        }
+      }
     } -ArgumentList $body
 
     $cpuSamples = @()
@@ -275,7 +309,9 @@ foreach ($model in $Models) {
     $raw = Receive-Job -Id $job.Id -Wait
     Remove-Job -Id $job.Id -Force
     $resp = $raw | ConvertFrom-Json
-    $evalSec = [double]$resp.eval_duration / 1e9
+    # eval_duration is null for cloud models — fall back to total_duration
+    $evalNs = if ($resp.eval_duration) { [double]$resp.eval_duration } elseif ($resp.total_duration) { [double]$resp.total_duration } else { 0 }
+    $evalSec = $evalNs / 1e9
     $tokps = if ($evalSec -gt 0) { [double]$resp.eval_count / $evalSec } else { 0 }
     $psLine = Get-OllamaPsLine -Model $model
 

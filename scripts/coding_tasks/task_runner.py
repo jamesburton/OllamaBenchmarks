@@ -98,27 +98,38 @@ def call_ollama(
         },
     }
     data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        "http://127.0.0.1:11434/api/chat",
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-        content = body.get("message", {}).get("content", "")
-        # Fall back to thinking field for models using Ollama's native thinking mode
-        # (e.g., IQuest-Coder puts all output in message.thinking, content is empty)
-        if not content:
-            content = body.get("message", {}).get("thinking", "")
-        # Strip thinking tags if present (some models use <think>...</think>)
-        if "<think>" in content:
-            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
-        return content
-    except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
-        print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
-        return ""
+    max_retries = 5
+    for attempt in range(max_retries):
+        req = urllib.request.Request(
+            "http://127.0.0.1:11434/api/chat",
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+            content = body.get("message", {}).get("content", "")
+            # Fall back to thinking field for models using Ollama's native thinking mode
+            # (e.g., IQuest-Coder puts all output in message.thinking, content is empty)
+            if not content:
+                content = body.get("message", {}).get("thinking", "")
+            # Strip thinking tags if present (some models use <think>...</think>)
+            if "<think>" in content:
+                content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+            return content
+        except urllib.error.HTTPError as exc:
+            if exc.code == 429 and attempt < max_retries - 1:
+                import time
+                wait = min(30 * (2 ** attempt), 300)
+                print(f"    [429 rate-limited] waiting {wait}s (attempt {attempt+1}/{max_retries})")
+                time.sleep(wait)
+                continue
+            print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
+            return ""
+        except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+            print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
+            return ""
 
 
 def setup_template_cache(template_dir: str, cache_dir: str) -> str:

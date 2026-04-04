@@ -6,6 +6,7 @@ import re
 import subprocess
 import tempfile
 import textwrap
+import time
 from typing import Any
 import urllib.request
 
@@ -101,15 +102,25 @@ def write_json(path: str, payload: dict[str, Any]) -> None:
         handle.write(json.dumps(payload, indent=2) + "\n")
 
 
-def post_json(path: str, payload: dict, timeout: int = 1200) -> dict:
-    req = urllib.request.Request(
-        f"http://127.0.0.1:11434{path}",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as response:
-        return json.loads(response.read().decode("utf-8"))
+def post_json(path: str, payload: dict, timeout: int = 1200, max_retries: int = 5) -> dict:
+    req_data = json.dumps(payload).encode("utf-8")
+    for attempt in range(max_retries):
+        req = urllib.request.Request(
+            f"http://127.0.0.1:11434{path}",
+            data=req_data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            if e.code == 429 and attempt < max_retries - 1:
+                wait = min(30 * (2 ** attempt), 300)  # 30s, 60s, 120s, 240s, 300s
+                print(f"    [429 rate-limited] waiting {wait}s (attempt {attempt+1}/{max_retries})")
+                time.sleep(wait)
+                continue
+            raise
 
 
 def think_setting(model: str) -> Any:
@@ -372,13 +383,20 @@ def run_model(model: str) -> dict:
                     "prompt": prompt,
                     "stream": False,
                     "think": think_setting(model),
-                    "options": {**general_options, "num_predict": 220, "seed": 42},
+                    "options": {**general_options, "num_predict": 512, "seed": 42},
                 },
             )
             raw_text = response.get("response", "")
-            # Fall back to thinking field for native-thinking models
+            # Fall back to thinking field for models that put output there
+            # (e.g., glm-5:cloud uses internal reasoning and returns empty response)
             if not raw_text:
                 raw_text = response.get("thinking", "")
+            # If thinking contains code blocks, extract from there even if
+            # response had some content (some models split across both)
+            if not extract_code(raw_text) and response.get("thinking"):
+                thinking_code = extract_code(response.get("thinking", ""))
+                if thinking_code:
+                    raw_text = response["thinking"]
             code = extract_code(raw_text)
             if run_python_asserts(code, asserts):
                 row["coding_pass"] += 1
