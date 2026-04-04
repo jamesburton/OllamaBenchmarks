@@ -24,34 +24,25 @@ public class UserDashboard : ComponentBase
     public string? DisplayName { get; set; }
     public bool IsAuthenticated { get; set; }
 
-    // Lifecycle method implementation
+    // Lifecycle method
     protected override async Task OnInitializedAsync()
     {
-        // Await AuthState to get the AuthenticationState
+        // Await AuthState
         var authState = await AuthState;
         var user = authState.User;
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            // Authenticated path
+            // Authenticated logic
             IsAuthenticated = true;
+            string userId = user.Identity.Name;
 
-            // Get the user's name claim
-            var userId = user.Identity.Name;
-
-            if (!string.IsNullOrEmpty(userId))
-            {
-                // Call the service and assign the result
-                DisplayName = await UserService.GetDisplayNameAsync(userId);
-            }
-            else
-            {
-                DisplayName = "User";
-            }
+            // Call service and set display name
+            DisplayName = await UserService.GetDisplayNameAsync(userId);
         }
         else
         {
-            // Not authenticated path
+            // Guest logic
             IsAuthenticated = false;
             DisplayName = "Guest";
         }

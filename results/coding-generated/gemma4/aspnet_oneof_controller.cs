@@ -13,11 +13,12 @@ public class User
     public string Email { get; set; } = string.Empty;
 }
 
-// NotFound record (parameterless constructor)
+// NotFound must be a record with a parameterless constructor
 public record NotFound;
 
-// ValidationError record (accepts Message)
+// ValidationError must be a record accepting a single string Message parameter
 public record ValidationError(string Message);
+
 
 // --- Service Interface ---
 
@@ -44,24 +45,26 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Get(int id)
     {
         // 1. Call the service which returns the OneOf union
-        OneOf<User, NotFound, ValidationError> result = await _userService.GetByIdAsync(id);
+        var result = await _userService.GetByIdAsync(id);
 
-        // 2. Use Match<IActionResult> to handle all possible types and map them to HTTP results
+        // 2. Use Match to handle the discriminated union and map to appropriate HTTP results
         return result.Match<IActionResult>(
             // Case 1: User found (200 OK)
             user => Ok(user),
 
-            // Case 2: Not found (404 Not Found)
-            notFound => NotFound(),
+            // Case 2: Not Found (404 Not Found)
+            // Note: We use the default record instance here
+            _ => NotFound(), 
 
-            // Case 3: Validation error (400 Bad Request)
+            // Case 3: Validation Error (400 Bad Request)
+            // The 'err' parameter is the ValidationError record
             err => BadRequest(new { Error = err.Message })
         );
     }
 }
 
-// --- Mock Implementation for Testing/Completeness ---
-// Note: In a real application, this would be registered in Program.cs
+// --- Mock Service Implementation (for completeness/testing) ---
+
 public class MockUserService : IUserService
 {
     public Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id)
@@ -74,16 +77,34 @@ public class MockUserService : IUserService
         }
         else if (id == 99)
         {
-            // Not Found case
-            return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
+            // Validation Error case
+            return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new ValidationError("The provided ID format is invalid.")));
         }
         else if (id == 0)
         {
-            // Validation Error case
-            return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new ValidationError("Invalid ID provided. Must be positive.")));
+            // Not Found case
+            return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
         }
-
-        // Default case (e.g., if the service logic was more complex)
-        return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
+        else
+        {
+            // Defaulting to Not Found for other IDs
+            return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
+        }
     }
 }
+
+// --- Program Setup (Simulating Dependency Injection) ---
+/*
+// In a real ASP.NET Core 10 setup, you would register these services:
+var builder = WebApplication.CreateBuilder(args);
+
+// Register services
+builder.Services.AddSingleton<IUserService, MockUserService>();
+
+// Add controllers
+builder.Services.AddControllers();
+
+var app = builder.Build();
+app.MapControllers();
+app.Run();
+*/

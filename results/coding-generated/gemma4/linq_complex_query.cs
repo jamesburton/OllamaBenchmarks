@@ -19,32 +19,34 @@ public static class SalesAnalyzer
     public static List<CategorySummary> SummarizeByCategory(IEnumerable<Sale> sales)
     {
         // Use LINQ method syntax: GroupBy -> Select -> OrderByDescending
-        return sales
+        var summary = sales
             .GroupBy(sale => sale.Category) // Group by Category
             .Select(group => new CategorySummary(
                 Category: group.Key,
-                TotalAmount: group.Sum(sale => sale.Amount), // Sum
-                AverageAmount: group.Average(sale => sale.Amount), // Average
+                TotalAmount: group.Sum(s => s.Amount), // Sum
+                AverageAmount: group.Average(s => s.Amount), // Average
                 Count: group.Count() // Count
             ))
             .OrderByDescending(summary => summary.TotalAmount) // Order by TotalAmount descending
             .ToList();
+
+        return summary;
     }
 }
 
-// Example usage (optional, but useful for testing the structure)
+// Example usage (optional, but useful for testing the code structure)
 public class Program
 {
     public static void Main()
     {
         var salesData = new List<Sale>
         {
-            new Sale("Laptop X", "Electronics", 1200.00m, new DateOnly(2023, 10, 1)),
-            new Sale("T-Shirt", "Apparel", 25.00m, new DateOnly(2023, 10, 2)),
-            new Sale("Monitor Y", "Electronics", 300.00m, new DateOnly(2023, 10, 3)),
-            new Sale("Jeans", "Apparel", 75.00m, new DateOnly(2023, 10, 4)),
-            new Sale("Mouse Z", "Electronics", 50.00m, new DateOnly(2023, 10, 5)),
-            new Sale("Sweater", "Apparel", 50.00m, new DateOnly(2023, 10, 6))
+            new Sale("Laptop", "Electronics", 1200.00m, new DateOnly(2023, 1, 15)),
+            new Sale("T-Shirt", "Apparel", 25.00m, new DateOnly(2023, 1, 16)),
+            new Sale("Monitor", "Electronics", 300.00m, new DateOnly(2023, 1, 17)),
+            new Sale("Jeans", "Apparel", 75.00m, new DateOnly(2023, 1, 18)),
+            new Sale("Mouse", "Electronics", 25.00m, new DateOnly(2023, 1, 19)),
+            new Sale("Sweater", "Apparel", 50.00m, new DateOnly(2023, 1, 20))
         };
 
         var summary = SalesAnalyzer.SummarizeByCategory(salesData);

@@ -31,10 +31,9 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     public OrderStateMachine()
     {
-        // Set the state instance property
         InstanceState(x => x.CurrentState);
 
-        // Configure correlation for all events
+        // Configure Correlation for all events
         OrderSubmitted = Event<OrderSubmitted>(
             cfg => cfg.CorrelateById(m => m.Message.OrderId));
 
@@ -44,26 +43,49 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         OrderCompleted = Event<OrderCompleted>(
             cfg => cfg.CorrelateById(m => m.Message.OrderId));
 
-        // Initial State: OrderSubmitted -> Submitted
+        // Initial State Flow
         Initially(
             When(OrderSubmitted)
                 .Then(context =>
                 {
                     context.Saga.OrderDate = context.Message.OrderDate;
                 })
-                .TransitionTo(Submitted));
+                .TransitionTo(Submitted)
+                .OnEnter(context =>
+                {
+                    // Set initial state property
+                    context.Saga.CurrentState = "Submitted";
+                })
+        );
 
-        // During Submitted: OrderAccepted -> Accepted
+        // Submitted State Flow
         During(Submitted,
             When(OrderAccepted)
                 .Then(context =>
                 {
                     context.Saga.AcceptedAt = context.Message.AcceptedAt;
                 })
-                .TransitionTo(Accepted));
+                .TransitionTo(Accepted)
+                .OnEnter(context =>
+                {
+                    context.Saga.CurrentState = "Accepted";
+                })
+        );
 
-        // During Accepted: OrderCompleted -> Finalize
+        // Accepted State Flow
         During(Accepted,
-            When(OrderCompleted).Finalize());
+            When(OrderCompleted)
+                .Then(context =>
+                {
+                    // No specific property update required for this transition, just finalizing
+                })
+                .Finalize()
+                .OnEnter(context =>
+                {
+                    context.Saga.CurrentState = "Completed";
+                })
+        );
+
+        SetCompletedWhenFinalized();
     }
 }

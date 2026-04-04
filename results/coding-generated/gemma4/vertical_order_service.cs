@@ -68,13 +68,14 @@ public class OrderService
         // Calculation
         decimal total = request.Items.Sum(item => item.Quantity * item.UnitPrice);
 
-        // Construction
+        // Creation
         var order = new Order
         {
-            // Assuming Id is set by the repository/database, but for this simulation, we'll use a placeholder
+            // Assuming ID generation happens here or in the repository, 
+            // but for simplicity in this slice, we'll use a placeholder ID.
             Id = 0, 
             CustomerName = request.CustomerName,
-            Items = new List<OrderItem>(request.Items),
+            Items = request.Items,
             Total = total,
             CreatedAt = DateTime.UtcNow
         };

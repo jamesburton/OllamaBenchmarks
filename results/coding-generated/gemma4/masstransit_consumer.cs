@@ -2,7 +2,7 @@ using MassTransit;
 using System;
 using System.Threading.Tasks;
 
-// Global using for easy access to types defined in the Contracts namespace
+// Global using statement to make types accessible without explicit using directives
 global using Contracts;
 
 namespace Contracts;
@@ -31,7 +31,7 @@ public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsu
     public SubmitOrderConsumerDefinition()
     {
         // Set ConcurrentMessageLimit = 4
-        this.SetConcurrentMessageLimit(4);
+        this.ConcurrentMessageLimit = 4;
     }
 
     protected override void ConfigureConsumer(
@@ -39,7 +39,7 @@ public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsu
         IConsumerConfigurator<SubmitOrderConsumer> consumer,
         IRegistrationContext ctx)
     {
-        // Configure retry: Interval(3, 1000)
+        // Set retry policy: Interval(3, 1000)
         ep.UseMessageRetry(r => r.Interval(3, 1000));
     }
 }
