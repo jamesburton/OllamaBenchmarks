@@ -1,12 +1,12 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-04-02T22:33:31.3742190+01:00",
-    "run_finished_at":  "2026-04-02T22:34:16.3665498+01:00",
+    "run_started_at":  "2026-04-04T17:33:27.2144811+01:00",
+    "run_finished_at":  "2026-04-04T17:33:38.4089302+01:00",
     "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-gemma4.json",
-    "host":  "FRAMEWORK",
+    "host":  "STRIX",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "hostname":  "FRAMEWORK"
+                         "hostname":  "STRIX"
                      },
     "models":  [
                    "gemma4"
@@ -27,16 +27,16 @@
                     {
                         "model":  "gemma4",
                         "eval_count":  192,
-                        "eval_s":  12.534,
-                        "toks_per_s":  15.32,
-                        "total_s":  13.476,
-                        "load_s":  0.477,
+                        "eval_s":  4.906,
+                        "toks_per_s":  39.13,
+                        "total_s":  5.371,
+                        "load_s":  0.338,
                         "cpu_avg_pct":  0,
                         "cpu_peak_pct":  0,
-                        "ram_peak_gb":  8.36,
+                        "ram_peak_gb":  1.27,
                         "gpu_util_avg":  0,
                         "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  5.99,
+                        "gpu_mem_peak_gb":  15.57,
                         "ollama_ps":  null
                     }
                 ]

@@ -1,8 +1,8 @@
 {
   "benchmark": "quality",
   "run_started_at": "2026-04-04T16:33:48.286546+00:00",
-  "run_finished_at": "2026-04-04T16:33:52.137389+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-hf.co_Jackrong_Qwopus3.5-9B-v3-GGUF_Q8_0.json",
+  "run_finished_at": "2026-04-04T16:33:52.139072+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-20260404-163348.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
     "captured_at": "2026-04-04T16:33:49.171543+00:00",
@@ -34,6 +34,11 @@
   "models": [
     "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0"
   ],
+  "completed_models": [
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
       "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",

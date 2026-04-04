@@ -1,11 +1,11 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-04-04T16:33:48.286546+00:00",
-  "run_finished_at": "2026-04-04T16:33:52.137389+00:00",
-  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-hf.co_Jackrong_Qwopus3.5-9B-v3-GGUF_Q8_0.json",
+  "run_started_at": "2026-04-04T16:32:50.646998+00:00",
+  "run_finished_at": "2026-04-04T16:33:23.246926+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-20260404-163250.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-04-04T16:33:49.171543+00:00",
+    "captured_at": "2026-04-04T16:32:51.893432+00:00",
     "hostname": "Strix",
     "host_slug": "strix",
     "os": {
@@ -32,18 +32,23 @@
     ]
   },
   "models": [
-    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0"
+    "gemma4"
   ],
+  "completed_models": [
+    "gemma4"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
   "results": [
     {
-      "model": "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
+      "model": "gemma4",
       "coding_pass": 0,
       "coding_total": 2,
-      "tool_pass": 0,
+      "tool_pass": 2,
       "tool_total": 2,
-      "agentic_pass": 0,
+      "agentic_pass": 1,
       "agentic_total": 1,
-      "score": 0,
+      "score": 3,
       "score_max": 5
     }
   ]
