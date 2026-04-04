@@ -89,6 +89,7 @@ def call_ollama(
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": False,
+        "think": False,  # Disable thinking mode — we want code output, not reasoning
         "options": {
             "num_predict": max_tokens,
             "num_ctx": num_ctx,
