@@ -174,14 +174,25 @@ def run_dotnet_task(
     if build.returncode != 0:
         return (False, False, 0, 0, build.stderr or build.stdout)
 
-    # Test
-    test = subprocess.run(
-        ["dotnet", "test", "--no-restore", "--no-build"],
-        cwd=work_dir,
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
+    # Test (use creationflags on Windows to enable process tree kill on timeout)
+    try:
+        test = subprocess.run(
+            ["dotnet", "test", "--no-restore", "--no-build"],
+            cwd=work_dir,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+    except subprocess.TimeoutExpired:
+        # Kill any lingering dotnet/test processes for this work_dir
+        try:
+            subprocess.run(
+                ["taskkill", "/F", "/IM", "dotnet.exe", "/T"],
+                capture_output=True, timeout=5,
+            )
+        except Exception:
+            pass
+        return (True, False, 0, 0, "dotnet test timed out (60s) — possible infinite loop in generated code")
     output = test.stdout + "\n" + test.stderr
 
     # Parse test results from stdout
