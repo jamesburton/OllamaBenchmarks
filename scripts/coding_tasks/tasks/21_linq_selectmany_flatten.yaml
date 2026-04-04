@@ -8,7 +8,8 @@ references: []
 prompt: |
   Generate the following in a single C# file:
 
-  1. A record Department with two properties: string Name and List<string> Employees.
+  1. A positional record: `public record Department(string Name, List<string> Employees);`
+     Use positional record syntax so that `new Department("Engineering", employees)` works.
 
   2. A static class StaffDirectory with a static method:
      List<string> GetAllEmployees(IEnumerable<Department> departments)

@@ -39,6 +39,7 @@
     "rnj-1:8b",
     "zac/phi4-tools",
     "devstral-small-2",
+    "hf.co/Intel/Qwen3-235B-A22B-Instruct-2507-gguf-q2ks-mixed-AutoRound",
     "nemotron-3-super",
     "glm-5:cloud",
     "minimax-m2.7:cloud",
@@ -168,6 +169,7 @@
     "minimax-m2.7:cloud": "Ollama cloud (provider: MiniMax). Latest M2-series. Coding L3: 14/20 (0.652). Strong on ASP.NET/EF Core/Blazor basics, weaker on vertical integration tasks.",
     "cogito-2.1:671b-cloud": "Ollama cloud (provider: Essential AI). 671B, MIT-licensed. Coding L3: 13/20 (0.652). Interesting failure pattern — fails some basics (aspnet_oneof, efcore_json) but passes harder tasks (masstransit_test_harness, vertical_blazor_crud).",
     "deepseek-v3.2:cloud": "Ollama cloud (provider: DeepSeek). Coding L3: 16/20 (0.826) — #2 cloud model. Strong across the board, only failed aspnet_service_di, masstransit_statemachine, masstransit_test_harness, xunit_assembly_fixture.",
+    "hf.co/Intel/Qwen3-235B-A22B-Instruct-2507-gguf-q2ks-mixed-AutoRound": "Strix candidate. Qwen3 235B MoE (22B active). Intel AutoRound mixed quant: 8-bit embeddings + 4-bit non-expert + 2-bit expert layers = 79.8GB. Fits Strix 128GB unified memory with ~48GB headroom for KV cache. Not yet tested.",
     "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0": "Framework: fails to load on Ollama 0.20.0-rc1 (qwen3.5 arch blob error). Via llama-server (llama.cpp b8645 CUDA 12.4): 14.7 tok/s, 3/5 quality (coding 0/2, tools 2/2, agentic 1/1), 9.77GB VRAM. Coding L3 not available (requires Ollama native API). Reasoning distill based on qwen3.5:9b."
   }
 }

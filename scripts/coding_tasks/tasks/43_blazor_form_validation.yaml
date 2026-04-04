@@ -73,8 +73,8 @@ test_code: |
       public void ContactModel_EmptyName_FailsValidation()
       {
           var model = new ContactModel { Name = "", Email = "test@example.com", Age = 25 };
-          var ctx = new EditContext(model);
-          var isValid = ctx.Validate();
+          var results = new System.Collections.Generic.List<ValidationResult>();
+          var isValid = Validator.TryValidateObject(model, new ValidationContext(model), results, true);
           isValid.Should().BeFalse();
       }
 
@@ -82,8 +82,8 @@ test_code: |
       public void ContactModel_ValidData_PassesValidation()
       {
           var model = new ContactModel { Name = "Bob", Email = "bob@example.com", Age = 25 };
-          var ctx = new EditContext(model);
-          var isValid = ctx.Validate();
+          var results = new System.Collections.Generic.List<ValidationResult>();
+          var isValid = Validator.TryValidateObject(model, new ValidationContext(model), results, true);
           isValid.Should().BeTrue();
       }
 
@@ -91,8 +91,8 @@ test_code: |
       public void ContactModel_InvalidAge_FailsValidation()
       {
           var model = new ContactModel { Name = "Alice", Email = "alice@example.com", Age = 0 };
-          var ctx = new EditContext(model);
-          ctx.Validate().Should().BeFalse();
+          var results = new System.Collections.Generic.List<ValidationResult>();
+          Validator.TryValidateObject(model, new ValidationContext(model), results, true).Should().BeFalse();
       }
 
       [Fact]

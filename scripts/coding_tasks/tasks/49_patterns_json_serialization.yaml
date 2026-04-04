@@ -25,6 +25,8 @@ prompt: |
 
   Return only valid C# code in a single file.
 test_code: |
+  using System.Text.Json;
+
   public class JsonSerializationTests
   {
       [Fact]

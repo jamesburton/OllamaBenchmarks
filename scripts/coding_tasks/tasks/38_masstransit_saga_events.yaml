@@ -31,9 +31,12 @@ prompt: |
        - During Approved: `During(Approved, When(InvoicePaid).TransitionTo(Paid).Finalize())`
        - Call `SetCompletedWhenFinalized()`
 
-  IMPORTANT: MassTransit requires all message types to be in a namespace. Place all types inside `namespace Contracts;` (file-scoped). Also add `global using Contracts;` at the top of the file so the types are accessible without explicit using statements from other files.
+  IMPORTANT: MassTransit requires all message types to be in a namespace. Place all types inside `namespace Contracts;` (file-scoped).
 
-  Include `using MassTransit;` BEFORE the `namespace Contracts;` declaration.
+  The file must start with these lines in EXACTLY this order (global usings first, then regular usings, then namespace):
+    global using Contracts;
+    using MassTransit;
+    namespace Contracts;
 
   Do NOT use `.Set()` on EventActivityBinder — use `.Then(ctx => { ... })` to mutate saga properties.
 

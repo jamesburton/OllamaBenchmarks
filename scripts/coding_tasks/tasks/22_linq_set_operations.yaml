@@ -8,7 +8,8 @@ references: []
 prompt: |
   Generate the following in a single C# file:
 
-  A static class ProductCatalog with three static methods:
+  A single `public static class ProductCatalog` containing three static methods.
+  All methods MUST be inside the ProductCatalog class body — do NOT emit bare top-level methods:
 
   1. IEnumerable<string> GetNewProducts(IEnumerable<string> current, IEnumerable<string> previous)
      - Returns products in current that are NOT in previous, using LINQ Except.
