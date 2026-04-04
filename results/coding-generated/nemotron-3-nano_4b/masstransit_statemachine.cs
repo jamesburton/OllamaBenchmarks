@@ -1,89 +1,146 @@
 global using Contracts;
+using System;
+using System.Threading.Tasks;
+using MassTransit;
 
 namespace Contracts
 {
+    /// <summary>
+    /// Saga state that tracks the order state.
+    /// </summary>
     public class OrderState : SagaStateMachineInstance
     {
         public Guid CorrelationId { get; set; }
-
-        public string CurrentState { get; set; } = "Submitted";
-
+        public string CurrentState { get; set; }
         public DateTime OrderDate { get; set; }
         public DateTime? AcceptedAt { get; set; }
     }
 
-    public partial record OrderSubmitted(Guid OrderId, DateTime OrderDate)
+    /// <summary>
+    /// Event fired when the order is submitted.
+    /// </summary>
+    public record OrderSubmitted(guid OrderId, DateTime OrderDate);
 
-    public partial record OrderAccepted(Guid OrderId, DateTime AcceptedAt)
+    /// <summary>
+    /// Event fired when the order is accepted.
+    /// </summary>
+    public record OrderAccepted(guid OrderId, DateTime AcceptedAt);
 
-    public partial record OrderCompleted(Guid OrderId)
+    /// <summary>
+    /// Event fired when the order is completed.
+    /// </summary>
+    public record OrderCompleted(guid OrderId);
 
+    /// <summary>
+    /// State machine definition for the order saga.
+    /// </summary>
     public class OrderStateMachine : MassTransitStateMachine<OrderState>
     {
-        public State Submitted { get; }
-        public State Accepted { get; }
-        public State Completed { get; }
+        public State Submitted { get; private set; }
+        public State Accepted { get; private set; }
+        public State Completed { get; private set; }
 
-        public Event<OrderSubmitted> OrderSubmittedEvent { get; }
-        public Event<OrderAccepted> OrderAcceptedEvent { get; }
-        public Event<OrderCompleted> OrderCompletedEvent { get; }
+        /// <summary>
+        /// Submitted event.
+        /// </summary>
+        public Event<OrderSubmitted> OrderSubmitted { get; private set; }
+
+        /// <summary>
+        /// Accepted event.
+        /// </summary>
+        public Event<OrderAccepted> OrderAccepted { get; private set; }
+
+        /// <summary>
+        /// Completed event.
+        /// </summary>
+        public Event<OrderCompleted> OrderCompleted { get; private set; }
 
         public OrderStateMachine()
         {
-            Submitted = State.FromDescription("Submitted");
-            Accepted  = State.FromDescription("Accepted");
-            Completed = State.FromDescription("Completed");
+            State Submitted, Accepted, Completed;
 
-            OrderSubmittedEvent = Event(() => OrderSubmitted,
-                order => order.CorrelateById(m => m.OrderId));
+            // -------------------- Event binding for OrderSubmitted --------------------
+            Event(() => OrderSubmitted, x => x.CorrelateById(m => m.OrderId))
+                .When(Submitted, orderSubmitted => { orderSubmitted.OrderDate = orderSubmitted.OrderDate; })
+                .Then(context => {
+                    context.Saga.PropertyName = "OrderDate";
+                })
+                .FinalizeOrderPlaced();
 
-            OrderAcceptedEvent = Event(() => OrderAccepted,
-                order => order.CorrelateById(m => m.OrderId));
+            // -------------------- Event binding for OrderAccepted --------------------
+            Event(() => OrderAccepted, x => x.CorrelateById(m => m.OrderId))
+                .When(Accepted, orderAccepted => { orderAccepted.AcceptedAt = orderAccepted.AcceptedAt; })
+                .Then(context => { context.Saga.PropertyName = "AcceptedAt"; })
+                .FinalizeOrderCompleted();
 
-            OrderCompletedEvent = Event(() => OrderCompleted,
-                order => order.CorrelateById(m => m.OrderId));
+            // -------------------- Event binding for OrderCompleted --------------------
+            Event(() => OrderCompleted, x => x.CorrelateById(m => m.OrderId))
+                .When(Completed, _ => {}) // just to satisfy the API
+                .Finalize();
 
-            Initially(
-                When(OrderSubmittedEvent)
-                    .TransitionTo(Submitted)
-                    .Then(context => 
-                    {
-                        var order = context.Message;
-                        order.OrderDate = order.OrderDate;
-                        context.Saga.PropertyName = "OrderDate";
-                    }));
+            // -------------------- State definitions --------------------
+            State Submitted, Accepted, Completed;
 
-            During(Submitted,
-                When(OrderAcceptedEvent)
-                    .TransitionTo(Accepted)
-                    .Then(context => 
-                    {
-                        var order = context.Message;
-                        order.AcceptedAt = order.AcceptedAt;
-                        context.Saga.PropertyName = "AcceptedAt";
-                    }));
+            // Default (final) state
+            DefaultState = Completed;
 
-            During(Accepted,
-                When(OrderCompletedEvent)
-                    .TransitionTo(Completed)
-                    .Then(context => 
-                    {
-                        context.Saga.Completed();
-                    }));
+            // Initially: OrderSubmitted event -> set OrderDate -> go to Submitted
+            Event(() => OrderSubmitted)
+                .Initials((s, msg) => { s.OrderDate = msg.OrderDate; })
+                .Then(context => { context.Saga.PropertyName = "OrderDate"; })
+                .FinalizeOrderPlaced();
 
-            Completed = State.FromDescription("Completed")
-                             .WhenFinalized()
-                             .Then(context => context.Saga.Completed());
+            // During Submitted: OrderAccepted event -> set AcceptedAt -> go to Accepted
+            Event(() => OrderAccepted)
+                .When(Submitted, (s, msg) => { s.AcceptedAt = msg.AcceptedAt; })
+                .Then(context => { context.Saga.PropertyName = "AcceptedAt"; })
+                .FinalizeOrderCompleted();
 
-            End(
-                When(OrderCompletionEvent)
-                    .TransitionTo(Completed)
-                    .Complete());
+            // During Accepted: OrderCompleted event -> finalize saga
+            Event(() => OrderCompleted)
+                .When(Completed, _ => {})
+                .Finalize();
+
+            // Attach state definitions (for IntelliSense only)
+            InstanceState(x => x); // placeholders to satisfy compiler – real logic handled via bindings above
         }
 
-        // The EventCompletionEvent is actually OrderCompletedEvent; Ensure finalization completes saga:
-        Complete = When(OrderCompletedEvent)
-                     .MakeCurrent(Completed)
-                     .Complete();
+        #region Disposable methods required by MassTransit
+
+        protected override void Dispose()
+        {
+            // No disposal needed
+            base.Dispose();
+        }
+
+        #endregion
+
+        #region State machine helper methods
+
+        private void FinalizeOrderPlaced()
+        {
+            // Called after the OrderSubmitted event finishes
+            DisposeCurrentSaga();
+        }
+
+        private void FinalizeOrderCompleted()
+        {
+            // Called after the OrderAccepted event finishes; leads to Completed state
+            DisposeCurrentSaga();
+        }
+
+        private void DisposeCurrentSaga()
+        {
+            // Standard way to finalise a saga
+            State current = GetCurrentState();
+            if (current != Completed)
+            {
+                current.CurrentState = "Completed";
+                CurrentState = "Completed";
+            }
+            base.Dispose();
+        }
+
+        #endregion
     }
 }

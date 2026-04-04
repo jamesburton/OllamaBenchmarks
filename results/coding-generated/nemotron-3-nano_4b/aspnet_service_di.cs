@@ -1,36 +1,50 @@
 using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
-// Interface
 interface IOrderRepository { }
 
-// Interface
-interface IOrderService { }
+class OrderRepository : IOrderRepository
+{
+    public OrderRepository()
+    {
+    }
 
-// Interface
-interface IEmailNotifier { }
-
-// Class
-class OrderRepository : IOrderRepository { }
-
-// Class
-class OrderService : IOrderService { }
-
-// Class
-class EmailNotifier : IEmailNotifier { }
-
-// Class
-class OrderSettings {
-    public string WarehouseCode { get; set; }
-    public int MaxRetries { get; set; }
+    public OrderSettings Settings { get; }
+    public OrderRepository(OrderSettings settings) => Settings = settings;
 }
 
-// Static extensions
-static class ServiceCollectionExtensions {
-    public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config) {
+interface IOrderService { }
+
+class OrderService : IOrderService
+{
+    public OrderService() => Settings = OrderSettings.Default;
+    public OrderSettings Settings { get; }
+    public static OrderSettings Default => new OrderSettings();
+}
+
+interface IEmailNotifier { }
+
+class EmailNotifier : IEmailNotifier
+{
+    public EmailNotifier() => Settings = OrderSettings.Default;
+    public OrderSettings Settings { get; }
+    public static OrderSettings Default => new OrderSettings();
+}
+
+class OrderSettings
+{
+    public string WarehouseCode { get; set; } = "";
+    public int MaxRetries { get; set; } = 3;
+}
+
+public static class ServiceCollectionExtensions
+{
+    public static void AddOrderServices(this IServiceCollection services, IConfiguration config)
+    {
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddTransient<IEmailNotifier, EmailNotifier>();
-        services.Configure<OrderSettings>();
-        return services;
+        services.Configure<OrderSettings>(config.GetSection("Orders"));
     }
 }

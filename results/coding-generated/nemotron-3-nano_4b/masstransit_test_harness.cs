@@ -2,40 +2,29 @@ using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-public class TestClass
+public class ProcessPaymentProcessorTests
 {
-    private ServiceProvider provider;
-    private ITestHarness harness;
-
-    public ValueTask InitializeAsync()
+    void TestProcessPaymentProcessed_ProducesEvent_WithCorrectOrderId()
     {
-        provider = new ServiceCollection()
+        var provider = new ServiceCollection()
             .AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>())
-            .BuildServiceProvider(true);
-        harness = provider.GetRequiredService<ITestHarness>();
+            .BuildServiceProvider();
+
+        var harness = provider.GetRequiredService<ITestHarness>();
         await harness.Start();
-        return default;
-    }
 
-    public ValueTask DisposeAsync()
-    {
-        await harness.DisposeAsync();
-        provider.Dispose();
-        return default;
-    }
+        var orderId = Guid.NewGuid();
+        var message = new ProcessPayment(orderId, 0m);
 
-    [Fact]
-    public async ValueTask Test()
-    {
-        await harness.Publish(new ProcessPayment(Guid.NewGuid(), 1m));
+        await harness.Bus.Publish(message);
 
-        bool consumed = await harness.Consumed.Any<ProcessPayment>();
-        bool published = await harness.Published.Any<PaymentProcessed>();
+        var consumed = await harness.Consumed.Any<ProcessPayment>();
+        var published = await harness.Published.Any<PaymentProcessed>();
 
-        var ok1 = consumed;
-        var ok2 = published;
-
-        Assert.Multiple(() => Assert.True(ok1),
-                        () => Assert.True(ok2));
+        Assert.Multiple(new[]
+        {
+            () => Assert.True(consumed),
+            () => Assert.True(published)
+        });
     }
 }

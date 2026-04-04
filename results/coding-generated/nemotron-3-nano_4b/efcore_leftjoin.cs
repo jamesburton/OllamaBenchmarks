@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 public class Customer
 {
     public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string Email { get; set; } = null!;
+    public string Name { get; set; }
+    public string Email { get; set; }
 }
 
 public class Order
@@ -16,34 +15,29 @@ public class Order
     public int CustomerId { get; set; }
     public decimal Total { get; set; }
     public DateTime OrderDate { get; set; }
-    public Customer Customer { get; set; } = default!;
 }
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options) { }
 
-    public DbSet<Order> Orders => _orders;
-    public DbSet<Customer> Customers => _customers;
-
-    private DbSet<Order> _orders;
-    private DbSet<Customer> _customers;
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Customer> Customers => Set<Customer>();
 }
 
-public record OrderDto(int OrderId, decimal Total, string CustomerName) { }
+public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
-public static class OrderQueries
+static class OrderQueries
 {
-    public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
+    public static List<OrderDto> GetOrdersWithCustomers(DbContext db)
     {
         return db.Orders
-            .FromEntity()
-            .SelectMany(o => o.Customer
-                .Where(c => c.Id == o.CustomerId)               // join condition
-                .Select(c => c.Name)
-                .FirstOrDefault())                            // "Unknown" if no match
-            .Select(o => new OrderDto(o.Id, o.Total,                     // fallback
-                         customerName ?? "Unknown"))                // fallback if query fails
+            .LeftJoin(
+                db.Customers,
+                o => o.CustomerId,
+                c => c.Id,
+                (o, c) => new OrderDto(o.Id, o.Total, c?.Name ?? "Unknown"))
             .ToList();
     }
 }

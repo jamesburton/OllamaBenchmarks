@@ -9,25 +9,27 @@ public interface IUserService
 
 public class UserDashboard : ComponentBase
 {
-    [CascadingParameter] public Task<AuthenticationState> AuthState { get; set; }
-    [Inject] public IUserService UserService { get; set; }
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    [Inject]
+    public IUserService UserService { get; set; }
+
     public string? DisplayName { get; set; }
     public bool IsAuthenticated { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var auth = await AuthState.Value;
-        IsAuthenticated = auth.User?.Identity?.IsAuthenticated == true;
-        if (IsAuthenticated)
+        var authState = await AuthState;
+        if (authState.User.Identity?.IsAuthenticated == true)
         {
-            var name = auth.User?.Identity?.Name;
-            if (!string.IsNullOrEmpty(name))
-            {
-                DisplayName = await UserService.GetDisplayNameAsync(name);
-            }
+            IsAuthenticated = true;
+            string? name = authState.User.Identity.Name;
+            DisplayName = await UserService.GetDisplayNameAsync(name ?? string.Empty);
         }
         else
         {
+            IsAuthenticated = false;
             DisplayName = "Guest";
         }
     }

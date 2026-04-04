@@ -1,4 +1,7 @@
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 public interface IDataSource
 {
@@ -12,22 +15,35 @@ public class DataProcessor
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         int batchNumber = 0;
-
-        while (!ct.IsCancellationRequested)
+        while (true)
         {
             if (ct.IsCancellationRequested)
             {
                 yield break;
             }
 
-            var batch = await source.FetchBatchAsync(batchNumber++, ct).ConfigureAwait(false);
-            if (batch.Count == 0)
+            IReadOnlyList<string> batch;
+            try
             {
+                batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // Handle cancellation gracefully.  Don't re-throw.
                 yield break;
             }
 
-            foreach (var item in batch)
+            if (batch.Count == 0)
+            {
+                break;
+            }
+
+            foreach (string item in batch)
+            {
                 yield return item;
+            }
+
+            batchNumber++;
         }
     }
 }

@@ -1,38 +1,58 @@
-global using Contracts;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
+global using Contracts;
 
-namespace Contracts
+namespace Contracts;
+public record PlaceOrder(Guid OrderId, string CustomerName);
+public record OrderPlaced(Guid OrderId, string CustomerName);
+public record CustomerNotified(Guid OrderId, string NotificationMessage);
+
+// consumers
+public class PlaceOrderConsumer : IConsumer<PlaceOrder>
 {
-    public record PlaceOrder(Guid OrderId, string CustomerName);
-    public record OrderPlaced(Guid OrderId, string CustomerName);
-    public record CustomerNotified(Guid OrderId, string NotificationMessage);
-
-    public class PlaceOrderConsumer : IConsumer<PlaceOrder>
+    public async Task Consume(ConsumeContext<PlaceOrder> context)
     {
-        public async Task Consume(ConsumeContext<PlaceOrder> context)
-        {
-            await context.Publish(new OrderPlaced(context.Message.OrderId, context.Message.CustomerName));
-        }
+        await context.Publish(new OrderPlaced(context.Message.OrderId, context.Message.CustomerName));
     }
+}
 
-    public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
+public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
+{
+    public async Task Consume(ConsumeContext<OrderPlaced> context)
     {
-        public async Task Consume(ConsumeContext<OrderPlaced> context)
-        {
-            await context.Publish(new CustomerNotified(context.Message.OrderId, $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}"));
-        }
+        var message = new CustomerNotified(context.Message.OrderId,
+            $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}");
+        await context.Publish(message);
     }
+}
 
-    [GlobalSetup]
-    public class TestSetup : IAsyncLifetime
-    {
-        public ValueTask InitializeAsync() =>
-            new ValueTask(AddMassTransitTestHarness(cfg => cfg.AddConsumer<PlaceOrderConsumer>()
-                .AddConsumer<NotifyCustomerConsumer>()),
-                (ctx, cfg) => cfg.ConfigureEndpoints(ctx)));
+// xUnit v3 test class (outside the Contracts namespace)
+[Fact]
+public async Task PlaceOrder_Consumer_Publishes_OrderPlaced()
+{
+    var provider = new ServiceCollection();
+    provider.AddMassTransitTestHarness(cfg => cfg.AddConsumer<PlaceOrderConsumer>());
+    var harness = provider.BuildServiceProvider().GetRequiredService<ITestHarness>();
 
-        public async ValueTask DisposeAsync() => base.DisposeAsync();
-    }
+    await harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "John Doe"));
+
+    Assert.True(await harness.Consumed.Any<PlaceOrder>());
+    Assert.True(await harness.Published.Any<OrderPlaced>());
+}
+
+[Fact]
+public async Task Full_Pipeline_Eventually_Completed()
+{
+    var provider = new ServiceCollection();
+    provider.AddMassTransitTestHarness(cfg =>
+        cfg.AddConsumer<PlaceOrderConsumer>()
+        .AddConsumer<NotifyCustomerConsumer>());
+    var harness = provider.BuildServiceProvider().GetRequiredService<ITestHarness>();
+
+    await harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "Alice"));
+
+    Assert.True(await harness.Consumed.Any<PlaceOrder>());
+    Assert.True(await harness.Published.Any<OrderPlaced>());
+    Assert.True(await harness.Published.Any<CustomerNotified>());
 }

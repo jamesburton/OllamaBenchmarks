@@ -1,0 +1,57 @@
+namespace Contracts;
+
+public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+
+public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+
+public record OrderCompleted(Guid OrderId);
+
+public class OrderState : SagaStateMachineInstance
+{
+    public Guid CorrelationId { get; set; }
+    public string CurrentState { get; set; }
+    public DateTime OrderDate { get; set; }
+    public DateTime? AcceptedAt { get; set; }
+
+    public OrderState() { }
+}
+
+public class OrderStateMachine : MassTransitStateMachine<OrderState>
+{
+    public State Submitted { get; private set; } = new State();
+    public State Accepted { get; private set; } = new State();
+    public State Completed { get; private set; } = new State();
+
+    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
+    public Event<OrderAccepted> OrderAccepted { get; private set; }
+    public Event<OrderCompleted> OrderCompleted { get; private set; }
+
+    public OrderStateMachine() : base(InstanceState(x => x.CurrentState))
+    {
+        Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId));
+        Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId));
+        Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId));
+
+        Initially
+            .When(OrderSubmitted)
+            .Then(context => { context.Saga.OrderDate = context.Data.OrderDate; })
+            .TransitionTo(Submitted);
+
+        During(Submitted
+            .When(OrderAccepted)
+            .Then(context => { context.Saga.AcceptedAt = context.Data.AcceptedAt; })
+            .TransitionTo(Accepted);
+
+        During(Accepted
+            .When(OrderCompleted)
+            .Finalize());
+
+        SetCompletedWhenFinalized();
+    }
+
+    protected void SetCompletedWhenFinalized()
+    {
+        Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId));
+        .Then(context => { context.Saga.CurrentState = "Completed"; });
+    }
+}
