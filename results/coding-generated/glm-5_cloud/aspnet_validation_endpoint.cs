@@ -16,8 +16,8 @@ public class OrderService
 {
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        var validationContext = new ValidationContext(request);
         var validationResults = new System.Collections.Generic.List<ValidationResult>();
+        var validationContext = new ValidationContext(request);
 
         bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
 

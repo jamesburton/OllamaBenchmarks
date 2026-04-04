@@ -14,7 +14,10 @@ public class Product
 
 public class ProductDbContext : DbContext
 {
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
+    {
+    }
+
     public DbSet<Product> Products { get; set; }
 }
 
@@ -22,17 +25,16 @@ public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        var products = await db.Products
+        var productsToUpdate = await db.Products
             .Where(p => p.Category == category)
             .ToListAsync();
 
-        foreach (var product in products)
+        foreach (var product in productsToUpdate)
         {
             product.Price = product.Price * (1 - discountPct);
             product.LastModified = DateTime.UtcNow;
         }
 
-        await db.SaveChangesAsync();
-        return products.Count;
+        return await db.SaveChangesAsync();
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using System.Threading.Tasks;
 
 public interface IUserService
 {
@@ -9,10 +10,10 @@ public interface IUserService
 public class UserDashboard : ComponentBase
 {
     [CascadingParameter]
-    public Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; }
 
     [Inject]
-    public IUserService UserService { get; set; } = default!;
+    public IUserService UserService { get; set; }
 
     public string? DisplayName { get; set; }
 

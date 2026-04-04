@@ -28,44 +28,43 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 
 public class NotificationServiceTests
 {
-    private readonly IUserRepository _repo;
-    private readonly IEmailService _email;
+    private readonly IUserRepository _userRepository;
+    private readonly IEmailService _emailService;
     private readonly NotificationService _sut;
 
     public NotificationServiceTests()
     {
-        _repo = Substitute.For<IUserRepository>();
-        _email = Substitute.For<IEmailService>();
-        _sut = new NotificationService(_repo, _email);
+        _userRepository = Substitute.For<IUserRepository>();
+        _emailService = Substitute.For<IEmailService>();
+        _sut = new NotificationService(_userRepository, _emailService);
     }
 
     [Fact]
-    public async Task NotifyUserAsync_UserExists_SendsWelcomeEmail()
+    public async Task NotifyUserAsync_ShouldSendWelcomeEmail_WhenUserIsFound()
     {
         // Arrange
         var user = new User { Id = 1, Name = "Test User", Email = "test@example.com" };
-        _repo.GetByIdAsync(user.Id).Returns(user);
+        _userRepository.GetByIdAsync(user.Id).Returns(user);
 
         // Act
         await _sut.NotifyUserAsync(user.Id);
 
         // Assert
-        await _repo.Received(1).GetByIdAsync(user.Id);
-        await _email.Received(1).SendWelcomeAsync(user.Email);
+        await _emailService.Received().SendWelcomeAsync(user.Email);
     }
 
     [Fact]
-    public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
+    public async Task NotifyUserAsync_ShouldThrowInvalidOperationException_WhenUserIsNotFound()
     {
         // Arrange
         int userId = 999;
-        _repo.GetByIdAsync(userId).Returns((User?)null);
+        _userRepository.GetByIdAsync(userId).Returns((User?)null);
 
         // Act
-        Func<Task> act = () => _sut.NotifyUserAsync(userId);
+        var act = async () => await _sut.NotifyUserAsync(userId);
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>();
-        await _email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+        await _emailService.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 }

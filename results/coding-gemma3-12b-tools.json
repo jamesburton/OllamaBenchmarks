@@ -245,5 +245,6 @@
       "generated_code_path": "results\\coding-generated\\gemma3-12b-tools\\vertical_blazor_crud.cs"
     }
   ],
-  "layer3_weighted_score": 0.391304347826087
+  "layer3_weighted_score": 0.391304347826087,
+  "composite_score": 0.234783
 }

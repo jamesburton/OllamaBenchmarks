@@ -1,6 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 public class Address
 {
@@ -27,10 +27,7 @@ public class CompanyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b =>
-        {
-            b.ToJson();
-        });
+        builder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
     }
 }
 

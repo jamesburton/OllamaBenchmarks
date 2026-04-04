@@ -1,9 +1,7 @@
 global using Contracts;
+using MassTransit;
 
 namespace Contracts;
-
-using MassTransit;
-using System;
 
 public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
 public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
@@ -12,7 +10,7 @@ public record OrderCompleted(Guid OrderId);
 public class OrderState : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; } = string.Empty;
+    public string CurrentState { get; set; }
     public DateTime OrderDate { get; set; }
     public DateTime? AcceptedAt { get; set; }
 }
