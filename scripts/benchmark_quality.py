@@ -31,6 +31,42 @@ CODING_TASKS = [
             "assert top_k_frequent([5],1)==[5]",
         ],
     ),
+    (
+        "merge_intervals",
+        "Return only Python code. Define merge_intervals(intervals: list[list[int]]) -> list[list[int]]]. Merge overlapping intervals. Input may be unsorted. Return sorted by start.",
+        [
+            "assert merge_intervals([[1,3],[2,6],[8,10],[15,18]])==[[1,6],[8,10],[15,18]]",
+            "assert merge_intervals([[1,4],[4,5]])==[[1,5]]",
+            "assert merge_intervals([[1,1]])==[[1,1]]",
+            "assert merge_intervals([[3,5],[1,2],[6,8]])==[[1,2],[3,5],[6,8]]",
+        ],
+    ),
+    (
+        "word_break",
+        "Return only Python code. Define word_break(s: str, word_dict: list[str]) -> bool. Return True if s can be segmented into one or more words from word_dict. Words can be reused.",
+        [
+            'assert word_break("leetcode",["leet","code"])==True',
+            'assert word_break("applepenapple",["apple","pen"])==True',
+            'assert word_break("catsandog",["cats","dog","sand","and","cat"])==False',
+            'assert word_break("",["a"])==True',
+        ],
+    ),
+    (
+        "lru_cache",
+        "Return only Python code. Define class LRUCache. __init__(self, capacity: int). get(self, key: int) -> int returns -1 if not found. put(self, key: int, value: int) evicts least recently used when at capacity. get() should mark as recently used.",
+        [
+            "c = LRUCache(2)",
+            "c.put(1, 1)",
+            "c.put(2, 2)",
+            "assert c.get(1) == 1",
+            "c.put(3, 3)",  # evicts key 2
+            "assert c.get(2) == -1",
+            "c.put(4, 4)",  # evicts key 1
+            "assert c.get(1) == -1",
+            "assert c.get(3) == 3",
+            "assert c.get(4) == 4",
+        ],
+    ),
 ]
 
 TOOL_TASKS = [
@@ -70,6 +106,81 @@ TOOL_TASKS = [
         "city_timezone",
         {"city": "Tokyo"},
     ),
+    (
+        "multi_tool_select",
+        "I need the product of 6 and 9. Use the correct tool. Tool call only.",
+        {
+            "type": "function",
+            "function": {
+                "name": "multiply_numbers",
+                "description": "Multiply two integers",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"a": {"type": "integer"}, "b": {"type": "integer"}},
+                    "required": ["a", "b"],
+                },
+            },
+        },
+        "multiply_numbers",
+        {"a": 6, "b": 9},
+        # Extra tools the model must NOT pick:
+        [
+            {
+                "type": "function",
+                "function": {
+                    "name": "add_numbers",
+                    "description": "Add two integers",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {"a": {"type": "integer"}, "b": {"type": "integer"}},
+                        "required": ["a", "b"],
+                    },
+                },
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "city_timezone",
+                    "description": "Get timezone for a city",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {"city": {"type": "string"}},
+                        "required": ["city"],
+                    },
+                },
+            },
+        ],
+    ),
+    (
+        "nested_args",
+        'Create a shipment for order "ORD-42" to 123 Main St, Seattle, zip 98101, with express priority. Tool call only.',
+        {
+            "type": "function",
+            "function": {
+                "name": "create_shipment",
+                "description": "Create a shipping order",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "order_id": {"type": "string"},
+                        "address": {
+                            "type": "object",
+                            "properties": {
+                                "street": {"type": "string"},
+                                "city": {"type": "string"},
+                                "zip": {"type": "string"},
+                            },
+                            "required": ["street", "city", "zip"],
+                        },
+                        "priority": {"type": "string", "enum": ["standard", "express"]},
+                    },
+                    "required": ["order_id", "address", "priority"],
+                },
+            },
+        },
+        "create_shipment",
+        {"order_id": "ORD-42", "address": {"street": "123 Main St", "city": "Seattle", "zip": "98101"}, "priority": "express"},
+    ),
 ]
 
 PLAN_AGENT_TASKS = [
@@ -87,7 +198,24 @@ PLAN_AGENT_TASKS = [
             "status": "completed",
             "summary": "Drafted a three-line benchmark summary for qwen3-coder-next and lfm2.",
         },
-    }
+    },
+    {
+        "name": "error_recovery_report",
+        "prompt": (
+            "You are coordinating a data analysis task. "
+            "First create a plan using create_plan. "
+            "Then request a sub-agent with request_subagent to fetch the data. "
+            "The sub-agent will report back — if it fails, you must still call finalize_result "
+            "with a summary acknowledging the failure. Do not skip steps."
+        ),
+        "expected_plan_keywords": ["data", "analysis"],
+        "subagent_result": {
+            "status": "failed",
+            "error": "data_unavailable",
+            "message": "The requested dataset could not be retrieved.",
+        },
+        "expect_error_acknowledgement": True,
+    },
 ]
 
 
@@ -153,6 +281,10 @@ def parse_arguments(arguments: Any) -> dict[str, Any]:
 def extract_code(text: str) -> str:
     if not text:
         return ""
+    # Strip <think>...</think> tags (some models wrap reasoning in these)
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.S).strip()
+    if not text:
+        return ""
     match = re.search(r"```(?:python)?\s*(.*?)```", text, flags=re.S | re.I)
     code = match.group(1) if match else text
     code = textwrap.dedent(code).strip()
@@ -185,15 +317,17 @@ def run_python_asserts(code: str, asserts: list[str]) -> bool:
             pass
 
 
-def run_tool_task(model: str, prompt: str, tool: dict, expected_name: str, expected_args: dict[str, Any]) -> bool:
+def run_tool_task(model: str, prompt: str, tool: dict, expected_name: str,
+                  expected_args: dict[str, Any], extra_tools: list[dict] | None = None) -> bool:
     options = sampling_options(model, use_case="tool")
+    all_tools = [tool] + (extra_tools or [])
     response = post_json(
         "/api/chat",
         {
             "model": model,
             "stream": False,
             "messages": [{"role": "user", "content": prompt}],
-            "tools": [tool],
+            "tools": all_tools,
             "think": think_setting(model),
             "options": {**options, "num_predict": 100, "seed": 42},
         },
@@ -205,7 +339,16 @@ def run_tool_task(model: str, prompt: str, tool: dict, expected_name: str, expec
     if function.get("name") != expected_name:
         return False
     arguments = parse_arguments(function.get("arguments"))
-    return all(arguments.get(key) == value for key, value in expected_args.items())
+    return _deep_match(arguments, expected_args)
+
+
+def _deep_match(actual: Any, expected: Any) -> bool:
+    """Recursively match expected values in actual (supports nested dicts)."""
+    if isinstance(expected, dict):
+        if not isinstance(actual, dict):
+            return False
+        return all(_deep_match(actual.get(k), v) for k, v in expected.items())
+    return actual == expected
 
 
 def run_plan_agent_task(model: str, task: dict[str, Any]) -> bool:
@@ -359,6 +502,9 @@ def run_plan_agent_task(model: str, task: dict[str, Any]) -> bool:
         return False
     final_args = parse_arguments(final_call.get("arguments"))
     summary = str(final_args.get("summary") or "").lower()
+    if task.get("expect_error_acknowledgement"):
+        # Error recovery: model must acknowledge the failure in its summary
+        return any(kw in summary for kw in ["fail", "error", "unavailable", "unable", "could not"])
     return "summary" in summary or "draft" in summary or "benchmark" in summary
 
 
@@ -403,9 +549,11 @@ def run_model(model: str) -> dict:
         except Exception:
             pass
 
-    for _, prompt, tool, expected_name, expected_args in TOOL_TASKS:
+    for task_tuple in TOOL_TASKS:
         try:
-            if run_tool_task(model, prompt, tool, expected_name, expected_args):
+            _, prompt, tool, expected_name, expected_args = task_tuple[:5]
+            extra_tools = task_tuple[5] if len(task_tuple) > 5 else None
+            if run_tool_task(model, prompt, tool, expected_name, expected_args, extra_tools):
                 row["tool_pass"] += 1
         except Exception:
             pass

@@ -1,0 +1,73 @@
+name: linq_set_operations
+category: linq
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  A static class ProductCatalog with three static methods:
+
+  1. IEnumerable<string> GetNewProducts(IEnumerable<string> current, IEnumerable<string> previous)
+     - Returns products in current that are NOT in previous, using LINQ Except.
+
+  2. IEnumerable<string> GetCommonProducts(IEnumerable<string> a, IEnumerable<string> b)
+     - Returns products present in BOTH sequences, using LINQ Intersect.
+
+  3. IEnumerable<string> GetAllUniqueProducts(IEnumerable<string> a, IEnumerable<string> b)
+     - Returns all distinct products from both sequences combined, using LINQ Union.
+
+  All three methods must use default (ordinal/case-sensitive) string comparison.
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductCatalogTests
+  {
+      private static readonly string[] Previous = ["Apple", "Banana", "Cherry"];
+      private static readonly string[] Current  = ["Banana", "Cherry", "Date", "Elderberry"];
+
+      [Fact]
+      public void GetNewProducts_ReturnsItemsInCurrentButNotPrevious()
+      {
+          var result = ProductCatalog.GetNewProducts(Current, Previous).ToList();
+          result.Should().HaveCount(2);
+          result.Should().Contain("Date");
+          result.Should().Contain("Elderberry");
+      }
+
+      [Fact]
+      public void GetCommonProducts_ReturnsItemsPresentInBoth()
+      {
+          var result = ProductCatalog.GetCommonProducts(Current, Previous).ToList();
+          result.Should().HaveCount(2);
+          result.Should().Contain("Banana");
+          result.Should().Contain("Cherry");
+      }
+
+      [Fact]
+      public void GetAllUniqueProducts_ReturnsDistinctUnionOfBothLists()
+      {
+          var result = ProductCatalog.GetAllUniqueProducts(Current, Previous).ToList();
+          result.Should().HaveCount(5);
+          result.Should().Contain("Apple");
+          result.Should().Contain("Date");
+          result.Should().Contain("Banana");
+      }
+
+      [Fact]
+      public void GetNewProducts_AllNew_ReturnsAllCurrent()
+      {
+          var result = ProductCatalog.GetNewProducts(["X", "Y"], []).ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetCommonProducts_NoOverlap_ReturnsEmpty()
+      {
+          var result = ProductCatalog.GetCommonProducts(["X"], ["Y"]).ToList();
+          result.Should().BeEmpty();
+      }
+  }

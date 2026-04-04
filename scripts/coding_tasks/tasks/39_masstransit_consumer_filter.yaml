@@ -1,0 +1,93 @@
+name: masstransit_consumer_filter
+category: masstransit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - masstransit_v8.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `ProcessPayment` message record with properties: `Guid OrderId`, `decimal Amount`, `string Currency`. Use positional record syntax.
+  2. A `PaymentProcessed` event record with properties: `Guid OrderId`, `DateTime ProcessedAt`. Use positional record syntax.
+  3. A `ProcessPaymentConsumer` class implementing `IConsumer<ProcessPayment>` that:
+     - In `Consume`: if `context.Message.Amount <= 0`, returns immediately without publishing anything
+     - Otherwise, publishes a `PaymentProcessed` event with `context.Message.OrderId` and `DateTime.UtcNow`, using `await context.Publish(...)`
+  4. A `ProcessPaymentConsumerDefinition` class extending `ConsumerDefinition<ProcessPaymentConsumer>` that:
+     - Sets `ConcurrentMessageLimit = 2` in the constructor
+     - In `ConfigureConsumer`, calls `ep.UseMessageRetry(r => r.Interval(2, 500))`
+
+  IMPORTANT: MassTransit requires all message types to be in a namespace. Place all types inside `namespace Contracts;` (file-scoped). Also add `global using Contracts;` at the top of the file so the types are accessible without explicit using statements from other files.
+
+  Include `using MassTransit;` BEFORE the `namespace Contracts;` declaration.
+
+  Use positional record syntax for all message types.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using MassTransit;
+  using MassTransit.Testing;
+  using Microsoft.Extensions.DependencyInjection;
+  using AwesomeAssertions;
+
+  public class ProcessPaymentConsumerTests
+  {
+      private static async Task<(ITestHarness harness, AsyncServiceScope scope)> BuildHarness()
+      {
+          var provider = new ServiceCollection()
+              .AddMassTransitTestHarness(cfg =>
+              {
+                  cfg.AddConsumer<ProcessPaymentConsumer, ProcessPaymentConsumerDefinition>();
+              })
+              .BuildServiceProvider(true);
+          var scope = provider.CreateAsyncScope();
+          var harness = scope.ServiceProvider.GetRequiredService<ITestHarness>();
+          await harness.Start();
+          return (harness, scope);
+      }
+
+      [Fact]
+      public async Task ValidPayment_PublishesPaymentProcessed()
+      {
+          var (harness, scope) = await BuildHarness();
+          await using var _ = scope;
+
+          var orderId = Guid.NewGuid();
+          await harness.Bus.Publish(new ProcessPayment(orderId, 49.99m, "USD"));
+
+          Assert.True(await harness.Consumed.Any<ProcessPayment>());
+          Assert.True(await harness.Published.Any<PaymentProcessed>());
+
+          var published = harness.Published.Select<PaymentProcessed>().FirstOrDefault();
+          published.Should().NotBeNull();
+          published!.Context.Message.OrderId.Should().Be(orderId);
+      }
+
+      [Fact]
+      public async Task ZeroAmount_DoesNotPublishPaymentProcessed()
+      {
+          var (harness, scope) = await BuildHarness();
+          await using var _ = scope;
+
+          await harness.Bus.Publish(new ProcessPayment(Guid.NewGuid(), 0m, "USD"));
+
+          Assert.True(await harness.Consumed.Any<ProcessPayment>());
+          Assert.False(await harness.Published.Any<PaymentProcessed>());
+      }
+
+      [Fact]
+      public async Task NegativeAmount_DoesNotPublishPaymentProcessed()
+      {
+          var (harness, scope) = await BuildHarness();
+          await using var _ = scope;
+
+          await harness.Bus.Publish(new ProcessPayment(Guid.NewGuid(), -10m, "EUR"));
+
+          Assert.True(await harness.Consumed.Any<ProcessPayment>());
+          Assert.False(await harness.Published.Any<PaymentProcessed>());
+      }
+  }

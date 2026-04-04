@@ -1,0 +1,82 @@
+name: async_whenall_parallel
+category: async
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. An interface IDataLoader with one method:
+     Task<string> LoadAsync(string source, CancellationToken ct);
+
+  2. A class ParallelDataService with:
+     - A constructor that accepts exactly three IDataLoader parameters: loaderA, loaderB, loaderC.
+       Store them as private fields.
+     - A method: Task<List<string>> LoadAllAsync(CancellationToken ct)
+       that calls LoadAsync on all three loaders in parallel using Task.WhenAll,
+       passing the source strings "sourceA", "sourceB", "sourceC" respectively,
+       and returns the results as a List<string> in the order [resultA, resultB, resultC].
+
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class ParallelDataServiceTests
+  {
+      [Fact]
+      public async Task LoadAllAsync_CallsAllThreeLoaders()
+      {
+          var a = Substitute.For<IDataLoader>();
+          var b = Substitute.For<IDataLoader>();
+          var c = Substitute.For<IDataLoader>();
+          a.LoadAsync("sourceA", Arg.Any<CancellationToken>()).Returns("resultA");
+          b.LoadAsync("sourceB", Arg.Any<CancellationToken>()).Returns("resultB");
+          c.LoadAsync("sourceC", Arg.Any<CancellationToken>()).Returns("resultC");
+
+          var svc = new ParallelDataService(a, b, c);
+          var results = await svc.LoadAllAsync(CancellationToken.None);
+
+          await a.Received(1).LoadAsync("sourceA", Arg.Any<CancellationToken>());
+          await b.Received(1).LoadAsync("sourceB", Arg.Any<CancellationToken>());
+          await c.Received(1).LoadAsync("sourceC", Arg.Any<CancellationToken>());
+          results.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task LoadAllAsync_ResultsReturnedInOrder()
+      {
+          var a = Substitute.For<IDataLoader>();
+          var b = Substitute.For<IDataLoader>();
+          var c = Substitute.For<IDataLoader>();
+          a.LoadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns("A");
+          b.LoadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns("B");
+          c.LoadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns("C");
+
+          var svc = new ParallelDataService(a, b, c);
+          var results = await svc.LoadAllAsync(CancellationToken.None);
+
+          results[0].Should().Be("A");
+          results[1].Should().Be("B");
+          results[2].Should().Be("C");
+      }
+
+      [Fact]
+      public async Task LoadAllAsync_CancellationPropagatedToLoaders()
+      {
+          var a = Substitute.For<IDataLoader>();
+          var b = Substitute.For<IDataLoader>();
+          var c = Substitute.For<IDataLoader>();
+          var cts = new CancellationTokenSource();
+          var token = cts.Token;
+          cts.Cancel();
+
+          a.LoadAsync(Arg.Any<string>(), token).Returns(Task.FromCanceled<string>(token));
+          b.LoadAsync(Arg.Any<string>(), token).Returns(Task.FromCanceled<string>(token));
+          c.LoadAsync(Arg.Any<string>(), token).Returns(Task.FromCanceled<string>(token));
+
+          var svc = new ParallelDataService(a, b, c);
+          await Assert.ThrowsAsync<TaskCanceledException>(() => svc.LoadAllAsync(token));
+      }
+  }

@@ -1,0 +1,86 @@
+name: async_valuetask_cache
+category: async
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. An interface IExpensiveService with one method:
+     Task<string> ComputeAsync(string key);
+
+  2. A class CachingService that wraps an IExpensiveService and provides caching:
+     - Constructor: CachingService(IExpensiveService inner)
+     - Private Dictionary<string, string> to store cached results.
+     - Method: ValueTask<string> GetAsync(string key)
+       - If the key is already in the cache, return the cached value synchronously
+         using: return new ValueTask<string>(cachedValue);
+       - If not cached, call inner.ComputeAsync(key), store the result in the cache,
+         and return it. Use async/await for the miss path.
+
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class CachingServiceTests
+  {
+      [Fact]
+      public async Task GetAsync_FirstCall_DelegatestoInner()
+      {
+          var inner = Substitute.For<IExpensiveService>();
+          inner.ComputeAsync("k1").Returns("value1");
+          var svc = new CachingService(inner);
+
+          var result = await svc.GetAsync("k1");
+
+          result.Should().Be("value1");
+          await inner.Received(1).ComputeAsync("k1");
+      }
+
+      [Fact]
+      public async Task GetAsync_SecondCall_ReturnsCachedWithoutCallingInner()
+      {
+          var inner = Substitute.For<IExpensiveService>();
+          inner.ComputeAsync("k1").Returns("value1");
+          var svc = new CachingService(inner);
+
+          await svc.GetAsync("k1");
+          var result = await svc.GetAsync("k1");
+
+          result.Should().Be("value1");
+          // inner must still have been called only once
+          await inner.Received(1).ComputeAsync("k1");
+      }
+
+      [Fact]
+      public async Task GetAsync_CacheHit_IsCompletedSynchronously()
+      {
+          var inner = Substitute.For<IExpensiveService>();
+          inner.ComputeAsync("k1").Returns("value1");
+          var svc = new CachingService(inner);
+
+          await svc.GetAsync("k1"); // populate cache
+
+          var vt = svc.GetAsync("k1");
+          vt.IsCompletedSuccessfully.Should().BeTrue();
+          (await vt).Should().Be("value1");
+      }
+
+      [Fact]
+      public async Task GetAsync_DifferentKeys_CachedIndependently()
+      {
+          var inner = Substitute.For<IExpensiveService>();
+          inner.ComputeAsync("a").Returns("alpha");
+          inner.ComputeAsync("b").Returns("beta");
+          var svc = new CachingService(inner);
+
+          (await svc.GetAsync("a")).Should().Be("alpha");
+          (await svc.GetAsync("b")).Should().Be("beta");
+          (await svc.GetAsync("a")).Should().Be("alpha");
+
+          await inner.Received(1).ComputeAsync("a");
+          await inner.Received(1).ComputeAsync("b");
+      }
+  }

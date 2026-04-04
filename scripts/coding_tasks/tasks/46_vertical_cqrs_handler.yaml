@@ -1,0 +1,158 @@
+name: vertical_cqrs_handler
+category: vertical
+weight: 2
+template: test_project
+max_tokens: 8192
+num_ctx: 12288
+references:
+  - oneof.md
+  - nsubstitute.md
+  - awesome_assertions.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a complete CQRS command handler vertical slice in a single C# file:
+
+  1. Records and types (NOT in a namespace):
+     - `public record CreateProductCommand(string Name, decimal Price)`
+     - `public record Product(int Id, string Name, decimal Price)`
+     - `public record ValidationError(string Message)`
+     - `public record DuplicateError(string ExistingName)`
+
+  2. An `IProductRepository` interface (NOT in a namespace) with:
+     - `Task<bool> ExistsAsync(string name)`
+     - `Task<Product> AddAsync(Product product)`
+
+  3. A generic `ICommandHandler<TCommand, TResult>` interface (NOT in a namespace) with:
+     - `Task<TResult> HandleAsync(TCommand command)`
+
+  4. A `CreateProductCommandHandler` class implementing `ICommandHandler<CreateProductCommand, OneOf<Product, ValidationError, DuplicateError>>` (NOT in a namespace):
+     - Constructor takes `IProductRepository repository`
+     - `HandleAsync` implementation:
+       - If `command.Name` is null or whitespace: return `new ValidationError("Name is required")`
+       - If `command.Price <= 0`: return `new ValidationError("Price must be positive")`
+       - If `await repository.ExistsAsync(command.Name)` is true: return `new DuplicateError(command.Name)`
+       - Otherwise: call `await repository.AddAsync(new Product(0, command.Name, command.Price))` and return the result
+
+  IMPORTANT constraints:
+  - Include `using OneOf;` at the top of the file.
+  - Do NOT add any other using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  - Do NOT wrap any types in a namespace.
+  - Use NSubstitute to mock `IProductRepository` in tests.
+  - Use AwesomeAssertions `.Should().Be()` for assertions.
+  - When checking OneOf result type, use `.IsT0`, `.IsT1`, `.IsT2`, `.AsT0`, `.AsT1`, `.AsT2`.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using OneOf;
+
+  public class CreateProductCommandHandlerMetaTests
+  {
+      private IProductRepository MakeRepo(bool exists = false, Product? addResult = null)
+      {
+          var repo = Substitute.For<IProductRepository>();
+          repo.ExistsAsync(Arg.Any<string>()).Returns(Task.FromResult(exists));
+          if (addResult is not null)
+              repo.AddAsync(Arg.Any<Product>()).Returns(Task.FromResult(addResult));
+          return repo;
+      }
+
+      [Fact]
+      public async Task HandleAsync_ValidCommand_ReturnsProduct()
+      {
+          var expected = new Product(1, "Widget", 9.99m);
+          var repo = MakeRepo(exists: false, addResult: expected);
+          var handler = new CreateProductCommandHandler(repo);
+
+          var result = await handler.HandleAsync(new CreateProductCommand("Widget", 9.99m));
+
+          result.IsT0.Should().BeTrue();
+          result.AsT0.Name.Should().Be("Widget");
+          result.AsT0.Price.Should().Be(9.99m);
+      }
+
+      [Fact]
+      public async Task HandleAsync_EmptyName_ReturnsValidationError()
+      {
+          var repo = MakeRepo();
+          var handler = new CreateProductCommandHandler(repo);
+
+          var result = await handler.HandleAsync(new CreateProductCommand("", 10m));
+
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Message.Should().Be("Name is required");
+      }
+
+      [Fact]
+      public async Task HandleAsync_WhitespaceName_ReturnsValidationError()
+      {
+          var repo = MakeRepo();
+          var handler = new CreateProductCommandHandler(repo);
+
+          var result = await handler.HandleAsync(new CreateProductCommand("   ", 10m));
+
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Message.Should().Be("Name is required");
+      }
+
+      [Fact]
+      public async Task HandleAsync_NegativePrice_ReturnsValidationError()
+      {
+          var repo = MakeRepo();
+          var handler = new CreateProductCommandHandler(repo);
+
+          var result = await handler.HandleAsync(new CreateProductCommand("Widget", -1m));
+
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Message.Should().Be("Price must be positive");
+      }
+
+      [Fact]
+      public async Task HandleAsync_ZeroPrice_ReturnsValidationError()
+      {
+          var repo = MakeRepo();
+          var handler = new CreateProductCommandHandler(repo);
+
+          var result = await handler.HandleAsync(new CreateProductCommand("Widget", 0m));
+
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Message.Should().Be("Price must be positive");
+      }
+
+      [Fact]
+      public async Task HandleAsync_DuplicateName_ReturnsDuplicateError()
+      {
+          var repo = MakeRepo(exists: true);
+          var handler = new CreateProductCommandHandler(repo);
+
+          var result = await handler.HandleAsync(new CreateProductCommand("Widget", 10m));
+
+          result.IsT2.Should().BeTrue();
+          result.AsT2.ExistingName.Should().Be("Widget");
+      }
+
+      [Fact]
+      public async Task HandleAsync_ValidCommand_CallsAddAsync()
+      {
+          var expected = new Product(1, "Widget", 9.99m);
+          var repo = MakeRepo(exists: false, addResult: expected);
+          var handler = new CreateProductCommandHandler(repo);
+
+          await handler.HandleAsync(new CreateProductCommand("Widget", 9.99m));
+
+          await repo.Received(1).AddAsync(Arg.Any<Product>());
+      }
+
+      [Fact]
+      public async Task HandleAsync_ValidationError_DoesNotCallRepository()
+      {
+          var repo = MakeRepo();
+          var handler = new CreateProductCommandHandler(repo);
+
+          await handler.HandleAsync(new CreateProductCommand("", 10m));
+
+          await repo.DidNotReceive().AddAsync(Arg.Any<Product>());
+          await repo.DidNotReceive().ExistsAsync(Arg.Any<string>());
+      }
+  }

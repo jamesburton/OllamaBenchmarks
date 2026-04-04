@@ -1,0 +1,105 @@
+name: xunit_memberdata
+category: xunit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - xunit_v3.md
+  - awesome_assertions.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `MathValidator` static class with:
+     - `public static bool IsEven(int n)` — returns `n % 2 == 0`
+     - `public static bool IsPrime(int n)` — returns true if n is prime (handle n < 2 as false)
+     - `public static string Classify(int n)` — returns `"negative"` if n < 0, `"zero"` if n == 0, `"positive"` if n > 0
+
+  2. A test class `MathValidatorTests` (NOT in a namespace) with:
+     - A `public static IEnumerable<object[]> EvenTestData` property returning test cases for IsEven: include (2, true), (3, false), (0, true), (-4, true), (7, false)
+     - A `[Theory]` test `IsEven_WithMemberData` using `[MemberData(nameof(EvenTestData))]` that takes `int n, bool expected` and asserts `MathValidator.IsEven(n).Should().Be(expected)`
+     - A `[Theory]` test `IsPrime_WithInlineData` using `[InlineData]` for: (2, true), (3, true), (4, false), (1, false), (17, true), (0, false)
+     - A `[Theory]` test `Classify_WithInlineData` using `[InlineData(-5, "negative")]`, `[InlineData(0, "zero")]`, `[InlineData(3, "positive")]`
+
+  IMPORTANT constraints:
+  - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  - Do NOT wrap code in a namespace.
+  - CRITICAL: Only use int, string, and bool types in [InlineData] arguments. Do NOT use decimal, float, or double in InlineData.
+  - Use AwesomeAssertions .Should() for assertions.
+  - EvenTestData must be `public static IEnumerable<object[]>` (not a method — a property).
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class MathValidatorMetaTests
+  {
+      [Fact]
+      public void IsEven_Two_ReturnsTrue()
+      {
+          MathValidator.IsEven(2).Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsEven_Three_ReturnsFalse()
+      {
+          MathValidator.IsEven(3).Should().BeFalse();
+      }
+
+      [Fact]
+      public void IsEven_Zero_ReturnsTrue()
+      {
+          MathValidator.IsEven(0).Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsPrime_Two_ReturnsTrue()
+      {
+          MathValidator.IsPrime(2).Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsPrime_One_ReturnsFalse()
+      {
+          MathValidator.IsPrime(1).Should().BeFalse();
+      }
+
+      [Fact]
+      public void IsPrime_Seventeen_ReturnsTrue()
+      {
+          MathValidator.IsPrime(17).Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsPrime_Four_ReturnsFalse()
+      {
+          MathValidator.IsPrime(4).Should().BeFalse();
+      }
+
+      [Fact]
+      public void Classify_Negative_ReturnsNegative()
+      {
+          MathValidator.Classify(-5).Should().Be("negative");
+      }
+
+      [Fact]
+      public void Classify_Zero_ReturnsZero()
+      {
+          MathValidator.Classify(0).Should().Be("zero");
+      }
+
+      [Fact]
+      public void Classify_Positive_ReturnsPositive()
+      {
+          MathValidator.Classify(3).Should().Be("positive");
+      }
+
+      [Fact]
+      public void MathValidatorTests_EvenTestData_IsEnumerable()
+      {
+          var data = MathValidatorTests.EvenTestData;
+          data.Should().NotBeNull();
+          data.Should().HaveCountGreaterThan(0);
+      }
+  }

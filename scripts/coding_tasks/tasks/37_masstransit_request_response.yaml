@@ -1,0 +1,79 @@
+name: masstransit_request_response
+category: masstransit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - masstransit_v8.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `GetProduct` request record with property: `Guid ProductId`. Use positional record syntax.
+  2. A `ProductResult` response record with properties: `Guid ProductId`, `string Name`, `decimal Price`. Use positional record syntax.
+  3. A `ProductNotFound` response record with no properties: `public record ProductNotFound();`
+  4. A `GetProductConsumer` class implementing `IConsumer<GetProduct>` that:
+     - Has a hardcoded known product: `Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111")` as a public static field
+     - In `Consume`: if `context.Message.ProductId == KnownId`, responds with `new ProductResult(KnownId, "Test Widget", 19.99m)`; otherwise responds with `new ProductNotFound()`
+     - Use `await context.RespondAsync(...)` to send the response
+
+  IMPORTANT: MassTransit requires all message types to be in a namespace. Place all types inside `namespace Contracts;` (file-scoped). Also add `global using Contracts;` at the top of the file so the types are accessible without explicit using statements from other files.
+
+  Include `using MassTransit;` BEFORE the `namespace Contracts;` declaration.
+
+  Use positional record syntax for all message types.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using MassTransit;
+  using MassTransit.Testing;
+  using Microsoft.Extensions.DependencyInjection;
+  using AwesomeAssertions;
+
+  public class GetProductConsumerTests
+  {
+      private static async Task<IServiceProvider> BuildProvider()
+      {
+          var provider = new ServiceCollection()
+              .AddMassTransitTestHarness(cfg =>
+              {
+                  cfg.AddConsumer<GetProductConsumer>();
+              })
+              .BuildServiceProvider(true);
+          var harness = provider.GetRequiredService<ITestHarness>();
+          await harness.Start();
+          return provider;
+      }
+
+      [Fact]
+      public async Task GetProduct_KnownId_RespondsWithProductResult()
+      {
+          await using var provider = (ServiceProvider)await BuildProvider();
+          var harness = provider.GetRequiredService<ITestHarness>();
+          var client = harness.GetRequestClient<GetProduct>();
+
+          var response = await client.GetResponse<ProductResult, ProductNotFound>(
+              new GetProduct(GetProductConsumer.KnownId));
+
+          response.Is(out Response<ProductResult>? found).Should().BeTrue();
+          found!.Message.Name.Should().Be("Test Widget");
+          found.Message.Price.Should().Be(19.99m);
+      }
+
+      [Fact]
+      public async Task GetProduct_UnknownId_RespondsWithProductNotFound()
+      {
+          await using var provider = (ServiceProvider)await BuildProvider();
+          var harness = provider.GetRequiredService<ITestHarness>();
+          var client = harness.GetRequestClient<GetProduct>();
+
+          var response = await client.GetResponse<ProductResult, ProductNotFound>(
+              new GetProduct(Guid.NewGuid()));
+
+          response.Is(out Response<ProductNotFound>? notFound).Should().BeTrue();
+          notFound.Should().NotBeNull();
+      }
+  }

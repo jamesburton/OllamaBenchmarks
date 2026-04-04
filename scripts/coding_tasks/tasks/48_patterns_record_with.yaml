@@ -1,0 +1,78 @@
+name: patterns_record_with
+category: patterns
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. A positional record Order declared exactly as:
+     public record Order(int Id, string Customer, decimal Total, string Status);
+
+  2. A static class OrderProcessor with two static methods:
+
+     a. Order MarkShipped(Order order)
+        - Returns a new Order using the with expression, changing only Status to "Shipped".
+        - Must not mutate the original order.
+
+     b. string Classify(Order order)
+        - Uses a switch expression on order.Total:
+          * Total > 1000m  => "Premium"
+          * Total > 100m   => "Standard"
+          * _              => "Budget"
+
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderProcessorTests
+  {
+      [Fact]
+      public void MarkShipped_ReturnsNewOrderWithShippedStatus()
+      {
+          var order = new Order(1, "Alice", 500m, "Pending");
+          var shipped = OrderProcessor.MarkShipped(order);
+
+          shipped.Status.Should().Be("Shipped");
+          shipped.Id.Should().Be(1);
+          shipped.Customer.Should().Be("Alice");
+          shipped.Total.Should().Be(500m);
+      }
+
+      [Fact]
+      public void MarkShipped_OriginalOrderIsUnchanged()
+      {
+          var order = new Order(2, "Bob", 200m, "Pending");
+          OrderProcessor.MarkShipped(order);
+          order.Status.Should().Be("Pending");
+      }
+
+      [Fact]
+      public void MarkShipped_WithExpressionCreatesDistinctInstance()
+      {
+          var order = new Order(3, "Carol", 150m, "Processing");
+          var shipped = OrderProcessor.MarkShipped(order);
+          ReferenceEquals(order, shipped).Should().BeFalse();
+      }
+
+      [Fact]
+      public void Classify_TotalAbove1000_ReturnsPremium()
+      {
+          OrderProcessor.Classify(new Order(1, "X", 1500m, "New")).Should().Be("Premium");
+      }
+
+      [Fact]
+      public void Classify_TotalAbove100_ReturnsStandard()
+      {
+          OrderProcessor.Classify(new Order(1, "X", 500m, "New")).Should().Be("Standard");
+      }
+
+      [Fact]
+      public void Classify_TotalAtOrBelow100_ReturnsBudget()
+      {
+          OrderProcessor.Classify(new Order(1, "X", 99m, "New")).Should().Be("Budget");
+          OrderProcessor.Classify(new Order(1, "X", 0m, "New")).Should().Be("Budget");
+      }
+  }

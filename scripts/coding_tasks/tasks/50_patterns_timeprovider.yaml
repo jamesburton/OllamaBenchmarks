@@ -1,0 +1,69 @@
+name: patterns_timeprovider
+category: patterns
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. A class FakeTimeProvider that inherits from TimeProvider:
+     - Has a constructor: FakeTimeProvider(DateTimeOffset fixedUtcNow)
+       that stores the value.
+     - Overrides GetUtcNow() to return the fixed DateTimeOffset passed to the constructor.
+
+  2. A class ExpiryChecker:
+     - Constructor: ExpiryChecker(TimeProvider timeProvider)
+       that stores the TimeProvider as a private field.
+     - Method: bool IsExpired(DateTimeOffset expiresAt)
+       that returns true if expiresAt is strictly before TimeProvider.GetUtcNow(),
+       and false otherwise.
+
+  TimeProvider is a built-in .NET 8+ abstract class in System. Do not define it yourself.
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExpiryCheckerTests
+  {
+      private static readonly DateTimeOffset FixedNow =
+          new DateTimeOffset(2026, 1, 15, 12, 0, 0, TimeSpan.Zero);
+
+      [Fact]
+      public void IsExpired_ExpiresBeforeNow_ReturnsTrue()
+      {
+          var fake = new FakeTimeProvider(FixedNow);
+          var checker = new ExpiryChecker(fake);
+
+          var expiredAt = new DateTimeOffset(2026, 1, 10, 0, 0, 0, TimeSpan.Zero);
+          checker.IsExpired(expiredAt).Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsExpired_ExpiresAfterNow_ReturnsFalse()
+      {
+          var fake = new FakeTimeProvider(FixedNow);
+          var checker = new ExpiryChecker(fake);
+
+          var futureExpiry = new DateTimeOffset(2026, 2, 1, 0, 0, 0, TimeSpan.Zero);
+          checker.IsExpired(futureExpiry).Should().BeFalse();
+      }
+
+      [Fact]
+      public void IsExpired_ExpiresExactlyAtNow_ReturnsFalse()
+      {
+          var fake = new FakeTimeProvider(FixedNow);
+          var checker = new ExpiryChecker(fake);
+
+          checker.IsExpired(FixedNow).Should().BeFalse();
+      }
+
+      [Fact]
+      public void FakeTimeProvider_GetUtcNow_ReturnsFixedTime()
+      {
+          var expected = new DateTimeOffset(2025, 6, 1, 9, 30, 0, TimeSpan.Zero);
+          var fake = new FakeTimeProvider(expected);
+          fake.GetUtcNow().Should().Be(expected);
+      }
+  }

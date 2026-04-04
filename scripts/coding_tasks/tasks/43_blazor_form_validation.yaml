@@ -1,0 +1,104 @@
+name: blazor_form_validation
+category: blazor
+weight: 1
+template: blazor_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - blazor_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing a Blazor form validation code-behind:
+
+  1. A `ContactModel` class (NOT in a namespace) with:
+     - `[Required] public string Name { get; set; } = ""`
+     - `[EmailAddress] public string Email { get; set; } = ""`
+     - `[Range(1, 120)] public int Age { get; set; }`
+
+  2. A `ContactFormBase` class inheriting from `Microsoft.AspNetCore.Components.ComponentBase` (NOT in a namespace) with:
+     - `public ContactModel Model { get; set; } = new()`
+     - `public EditContext EditCtx { get; set; } = null!`
+     - `public bool IsSubmitted { get; set; }`
+     - `protected override void OnInitialized()` — creates `EditCtx = new EditContext(Model)`
+     - `public void HandleValidSubmit()` — sets `IsSubmitted = true`
+
+  IMPORTANT constraints:
+  - Include `using Microsoft.AspNetCore.Components;`, `using Microsoft.AspNetCore.Components.Forms;`, and `using System.ComponentModel.DataAnnotations;` at the top of the file.
+  - Do NOT add any other using statements. The project already has global usings for Xunit, AwesomeAssertions, NSubstitute, and Bunit.
+  - Do NOT wrap any types in a namespace — put everything in the global namespace.
+  - `ContactFormBase` must be `public class ContactFormBase` — NOT abstract.
+  - `EditCtx` must be of type `EditContext` (from `Microsoft.AspNetCore.Components.Forms`).
+
+  Return only valid C# code in a single file.
+test_code: |
+  using Microsoft.AspNetCore.Components.Forms;
+  using System.ComponentModel.DataAnnotations;
+
+  public class ContactFormBaseMetaTests
+  {
+      [Fact]
+      public void ContactModel_CanBeInstantiated()
+      {
+          var model = new ContactModel { Name = "Alice", Email = "alice@example.com", Age = 30 };
+          model.Name.Should().Be("Alice");
+          model.Email.Should().Be("alice@example.com");
+          model.Age.Should().Be(30);
+      }
+
+      [Fact]
+      public void ContactFormBase_OnInitialized_SetsEditCtx()
+      {
+          var form = new ContactFormBase();
+          // Invoke OnInitialized via reflection since it's protected
+          var method = typeof(ContactFormBase).GetMethod("OnInitialized",
+              System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+          method!.Invoke(form, null);
+          form.EditCtx.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void ContactFormBase_HandleValidSubmit_SetsIsSubmitted()
+      {
+          var form = new ContactFormBase();
+          var method = typeof(ContactFormBase).GetMethod("OnInitialized",
+              System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+          method!.Invoke(form, null);
+          form.HandleValidSubmit();
+          form.IsSubmitted.Should().BeTrue();
+      }
+
+      [Fact]
+      public void ContactModel_EmptyName_FailsValidation()
+      {
+          var model = new ContactModel { Name = "", Email = "test@example.com", Age = 25 };
+          var ctx = new EditContext(model);
+          var isValid = ctx.Validate();
+          isValid.Should().BeFalse();
+      }
+
+      [Fact]
+      public void ContactModel_ValidData_PassesValidation()
+      {
+          var model = new ContactModel { Name = "Bob", Email = "bob@example.com", Age = 25 };
+          var ctx = new EditContext(model);
+          var isValid = ctx.Validate();
+          isValid.Should().BeTrue();
+      }
+
+      [Fact]
+      public void ContactModel_InvalidAge_FailsValidation()
+      {
+          var model = new ContactModel { Name = "Alice", Email = "alice@example.com", Age = 0 };
+          var ctx = new EditContext(model);
+          ctx.Validate().Should().BeFalse();
+      }
+
+      [Fact]
+      public void ContactFormBase_IsSubmitted_DefaultFalse()
+      {
+          var form = new ContactFormBase();
+          form.IsSubmitted.Should().BeFalse();
+      }
+  }

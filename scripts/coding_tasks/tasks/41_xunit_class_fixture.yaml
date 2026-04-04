@@ -1,0 +1,96 @@
+name: xunit_class_fixture
+category: xunit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - xunit_v3.md
+  - awesome_assertions.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. An `InMemoryStore` class implementing `IAsyncLifetime` (ValueTask return types — NOT Task):
+     - `public Dictionary<string, string> Data { get; private set; } = new()`
+     - `public ValueTask InitializeAsync()` — seeds Data with `{"key1": "value1", "key2": "value2"}` and returns `default`
+     - `public ValueTask DisposeAsync()` — calls `Data.Clear()` and returns `default`
+
+  2. A `StoreService` class:
+     - Constructor takes `InMemoryStore store`
+     - `public string? Get(string key)` — returns `store.Data.TryGetValue(key, out var v) ? v : null`
+     - `public void Set(string key, string value)` — sets `store.Data[key] = value`
+
+  3. A test class `StoreServiceTests` implementing `IClassFixture<InMemoryStore>` (NOT in a namespace):
+     - Constructor receives `InMemoryStore store` and creates a `StoreService` from it
+     - `[Fact] Get_ExistingKey_ReturnsValue()` — asserts `Get("key1")` returns `"value1"`
+     - `[Fact] Set_ThenGet_ReturnsSetValue()` — sets `"key3"` to `"value3"`, then asserts `Get("key3")` returns `"value3"`
+     - `[Fact] Get_NonexistentKey_ReturnsNull()` — asserts `Get("nonexistent")` returns null
+
+  IMPORTANT constraints:
+  - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  - Do NOT wrap code in a namespace.
+  - CRITICAL: IAsyncLifetime must use ValueTask return types (NOT Task). This is xUnit v3.
+  - Use AwesomeAssertions .Should() for assertions.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class InMemoryStoreMetaTests
+  {
+      [Fact]
+      public async Task InMemoryStore_InitializeAsync_SeedsData()
+      {
+          var store = new InMemoryStore();
+          await store.InitializeAsync();
+          store.Data.Should().ContainKey("key1");
+          store.Data["key1"].Should().Be("value1");
+          store.Data.Should().ContainKey("key2");
+          store.Data["key2"].Should().Be("value2");
+      }
+
+      [Fact]
+      public async Task InMemoryStore_DisposeAsync_ClearsData()
+      {
+          var store = new InMemoryStore();
+          await store.InitializeAsync();
+          await store.DisposeAsync();
+          store.Data.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task StoreService_Get_ReturnsValue()
+      {
+          var store = new InMemoryStore();
+          await store.InitializeAsync();
+          var sut = new StoreService(store);
+          sut.Get("key1").Should().Be("value1");
+      }
+
+      [Fact]
+      public async Task StoreService_Get_NonExistent_ReturnsNull()
+      {
+          var store = new InMemoryStore();
+          await store.InitializeAsync();
+          var sut = new StoreService(store);
+          sut.Get("missing").Should().BeNull();
+      }
+
+      [Fact]
+      public async Task StoreService_Set_ThenGet_ReturnsValue()
+      {
+          var store = new InMemoryStore();
+          await store.InitializeAsync();
+          var sut = new StoreService(store);
+          sut.Set("newkey", "newval");
+          sut.Get("newkey").Should().Be("newval");
+      }
+
+      [Fact]
+      public void InMemoryStore_ImplementsIAsyncLifetime()
+      {
+          var store = new InMemoryStore();
+          store.Should().BeAssignableTo<IAsyncLifetime>();
+      }
+  }

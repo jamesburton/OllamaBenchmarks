@@ -1,0 +1,81 @@
+name: aspnet_problemdetails_handler
+category: aspnet
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - aspnet_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `NotFoundException` class extending `Exception` with:
+     - A public `string ResourceName` property
+     - A constructor `NotFoundException(string resourceName)` that calls `base($"Resource not found: {resourceName}")` and sets `ResourceName`
+  2. A `ConflictException` class extending `Exception` with:
+     - A public `string ConflictReason` property
+     - A constructor `ConflictException(string conflictReason)` that calls `base($"Conflict: {conflictReason}")` and sets `ConflictReason`
+  3. A static class `ApiExceptionMapper` with a static method `ProblemDetails MapException(Exception ex)` that returns a `Microsoft.AspNetCore.Mvc.ProblemDetails` object:
+     - `NotFoundException` → Status = 404, Title = "Not Found", Detail = the `ResourceName` property
+     - `ConflictException` → Status = 409, Title = "Conflict", Detail = the `ConflictReason` property
+     - Any other `Exception` → Status = 500, Title = "Internal Server Error", Detail = ex.Message
+
+  Important implementation details:
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - Add `using Microsoft.AspNetCore.Mvc;` at the top of the file.
+  - Use pattern matching with `switch (ex)` or `ex switch` to dispatch on the exception type.
+  - `ProblemDetails` is in the `Microsoft.AspNetCore.Mvc` namespace (available via `FrameworkReference` to `Microsoft.AspNetCore.App`).
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.AspNetCore.Mvc;
+
+  public class ApiExceptionMapperTests
+  {
+      [Fact]
+      public void MapException_NotFoundException_Returns404WithResourceName()
+      {
+          var ex = new NotFoundException("Product#42");
+          var result = ApiExceptionMapper.MapException(ex);
+          result.Status.Should().Be(404);
+          result.Title.Should().Be("Not Found");
+          result.Detail.Should().Be("Product#42");
+      }
+
+      [Fact]
+      public void MapException_ConflictException_Returns409WithConflictReason()
+      {
+          var ex = new ConflictException("Duplicate email address");
+          var result = ApiExceptionMapper.MapException(ex);
+          result.Status.Should().Be(409);
+          result.Title.Should().Be("Conflict");
+          result.Detail.Should().Be("Duplicate email address");
+      }
+
+      [Fact]
+      public void MapException_GenericException_Returns500()
+      {
+          var ex = new InvalidOperationException("Something went wrong");
+          var result = ApiExceptionMapper.MapException(ex);
+          result.Status.Should().Be(500);
+          result.Title.Should().Be("Internal Server Error");
+      }
+
+      [Fact]
+      public void NotFoundException_HasCorrectResourceName()
+      {
+          var ex = new NotFoundException("Order#7");
+          ex.ResourceName.Should().Be("Order#7");
+      }
+
+      [Fact]
+      public void ConflictException_HasCorrectConflictReason()
+      {
+          var ex = new ConflictException("Username taken");
+          ex.ConflictReason.Should().Be("Username taken");
+      }
+  }

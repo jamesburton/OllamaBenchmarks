@@ -1,0 +1,76 @@
+name: aspnet_ioptions_config
+category: aspnet
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - aspnet_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `SmtpOptions` class with properties: `string Host`, `int Port`, `string? Username`. All properties must have public getters and setters.
+  2. An `IEmailSender` interface with method: `Task SendAsync(string to, string subject, string body)`
+  3. A `SmtpEmailSender` class implementing `IEmailSender` that:
+     - Takes `IOptions<SmtpOptions> options` via constructor (from `Microsoft.Extensions.Options`)
+     - Has a public `string? LastSentTo` property with a getter and setter
+     - Has a public `SmtpOptions Options` property that returns `options.Value`
+     - Implements `SendAsync` by storing `to` in `LastSentTo` and returning `Task.CompletedTask`
+
+  Important implementation details:
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - Add `using Microsoft.Extensions.Options;` and `using Microsoft.Extensions.DependencyInjection;` at the top.
+  - `SmtpEmailSender` must expose the resolved options via its `Options` property so tests can verify configuration.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public class SmtpEmailSenderTests
+  {
+      private static IServiceProvider BuildProvider(Action<SmtpOptions> configure)
+      {
+          var services = new ServiceCollection();
+          services.Configure<SmtpOptions>(configure);
+          services.AddSingleton<IEmailSender, SmtpEmailSender>();
+          return services.BuildServiceProvider();
+      }
+
+      [Fact]
+      public async Task SendAsync_StoresLastSentTo()
+      {
+          var provider = BuildProvider(o => { o.Host = "smtp.test"; o.Port = 587; });
+          var sender = (SmtpEmailSender)provider.GetRequiredService<IEmailSender>();
+
+          await sender.SendAsync("alice@example.com", "Hello", "Body text");
+
+          sender.LastSentTo.Should().Be("alice@example.com");
+      }
+
+      [Fact]
+      public void Options_ReflectConfiguredValues()
+      {
+          var provider = BuildProvider(o => { o.Host = "mail.example.com"; o.Port = 465; o.Username = "user@example.com"; });
+          var sender = (SmtpEmailSender)provider.GetRequiredService<IEmailSender>();
+
+          sender.Options.Host.Should().Be("mail.example.com");
+          sender.Options.Port.Should().Be(465);
+          sender.Options.Username.Should().Be("user@example.com");
+      }
+
+      [Fact]
+      public async Task SendAsync_MultipleEmails_LastSentToIsUpdated()
+      {
+          var provider = BuildProvider(o => { o.Host = "smtp.test"; o.Port = 25; });
+          var sender = (SmtpEmailSender)provider.GetRequiredService<IEmailSender>();
+
+          await sender.SendAsync("first@example.com", "A", "B");
+          await sender.SendAsync("second@example.com", "C", "D");
+
+          sender.LastSentTo.Should().Be("second@example.com");
+      }
+  }

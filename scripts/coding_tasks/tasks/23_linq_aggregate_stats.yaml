@@ -1,0 +1,71 @@
+name: linq_aggregate_stats
+category: linq
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  A static class SurveyAnalyzer with a single static method:
+  (double Mean, double Median, double Min, double Max) ComputeStats(IEnumerable<double> values)
+
+  The method must:
+  - Throw ArgumentException (with any message) if the input sequence is empty.
+  - Compute Mean using LINQ Average().
+  - Compute Min using LINQ Min().
+  - Compute Max using LINQ Max().
+  - Compute Median by sorting the values and taking the middle element for odd count,
+    or the average of the two middle elements for even count.
+  - Return the four values as a named tuple: (double Mean, double Median, double Min, double Max).
+
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class SurveyAnalyzerTests
+  {
+      [Fact]
+      public void ComputeStats_OddCount_CorrectValues()
+      {
+          var (mean, median, min, max) = SurveyAnalyzer.ComputeStats([1, 2, 3, 4, 5]);
+          mean.Should().Be(3.0);
+          median.Should().Be(3.0);
+          min.Should().Be(1.0);
+          max.Should().Be(5.0);
+      }
+
+      [Fact]
+      public void ComputeStats_EvenCount_MedianIsAverageOfTwoMiddle()
+      {
+          // sorted: 1,2,3,4 → median = (2+3)/2 = 2.5
+          var (_, median, _, _) = SurveyAnalyzer.ComputeStats([4, 1, 3, 2]);
+          median.Should().Be(2.5);
+      }
+
+      [Fact]
+      public void ComputeStats_SingleElement_AllValuesEqual()
+      {
+          var (mean, median, min, max) = SurveyAnalyzer.ComputeStats([7.0]);
+          mean.Should().Be(7.0);
+          median.Should().Be(7.0);
+          min.Should().Be(7.0);
+          max.Should().Be(7.0);
+      }
+
+      [Fact]
+      public void ComputeStats_EmptyInput_ThrowsArgumentException()
+      {
+          var act = () => SurveyAnalyzer.ComputeStats([]);
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void ComputeStats_UnsortedInput_CorrectMedian()
+      {
+          // sorted: 10,20,30,40,50 → median = 30
+          var (_, median, _, _) = SurveyAnalyzer.ComputeStats([50, 10, 30, 20, 40]);
+          median.Should().Be(30.0);
+      }
+  }

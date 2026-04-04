@@ -1,0 +1,91 @@
+name: efcore_include_navigation
+category: efcore
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - efcore_10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `Comment` class with properties: `int Id`, `string Text`, `int PostId`, and navigation property `Post Post`
+  2. A `Post` class with properties: `int Id`, `string Content`, `int BlogId`, navigation property `Blog Blog`, and `List<Comment> Comments`
+  3. A `Blog` class with properties: `int Id`, `string Title`, and `List<Post> Posts`
+  4. A `BlogDbContext` class extending `DbContext` with:
+     - `DbSet<Blog> Blogs`, `DbSet<Post> Posts`, `DbSet<Comment> Comments`
+     - Constructor accepting `DbContextOptions<BlogDbContext>`
+     - `OnModelCreating` override that configures:
+       - Blog has many Posts (with foreign key BlogId)
+       - Post has many Comments (with foreign key PostId)
+  5. A `BlogRepository` class that:
+     - Takes `BlogDbContext context` via constructor
+     - Has method `Task<Blog?> GetWithPostsAndCommentsAsync(int blogId)` that uses `.Include(b => b.Posts).ThenInclude(p => p.Comments)` and returns the blog or null
+
+  Important implementation details:
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - Add `using Microsoft.EntityFrameworkCore;` at the top.
+  - Navigation properties `Blog` on `Post` and `Post` on `Comment` must be nullable to avoid EF Core warnings: `Blog? Blog` and `Post? Post`.
+  - Collections `List<Post>` and `List<Comment>` must be initialized to `new()` in the entity class.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.EntityFrameworkCore;
+
+  public class BlogRepositoryTests
+  {
+      private static BlogDbContext CreateContext()
+      {
+          var options = new DbContextOptionsBuilder<BlogDbContext>()
+              .UseInMemoryDatabase("BlogDb_" + Guid.NewGuid())
+              .Options;
+          return new BlogDbContext(options);
+      }
+
+      [Fact]
+      public async Task GetWithPostsAndCommentsAsync_ReturnsNavigationLoaded()
+      {
+          await using var ctx = CreateContext();
+          ctx.Blogs.Add(new Blog
+          {
+              Id = 1,
+              Title = "My Blog",
+              Posts = new List<Post>
+              {
+                  new Post { Id = 1, Content = "Post One", BlogId = 1, Comments = new List<Comment>
+                  {
+                      new Comment { Id = 1, Text = "Comment A", PostId = 1 },
+                      new Comment { Id = 2, Text = "Comment B", PostId = 1 }
+                  }},
+                  new Post { Id = 2, Content = "Post Two", BlogId = 1, Comments = new List<Comment>
+                  {
+                      new Comment { Id = 3, Text = "Comment C", PostId = 2 },
+                      new Comment { Id = 4, Text = "Comment D", PostId = 2 }
+                  }}
+              }
+          });
+          await ctx.SaveChangesAsync();
+
+          var repo = new BlogRepository(ctx);
+          var blog = await repo.GetWithPostsAndCommentsAsync(1);
+
+          blog.Should().NotBeNull();
+          blog!.Title.Should().Be("My Blog");
+          blog.Posts.Should().HaveCount(2);
+          blog.Posts[0].Comments.Should().HaveCount(2);
+          blog.Posts[1].Comments.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetWithPostsAndCommentsAsync_UnknownId_ReturnsNull()
+      {
+          await using var ctx = CreateContext();
+          var repo = new BlogRepository(ctx);
+          var blog = await repo.GetWithPostsAndCommentsAsync(999);
+          blog.Should().BeNull();
+      }
+  }

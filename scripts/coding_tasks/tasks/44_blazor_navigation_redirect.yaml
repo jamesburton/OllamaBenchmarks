@@ -1,0 +1,91 @@
+name: blazor_navigation_redirect
+category: blazor
+weight: 1
+template: blazor_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - blazor_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing a Blazor component code-behind that handles navigation after a delete:
+
+  1. An `IProductService` interface (NOT in a namespace) with:
+     - `Task<bool> DeleteAsync(int id)`
+
+  2. A `ProductDetailBase` class inheriting from `Microsoft.AspNetCore.Components.ComponentBase` (NOT in a namespace) with:
+     - `[Parameter] public int ProductId { get; set; }`
+     - `[Inject] public NavigationManager Nav { get; set; } = null!`
+     - `[Inject] public IProductService ProductService { get; set; } = null!`
+     - `public string? ErrorMessage { get; set; }`
+     - `public async Task DeleteProduct()` — awaits `ProductService.DeleteAsync(ProductId)`:
+       - If the result is `true`, calls `Nav.NavigateTo("/products")`
+       - If the result is `false`, sets `ErrorMessage = "Delete failed"`
+
+  IMPORTANT constraints:
+  - Include `using Microsoft.AspNetCore.Components;` at the top of the file.
+  - Do NOT add any other using statements. The project already has global usings for Xunit, AwesomeAssertions, NSubstitute, and Bunit.
+  - Do NOT wrap any types in a namespace — put everything in the global namespace.
+  - `ProductDetailBase` must be `public class ProductDetailBase` — NOT abstract.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using Bunit;
+  using Microsoft.AspNetCore.Components;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public class ProductDetailBaseTests : Bunit.TestContext
+  {
+      [Fact]
+      public async Task DeleteProduct_Success_NavigatesToProducts()
+      {
+          var productService = Substitute.For<IProductService>();
+          productService.DeleteAsync(42).Returns(Task.FromResult(true));
+          Services.AddSingleton(productService);
+
+          var cut = RenderComponent<ProductDetailBase>(p =>
+              p.Add(x => x.ProductId, 42));
+
+          await cut.InvokeAsync(() => cut.Instance.DeleteProduct());
+
+          cut.Instance.ErrorMessage.Should().BeNull();
+          // NavigationManager navigated — check via the bUnit NavigationManager
+          var nav = Services.GetRequiredService<NavigationManager>();
+          nav.Uri.Should().EndWith("/products");
+      }
+
+      [Fact]
+      public async Task DeleteProduct_Failure_SetsErrorMessage()
+      {
+          var productService = Substitute.For<IProductService>();
+          productService.DeleteAsync(7).Returns(Task.FromResult(false));
+          Services.AddSingleton(productService);
+
+          var cut = RenderComponent<ProductDetailBase>(p =>
+              p.Add(x => x.ProductId, 7));
+
+          await cut.InvokeAsync(() => cut.Instance.DeleteProduct());
+
+          cut.Instance.ErrorMessage.Should().Be("Delete failed");
+      }
+
+      [Fact]
+      public async Task DeleteProduct_Failure_DoesNotNavigate()
+      {
+          var productService = Substitute.For<IProductService>();
+          productService.DeleteAsync(Arg.Any<int>()).Returns(Task.FromResult(false));
+          Services.AddSingleton(productService);
+
+          var nav = Services.GetRequiredService<NavigationManager>();
+          var originalUri = nav.Uri;
+
+          var cut = RenderComponent<ProductDetailBase>(p =>
+              p.Add(x => x.ProductId, 1));
+
+          await cut.InvokeAsync(() => cut.Instance.DeleteProduct());
+
+          nav.Uri.Should().Be(originalUri);
+      }
+  }

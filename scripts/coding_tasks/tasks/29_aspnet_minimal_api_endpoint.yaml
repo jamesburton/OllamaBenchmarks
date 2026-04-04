@@ -1,0 +1,64 @@
+name: aspnet_minimal_api_endpoint
+category: aspnet
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - aspnet_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `CreateProductRequest` record with properties: `string Name` (required, must be non-empty) and `decimal Price` (must be > 0). Use positional record syntax.
+  2. A `ProductResponse` record with properties: `int Id`, `string Name`, `decimal Price`. Use positional record syntax.
+  3. A static class `ProductEndpoints` with a static method `IResult CreateProduct(CreateProductRequest request)` that:
+     - Validates: if Name is null or whitespace, returns `Results.ValidationProblem(...)` with a validation error on the "Name" field
+     - Validates: if Price <= 0, returns `Results.ValidationProblem(...)` with a validation error on the "Price" field
+     - On success, increments a private static int counter (starting at 0) to generate an Id, then returns `Results.Ok(new ProductResponse(Id, Name, Price))`
+
+  Important implementation details:
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - `Results.ValidationProblem` accepts a `Dictionary<string, string[]>` as its first argument, e.g. `Results.ValidationProblem(new Dictionary<string, string[]> { ["Name"] = ["Name is required."] })`
+  - The static counter must be a private static field on `ProductEndpoints`, incremented each time a valid product is created.
+  - `CreateProduct` must be a public static method returning `IResult`.
+  - Add `using Microsoft.AspNetCore.Http;` at the top of the file.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.AspNetCore.Http;
+  using Microsoft.AspNetCore.Http.HttpResults;
+
+  public class ProductEndpointsTests
+  {
+      [Fact]
+      public void CreateProduct_ValidRequest_ReturnsOkWithProductResponse()
+      {
+          var request = new CreateProductRequest("Widget", 9.99m);
+          var result = ProductEndpoints.CreateProduct(request);
+          result.Should().BeOfType<Ok<ProductResponse>>();
+          var ok = (Ok<ProductResponse>)result;
+          ok.Value!.Name.Should().Be("Widget");
+          ok.Value.Price.Should().Be(9.99m);
+          ok.Value.Id.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public void CreateProduct_EmptyName_ReturnsValidationProblem()
+      {
+          var request = new CreateProductRequest("", 5.00m);
+          var result = ProductEndpoints.CreateProduct(request);
+          result.Should().BeOfType<ValidationProblem>();
+      }
+
+      [Fact]
+      public void CreateProduct_NegativePrice_ReturnsValidationProblem()
+      {
+          var request = new CreateProductRequest("Gadget", -1.00m);
+          var result = ProductEndpoints.CreateProduct(request);
+          result.Should().BeOfType<ValidationProblem>();
+      }
+  }

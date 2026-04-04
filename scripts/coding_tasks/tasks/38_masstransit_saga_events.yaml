@@ -1,0 +1,104 @@
+name: masstransit_saga_events
+category: masstransit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - masstransit_v8.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. An `InvoiceSaga` class implementing `SagaStateMachineInstance` with properties:
+     - `Guid CorrelationId`
+     - `string CurrentState`
+     - `decimal Amount`
+  2. Event records (use positional record syntax):
+     - `InvoiceCreated` with `Guid InvoiceId` and `decimal Amount`
+     - `InvoiceApproved` with `Guid InvoiceId`
+     - `InvoicePaid` with `Guid InvoiceId`
+  3. An `InvoiceStateMachine` class extending `MassTransitStateMachine<InvoiceSaga>` with:
+     - States declared as `public State Pending { get; private set; } = null!;`, `public State Approved { get; private set; } = null!;`, `public State Paid { get; private set; } = null!;`
+     - Events declared as `public Event<InvoiceCreated> InvoiceCreated { get; private set; } = null!;`, and similarly for `InvoiceApproved` and `InvoicePaid`
+     - In the constructor:
+       - Call `InstanceState(x => x.CurrentState)`
+       - Configure event correlation: `Event(() => InvoiceCreated, x => x.CorrelateById(m => m.Message.InvoiceId))`, and similarly for `InvoiceApproved` and `InvoicePaid`
+       - Initially: `Initially(When(InvoiceCreated).Then(ctx => ctx.Saga.Amount = ctx.Message.Amount).TransitionTo(Pending))`
+       - During Pending: `During(Pending, When(InvoiceApproved).TransitionTo(Approved))`
+       - During Approved: `During(Approved, When(InvoicePaid).TransitionTo(Paid).Finalize())`
+       - Call `SetCompletedWhenFinalized()`
+
+  IMPORTANT: MassTransit requires all message types to be in a namespace. Place all types inside `namespace Contracts;` (file-scoped). Also add `global using Contracts;` at the top of the file so the types are accessible without explicit using statements from other files.
+
+  Include `using MassTransit;` BEFORE the `namespace Contracts;` declaration.
+
+  Do NOT use `.Set()` on EventActivityBinder — use `.Then(ctx => { ... })` to mutate saga properties.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using MassTransit;
+  using MassTransit.Testing;
+  using Microsoft.Extensions.DependencyInjection;
+  using AwesomeAssertions;
+
+  public class InvoiceStateMachineTests
+  {
+      [Fact]
+      public async Task Saga_Transitions_Pending_Approved_Paid()
+      {
+          await using var provider = new ServiceCollection()
+              .AddMassTransitTestHarness(cfg =>
+              {
+                  cfg.AddSagaStateMachine<InvoiceStateMachine, InvoiceSaga>()
+                      .InMemoryRepository();
+              })
+              .BuildServiceProvider(true);
+
+          var harness = provider.GetRequiredService<ITestHarness>();
+          await harness.Start();
+
+          var invoiceId = Guid.NewGuid();
+
+          await harness.Bus.Publish(new InvoiceCreated(invoiceId, 250.00m));
+          Assert.True(await harness.Consumed.Any<InvoiceCreated>());
+
+          var sagaHarness = harness.GetSagaStateMachineHarness<InvoiceStateMachine, InvoiceSaga>();
+          Assert.True(await sagaHarness.Exists(invoiceId, x => x.Pending) != null);
+
+          await harness.Bus.Publish(new InvoiceApproved(invoiceId));
+          Assert.True(await harness.Consumed.Any<InvoiceApproved>());
+          Assert.True(await sagaHarness.Exists(invoiceId, x => x.Approved) != null);
+
+          await harness.Bus.Publish(new InvoicePaid(invoiceId));
+          Assert.True(await harness.Consumed.Any<InvoicePaid>());
+
+          // After finalization the saga is removed from the repository
+          Assert.Null(await sagaHarness.Exists(invoiceId, x => x.Paid));
+      }
+
+      [Fact]
+      public async Task Saga_SetsAmount_OnInvoiceCreated()
+      {
+          await using var provider = new ServiceCollection()
+              .AddMassTransitTestHarness(cfg =>
+              {
+                  cfg.AddSagaStateMachine<InvoiceStateMachine, InvoiceSaga>()
+                      .InMemoryRepository();
+              })
+              .BuildServiceProvider(true);
+
+          var harness = provider.GetRequiredService<ITestHarness>();
+          await harness.Start();
+
+          var invoiceId = Guid.NewGuid();
+          await harness.Bus.Publish(new InvoiceCreated(invoiceId, 99.50m));
+          Assert.True(await harness.Consumed.Any<InvoiceCreated>());
+
+          var sagaHarness = harness.GetSagaStateMachineHarness<InvoiceStateMachine, InvoiceSaga>();
+          var instance = sagaHarness.Created.Select(x => x.CorrelationId == invoiceId).FirstOrDefault();
+          instance.Should().NotBeNull();
+      }
+  }

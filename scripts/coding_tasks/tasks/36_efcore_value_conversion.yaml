@@ -1,0 +1,77 @@
+name: efcore_value_conversion
+category: efcore
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - efcore_10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `Money` record with properties: `decimal Amount`, `string Currency`. Use positional record syntax: `public record Money(decimal Amount, string Currency);`
+  2. A `Product` class with properties: `int Id`, `string Name`, `Money Price`. All properties must have public getters and setters. `Price` must be initialized to `new Money(0, "USD")` to avoid null issues.
+  3. A `ProductDbContext` class extending `DbContext` with:
+     - `DbSet<Product> Products`
+     - Constructor accepting `DbContextOptions<ProductDbContext>`
+     - A private static method `ParseMoney(string s)` that splits `s` on `':'`, parses the first part as `decimal` and uses the second part as currency, returning a `Money` instance
+     - `OnModelCreating` override that configures a value conversion for `Product.Price`:
+       `modelBuilder.Entity<Product>().Property(p => p.Price).HasConversion(m => $"{m.Amount}:{m.Currency}", s => ParseMoney(s))`
+  4. A `ProductRepository` class that:
+     - Takes `ProductDbContext context` via constructor
+     - `Task<Product> SaveAsync(Product product)`: adds and saves the product, returns it
+     - `Task<Product?> GetByIdAsync(int id)`: returns the product with given Id using `AsNoTracking()`, or null
+
+  Important implementation details:
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - Add `using Microsoft.EntityFrameworkCore;` at the top.
+  - `ParseMoney` must handle the `"amount:currency"` format produced by the serializer.
+  - Use `AsNoTracking()` in `GetByIdAsync` so EF Core re-applies the conversion when loading.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.EntityFrameworkCore;
+
+  public class ProductValueConversionTests
+  {
+      private static ProductDbContext CreateContext()
+      {
+          var options = new DbContextOptionsBuilder<ProductDbContext>()
+              .UseInMemoryDatabase("ProductDb_" + Guid.NewGuid())
+              .Options;
+          return new ProductDbContext(options);
+      }
+
+      [Fact]
+      public async Task SaveAndLoad_PreservesMoney()
+      {
+          await using var ctx = CreateContext();
+          var repo = new ProductRepository(ctx);
+
+          var product = new Product { Id = 1, Name = "Widget", Price = new Money(29.99m, "USD") };
+          await repo.SaveAsync(product);
+
+          var loaded = await repo.GetByIdAsync(1);
+          loaded.Should().NotBeNull();
+          loaded!.Price.Amount.Should().Be(29.99m);
+          loaded.Price.Currency.Should().Be("USD");
+      }
+
+      [Fact]
+      public async Task SaveAndLoad_DifferentCurrency_Preserved()
+      {
+          await using var ctx = CreateContext();
+          var repo = new ProductRepository(ctx);
+
+          var product = new Product { Id = 2, Name = "Gadget", Price = new Money(14.50m, "EUR") };
+          await repo.SaveAsync(product);
+
+          var loaded = await repo.GetByIdAsync(2);
+          loaded!.Price.Amount.Should().Be(14.50m);
+          loaded.Price.Currency.Should().Be("EUR");
+      }
+  }

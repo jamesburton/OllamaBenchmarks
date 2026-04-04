@@ -1,0 +1,81 @@
+name: async_semaphore_throttle
+category: async
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  A class ThrottledProcessor with:
+  - A constructor that accepts int maxConcurrent and creates a SemaphoreSlim with that
+    initial and maximum count. Store the semaphore as a private field.
+  - A generic method:
+    Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
+    that:
+    - For each task factory in tasks, acquires the semaphore before starting the work
+      and releases it after the work completes (use try/finally).
+    - Runs all task factories concurrently (start all before awaiting) using Task.WhenAll.
+    - Returns the results as a List<T> in the same order as the input task factories.
+
+  The implementation must use SemaphoreSlim.WaitAsync(ct) to acquire and SemaphoreSlim.Release()
+  to release. Do NOT process tasks sequentially — all should be launched and awaited with Task.WhenAll.
+
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class ThrottledProcessorTests
+  {
+      [Fact]
+      public async Task ProcessAllAsync_AllTasksComplete()
+      {
+          var processor = new ThrottledProcessor(3);
+          var tasks = Enumerable.Range(1, 10)
+              .Select(i => (Func<CancellationToken, Task<int>>)(ct => Task.FromResult(i)))
+              .ToList();
+
+          var results = await processor.ProcessAllAsync(tasks, CancellationToken.None);
+
+          results.Should().HaveCount(10);
+          results.Should().BeEquivalentTo(Enumerable.Range(1, 10));
+      }
+
+      [Fact]
+      public async Task ProcessAllAsync_ThrottlesCorrectly()
+      {
+          int concurrent = 0;
+          int maxObservedConcurrent = 0;
+          var lk = new object();
+
+          var processor = new ThrottledProcessor(3);
+          var tasks = Enumerable.Range(0, 10).Select(_ =>
+              (Func<CancellationToken, Task<int>>)(async ct =>
+              {
+                  int cur;
+                  lock (lk)
+                  {
+                      cur = ++concurrent;
+                      if (cur > maxObservedConcurrent) maxObservedConcurrent = cur;
+                  }
+                  await Task.Delay(20, ct);
+                  lock (lk) { concurrent--; }
+                  return cur;
+              })).ToList();
+
+          await processor.ProcessAllAsync(tasks, CancellationToken.None);
+
+          maxObservedConcurrent.Should().BeLessOrEqualTo(3);
+      }
+
+      [Fact]
+      public async Task ProcessAllAsync_EmptyInput_ReturnsEmpty()
+      {
+          var processor = new ThrottledProcessor(2);
+          var results = await processor.ProcessAllAsync(
+              Enumerable.Empty<Func<CancellationToken, Task<string>>>(),
+              CancellationToken.None);
+          results.Should().BeEmpty();
+      }
+  }

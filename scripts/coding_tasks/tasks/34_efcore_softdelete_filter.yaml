@@ -1,0 +1,95 @@
+name: efcore_softdelete_filter
+category: efcore
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - efcore_10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. An `ISoftDeletable` interface with property: `bool IsDeleted { get; set; }`
+  2. An `Article` class implementing `ISoftDeletable` with properties: `int Id`, `string Title`, `bool IsDeleted`
+  3. An `ArticleDbContext` class extending `DbContext` with:
+     - `DbSet<Article> Articles`
+     - Constructor accepting `DbContextOptions<ArticleDbContext>`
+     - `OnModelCreating` override that applies a query filter: `modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted)`
+  4. An `ArticleRepository` class that:
+     - Takes `ArticleDbContext context` via constructor
+     - `Task SoftDeleteAsync(int id)`: finds the article by Id (using `.IgnoreQueryFilters()` to find even deleted ones), sets `IsDeleted = true`, saves changes. Does nothing if not found.
+     - `Task<List<Article>> GetAllAsync()`: returns all articles where `IsDeleted == false` (the query filter handles this automatically)
+     - `Task<List<Article>> GetAllIncludingDeletedAsync()`: returns all articles including deleted ones using `.IgnoreQueryFilters()`
+
+  Important implementation details:
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - Add `using Microsoft.EntityFrameworkCore;` at the top.
+  - `SoftDeleteAsync` must use `.IgnoreQueryFilters()` when locating the record to soft-delete (so it can still find already-soft-deleted records or future use).
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.EntityFrameworkCore;
+
+  public class ArticleRepositoryTests
+  {
+      private static ArticleDbContext CreateContext()
+      {
+          var options = new DbContextOptionsBuilder<ArticleDbContext>()
+              .UseInMemoryDatabase("ArticleDb_" + Guid.NewGuid())
+              .Options;
+          return new ArticleDbContext(options);
+      }
+
+      [Fact]
+      public async Task GetAllAsync_ExcludesSoftDeleted()
+      {
+          await using var ctx = CreateContext();
+          ctx.Articles.AddRange(
+              new Article { Id = 1, Title = "Alpha", IsDeleted = false },
+              new Article { Id = 2, Title = "Beta",  IsDeleted = false },
+              new Article { Id = 3, Title = "Gamma", IsDeleted = false });
+          await ctx.SaveChangesAsync();
+
+          var repo = new ArticleRepository(ctx);
+          await repo.SoftDeleteAsync(3);
+
+          var visible = await repo.GetAllAsync();
+          visible.Should().HaveCount(2);
+          visible.Should().NotContain(a => a.Title == "Gamma");
+      }
+
+      [Fact]
+      public async Task GetAllIncludingDeletedAsync_ReturnsAll()
+      {
+          await using var ctx = CreateContext();
+          ctx.Articles.AddRange(
+              new Article { Id = 1, Title = "Alpha", IsDeleted = false },
+              new Article { Id = 2, Title = "Beta",  IsDeleted = false },
+              new Article { Id = 3, Title = "Gamma", IsDeleted = false });
+          await ctx.SaveChangesAsync();
+
+          var repo = new ArticleRepository(ctx);
+          await repo.SoftDeleteAsync(2);
+
+          var all = await repo.GetAllIncludingDeletedAsync();
+          all.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task SoftDeleteAsync_SetsIsDeletedTrue()
+      {
+          await using var ctx = CreateContext();
+          ctx.Articles.Add(new Article { Id = 10, Title = "ToDelete", IsDeleted = false });
+          await ctx.SaveChangesAsync();
+
+          var repo = new ArticleRepository(ctx);
+          await repo.SoftDeleteAsync(10);
+
+          var all = await repo.GetAllIncludingDeletedAsync();
+          all.First(a => a.Id == 10).IsDeleted.Should().BeTrue();
+      }
+  }

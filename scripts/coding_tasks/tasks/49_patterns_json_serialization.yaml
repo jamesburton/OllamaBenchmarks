@@ -1,0 +1,86 @@
+name: patterns_json_serialization
+category: patterns
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. An enum Status decorated with [JsonConverter(typeof(JsonStringEnumConverter))]:
+     public enum Status { Active, Inactive, Pending }
+
+  2. A class PersonDto with the following properties:
+     - [JsonPropertyName("full_name")] public string FullName { get; set; }
+     - [JsonPropertyName("age")]       public int Age { get; set; }
+     - [JsonIgnore]                    public string InternalId { get; set; }
+     - [JsonPropertyName("status")]    public Status Status { get; set; }
+
+  Use these exact attribute names and JSON property names.
+  Include the following using statements at the top of the file:
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
+  Do NOT wrap code in a namespace. Do NOT add other using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class JsonSerializationTests
+  {
+      [Fact]
+      public void Serialize_UsesSnakeCaseJsonPropertyNames()
+      {
+          var dto = new PersonDto { FullName = "Jane Doe", Age = 30, InternalId = "secret", Status = Status.Active };
+          var json = JsonSerializer.Serialize(dto);
+
+          json.Should().Contain("\"full_name\"");
+          json.Should().Contain("\"age\"");
+          json.Should().Contain("\"status\"");
+          json.Should().NotContain("FullName");
+          json.Should().NotContain("Age\":");
+      }
+
+      [Fact]
+      public void Serialize_InternalId_IsAbsentFromJson()
+      {
+          var dto = new PersonDto { FullName = "Jane", Age = 25, InternalId = "should-be-hidden", Status = Status.Pending };
+          var json = JsonSerializer.Serialize(dto);
+
+          json.Should().NotContain("InternalId");
+          json.Should().NotContain("should-be-hidden");
+      }
+
+      [Fact]
+      public void Deserialize_RoundTrip_PreservesValues()
+      {
+          var original = new PersonDto { FullName = "John Smith", Age = 42, Status = Status.Inactive };
+          var json = JsonSerializer.Serialize(original);
+          var result = JsonSerializer.Deserialize<PersonDto>(json)!;
+
+          result.FullName.Should().Be("John Smith");
+          result.Age.Should().Be(42);
+          result.Status.Should().Be(Status.Inactive);
+      }
+
+      [Fact]
+      public void Serialize_Status_IsStringNotInteger()
+      {
+          var dto = new PersonDto { FullName = "Test", Age = 1, Status = Status.Active };
+          var json = JsonSerializer.Serialize(dto);
+
+          json.Should().Contain("\"Active\"");
+          // Numeric value 0 for Active must not appear as the status value
+          json.Should().NotContain("\"status\":0");
+      }
+
+      [Fact]
+      public void Deserialize_FromSnakeCaseJson_MapsCorrectly()
+      {
+          var json = "{\"full_name\":\"Alice\",\"age\":28,\"status\":\"Pending\"}";
+          var dto = JsonSerializer.Deserialize<PersonDto>(json)!;
+
+          dto.FullName.Should().Be("Alice");
+          dto.Age.Should().Be(28);
+          dto.Status.Should().Be(Status.Pending);
+      }
+  }

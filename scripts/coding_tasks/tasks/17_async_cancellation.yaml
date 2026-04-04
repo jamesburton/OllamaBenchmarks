@@ -1,5 +1,5 @@
 name: async_cancellation
-category: linq
+category: async
 weight: 1
 template: test_project
 max_tokens: 4096

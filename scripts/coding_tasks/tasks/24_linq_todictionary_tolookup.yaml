@@ -1,0 +1,84 @@
+name: linq_todictionary_tolookup
+category: linq
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. A positional record Student with two string properties: Name and Grade.
+     Example grades are "A", "B", "C".
+     Declare it as: public record Student(string Name, string Grade);
+
+  2. A static class GradeBook with two static methods:
+
+     a. Dictionary<string, Student> IndexByName(IEnumerable<Student> students)
+        - Uses LINQ ToDictionary with the student's Name as the key.
+        - If two students share the same Name, the method should throw (ToDictionary
+          throws ArgumentException on duplicate keys — rely on that default behaviour).
+
+     b. ILookup<string, Student> GroupByGrade(IEnumerable<Student> students)
+        - Uses LINQ ToLookup with the student's Grade as the key.
+
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class GradeBookTests
+  {
+      private static List<Student> BuildStudents() =>
+      [
+          new Student("Alice", "A"),
+          new Student("Bob",   "B"),
+          new Student("Carol", "A"),
+          new Student("Dave",  "C"),
+          new Student("Eve",   "B"),
+      ];
+
+      [Fact]
+      public void IndexByName_LooksUpStudentByName()
+      {
+          var dict = GradeBook.IndexByName(BuildStudents());
+          dict["Alice"].Grade.Should().Be("A");
+          dict["Dave"].Grade.Should().Be("C");
+      }
+
+      [Fact]
+      public void IndexByName_DuplicateName_Throws()
+      {
+          var students = new List<Student>
+          {
+              new("Alice", "A"),
+              new("Alice", "B"),
+          };
+          var act = () => GradeBook.IndexByName(students);
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void GroupByGrade_ReturnsCorrectGroupSizes()
+      {
+          var lookup = GradeBook.GroupByGrade(BuildStudents());
+          lookup["A"].Should().HaveCount(2);
+          lookup["B"].Should().HaveCount(2);
+          lookup["C"].Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void GroupByGrade_MissingKey_ReturnsEmpty()
+      {
+          var lookup = GradeBook.GroupByGrade(BuildStudents());
+          lookup["D"].Should().BeEmpty();
+      }
+
+      [Fact]
+      public void GroupByGrade_ContainsCorrectStudents()
+      {
+          var lookup = GradeBook.GroupByGrade(BuildStudents());
+          var aStudents = lookup["A"].Select(s => s.Name).ToList();
+          aStudents.Should().Contain("Alice");
+          aStudents.Should().Contain("Carol");
+      }
+  }

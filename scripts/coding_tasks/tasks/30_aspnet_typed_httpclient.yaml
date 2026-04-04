@@ -1,0 +1,82 @@
+name: aspnet_typed_httpclient
+category: aspnet
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - aspnet_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. A `GitHubUser` record with properties: `string Login`, `string Name`, `int PublicRepos`. Use positional record syntax. Add `[System.Text.Json.Serialization.JsonPropertyName("...")]` attributes: Login → "login", Name → "name", PublicRepos → "public_repos".
+  2. An `IGitHubClient` interface with method: `Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)`
+  3. A `GitHubClient` class implementing `IGitHubClient` that:
+     - Takes `HttpClient httpClient` via constructor, stores it in a private field
+     - Implements `GetUserAsync` by calling `httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct)`
+  4. A static extension class `GitHubClientExtensions` with method `AddGitHubClient(this IServiceCollection services)` that calls `services.AddHttpClient<IGitHubClient, GitHubClient>()` and returns `IServiceCollection`.
+
+  Important implementation details:
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - Add `using System.Net.Http.Json;` and `using Microsoft.Extensions.DependencyInjection;` at the top.
+  - `GitHubClient` constructor parameter is `HttpClient httpClient`.
+  - `AddGitHubClient` must be a public static method on a public static class.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.Extensions.DependencyInjection;
+  using System.Net;
+  using System.Net.Http;
+  using System.Text;
+  using System.Text.Json;
+
+  public class FakeHttpMessageHandler : HttpMessageHandler
+  {
+      private readonly string _responseJson;
+      public FakeHttpMessageHandler(string responseJson) => _responseJson = responseJson;
+      protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+      {
+          var response = new HttpResponseMessage(HttpStatusCode.OK)
+          {
+              Content = new StringContent(_responseJson, Encoding.UTF8, "application/json")
+          };
+          return Task.FromResult(response);
+      }
+  }
+
+  public class GitHubClientTests
+  {
+      [Fact]
+      public async Task GetUserAsync_DeserializesGitHubUser()
+      {
+          var json = JsonSerializer.Serialize(new { login = "octocat", name = "The Octocat", public_repos = 8 });
+          var handler = new FakeHttpMessageHandler(json);
+          var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://api.github.com") };
+
+          var services = new ServiceCollection();
+          services.AddSingleton<IGitHubClient>(new GitHubClient(httpClient));
+          var provider = services.BuildServiceProvider();
+
+          var client = provider.GetRequiredService<IGitHubClient>();
+          var user = await client.GetUserAsync("octocat");
+
+          user.Should().NotBeNull();
+          user!.Login.Should().Be("octocat");
+          user.Name.Should().Be("The Octocat");
+          user.PublicRepos.Should().Be(8);
+      }
+
+      [Fact]
+      public void AddGitHubClient_RegistersIGitHubClient()
+      {
+          var services = new ServiceCollection();
+          services.AddGitHubClient();
+          var provider = services.BuildServiceProvider();
+          var client = provider.GetRequiredService<IGitHubClient>();
+          client.Should().NotBeNull();
+      }
+  }

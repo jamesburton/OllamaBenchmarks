@@ -1,0 +1,95 @@
+name: blazor_parameter_lifecycle
+category: blazor
+weight: 1
+template: blazor_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - blazor_net10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing a Blazor component code-behind that reacts to parameter changes:
+
+  1. A `UserProfile` record (NOT in a namespace):
+     - `public record UserProfile(int Id, string DisplayName, string Email)`
+
+  2. An `IUserService` interface (NOT in a namespace) with:
+     - `Task<UserProfile?> GetProfileAsync(int userId)`
+
+  3. A `UserProfileBase` class inheriting from `Microsoft.AspNetCore.Components.ComponentBase` (NOT in a namespace) with:
+     - `[Parameter] public int UserId { get; set; }`
+     - `[Inject] public IUserService UserService { get; set; } = null!`
+     - `public UserProfile? Profile { get; set; }`
+     - `public bool IsLoading { get; set; }`
+     - `protected override async Task OnParametersSetAsync()` that:
+       1. Sets `IsLoading = true`
+       2. Sets `Profile = await UserService.GetProfileAsync(UserId)`
+       3. Sets `IsLoading = false`
+
+  IMPORTANT constraints:
+  - Include `using Microsoft.AspNetCore.Components;` at the top of the file.
+  - Do NOT add any other using statements. The project already has global usings for Xunit, AwesomeAssertions, NSubstitute, and Bunit.
+  - Do NOT wrap any types in a namespace — put everything in the global namespace.
+  - `UserProfileBase` must be `public class UserProfileBase` — NOT abstract.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using Bunit;
+  using Microsoft.Extensions.DependencyInjection;
+
+  public class UserProfileBaseTests : Bunit.TestContext
+  {
+      [Fact]
+      public async Task OnParametersSet_LoadsProfileForUserId()
+      {
+          var userService = Substitute.For<IUserService>();
+          userService.GetProfileAsync(1).Returns(Task.FromResult<UserProfile?>(
+              new UserProfile(1, "Alice Smith", "alice@example.com")));
+          Services.AddSingleton(userService);
+
+          var cut = RenderComponent<UserProfileBase>(p =>
+              p.Add(x => x.UserId, 1));
+
+          cut.Instance.Profile.Should().NotBeNull();
+          cut.Instance.Profile!.DisplayName.Should().Be("Alice Smith");
+          cut.Instance.Profile.Email.Should().Be("alice@example.com");
+          cut.Instance.IsLoading.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task OnParametersSet_WhenParameterChanges_ReloadsProfile()
+      {
+          var userService = Substitute.For<IUserService>();
+          userService.GetProfileAsync(1).Returns(Task.FromResult<UserProfile?>(
+              new UserProfile(1, "Alice Smith", "alice@example.com")));
+          userService.GetProfileAsync(2).Returns(Task.FromResult<UserProfile?>(
+              new UserProfile(2, "Bob Jones", "bob@example.com")));
+          Services.AddSingleton(userService);
+
+          var cut = RenderComponent<UserProfileBase>(p =>
+              p.Add(x => x.UserId, 1));
+
+          cut.Instance.Profile!.DisplayName.Should().Be("Alice Smith");
+
+          cut.SetParametersAndRender(p => p.Add(x => x.UserId, 2));
+
+          cut.Instance.Profile!.DisplayName.Should().Be("Bob Jones");
+          cut.Instance.Profile.Id.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task OnParametersSet_WhenServiceReturnsNull_ProfileIsNull()
+      {
+          var userService = Substitute.For<IUserService>();
+          userService.GetProfileAsync(99).Returns(Task.FromResult<UserProfile?>(null));
+          Services.AddSingleton(userService);
+
+          var cut = RenderComponent<UserProfileBase>(p =>
+              p.Add(x => x.UserId, 99));
+
+          cut.Instance.Profile.Should().BeNull();
+          cut.Instance.IsLoading.Should().BeFalse();
+      }
+  }

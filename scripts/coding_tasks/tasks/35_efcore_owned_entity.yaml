@@ -1,0 +1,77 @@
+name: efcore_owned_entity
+category: efcore
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - efcore_10.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing:
+
+  1. An `Address` class with properties: `string Street`, `string City`, `string Zip`. All properties must have public getters and setters. This is an EF Core owned type — it is NOT a separate entity or DbSet.
+  2. A `Customer` class with properties: `int Id`, `string Name`, and `Address HomeAddress`. All properties must have public getters and setters.
+  3. A `CustomerDbContext` class extending `DbContext` with:
+     - `DbSet<Customer> Customers`
+     - Constructor accepting `DbContextOptions<CustomerDbContext>`
+     - `OnModelCreating` override that configures `modelBuilder.Entity<Customer>().OwnsOne(c => c.HomeAddress)`
+  4. A `CustomerRepository` class that:
+     - Takes `CustomerDbContext context` via constructor
+     - `Task<Customer> CreateAsync(Customer customer)`: adds the customer, saves changes, returns the entity
+     - `Task<Customer?> GetByIdAsync(int id)`: returns the customer with the given Id, or null if not found
+
+  Important implementation details:
+  - Do NOT place any types inside a namespace; all types must be declared at the top level (global namespace).
+  - Add `using Microsoft.EntityFrameworkCore;` at the top.
+  - `Address` must NOT be a record — it must be a class with property setters so EF Core can hydrate it.
+  - `Customer.HomeAddress` must be initialized to a new `Address()` instance to avoid null reference issues.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using AwesomeAssertions;
+  using Microsoft.EntityFrameworkCore;
+
+  public class CustomerRepositoryTests
+  {
+      private static CustomerDbContext CreateContext()
+      {
+          var options = new DbContextOptionsBuilder<CustomerDbContext>()
+              .UseInMemoryDatabase("CustomerDb_" + Guid.NewGuid())
+              .Options;
+          return new CustomerDbContext(options);
+      }
+
+      [Fact]
+      public async Task CreateAndGet_PreservesOwnedAddress()
+      {
+          await using var ctx = CreateContext();
+          var repo = new CustomerRepository(ctx);
+
+          var customer = new Customer
+          {
+              Id = 1,
+              Name = "Alice",
+              HomeAddress = new Address { Street = "123 Main St", City = "Springfield", Zip = "62701" }
+          };
+          await repo.CreateAsync(customer);
+
+          var loaded = await repo.GetByIdAsync(1);
+          loaded.Should().NotBeNull();
+          loaded!.Name.Should().Be("Alice");
+          loaded.HomeAddress.Street.Should().Be("123 Main St");
+          loaded.HomeAddress.City.Should().Be("Springfield");
+          loaded.HomeAddress.Zip.Should().Be("62701");
+      }
+
+      [Fact]
+      public async Task GetByIdAsync_UnknownId_ReturnsNull()
+      {
+          await using var ctx = CreateContext();
+          var repo = new CustomerRepository(ctx);
+          var result = await repo.GetByIdAsync(999);
+          result.Should().BeNull();
+      }
+  }

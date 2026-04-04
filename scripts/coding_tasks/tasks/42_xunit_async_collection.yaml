@@ -1,0 +1,93 @@
+name: xunit_async_collection
+category: xunit
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references:
+  - xunit_v3.md
+  - awesome_assertions.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a single C# file containing a shared collection fixture demo with two test classes that share state.
+
+  1. A `CounterService` class:
+     - `public int Count { get; private set; }` initialized to 0
+     - `public void Increment()` — increments Count by 1
+     - `public void Reset()` — sets Count to 0
+
+  2. A `CounterFixture` class implementing `IAsyncLifetime` (ValueTask return types — NOT Task):
+     - `public CounterService Counter { get; private set; } = null!`
+     - `public ValueTask InitializeAsync()` — assigns `Counter = new CounterService()` and returns `default`
+     - `public ValueTask DisposeAsync()` — returns `default`
+
+  3. A marker class `[CollectionDefinition("Counter")]` on a class named `CounterCollection` that implements `ICollectionFixture<CounterFixture>` (no test methods — just the attribute and interface)
+
+  4. Two test classes, both marked with `[Collection("Counter")]`, each receiving `CounterFixture` via constructor:
+     - `CounterFirstTests`: one `[Fact]` that calls `fixture.Counter.Increment()` and asserts `fixture.Counter.Count >= 1`
+     - `CounterSecondTests`: one `[Fact]` that calls `fixture.Counter.Increment()` twice and asserts `fixture.Counter.Count >= 2`
+
+  The key behavior to implement: since both test classes share the same `CounterFixture` instance via `[Collection("Counter")]`, the counter state is shared between them.
+
+  IMPORTANT constraints:
+  - Do NOT add any using statements. The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute.
+  - Do NOT wrap code in a namespace.
+  - CRITICAL: IAsyncLifetime must use ValueTask return types (NOT Task). This is xUnit v3.
+  - Use AwesomeAssertions .Should() for assertions.
+  - The `CounterCollection` class must have `[CollectionDefinition("Counter")]` and implement `ICollectionFixture<CounterFixture>`. It must have NO test methods.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class CounterFixtureMetaTests
+  {
+      [Fact]
+      public async Task CounterFixture_InitializeAsync_CreatesCounterService()
+      {
+          var fixture = new CounterFixture();
+          await fixture.InitializeAsync();
+          fixture.Counter.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task CounterFixture_InitializeAsync_StartsAtZero()
+      {
+          var fixture = new CounterFixture();
+          await fixture.InitializeAsync();
+          fixture.Counter.Count.Should().Be(0);
+      }
+
+      [Fact]
+      public void CounterService_Increment_IncreasesCount()
+      {
+          var svc = new CounterService();
+          svc.Increment();
+          svc.Count.Should().Be(1);
+      }
+
+      [Fact]
+      public void CounterService_Reset_SetsCountToZero()
+      {
+          var svc = new CounterService();
+          svc.Increment();
+          svc.Increment();
+          svc.Reset();
+          svc.Count.Should().Be(0);
+      }
+
+      [Fact]
+      public void CounterCollection_HasCollectionDefinitionAttribute()
+      {
+          var attr = typeof(CounterCollection)
+              .GetCustomAttributes(typeof(CollectionDefinitionAttribute), false);
+          attr.Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void CounterCollection_ImplementsICollectionFixture()
+      {
+          typeof(CounterCollection).GetInterfaces()
+              .Should().Contain(typeof(ICollectionFixture<CounterFixture>));
+      }
+  }

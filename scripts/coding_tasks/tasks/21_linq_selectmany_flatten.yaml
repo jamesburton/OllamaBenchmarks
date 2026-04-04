@@ -1,0 +1,56 @@
+name: linq_selectmany_flatten
+category: linq
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  1. A record Department with two properties: string Name and List<string> Employees.
+
+  2. A static class StaffDirectory with a static method:
+     List<string> GetAllEmployees(IEnumerable<Department> departments)
+     that:
+     - Uses SelectMany to flatten all Employees lists from all departments into one sequence
+     - Orders the resulting names alphabetically using OrderBy
+     - Returns the result as a List<string>
+
+  Do NOT wrap code in a namespace. Do NOT add using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class StaffDirectoryTests
+  {
+      private static List<Department> BuildDepts() =>
+      [
+          new Department("Engineering", ["Zara", "Alice", "Bob"]),
+          new Department("Marketing", ["Carol", "Dave"]),
+          new Department("Finance", ["Eve", "Frank", "Grace"]),
+      ];
+
+      [Fact]
+      public void GetAllEmployees_ReturnsTotalCountFromThreeDepartments()
+      {
+          var result = StaffDirectory.GetAllEmployees(BuildDepts());
+          result.Should().HaveCount(8);
+      }
+
+      [Fact]
+      public void GetAllEmployees_ReturnsNamesInAlphabeticalOrder()
+      {
+          var result = StaffDirectory.GetAllEmployees(BuildDepts());
+          result[0].Should().Be("Alice");
+          result[1].Should().Be("Bob");
+          result[2].Should().Be("Carol");
+          result[^1].Should().Be("Zara");
+      }
+
+      [Fact]
+      public void GetAllEmployees_EmptyDepartmentsList_ReturnsEmpty()
+      {
+          var result = StaffDirectory.GetAllEmployees([]);
+          result.Should().BeEmpty();
+      }
+  }

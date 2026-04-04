@@ -1,0 +1,165 @@
+name: vertical_efcore_service
+category: vertical
+weight: 2
+template: test_project
+max_tokens: 8192
+num_ctx: 12288
+references:
+  - efcore_10.md
+  - aspnet_net10.md
+  - awesome_assertions.md
+prompt: |
+  Given the following API reference:
+  {references}
+
+  Generate a complete EF Core service vertical slice in a single C# file:
+
+  1. A `TodoItem` class (NOT in a namespace) with public get/set properties:
+     - `int Id`
+     - `string Title`
+     - `bool IsComplete`
+     - `DateTime CreatedAt`
+
+  2. A `TodoDbContext` class inheriting from `Microsoft.EntityFrameworkCore.DbContext` (NOT in a namespace) with:
+     - Constructor: `TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options)`
+     - `public DbSet<TodoItem> TodoItems { get; set; }`
+
+  3. An `ITodoService` interface (NOT in a namespace) with:
+     - `Task<TodoItem> CreateAsync(string title)`
+     - `Task<List<TodoItem>> GetAllAsync()`
+     - `Task<TodoItem?> GetByIdAsync(int id)`
+     - `Task<bool> CompleteAsync(int id)`
+     - `Task<bool> DeleteAsync(int id)`
+
+  4. A `TodoService` class implementing `ITodoService` (NOT in a namespace):
+     - Constructor takes `TodoDbContext db`
+     - `CreateAsync`: creates a `TodoItem` with `IsComplete = false`, `CreatedAt = DateTime.UtcNow`, adds it to the DbSet, calls `SaveChangesAsync()`, and returns the item
+     - `GetAllAsync`: returns `await db.TodoItems.ToListAsync()`
+     - `GetByIdAsync`: returns `await db.TodoItems.FindAsync(id)` (returns null if not found)
+     - `CompleteAsync`: finds the item, sets `IsComplete = true`, saves, returns `true`. Returns `false` if not found.
+     - `DeleteAsync`: finds the item, removes it, saves, returns `true`. Returns `false` if not found.
+
+  IMPORTANT constraints:
+  - Include `using Microsoft.EntityFrameworkCore;` at the top of the file.
+  - Do NOT add any other using statements. The project already has global usings for Xunit and AwesomeAssertions.
+  - Do NOT wrap any types in a namespace.
+  - Do NOT use static fields or shared state — each test creates its own in-memory DbContext.
+  - Use `DbContextOptionsBuilder<TodoDbContext>` with `UseInMemoryDatabase` for tests.
+
+  Return only valid C# code in a single file.
+test_code: |
+  using Microsoft.EntityFrameworkCore;
+
+  public class TodoServiceMetaTests
+  {
+      private static TodoDbContext CreateContext(string dbName)
+      {
+          var options = new DbContextOptionsBuilder<TodoDbContext>()
+              .UseInMemoryDatabase(databaseName: dbName)
+              .Options;
+          return new TodoDbContext(options);
+      }
+
+      [Fact]
+      public async Task CreateAsync_AssignsIdAndCreatedAt()
+      {
+          using var ctx = CreateContext(nameof(CreateAsync_AssignsIdAndCreatedAt));
+          var sut = new TodoService(ctx);
+
+          var item = await sut.CreateAsync("My Task");
+
+          item.Id.Should().BeGreaterThan(0);
+          item.Title.Should().Be("My Task");
+          item.IsComplete.Should().BeFalse();
+          item.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+      }
+
+      [Fact]
+      public async Task GetAllAsync_ReturnsCreatedItems()
+      {
+          using var ctx = CreateContext(nameof(GetAllAsync_ReturnsCreatedItems));
+          var sut = new TodoService(ctx);
+          await sut.CreateAsync("Task 1");
+          await sut.CreateAsync("Task 2");
+
+          var all = await sut.GetAllAsync();
+
+          all.Should().HaveCount(2);
+          all.Select(x => x.Title).Should().Contain("Task 1");
+          all.Select(x => x.Title).Should().Contain("Task 2");
+      }
+
+      [Fact]
+      public async Task GetByIdAsync_ExistingId_ReturnsItem()
+      {
+          using var ctx = CreateContext(nameof(GetByIdAsync_ExistingId_ReturnsItem));
+          var sut = new TodoService(ctx);
+          var created = await sut.CreateAsync("Find Me");
+
+          var found = await sut.GetByIdAsync(created.Id);
+
+          found.Should().NotBeNull();
+          found!.Title.Should().Be("Find Me");
+      }
+
+      [Fact]
+      public async Task GetByIdAsync_NonexistentId_ReturnsNull()
+      {
+          using var ctx = CreateContext(nameof(GetByIdAsync_NonexistentId_ReturnsNull));
+          var sut = new TodoService(ctx);
+
+          var found = await sut.GetByIdAsync(9999);
+
+          found.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task CompleteAsync_ExistingId_SetsIsCompleteTrue()
+      {
+          using var ctx = CreateContext(nameof(CompleteAsync_ExistingId_SetsIsCompleteTrue));
+          var sut = new TodoService(ctx);
+          var item = await sut.CreateAsync("Complete Me");
+
+          var result = await sut.CompleteAsync(item.Id);
+
+          result.Should().BeTrue();
+          var updated = await sut.GetByIdAsync(item.Id);
+          updated!.IsComplete.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task CompleteAsync_NonexistentId_ReturnsFalse()
+      {
+          using var ctx = CreateContext(nameof(CompleteAsync_NonexistentId_ReturnsFalse));
+          var sut = new TodoService(ctx);
+
+          var result = await sut.CompleteAsync(9999);
+
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task DeleteAsync_ExistingId_RemovesItem()
+      {
+          using var ctx = CreateContext(nameof(DeleteAsync_ExistingId_RemovesItem));
+          var sut = new TodoService(ctx);
+          var item = await sut.CreateAsync("Delete Me");
+
+          var result = await sut.DeleteAsync(item.Id);
+
+          result.Should().BeTrue();
+          var all = await sut.GetAllAsync();
+          all.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task DeleteAsync_NonexistentId_ReturnsFalse()
+      {
+          using var ctx = CreateContext(nameof(DeleteAsync_NonexistentId_ReturnsFalse));
+          var sut = new TodoService(ctx);
+
+          var result = await sut.DeleteAsync(9999);
+
+          result.Should().BeFalse();
+      }
+  }

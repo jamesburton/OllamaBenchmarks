@@ -1,0 +1,77 @@
+name: async_channel_pipeline
+category: async
+weight: 1
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+references: []
+prompt: |
+  Generate the following in a single C# file:
+
+  A class DataPipeline with:
+  - A constructor that accepts int capacity and creates a bounded Channel<string>
+    with that capacity (use Channel.CreateBounded<string>(capacity)).
+  - A property: ChannelWriter<string> Writer { get; }
+    that exposes the channel's writer.
+  - A method: IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
+    that reads all items from the channel using channel.Reader.ReadAllAsync(ct)
+    and returns the resulting IAsyncEnumerable<string>.
+  - A method: Task CompleteAsync()
+    that calls Writer.Complete() and returns Task.CompletedTask.
+
+  Include only the using statement for System.Threading.Channels.
+  Do NOT wrap code in a namespace. Do NOT add other using statements.
+
+  Return only valid C# code in a single file.
+test_code: |
+  public class DataPipelineTests
+  {
+      [Fact]
+      public async Task WriteAndRead_FiveItems_CorrectCountAndOrder()
+      {
+          var pipeline = new DataPipeline(capacity: 10);
+          var items = new[] { "alpha", "beta", "gamma", "delta", "epsilon" };
+
+          foreach (var item in items)
+              await pipeline.Writer.WriteAsync(item);
+
+          await pipeline.CompleteAsync();
+
+          var results = new List<string>();
+          await foreach (var s in pipeline.ReadAllAsync(CancellationToken.None))
+              results.Add(s);
+
+          results.Should().HaveCount(5);
+          results[0].Should().Be("alpha");
+          results[4].Should().Be("epsilon");
+      }
+
+      [Fact]
+      public async Task CompleteAsync_NoItems_ReadAllReturnsEmpty()
+      {
+          var pipeline = new DataPipeline(capacity: 5);
+          await pipeline.CompleteAsync();
+
+          var results = new List<string>();
+          await foreach (var s in pipeline.ReadAllAsync(CancellationToken.None))
+              results.Add(s);
+
+          results.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task Writer_IsExposedAndUsable()
+      {
+          var pipeline = new DataPipeline(capacity: 4);
+          pipeline.Writer.Should().NotBeNull();
+          await pipeline.Writer.WriteAsync("test");
+          await pipeline.CompleteAsync();
+
+          var results = new List<string>();
+          await foreach (var s in pipeline.ReadAllAsync(CancellationToken.None))
+              results.Add(s);
+
+          results.Should().HaveCount(1);
+          results[0].Should().Be("test");
+      }
+  }
