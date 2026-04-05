@@ -89,7 +89,9 @@ def call_ollama(
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": False,
-        "think": False,  # Disable thinking mode — we want code output, not reasoning
+        # Note: do NOT set "think": false — some models (qwen3-coder-next on
+        # Ollama 0.20.2) crash with 500 error when thinking is disabled.
+        # Instead, we read from message.thinking as fallback below.
         "options": {
             "num_predict": max_tokens,
             "num_ctx": num_ctx,
