@@ -27,20 +27,12 @@ public class StringProcessorTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    [InlineData("hi", 5)]
+    [InlineData("hi", 10)]
     [InlineData("hello", 5)]
     [InlineData("hello world", 5)]
-    public void Truncate_ShouldHandleAllCases(string input, int maxLength = 5)
+    public void Truncate_ShouldHandleAllCases(string input, int maxLength, string expected)
     {
         // Arrange
-        string expected;
-        if (input is null)
-            expected = "";
-        else if (input.Length <= maxLength)
-            expected = input;
-        else
-            expected = input[..maxLength] + "...";
-
         // Act
         var result = _processor.Truncate(input, maxLength);
 
@@ -49,12 +41,12 @@ public class StringProcessorTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
+    [InlineData(null, 0)]
+    [InlineData("", 0)]
     [InlineData("hello", 1)]
     [InlineData("hello world", 2)]
-    [InlineData("  hello   world  ", 2)]
-    public void CountWords_ShouldHandleAllCases(string input, int expected = 0)
+    [InlineData("  multiple   spaces   here  ", 3)]
+    public void CountWords_ShouldHandleAllCases(string input, int expected)
     {
         // Act
         var result = _processor.CountWords(input);
@@ -64,13 +56,13 @@ public class StringProcessorTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
+    [InlineData(null, false)]
+    [InlineData("", false)]
     [InlineData("a", true)]
     [InlineData("racecar", true)]
     [InlineData("hello", false)]
     [InlineData("RaceCar", true)]
-    public void IsPalindrome_ShouldHandleAllCases(string input, bool expected = false)
+    public void IsPalindrome_ShouldHandleAllCases(string input, bool expected)
     {
         // Act
         var result = _processor.IsPalindrome(input);
