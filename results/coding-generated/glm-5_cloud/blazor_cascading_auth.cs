@@ -10,10 +10,10 @@ public interface IUserService
 public class UserDashboard : ComponentBase
 {
     [CascadingParameter]
-    public Task<AuthenticationState> AuthState { get; set; }
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
 
     [Inject]
-    public IUserService UserService { get; set; }
+    public IUserService UserService { get; set; } = default!;
 
     public string? DisplayName { get; set; }
 

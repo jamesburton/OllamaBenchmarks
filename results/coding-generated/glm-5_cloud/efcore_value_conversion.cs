@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 public record Money(decimal Amount, string Currency);
@@ -7,13 +5,13 @@ public record Money(decimal Amount, string Currency);
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
 public class ProductDbContext : DbContext
 {
-    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Product> Products { get; set; }
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
     {
@@ -49,7 +47,7 @@ public class ProductRepository
 
     public async Task<Product> SaveAsync(Product product)
     {
-        await _context.Products.AddAsync(product);
+        _context.Products.Add(product);
         await _context.SaveChangesAsync();
         return product;
     }

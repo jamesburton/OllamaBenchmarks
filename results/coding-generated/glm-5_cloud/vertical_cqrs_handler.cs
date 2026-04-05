@@ -58,63 +58,62 @@ public class CreateProductCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_ShouldReturnValidationError_WhenNameIsNullOrWhitespace()
+    public async Task HandleAsync_ShouldReturnValidationError_WhenNameIsNull()
     {
-        // Arrange
         var command = new CreateProductCommand(null, 100m);
 
-        // Act
         var result = await _sut.HandleAsync(command);
 
-        // Assert
-        result.IsT1.Should().Be(true);
+        result.IsT1.Should().BeTrue();
+        result.AsT1.Should().Be(new ValidationError("Name is required"));
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldReturnValidationError_WhenNameIsWhitespace()
+    {
+        var command = new CreateProductCommand("   ", 100m);
+
+        var result = await _sut.HandleAsync(command);
+
+        result.IsT1.Should().BeTrue();
         result.AsT1.Should().Be(new ValidationError("Name is required"));
     }
 
     [Fact]
     public async Task HandleAsync_ShouldReturnValidationError_WhenPriceIsNotPositive()
     {
-        // Arrange
         var command = new CreateProductCommand("ValidName", 0m);
 
-        // Act
         var result = await _sut.HandleAsync(command);
 
-        // Assert
-        result.IsT1.Should().Be(true);
+        result.IsT1.Should().BeTrue();
         result.AsT1.Should().Be(new ValidationError("Price must be positive"));
     }
 
     [Fact]
     public async Task HandleAsync_ShouldReturnDuplicateError_WhenProductExists()
     {
-        // Arrange
-        var command = new CreateProductCommand("Existing", 10m);
-        _repository.ExistsAsync("Existing").Returns(true);
+        var command = new CreateProductCommand("ExistingProduct", 50m);
+        _repository.ExistsAsync("ExistingProduct").Returns(true);
 
-        // Act
         var result = await _sut.HandleAsync(command);
 
-        // Assert
-        result.IsT2.Should().Be(true);
-        result.AsT2.Should().Be(new DuplicateError("Existing"));
+        result.IsT2.Should().BeTrue();
+        result.AsT2.Should().Be(new DuplicateError("ExistingProduct"));
+        await _repository.DidNotReceive().AddAsync(Arg.Any<Product>());
     }
 
     [Fact]
-    public async Task HandleAsync_ShouldReturnProduct_WhenCreationIsSuccessful()
+    public async Task HandleAsync_ShouldReturnProduct_WhenCreationIsValid()
     {
-        // Arrange
-        var command = new CreateProductCommand("NewProduct", 10m);
-        var expectedProduct = new Product(1, "NewProduct", 10m);
-
+        var command = new CreateProductCommand("NewProduct", 50m);
+        var expectedProduct = new Product(1, "NewProduct", 50m);
         _repository.ExistsAsync("NewProduct").Returns(false);
         _repository.AddAsync(Arg.Any<Product>()).Returns(expectedProduct);
 
-        // Act
         var result = await _sut.HandleAsync(command);
 
-        // Assert
-        result.IsT0.Should().Be(true);
+        result.IsT0.Should().BeTrue();
         result.AsT0.Should().Be(expectedProduct);
     }
 }

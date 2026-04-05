@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 public interface ISoftDeletable
 {
@@ -58,6 +55,8 @@ public class ArticleRepository
 
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        return await _context.Articles.IgnoreQueryFilters().ToListAsync();
+        return await _context.Articles
+            .IgnoreQueryFilters()
+            .ToListAsync();
     }
 }

@@ -1,9 +1,10 @@
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 
 public class SmtpOptions
 {
-    public string Host { get; set; }
+    public string Host { get; set; } = string.Empty;
     public int Port { get; set; }
     public string? Username { get; set; }
 }

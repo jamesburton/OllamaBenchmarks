@@ -1,8 +1,4 @@
-public record Department
-{
-    public string Name { get; init; }
-    public List<string> Employees { get; init; }
-}
+public record Department(string Name, List<string> Employees);
 
 public static class StaffDirectory
 {

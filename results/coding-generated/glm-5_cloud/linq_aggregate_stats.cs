@@ -2,11 +2,11 @@ public static class SurveyAnalyzer
 {
     public static (double Mean, double Median, double Min, double Max) ComputeStats(System.Collections.Generic.IEnumerable<double> values)
     {
-        var list = new System.Collections.Generic.List<double>(values);
+        var list = System.Linq.Enumerable.ToList(values);
 
         if (list.Count == 0)
         {
-            throw new System.ArgumentException("Sequence is empty");
+            throw new System.ArgumentException("Input sequence cannot be empty.");
         }
 
         double mean = System.Linq.Enumerable.Average(list);
@@ -14,9 +14,8 @@ public static class SurveyAnalyzer
         double max = System.Linq.Enumerable.Max(list);
 
         list.Sort();
-
-        double median;
         int count = list.Count;
+        double median;
 
         if (count % 2 == 0)
         {

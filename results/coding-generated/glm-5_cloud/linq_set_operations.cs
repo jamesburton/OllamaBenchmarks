@@ -1,15 +1,23 @@
-public static IEnumerable<string> GetNewProducts(IEnumerable<string> current, IEnumerable<string> previous)
+public static class ProductCatalog
+{
+    public static System.Collections.Generic.IEnumerable<string> GetNewProducts(
+        System.Collections.Generic.IEnumerable<string> current,
+        System.Collections.Generic.IEnumerable<string> previous)
     {
-        return current.Except(previous);
+        return System.Linq.Enumerable.Except(current, previous);
     }
 
-    public static IEnumerable<string> GetCommonProducts(IEnumerable<string> a, IEnumerable<string> b)
+    public static System.Collections.Generic.IEnumerable<string> GetCommonProducts(
+        System.Collections.Generic.IEnumerable<string> a,
+        System.Collections.Generic.IEnumerable<string> b)
     {
-        return a.Intersect(b);
+        return System.Linq.Enumerable.Intersect(a, b);
     }
 
-    public static IEnumerable<string> GetAllUniqueProducts(IEnumerable<string> a, IEnumerable<string> b)
+    public static System.Collections.Generic.IEnumerable<string> GetAllUniqueProducts(
+        System.Collections.Generic.IEnumerable<string> a,
+        System.Collections.Generic.IEnumerable<string> b)
     {
-        return a.Union(b);
+        return System.Linq.Enumerable.Union(a, b);
     }
 }

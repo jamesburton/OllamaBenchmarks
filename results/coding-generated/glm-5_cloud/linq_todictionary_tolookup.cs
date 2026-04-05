@@ -2,13 +2,13 @@ public record Student(string Name, string Grade);
 
 public static class GradeBook
 {
-    public static Dictionary<string, Student> IndexByName(IEnumerable<Student> students)
+    public static System.Collections.Generic.Dictionary<string, Student> IndexByName(System.Collections.Generic.IEnumerable<Student> students)
     {
-        return students.ToDictionary(student => student.Name);
+        return System.Linq.Enumerable.ToDictionary(students, s => s.Name);
     }
 
-    public static ILookup<string, Student> GroupByGrade(IEnumerable<Student> students)
+    public static System.Linq.ILookup<string, Student> GroupByGrade(System.Collections.Generic.IEnumerable<Student> students)
     {
-        return students.ToLookup(student => student.Grade);
+        return System.Linq.Enumerable.ToLookup(students, s => s.Grade);
     }
 }
