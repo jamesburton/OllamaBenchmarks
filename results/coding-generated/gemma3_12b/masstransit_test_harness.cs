@@ -1,64 +1,38 @@
-using System;
-using System.Threading.Tasks;
 using MassTransit;
 using MassTransit.Testing;
-using Xunit;
-using Xunit.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
-public record ProcessPayment(Guid OrderId, decimal Amount);
-public record PaymentProcessed(Guid OrderId, string TransactionId);
-public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
+public class ProcessPaymentConsumerTests
 {
-    public async Task Consume(ConsumeContext<ProcessPayment> context)
-    {
-        await context.Publish(new PaymentProcessed(context.Message.OrderId, Guid.NewGuid().ToString()));
-    }
-}
-
-public class ProcessPaymentConsumerTests : IDisposable
-{
-    private ITestHarness? _harness;
-
-    public ProcessPaymentConsumerTests(ITestOutputHelper output)
-    {
-        _harness = new InMemoryTestHarness(cfg =>
-        {
-            cfg.ConfigureEndpoints(endpointConfig =>
-            {
-                endpointConfig.UseInMemory(endpoint => endpoint.Consumer<ProcessPaymentConsumer>());
-            });
-        });
-        _harness.TestCleanup += Output.WriteLine;
-    }
-
-    public void Dispose()
-    {
-        _harness?.Stop();
-    }
-
     [Fact]
     public async Task ProcessPayment_PublishesPaymentProcessed()
     {
-        await _harness.Start();
+        var harness = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg =>
+            {
+                cfg.AddConsumer<ProcessPaymentConsumer>();
+            })
+            .BuildServiceProvider(true);
+
+        await harness.Start();
 
         var orderId = Guid.NewGuid();
-        var amount = 100.00m;
-        var message = new ProcessPayment(orderId, amount);
+        await harness.Bus.Publish(new ProcessPayment(orderId, 100.00m));
 
-        await _harness.Bus.Publish(message);
+        bool consumed = await harness.Consumed.Any<ProcessPayment>();
+        bool published = await harness.Published.Any<PaymentProcessed>();
 
-        var paymentProcessed = await _harness.Consumed.Any<PaymentProcessed>();
-        Assert.True(paymentProcessed);
+        Assert.True(consumed);
+        Assert.True(published);
 
-        var paymentProcessedEvent = await _harness.Consumed.Received<PaymentProcessed>();
-        Assert.Single(paymentProcessedEvent);
+        var publishedEvents = await harness.Published.GetPayloads<PaymentProcessed>();
+        Assert.Single(publishedEvents);
 
-        Assert.Multiple(() =>
-        {
-            Assert.Equal(orderId, paymentProcessedEvent.First().OrderId);
-            Assert.NotEmpty(paymentProcessedEvent.First().TransactionId);
-        });
+        Assert.Multiple(
+            () => Assert.Equal(orderId, publishedEvents[0].OrderId),
+            () => Assert.True(Guid.TryParse(publishedEvents[0].TransactionId, out _))
+        );
 
-        await _harness.Stop();
+        await harness.Stop();
     }
 }

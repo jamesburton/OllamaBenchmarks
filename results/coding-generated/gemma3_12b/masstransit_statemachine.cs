@@ -1,5 +1,6 @@
-using MassTransit;
-using System;
+global using Contracts;
+
+namespace Contracts;
 
 public class OrderState : SagaStateMachineInstance
 {
@@ -25,46 +26,26 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
     public OrderStateMachine()
     {
-        var initialState = new InitialState();
-        Submitted = new State(initialState);
-        Accepted = new State();
-        Completed = new State();
+        InstanceState(x => x.CurrentState);
 
-        OrderSubmitted = new Event<OrderSubmitted>(initialState);
-        OrderAccepted = new Event<OrderAccepted>(initialState);
-        OrderCompleted = new Event<OrderCompleted>(initialState);
+        OrderSubmitted = Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId));
+        OrderAccepted = Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId));
+        OrderCompleted = Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId));
 
-        Initially(
-            When(OrderSubmitted)
-                .SetOrderDate(x => x.OrderDate = x.Message.OrderDate)
-                .TransitionTo(Submitted));
+        Initially
+            .When(OrderSubmitted)
+                .Set(x => x.OrderDate, m => m.Message.OrderDate)
+                .TransitionTo(Submitted);
 
-        During(Submitted,
-            When(OrderAccepted)
-                .SetAcceptedAt(x => x.AcceptedAt = x.Message.AcceptedAt)
-                .TransitionTo(Accepted));
+        During(Submitted)
+            .When(OrderAccepted)
+                .Set(x => x.AcceptedAt, m => m.Message.AcceptedAt)
+                .TransitionTo(Accepted);
 
-        During(Accepted,
-            When(OrderCompleted)
-                .Finalize());
+        During(Accepted)
+            .When(OrderCompleted)
+                .Finalize();
 
         SetCompletedWhenFinalized();
     }
-
-    protected override void ConfigureStateMachineActions()
-    {
-        // Define actions for setting properties
-        SetOrderDate = new Action<ISetStateContext<OrderState>, OrderSubmitted>(context, message) =>
-        {
-            context.SagaState.OrderDate = message.OrderDate;
-        };
-
-        SetAcceptedAt = new Action<ISetStateContext<OrderState>, OrderAccepted>(context, message) =>
-        {
-            context.SagaState.AcceptedAt = message.AcceptedAt;
-        };
-    }
-
-    private Action<ISetStateContext<OrderState>, OrderSubmitted> SetOrderDate;
-    private Action<ISetStateContext<OrderState>, OrderAccepted> SetAcceptedAt;
 }

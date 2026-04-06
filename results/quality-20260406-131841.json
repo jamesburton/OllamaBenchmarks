@@ -1,0 +1,55 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-04-06T13:18:41.083747+00:00",
+  "run_finished_at": "2026-04-06T13:19:24.337846+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-20260406-131841.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-04-06T13:18:43.393959+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.20.2",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "gemma3:4b"
+  ],
+  "completed_models": [
+    "gemma3:4b"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "results": [
+    {
+      "model": "gemma3:4b",
+      "coding_pass": 5,
+      "coding_total": 5,
+      "tool_pass": 0,
+      "tool_total": 4,
+      "agentic_pass": 0,
+      "agentic_total": 2,
+      "score": 5,
+      "score_max": 11
+    }
+  ]
+}

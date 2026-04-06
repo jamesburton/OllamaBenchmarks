@@ -1,46 +1,29 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System.Collections.Generic;
-using System.Linq;
-
-[ComplexType]
-public class Address
-{
+public class Address {
     public string Street { get; set; }
     public string City { get; set; }
     public string PostCode { get; set; }
 }
 
-public class Company
-{
+public class Company {
     public int Id { get; set; }
     public string Name { get; set; }
     public Address HeadquartersAddress { get; set; }
 }
 
-public class CompanyDbContext : DbContext
-{
+public class CompanyDbContext : DbContext {
     public DbSet<Company> Companies { get; set; }
 
     public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
-        : base(options)
-    {
+        : base(options) {
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Company>()
-            .Property(c => c.HeadquartersAddress)
-            .HasJsonConversion();
-
-        base.OnModelCreating(modelBuilder);
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        modelBuilder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
     }
 }
 
-public static class CompanyQueries
-{
-    public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
-    {
+public static class CompanyQueries {
+    public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city) {
         return db.Companies
             .Where(c => c.HeadquartersAddress.City == city)
             .ToList();

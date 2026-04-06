@@ -1,8 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
-
 public class SharedCounter : IAsyncLifetime
 {
     private int counter;
@@ -25,12 +20,10 @@ public class SharedCounter : IAsyncLifetime
     }
 }
 
-[assembly: AssemblyFixture(typeof(SharedCounter))]
-
 public class FirstCounterTests(SharedCounter sharedCounter)
 {
     [Fact]
-    public void IncrementAndGet_ShouldReturnGreaterThanZero()
+    public async Task IncrementAndGet_ShouldBeGreaterThanZero()
     {
         int result = sharedCounter.IncrementAndGet();
         Assert.True(result > 0);
@@ -40,7 +33,7 @@ public class FirstCounterTests(SharedCounter sharedCounter)
 public class SecondCounterTests
 {
     [Fact]
-    public void IncrementAndGet_ShouldReturnGreaterThanZero_UsingTestContext()
+    public async Task IncrementAndGet_ShouldBeGreaterThanZero()
     {
         SharedCounter sharedCounter = TestContext.Current.GetFixture<SharedCounter>();
         int result = sharedCounter.IncrementAndGet();

@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using System;
+using System.Threading.Tasks;
 
 public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
 
@@ -13,9 +12,9 @@ public interface IWeatherService
 [StreamRendering]
 public class WeatherPageBase : ComponentBase
 {
-    [Inject] private IWeatherService WeatherService { get; set; }
+    [Inject] public IWeatherService WeatherService { get; set; }
 
-    public WeatherForecast[]? Forecasts { get; set; }
+    public WeatherForecast[]? Forecasts { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {

@@ -1,25 +1,33 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 public interface IOrderRepository { }
 
-public class OrderRepository : IOrderRepository { }
+// OrderRepository.cs
+public class OrderRepository : IOrderRepository {
+    public OrderRepository() { }
+}
 
+// IOrderService.cs
 public interface IOrderService { }
 
-public class OrderService : IOrderService { }
+// OrderService.cs
+public class OrderService : IOrderService {
+    public OrderService() { }
+}
 
+// IEmailNotifier.cs
 public interface IEmailNotifier { }
 
-public class EmailNotifier : IEmailNotifier { }
+// EmailNotifier.cs
+public class EmailNotifier : IEmailNotifier {
+    public EmailNotifier() { }
+}
 
-public class OrderSettings
-{
+// OrderSettings.cs
+public class OrderSettings {
     public string WarehouseCode { get; set; }
     public int MaxRetries { get; set; }
 }
 
+// ServiceCollectionExtensions.cs
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config)

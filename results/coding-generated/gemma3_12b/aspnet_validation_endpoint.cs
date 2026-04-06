@@ -1,37 +1,32 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Mime;
+using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
-public record CreateOrderRequest(
-    [Required] string Name,
-    [Range(0.01, 10000)] decimal Price,
-    [Range(1, 999)] int Quantity
-);
+public class CreateOrderRequest
+{
+    [Required]
+    public string Name { get; set; }
+
+    [Range(0.01, 10000)]
+    public decimal Price { get; set; }
+
+    [Range(1, 999)]
+    public int Quantity { get; set; }
+}
 
 public class OrderService
 {
-    public CreateOrderRequest CreateOrder(CreateOrderRequest request)
+    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        return request;
-    }
-}
+        var validationContext = new ValidationContext(request, serviceProvider: null, items: null);
+        var validationResults = new List<ValidationResult>();
 
-public static class OrderEndpoints
-{
-    public static void MapOrderEndpoints(this WebApplication app)
-    {
-        app.MapPost("/api/orders", async (CreateOrderRequest request, OrderService orderService) =>
+        bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
+
+        if (!isValid)
         {
-            try
-            {
-                // Validation is handled by the record attributes.  No explicit validation needed here.
-                var order = orderService.CreateOrder(request);
-                return Results.Ok(order);
-            }
-            catch (Exception ex)
-            {
-                // Handle validation errors or other exceptions.
-                return Results.Problem(detail: ex.Message, statusCode: 400);
-            }
-        });
+            throw new ArgumentException($"Validation failed for CreateOrderRequest: {string.Join(", ", validationResults.Select(vr => vr.ErrorMessage))}");
+        }
+
+        return request;
     }
 }

@@ -1,16 +1,25 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-03-22T15:56:19.2405499+00:00",
-    "run_finished_at":  "2026-03-22T16:02:05.6517404+00:00",
+    "run_started_at":  "2026-04-06T14:19:26.5529006+01:00",
+    "run_finished_at":  "2026-04-06T14:19:34.9232752+01:00",
     "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-gemma3_4b.json",
-    "host":  "FRAMEWORK",
+    "host":  "STRIX",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "hostname":  "FRAMEWORK"
+                         "hostname":  "STRIX"
                      },
     "models":  [
                    "gemma3:4b"
                ],
+    "completed_models":  [
+                             "gemma3:4b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,
@@ -18,17 +27,17 @@
                     {
                         "model":  "gemma3:4b",
                         "eval_count":  192,
-                        "eval_s":  2.276,
-                        "toks_per_s":  84.36,
-                        "total_s":  3.544,
-                        "load_s":  0.373,
-                        "cpu_avg_pct":  0.1,
-                        "cpu_peak_pct":  0.1,
-                        "ram_peak_gb":  0.14,
-                        "gpu_util_avg":  0,
-                        "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  0,
-                        "ollama_ps":  "gemma3:4b size=4.05GB vram=4.05GB ctx=4096 quant=Q4_K_M"
+                        "eval_s":  5.314,
+                        "toks_per_s":  36.13,
+                        "total_s":  6.093,
+                        "load_s":  0.589,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  2.09,
+                        "gpu_util_avg":  185.9,
+                        "gpu_util_peak":  185.9,
+                        "gpu_mem_peak_gb":  14.75,
+                        "ollama_ps":  "gemma3:4b size=6.74GB vram=6.74GB ctx=131072 quant=Q4_K_M"
                     }
                 ]
 }

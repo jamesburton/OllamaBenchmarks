@@ -26,50 +26,47 @@ public class NotificationService(IUserRepository repo, IEmailService email)
     }
 }
 
-using NSubstitute;
-using AwesomeAssertions;
-using Xunit;
-using System.Threading.Tasks;
-
-public class NotificationServiceTests
+[Fact]
+public async Task NotifyUserAsync_HappyPath()
 {
-    [Fact]
-    public async Task NotifyUserAsync_HappyPath()
-    {
-        // Arrange
-        var userRepository = Substitute.For<IUserRepository>();
-        var emailService = Substitute.For<IEmailService>();
+    var expectedEmail = "test@example.com";
+    var mockRepo = Substitute.For<IUserRepository>();
+    var mockEmail = Substitute.For<IEmailService>();
 
-        var user = new User { Id = 1, Name = "Test User", Email = "test@example.com" };
-        userRepository.GetByIdAsync(1).Returns(user);
+    var user = new User { Id = 1, Name = "Test User", Email = expectedEmail };
+    mockRepo.GetByIdAsync(1).Returns(user);
 
-        var notificationService = new NotificationService(userRepository, emailService);
+    var service = new NotificationService(mockRepo, mockEmail);
+    await service.NotifyUserAsync(1);
 
-        // Act
-        await notificationService.NotifyUserAsync(1);
+    mockEmail.Received().SendWelcomeAsync(expectedEmail);
+}
 
-        // Assert
-        await userRepository.Received().GetByIdAsync(1);
-        emailService.Received().SendWelcomeAsync("test@example.com");
-    }
+[Fact]
+public async Task NotifyUserAsync_UserNotFound()
+{
+    var mockRepo = Substitute.For<IUserRepository>();
+    var mockEmail = Substitute.For<IEmailService>();
 
-    [Fact]
-    public async Task NotifyUserAsync_UserNotFound()
-    {
-        // Arrange
-        var userRepository = Substitute.For<IUserRepository>();
-        var emailService = Substitute.For<IEmailService>();
+    mockRepo.GetByIdAsync(1).Returns((User?)null);
 
-        userRepository.GetByIdAsync(1).Returns((User?)null);
+    var service = new NotificationService(mockRepo, mockEmail);
+    var act = () => service.NotifyUserAsync(1);
 
-        var notificationService = new NotificationService(userRepository, emailService);
+    act.Should().ThrowAsync<InvalidOperationException>()
+        .WithMessage("User not found");
 
-        // Act
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => notificationService.NotifyUserAsync(1));
+    mockEmail.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+}
 
-        // Assert
-        exception.Message.Should().Be("User not found");
-        await userRepository.Received().GetByIdAsync(1);
-        emailService.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
-    }
+[Fact]
+public async Task NotifyUserAsync_VerifyRepoCall()
+{
+    var mockRepo = Substitute.For<IUserRepository>();
+    var mockEmail = Substitute.For<IEmailService>();
+
+    var service = new NotificationService(mockRepo, mockEmail);
+    await service.NotifyUserAsync(1);
+
+    mockRepo.Received().GetByIdAsync(1);
 }

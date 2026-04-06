@@ -1,27 +1,35 @@
 {
   "benchmark": "quality",
-  "run_started_at": "2026-03-31T01:10:27.322876+00:00",
-  "run_finished_at": "2026-03-31T01:12:44.139062+00:00",
+  "run_started_at": "2026-04-06T13:19:53.822935+00:00",
+  "run_finished_at": "2026-04-06T13:21:36.658280+00:00",
   "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-gemma3_12b.json",
   "ollama_host": "http://127.0.0.1:11434",
   "host_details": {
-    "captured_at": "2026-03-31T01:11:27.694601+00:00",
-    "hostname": "Framework",
-    "host_slug": "framework",
+    "captured_at": "2026-04-06T13:19:55.212344+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
     "os": {
       "system": "Windows",
       "release": "11",
-      "version": "10.0.26220",
+      "version": "10.0.26200",
       "machine": "AMD64"
     },
-    "manufacturer": null,
-    "model": null,
-    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
-    "logical_cpu_count": 22,
-    "total_memory_gb": null,
-    "python_version": "3.12.2",
-    "ollama_version": "ollama version is 0.17.1",
-    "gpus": []
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.20.2",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      }
+    ]
   },
   "models": [
     "gemma3:12b"
@@ -29,14 +37,14 @@
   "results": [
     {
       "model": "gemma3:12b",
-      "coding_pass": 2,
-      "coding_total": 2,
+      "coding_pass": 5,
+      "coding_total": 5,
       "tool_pass": 0,
-      "tool_total": 2,
+      "tool_total": 4,
       "agentic_pass": 0,
-      "agentic_total": 1,
-      "score": 2,
-      "score_max": 5
+      "agentic_total": 2,
+      "score": 5,
+      "score_max": 11
     }
   ]
 }

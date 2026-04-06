@@ -1,6 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,21 +17,33 @@ public class DataProcessor
         int batchNumber = 0;
         while (true)
         {
-            var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
-
-            if (batch == null || batch.Count == 0)
+            if (ct.IsCancellationRequested)
             {
                 yield break;
             }
 
-            foreach (var item in batch)
+            IReadOnlyList<string> batch;
+            try
+            {
+                batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                // Handle cancellation gracefully.  Don't re-throw.
+                yield break;
+            }
+
+            if (batch.Count == 0)
+            {
+                break;
+            }
+
+            foreach (string item in batch)
             {
                 yield return item;
             }
 
             batchNumber++;
-
-            ct.ThrowIfCancellationRequested();
         }
     }
 }
