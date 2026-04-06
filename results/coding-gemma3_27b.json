@@ -605,5 +605,6 @@
       "generated_code_path": "results\\coding-generated\\gemma3_27b\\patterns_timeprovider.cs"
     }
   ],
-  "layer3_weighted_score": 0.6181818181818182
+  "layer3_weighted_score": 0.6181818181818182,
+  "composite_score": 0.370909
 }

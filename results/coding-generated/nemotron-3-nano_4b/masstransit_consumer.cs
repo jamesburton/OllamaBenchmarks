@@ -1,33 +1,35 @@
 global using Contracts;
+
+// Namespace where all types live – also used for the file‑scoped namespace
 using MassTransit;
 
-namespace Contracts;
-
-public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
-public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
-
-public class SubmitOrderConsumer : IConsumer<SubmitOrder>
+namespace Contracts
 {
-    public async Task Consume(ConsumeContext<SubmitOrder> context)
-    {
-        var msg = context.Message;
-        await context.Publish(new OrderSubmitted(msg.OrderId, DateTime.UtcNow));
-    }
-}
+    public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
+    public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
 
-public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
-{
-    public SubmitOrderConsumer()
+    public class SubmitOrderConsumer : IConsumer<SubmitOrder>
     {
-        Setting.ConcurrentMessageLimit(4);
+        public async Task Consume(ConsumeContext<SubmitOrder> context)
+        {
+            var msg = context.Message;
+            await context.Publish(new OrderSubmitted(msg.OrderId, DateTime.UtcNow));
+        }
     }
 
-    protected override void ConfigureConsumer(
-        IReceiveEndpointConfigurator ep,
-        IConsumerConfigurator<SubmitOrderConsumer> consumer,
-        IRegistrationContext ctx)
+    public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
     {
-        ep.UseMessageRetry(r => r.Interval(3, 1000));
-        ep.UseInMemoryOutbox(ctx);
+        public SubmitOrderConsumer()
+        {
+            ConcurrentMessageLimit = 4;
+        }
+
+        protected override void ConfigureConsumer(
+            IReceiveEndpointConfigurator ep,
+            IConsumerConfigurator<SubmitOrderConsumer> consumer,
+            IRegistrationContext ctx)
+        {
+            ep.UseMessageRetry(r => r.Interval(3, 1000));
+        }
     }
 }

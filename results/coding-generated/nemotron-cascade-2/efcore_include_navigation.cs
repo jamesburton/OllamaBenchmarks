@@ -1,33 +1,31 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 public class Comment
 {
     public int Id { get; set; }
-    public string Text { get; set; } = string.Empty;
+    public string Text { get; set; } = null!;
     public int PostId { get; set; }
-
     public Post? Post { get; set; }
 }
 
 public class Post
 {
     public int Id { get; set; }
-    public string Content { get; set; } = string.Empty;
+    public string Content { get; set; } = null!;
     public int BlogId { get; set; }
-
     public Blog? Blog { get; set; }
-    public List<Comment> Comments { get; set; } = new();
+    public List<Comment> Comments { get; } = new List<Comment>();
 }
 
 public class Blog
 {
     public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-
-    public List<Post> Posts { get; set; } = new();
-    public Blog? Blog { get; set; }
+    public string Title { get; set; } = null!;
+    public List<Post> Posts { get; } = new List<Post>();
 }
 
 public class BlogDbContext : DbContext
@@ -43,14 +41,12 @@ public class BlogDbContext : DbContext
         modelBuilder.Entity<Blog>()
             .HasMany(b => b.Posts)
             .WithOne(p => p.Blog)
-            .HasForeignKey(p => p.BlogId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(p => p.BlogId);
 
         modelBuilder.Entity<Post>()
             .HasMany(p => p.Comments)
             .WithOne(c => c.Post)
-            .HasForeignKey(c => c.PostId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(c => c.PostId);
     }
 }
 

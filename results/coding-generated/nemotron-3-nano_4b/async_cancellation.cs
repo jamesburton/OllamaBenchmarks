@@ -5,19 +5,26 @@ public interface IDataSource
     Task<IReadOnlyList<string>> FetchBatchAsync(int batchNumber, CancellationToken ct);
 }
 
-public class DataProcessor
+public class DataProcessor : IAsyncEnumerable<string>
 {
-    public async IAsyncEnumerable<string> ProcessAllBatchesAsync(IDataSource source, [EnumeratorCancellation] CancellationToken ct = default)
+    public async IAsyncEnumerable<string> ProcessAllBatchesAsync(
+        IDataSource source,
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
-        int batch = 0;
+        int batchNumber = 0;
         while (!ct.IsCancellationRequested)
         {
-            var batchResult = await source.FetchBatchAsync(batch, ct).ConfigureAwait(false);
-            if (batchResult.Count == 0) break;
+            if (ct.IsCancellationRequested)
+                yield break;
 
-            foreach (var item in batchResult) yield return item;
+            var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
+            if (batch.Count == 0)
+                break;
 
-            batch++;
+            foreach (var item in batch)
+                yield return item;
+
+            batchNumber++;
         }
     }
 }

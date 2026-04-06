@@ -1,0 +1,2 @@
+public record Department(string Name, List<string> Employees);  
+public class StaffDirectory {public static List<string> GetAllEmployees(IEnumerable<Department> departments) {var result = departments.SelectMany(d => d.Employees).ToList();return result.OrderBy(s => s.Name).ToList();}

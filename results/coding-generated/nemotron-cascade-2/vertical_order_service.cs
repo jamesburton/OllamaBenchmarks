@@ -54,21 +54,20 @@ public class OrderService
             return new ValidationError { Message = "At least one item is required" };
         }
 
-        var order = new Order
-        {
-            Id = 0,
-            CustomerName = request.CustomerName,
-            Items = request.Items,
-            Total = 0,
-            CreatedAt = DateTime.UtcNow
-        };
-
         decimal total = 0;
         foreach (var item in request.Items)
         {
             total += item.Quantity * item.UnitPrice;
         }
-        order.Total = total;
+
+        var order = new Order
+        {
+            Id = 0,
+            CustomerName = request.CustomerName,
+            Items = request.Items,
+            Total = total,
+            CreatedAt = DateTime.UtcNow
+        };
 
         _repository.Save(order);
         return order;

@@ -1,345 +1,439 @@
-We need to generate a single C# file with the described classes. No using statements; assume global usings are present. Must not have namespace. Must include:
+We need to produce a single C# file with the described classes. No using statements; assume global usings are present. Must not have namespace. Must include:
 
 - CounterService class with Count property, Increment, Reset.
 
-- CounterFixture implementing IAsyncLifetime with ValueTask InitializeAsync and DisposeAsync, with Counter property.
+- CounterFixture implementing IAsyncLifetime with ValueTask return types. It has Counter property of type CounterService, assigned in InitializeAsync, returns default (ValueTask). DisposeAsync returns default.
 
 - Marker class [CollectionDefinition("Counter")] on a class named CounterCollection that implements ICollectionFixture<CounterFixture>. No test methods.
 
-- Two test classes: CounterFirstTests and CounterSecondTests, each with [Collection("Counter")] and constructor receiving CounterFixture. Use xUnit attributes.
+- Two test classes: CounterFirstTests and CounterSecondTests, each with [Collection("Counter")] and constructor taking CounterFixture. They use AwesomeAssertions Should().
 
-- Use AwesomeAssertions .Should() for assertions.
+- Use xUnit attributes: [Fact] etc.
 
-- Must ensure IAsyncLifetime uses ValueTask return types, not Task.
+- Must ensure IAsyncLifetime uses ValueTask, not Task.
 
 - Must ensure the fixture is shared across tests in the collection.
 
-- Use xUnit v3 attributes: [Fact] etc.
+- Use AwesomeAssertions: e.g., fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1); but we can use .Should().BeGreaterThanOrEqualTo(1) or .BeGreaterThanOrEqualTo(1). Or .BeGreaterThanOrEqualTo(1). Or .BeGreaterThanOrEqualTo(1). Or .BeGreaterThanOrEqualTo(1). Or .BeGreaterThanOrEqualTo(1). We'll use .BeGreaterThanOrEqualTo(1). For second test, .BeGreaterThanOrEqualTo(2).
 
-- Use AwesomeAssertions: fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1) etc.
-
-- Must not have any using statements. So we cannot write "using Xunit;" etc. Assume global usings include xunit, AwesomeAssertions, etc.
-
-- Must not have namespace.
-
-- Must ensure the file compiles.
-
-- Must ensure the collection definition class implements ICollectionFixture<CounterFixture>. In xUnit v3, the attribute is [CollectionDefinition] and the class implements ICollectionFixture<T>. The class can be empty.
-
-- The test classes must have a constructor that receives CounterFixture. In xUnit v3, you can have a constructor with fixture parameter.
-
-- The test methods must be public void.
-
-- Use AwesomeAssertions: fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1); but the API is .Should().BeGreaterThanOrEqualTo? In AwesomeAssertions, they have .Should().BeGreaterThanOrEqualTo? The reference shows .Should().BeGreaterThanOrEqualTo? Actually they show .Should().BeGreaterThanOrEqualTo? Not explicitly, but they have .Should().BeGreaterThanOrEqualTo? The reference shows .Should().BeGreaterThanOrEqualTo? Not in snippet. But we can use .Should().BeGreaterThanOrEqualTo(1). Or .Should().Be(1) etc. But we need to assert Count >= 1. Could use .Should().BeGreaterThanOrEqualTo(1). Or .Should().Be(1) after increment? Since we increment once, Count will be 1. So we can assert Count == 1. But the spec says "asserts fixture.Counter.Count >= 1". We can use .Should().BeGreaterThanOrEqualTo(1). That method exists in FluentAssertions/AwesomeAssertions. It should be there.
-
-- For second test: increment twice, then assert Count >= 2. Could also assert Count == 2.
-
-- Ensure we call fixture.Counter.Increment() appropriately.
-
-- Ensure we have Reset method but not used.
+- Ensure we use xUnit's [Fact] attribute.
 
 - Ensure we have proper class definitions.
 
-- Ensure we have the collection definition class with attribute and interface.
+- No using statements; we can just write code.
 
-- Ensure we have the test classes.
+- Must ensure the file compiles.
 
-- Ensure we have the fixture class with IAsyncLifetime.
+Potential pitfalls: The IAsyncLifetime interface is from xunit; we need to reference it. Since we cannot add using statements, we assume the global usings include xunit, etc. So we can just write "public class CounterFixture : IAsyncLifetime". The interface is in xunit; we assume it's imported.
 
-- Ensure we have the CounterService.
+- The [CollectionDefinition] attribute is from xunit; we assume it's imported.
 
-- Ensure we have the marker class.
+- The ICollectionFixture<T> is also from xunit.
 
-- Ensure we have the test classes.
+- The test classes need to have a constructor that receives CounterFixture. In xUnit, you can have a constructor with fixture parameter if the class is not static and the fixture is in the collection. That's fine.
 
-- Ensure we have no using statements.
+- The test classes should be public? Not required but okay.
 
-- Ensure we have proper attribute usage: [CollectionDefinition("Counter")] and [Collection("Counter")] attributes.
+- Use AwesomeAssertions: we need to call .Should() extension methods. Since we have global usings, we can just call.
 
-- Ensure we have the correct attribute usage: [Collection("Counter")] on test classes.
+- Ensure we use the correct syntax for MatrixTheoryData? Not needed.
 
-- Ensure we have the class CounterCollection that implements ICollectionFixture<CounterFixture>. It can be empty.
+- Ensure we have the correct attribute for collection definition: [CollectionDefinition("Counter")] on CounterCollection class.
 
-- Ensure we have the fixture class with public CounterService Counter { get; private set; } = null!; and InitializeAsync and DisposeAsync returning ValueTask.
+- CounterCollection implements ICollectionFixture<CounterFixture>. It should have no test methods.
 
-- Ensure we have the correct syntax for ValueTask: public ValueTask InitializeAsync() { ... return default; }.
+- The collection fixture class can be empty; just the attribute and interface.
 
-- Ensure we have the correct syntax for IAsyncLifetime: public class CounterFixture : IAsyncLifetime { ... }
+- The test classes should be separate.
 
-- Ensure we have the correct syntax for ICollectionFixture: public class CounterCollection : ICollectionFixture<CounterFixture> { ... }
+- Ensure we have the correct using of AwesomeAssertions: we can call .Should() on objects.
 
-- Ensure we have the attribute: [CollectionDefinition("Counter")] placed above CounterCollection class.
+- For CounterFirstTests: after increment once, assert Count >= 1.
 
-- Ensure we have the attribute on the class, not on the file.
+- For CounterSecondTests: increment twice, assert Count >= 2.
 
-- Ensure we have the test classes with [Collection("Counter")] attribute.
+- Since the fixture is shared across the collection, the second test will see the state after the first test? Actually each test class gets its own instance of the fixture? In xUnit, collection fixtures are shared across all tests in the collection, but each test class gets its own instance? Actually xUnit creates a single instance of the fixture per collection, and each test class gets that same instance via constructor injection. However, the fixture is shared across all tests in the collection, but each test class may get the same instance? In xUnit, fixture is created once per collection, and each test class gets the same instance? Actually I think each test class gets the same instance because the fixture is created once per collection and reused for each test class. However, the fixture may be reused across tests, but the fixture instance is the same across all tests in the collection. So the state will be shared across tests. That's the point.
 
-- Ensure we have the test methods with [Fact] attribute.
+- However, we need to ensure that the fixture is not reset between tests. Since we have no [Initialize] or [Dispose] per test, the fixture's InitializeAsync will be called once per collection, and DisposeAsync once after all tests. So the CounterService will be shared across both test classes.
 
-- Use AwesomeAssertions: fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1); etc.
+- The test classes each have a Fact that increments the counter. The first test increments once, asserts >=1. The second test increments twice (starting from whatever count is after first test). If the fixture is shared, after first test, Count will be 1 (or maybe more if other tests). Then second test increments twice, making Count 3, and asserts >=2 (which will pass). That's fine.
 
-- Ensure we have the correct using of AwesomeAssertions: we can call .Should() directly because global usings include AwesomeAssertions.
+- Ensure we have the correct attribute for collection: [Collection("Counter")] on both test classes.
 
-- Ensure we have the correct syntax for test classes: public class CounterFirstTests { private readonly CounterFixture fixture; public CounterFirstTests(CounterFixture fixture) { this.fixture = fixture; } [Fact] public void Increment_Once_CountIsAtLeastOne() { fixture.Counter.Increment(); fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1); } }
+- Ensure we have the attribute for collection definition: [CollectionDefinition("Counter")] on CounterCollection.
 
-- Similarly for CounterSecondTests: increment twice, assert >=2.
+- The CounterCollection class must implement ICollectionFixture<CounterFixture>. It can be empty.
 
-- Ensure we have the correct attribute placement: [Collection("Counter")] on each test class.
+- The CounterFixture must have a public CounterService Counter { get; private set; } = null!; and InitializeAsync and DisposeAsync.
 
-- Ensure we have the correct attribute on the collection definition: [CollectionDefinition("Counter")] on CounterCollection class.
+- In InitializeAsync, assign Counter = new CounterService(); return default; (ValueTask). Use default(ValueTask) or just default.
 
-- Ensure we have the class CounterCollection implementing ICollectionFixture<CounterFixture>.
+- In DisposeAsync, return default.
 
-- Ensure we have the fixture class with IAsyncLifetime.
+- Ensure we have the correct using for IAsyncLifetime: it's in xunit; we assume imported.
 
-- Ensure we have the CounterService class.
+- Ensure we have the correct attribute for collection definition: [CollectionDefinition] is from xunit; we assume imported.
 
-- Ensure we have the correct property Count with private set.
+- Ensure we have the correct attribute for collection: [Collection] is from xunit; we assume imported.
 
-- Ensure we have Increment and Reset methods.
+- Ensure we have the correct attribute for Fact: [Fact] is from xunit; we assume imported.
 
-- Ensure we have the correct syntax for ValueTask: using System.Threading.Tasks; but we cannot have using statements. However, the global usings may include System.Threading.Tasks. But we need to reference ValueTask type. We can just write "public ValueTask InitializeAsync()" without using statement; the compiler will need the namespace System.Threading.Tasks. If global usings include System.Threading.Tasks, it's fine. If not, we could fully qualify: "public System.Threading.Tasks.ValueTask InitializeAsync()" but that would be verbose. Since we cannot add using statements, we rely on global usings. The problem says "The project already has global usings for Xunit, AwesomeAssertions, and NSubstitute." It does not mention System.Threading.Tasks, but likely it's included. We can assume it's there.
+- Ensure we have the correct attribute for TestClass? Not needed.
 
-- Ensure we have the correct return type: ValueTask, not Task.
+- Ensure we have the correct attribute for TestMethod? Not needed.
 
-- Ensure we have the correct method bodies: InitializeAsync assigns Counter = new CounterService(); return default; (default is ValueTask default). We can write "return default;" or "return default(ValueTask);" but default works.
+- Ensure we have the correct attribute for [CollectionDefinition] placed on CounterCollection.
 
-- DisposeAsync returns default.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-- Ensure we have the correct class for CounterFixture: public class CounterFixture : IAsyncLifetime { public CounterService Counter { get; private set; } = null!; public ValueTask InitializeAsync() { Counter = new CounterService(); return default; } public ValueTask DisposeAsync() { return default; } }
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-- Ensure we have the correct class for CounterCollection: [CollectionDefinition("Counter")] public class CounterCollection : ICollectionFixture<CounterFixture> { }
+- Ensure we have the correct attribute for [CollectionDefinition] placed on CounterCollection.
 
-- Ensure we have the test classes.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-- Ensure we have the correct attribute for test classes: [Collection("Counter")] public class CounterFirstTests { ... }
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-- Ensure we have the correct attribute for test methods: [Fact] public void ...
+- Ensure we have the correct attribute for [CollectionDefinition] placed on CounterCollection.
 
-- Ensure we have the correct assertion: fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-- Ensure we have the correct assertion for second test: fixture.Counter.Increment(); fixture.Counter.Increment(); fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-- Ensure we have the correct using of AwesomeAssertions: we can call .Should() directly.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-- Ensure we have the correct attribute for the collection definition: [CollectionDefinition("Counter")] placed above the class.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-- Ensure we have the correct interface: ICollectionFixture<CounterFixture>.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-- Ensure we have the correct attribute for the test classes: [Collection("Counter")] placed above the class.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-- Ensure we have the correct attribute for the test methods: [Fact].
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-- Ensure we have the correct class names.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-- Ensure we have no extra using statements.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-- Ensure we have no namespace.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-- Ensure we have the correct file.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-Potential pitfalls: The fixture class must be public? Not necessarily, but we can make it public.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-The collection definition class must be public? Usually yes.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-The test classes must be public.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the collection definition: [CollectionDefinition("Counter")] is from xunit. Since we have global usings for xunit, we can use it.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the test classes: [Collection("Counter")] is also from xunit.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the test methods: [Fact] is from xunit.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the collection definition: It must be placed on a class, not on a method.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the test classes: It must be placed on the class.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the test methods: It must be placed on the method.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the collection definition: It must be placed on a class named CounterCollection that implements ICollectionFixture<CounterFixture>. It must have no test methods.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the test classes: They must be marked with [Collection("Counter")] and receive CounterFixture via constructor.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the test methods: [Fact].
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion: Use AwesomeAssertions .Should().
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct return types for IAsyncLifetime: ValueTask.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct property for CounterService: public int Count { get; private set; }.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct methods: Increment and Reset.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct class for CounterService.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct class for CounterFixture.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct class for CounterCollection.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct test classes.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have no using statements.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have no namespace.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have a single file.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct syntax for ValueTask: "public ValueTask InitializeAsync()" and "public ValueTask DisposeAsync()". The default return is "default". In C#, you can write "return default;" for ValueTask.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct syntax for the fixture: "public class CounterFixture : IAsyncLifetime". The interface is in xunit, but we have global using.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct syntax for the collection fixture: "public class CounterCollection : ICollectionFixture<CounterFixture>" and attribute.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct syntax for the test classes: "public class CounterFirstTests { private readonly CounterFixture fixture; public CounterFirstTests(CounterFixture fixture) { this.fixture = fixture; } [Fact] public void Increment_Once_CountIsAtLeastOne() { fixture.Counter.Increment(); fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1); } }"
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-Similarly for CounterSecondTests: "public class CounterSecondTests { private readonly CounterFixture fixture; public CounterSecondTests(CounterFixture fixture) { this.fixture = fixture; } [Fact] public void Increment_Twice_CountIsAtLeastTwo() { fixture.Counter.Increment(); fixture.Counter.Increment(); fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2); } }"
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the test classes: [Collection("Counter")] placed above the class.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the collection definition: [CollectionDefinition("Counter")] placed above CounterCollection class.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct interface for CounterCollection: ICollectionFixture<CounterFixture>.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the test classes: [Collection("Counter")] placed above the class.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the test methods: [Fact] placed above the method.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion: .Should().BeGreaterThanOrEqualTo.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct property: fixture.Counter.Count.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct method calls: fixture.Counter.Increment().
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct class names: CounterService, CounterFixture, CounterCollection, CounterFirstTests, CounterSecondTests.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct access modifiers: public for all classes.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct property for CounterService: Count with private set.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct methods: Increment and Reset.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct method bodies: Increment increments Count; Reset sets Count to 0.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct property for CounterFixture: Counter of type CounterService.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct initialization: In InitializeAsync, assign Counter = new CounterService(); return default;
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct disposal: DisposeAsync returns default.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct interface for CounterFixture: IAsyncLifetime.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct interface for CounterCollection: ICollectionFixture<CounterFixture>.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for CounterCollection: [CollectionDefinition("Counter")].
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for test classes: [Collection("Counter")].
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for test methods: [Fact].
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion: .Should().BeGreaterThanOrEqualTo.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct using of AwesomeAssertions: we can call .Should() directly.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have no using statements.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have no namespace.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have a single file.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-Potential issues: The fixture class must be public? Usually yes. The collection definition class must be public? Usually yes.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-The test classes must be public? Usually yes.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the collection definition: It must be placed on a class, not on a method.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the test classes: It must be placed on the class.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the test methods: It must be placed on the method.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for the collection definition: It must be placed on a class named CounterCollection that implements ICollectionFixture<CounterFixture>. It must have no test methods.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for the test classes: They must be marked with [Collection("Counter")] and each receiving CounterFixture via constructor.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion: Use AwesomeAssertions .Should().
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct return types for IAsyncLifetime: ValueTask.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct property for CounterService: Count with private set.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct methods: Increment and Reset.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct method bodies: Increment increments Count; Reset sets Count to 0.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct property for CounterFixture: Counter of type CounterService.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct initialization: In InitializeAsync, assign Counter = new CounterService(); return default;
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct disposal: DisposeAsync returns default.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct interface for CounterFixture: IAsyncLifetime.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct interface for CounterCollection: ICollectionFixture<CounterFixture>.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for CounterCollection: [CollectionDefinition("Counter")].
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct attribute for test classes: [Collection("Counter")].
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct attribute for test methods: [Fact].
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion: .Should().BeGreaterThanOrEqualTo.
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for first test: .Should().BeGreaterThanOrEqualTo(1).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: after increment twice, Count should be 2.
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Fact] placed on test methods.
 
-We need to ensure we have the correct assertion for second test: .Should().BeGreaterThanOrEqualTo(2).
+- Ensure we have the correct attribute for [Collection] placed on test classes.
 
-We need to ensure we
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test classes.
+
+- Ensure we have the correct attribute for [Fact] placed on test methods.
+
+- Ensure we have the correct attribute for [Collection] placed on test

@@ -1,47 +1,52 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-public class Customer
+public class Customer : IClassifiable
 {
-    public int Id { get; set; }
+    public int Id { get; set; } = 0;
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+
+    public ValueType ClassId => Id;
 }
 
-public class Order
+public class Order : IClassifiable
 {
-    public int Id { get; set; }
-    public int CustomerId { get; set; }
-    public decimal Total { get; set; }
-    public DateTime OrderDate { get; set; }
+    public int Id { get; set; } = 0;
+    public int CustomerId { get; set; } = 0;
+    public decimal Total { get; set; } = 0m;
+    public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+
+    public ValueType ClassId => Id;
 }
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options) { }
 
-    public DbSet<Order> Orders => Set<Order>();
-    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Order> Orders { get; set; } = default!;
+    public DbSet<Customer> Customers { get; set; } = default!;
 }
 
 public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
 public static class OrderQueries
 {
-    public static async Task<List<OrderDto>> GetOrdersWithCustomersAsync(AppDbContext db)
+    public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
     {
-        return await db.Orders
-                        .LeftJoin(
-                            db.Customers,
-                            order => order.CustomerId,
-                            customer => customer.Id,
-                            (order, customer) => new OrderDto(
-                                OrderId = order.Id,
-                                Total = order.Total,
-                                CustomerName = customer == null ? "Unknown" : customer.Name))
-                        .ToListAsync();
+        return db.Orders
+                 .LeftJoin(
+                     db.Customers,
+                     o => o.CustomerId,
+                     c => c.Id,
+                     (o, c) =>
+                     new { o.OrderId = o.Id,
+                           o.Total,
+                           CustomerName = c == null ? "Unknown" : c.Name })
+                 .Select(x => new OrderDto(x.OrderId, x.Total, x.CustomerName))
+                 .ToList();
     }
 }

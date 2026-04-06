@@ -1,0 +1,42 @@
+using Microsoft.AspNetCore.Http;
+
+// 1. CreateProductRequest record
+public record CreateProductRequest(string Name, decimal Price);
+
+// 2. ProductResponse record
+public record ProductResponse(int Id, string Name, decimal Price);
+
+// 3. Static class with endpoint method
+public static class ProductEndpoints
+{
+    private static int _idCounter = 0;
+
+    public static IResult CreateProduct(CreateProductRequest request)
+    {
+        // Validate Name
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return Results.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    ["Name"] = ["Name is required."]
+                });
+        }
+
+        // Validate Price
+        if (request.Price <= 0)
+        {
+            return Results.ValidationProblem(
+                new Dictionary<string, string[]>
+                {
+                    ["Price"] = ["Price must be greater than zero."]
+                });
+        }
+
+        // Create product with incremented ID
+        int id = ++_idCounter;
+        var product = new ProductResponse(id, request.Name, request.Price);
+
+        return Results.Ok(product);
+    }
+}

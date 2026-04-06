@@ -1,30 +1,27 @@
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
-namespace
+[Fact]
+public void ProcessPaymentConsumer_ProcessesMessage_PublishesPaymentProcessed()
 {
-    public class ProcessPaymentConsumer_ShouldProcessAndPublish
-    {
-        [Fact]
-        public async Task ProcessPaymentConsumer_ShouldProcessAndPublish()
-        {
-            var provider = new ServiceCollection()
-                .AddMassTransitTestHarness(() => cfg => cfg.AddConsumer<ProcessPaymentConsumer>())
-                .BuildServiceProvider(true);
+    var provider = new ServiceCollection()
+        .AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>())
+        .BuildServiceProvider(true);
 
-            ITestHarness harness = provider.GetRequiredService<ITestHarness>();
-            await harness.Start();
-            await harness.Publish(new ProcessPayment(Guid.NewGuid(), 1m));
+    var harness = provider.GetRequiredService<ITestHarness>();
+    await harness.Start();
 
-            var consumedOk = await harness.Consumed.Any<ProcessPayment>();
-            var publishedOk = await harness.Published.Any<PaymentProcessed>();
-            Assert.Multiple(() => Assert.True(consumedOk), () => Assert.True(publishedOk));
-        }
-    }
+    var orderId = Guid.NewGuid();
+    var msg = new ProcessPayment(orderId, 0m);
+    await harness.Bus.Publish(msg);
+
+    var publishedEvent = await harness.Bus.GetMessages(PaymentProcessed);
+    Assert.NotNull(publishedEvent, "A PaymentProcessed event should have been published");
+    Assert.Equal(orderId, publishedEvent.OrderId);
+
+    var consumed = await harness.Consumed.Any<ProcessPayment>().ConfigureAwait(false);
+    var published = await harness.Published.Any<PaymentProcessed>().ConfigureAwait(false);
+    Assert.True(consumed);
+    Assert.True(published);
 }

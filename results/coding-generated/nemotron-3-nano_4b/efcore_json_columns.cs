@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.ModelConfiguration;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+using System.Linq;
+using System.Threading.Tasks;
 
 public class Address
 {
@@ -27,19 +24,20 @@ public class CompanyDbContext : DbContext
 
     public DbSet<Company> Companies { get; set; }
 
-    public override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(DbModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Company>()
-            .OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
+            .OwnsOne(c => c.HeadquartersAddress, b => b.ToJson());
     }
 }
 
 public static class CompanyQueries
 {
-    public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
+    public static async Task<List<Company>> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        return db.Companies
-                 .Where(c => c.HeadquartersAddress.City == city)
-                 .ToList();
+        return await db.Companies
+            .Where(c => c.HeadquartersAddress.City == city)
+            .ToListAsync();
     }
 }
