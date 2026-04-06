@@ -71,6 +71,17 @@ def load_task(yaml_path: str, references_dir: str) -> dict:
     return task
 
 
+def _load_prompt_config(model: str) -> dict | None:
+    """Load prompt optimizer config for a model, if it exists."""
+    config_dir = os.path.join(os.path.dirname(__file__), "..", "prompt_configs")
+    slug = re.sub(r"[^\w\.-]", "_", model.replace(":", "_").replace("/", "_"))
+    config_path = os.path.join(config_dir, f"{slug}.json")
+    if os.path.isfile(config_path):
+        with open(config_path, "r", encoding="utf-8") as fh:
+            return json.load(fh)
+    return None
+
+
 def call_ollama(
     model: str,
     prompt: str,
@@ -85,9 +96,19 @@ def call_ollama(
     Returns empty string on timeout or connection error (does not crash).
     """
     options = sampling_options(model)
+
+    # Check for prompt optimizer config override
+    config = _load_prompt_config(model)
+    messages = []
+    if config and config.get("system_prompt"):
+        messages.append({"role": "system", "content": config["system_prompt"]})
+    if config and config.get("sampling"):
+        options.update(config["sampling"])
+    messages.append({"role": "user", "content": prompt})
+
     payload = {
         "model": model,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": messages,
         "stream": False,
         # Note: do NOT set "think": false — some models (qwen3-coder-next on
         # Ollama 0.20.2) crash with 500 error when thinking is disabled.
