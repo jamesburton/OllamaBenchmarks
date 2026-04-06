@@ -1,11 +1,11 @@
 using System.Runtime.CompilerServices;
 
-interface IDataSource
+public interface IDataSource
 {
     Task<IReadOnlyList<string>> FetchBatchAsync(int batchNumber, CancellationToken ct);
 }
 
-class DataProcessor
+public class DataProcessor
 {
     public async IAsyncEnumerable<string> ProcessAllBatchesAsync(
         IDataSource source,

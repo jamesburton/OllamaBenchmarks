@@ -58,12 +58,11 @@ public class OrderService
         {
             CustomerName = request.CustomerName,
             Items = request.Items,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Total = request.Items.Sum(item => item.Quantity * item.UnitPrice)
         };
 
-        order.Total = request.Items.Sum(item => item.Quantity * item.UnitPrice);
         _repository.Save(order);
-
         return order;
     }
 }

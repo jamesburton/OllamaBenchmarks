@@ -2,10 +2,10 @@ using System.Threading;
 
 public class SharedCounter : IAsyncLifetime
 {
-    private int _counter;
+    private int counter;
     public ValueTask InitializeAsync()
     {
-        _counter = 0;
+        counter = 0;
         return default;
     }
     public ValueTask DisposeAsync()
@@ -14,7 +14,7 @@ public class SharedCounter : IAsyncLifetime
     }
     public int IncrementAndGet()
     {
-        return Interlocked.Increment(ref _counter);
+        return Interlocked.Increment(ref counter);
     }
 }
 
@@ -26,23 +26,21 @@ public class FirstCounterTests
         _counter = counter;
     }
     [Fact]
-    public void Increment_ReturnsPositive()
+    public void TestIncrement()
     {
-        var value = _counter.IncrementAndGet();
+        int value = _counter.IncrementAndGet();
         Assert.True(value > 0);
     }
 }
 
 public class SecondCounterTests
 {
-    public SecondCounterTests()
-    {
-    }
+    public SecondCounterTests() { }
     [Fact]
-    public void Increment_ReturnsPositiveViaTestContext()
+    public void TestIncrementViaTestContext()
     {
         var counter = TestContext.Current.GetFixture<SharedCounter>();
-        var value = counter.IncrementAndGet();
+        int value = counter.IncrementAndGet();
         Assert.True(value > 0);
     }
 }

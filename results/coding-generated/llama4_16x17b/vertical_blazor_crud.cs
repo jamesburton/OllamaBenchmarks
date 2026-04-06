@@ -58,6 +58,7 @@ public partial class TodoListBase : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         await LoadTodosAsync();
     }
 
@@ -138,12 +139,12 @@ public class TodoListBaseTests
     public async Task RendersCorrectly()
     {
         // Arrange
+        var ctx = new TestContext();
         var service = Substitute.For<ITodoService>();
         service.GetAllAsync().Returns(new List<TodoItem>());
 
         // Act
-        var ctx = new TestContext();
-        var cut = ctx.RenderComponent<TodoListBase>();
+        var cut = ctx.RenderComponent<TodoListBase>(parameters => parameters.Inject(service));
 
         // Assert
         cut.Markup.Should().NotBeNull();

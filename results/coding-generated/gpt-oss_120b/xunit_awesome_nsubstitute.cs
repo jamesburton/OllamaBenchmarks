@@ -29,7 +29,7 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 public class NotificationServiceTests
 {
     [Fact]
-    public async Task NotifyUserAsync_UserExists_SendsWelcomeEmail()
+    public async Task NotifyUserAsync_UserFound_SendsWelcomeEmail()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
@@ -38,10 +38,11 @@ public class NotificationServiceTests
 
         var userId = 42;
         var user = new User { Id = userId, Name = "Alice", Email = "alice@example.com" };
-        repo.GetByIdAsync(userId).Returns(user); // NSubstitute auto‑wraps in Task
+        repo.GetByIdAsync(userId).Returns(user);
 
         // Act
-        await service.NotifyUserAsync(userId);
+        Func<Task> act = () => service.NotifyUserAsync(userId);
+        await act.Should().NotThrowAsync();
 
         // Assert
         repo.Received(1).GetByIdAsync(userId);
@@ -57,13 +58,13 @@ public class NotificationServiceTests
         var service = new NotificationService(repo, email);
 
         var userId = 99;
-        repo.GetByIdAsync(userId).Returns((User?)null); // return null
+        repo.GetByIdAsync(userId).Returns((User?)null);
 
         // Act
         Func<Task> act = () => service.NotifyUserAsync(userId);
+        await act.Should().ThrowAsync<InvalidOperationException>();
 
         // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>();
         repo.Received(1).GetByIdAsync(userId);
         email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }

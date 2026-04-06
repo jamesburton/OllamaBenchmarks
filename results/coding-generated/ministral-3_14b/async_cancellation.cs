@@ -12,7 +12,6 @@ public class DataProcessor
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         int batchNumber = 0;
-
         while (true)
         {
             if (ct.IsCancellationRequested)

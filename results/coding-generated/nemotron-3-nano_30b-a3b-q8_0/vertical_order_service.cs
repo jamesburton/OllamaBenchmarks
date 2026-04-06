@@ -11,15 +11,15 @@ public class Order
 {
     public int Id { get; set; }
     public string CustomerName { get; set; }
-    public List<OrderItem> Items { get; set; } = new();
+    public System.Collections.Generic.List<OrderItem> Items { get; set; }
     public decimal Total { get; set; }
-    public DateTime CreatedAt { get; set; }
+    public System.DateTime CreatedAt { get; set; }
 }
 
 public class CreateOrderRequest
 {
     public string CustomerName { get; set; }
-    public List<OrderItem> Items { get; set; } = new();
+    public System.Collections.Generic.List<OrderItem> Items { get; set; }
 }
 
 public class ValidationError
@@ -42,27 +42,29 @@ public class OrderService
     {
         if (string.IsNullOrEmpty(request.CustomerName))
         {
-            return OneOf<Order, ValidationError>.FromT1(new ValidationError { Message = "Customer name is required" });
+            return new ValidationError { Message = "Customer name is required" };
         }
 
-        if (request.Items == null || request.Items.Count == 0)
+        var items = request.Items;
+        if (items == null || items.Count == 0)
         {
-            return OneOf<Order, ValidationError>.FromT1(new ValidationError { Message = "At least one item is required" });
+            return new ValidationError { Message = "At least one item is required" };
+        }
+
+        decimal total = 0m;
+        foreach (var item in items)
+        {
+            total += item.Quantity * item.UnitPrice;
         }
 
         var order = new Order
         {
             Id = 0,
             CustomerName = request.CustomerName,
-            Items = request.Items,
-            Total = 0,
-            CreatedAt = DateTime.UtcNow
+            Items = items,
+            Total = total,
+            CreatedAt = System.DateTime.UtcNow
         };
-
-        foreach (var item in request.Items)
-        {
-            order.Total += item.Quantity * item.UnitPrice;
-        }
 
         _repository.Save(order);
         return OneOf<Order, ValidationError>.FromT0(order);

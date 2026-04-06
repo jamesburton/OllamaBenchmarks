@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public record Sale(string Product, string Category, decimal Amount, DateOnly Date);
+record Sale(string Product, string Category, decimal Amount, DateOnly Date);
+record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
 
-public record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
-
-static class SalesAnalyzer
+public static class SalesAnalyzer
 {
     public static List<CategorySummary> SummarizeByCategory(IEnumerable<Sale> sales)
     {
@@ -14,9 +13,10 @@ static class SalesAnalyzer
             .GroupBy(s => s.Category)
             .Select(g => new CategorySummary(
                 g.Key,
-                TotalAmount: g.Sum(s => s.Amount),
-                AverageAmount: g.Average(s => s.Amount),
-                Count: g.Count()))
+                g.Sum(s => s.Amount),
+                g.Average(s => s.Amount),
+                g.Count()
+            ))
             .OrderByDescending(cs => cs.TotalAmount)
             .ToList();
     }

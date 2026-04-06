@@ -7,9 +7,7 @@ public interface IDataSource
 
 public class DataProcessor
 {
-    public async System.Collections.Generic.IAsyncEnumerable<string> ProcessAllBatchesAsync(
-        IDataSource source,
-        [EnumeratorCancellation] System.Threading.CancellationToken ct = default)
+    public async System.Collections.Generic.IAsyncEnumerable<string> ProcessAllBatchesAsync(IDataSource source, [EnumeratorCancellation] System.Threading.CancellationToken ct = default)
     {
         int batchNumber = 0;
         while (true)

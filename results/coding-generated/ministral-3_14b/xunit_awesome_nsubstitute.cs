@@ -62,7 +62,7 @@ public class NotificationServiceTests
     }
 
     [Fact]
-    public async Task NotifyUserAsync_VerifiesCorrectMethodCalls()
+    public async Task NotifyUserAsync_VerifiesCorrectCalls_WhenUserFound()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();

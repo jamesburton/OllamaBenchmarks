@@ -36,7 +36,7 @@ public class OrderSettings
     public int MaxRetries { get; set; }
 }
 
-// 8. Extension method to register services and bind settings
+// 8. Extension method to register services and bind options
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config)

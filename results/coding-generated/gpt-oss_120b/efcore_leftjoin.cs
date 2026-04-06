@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace EfCore10Sample
 {
-    // Entity classes
+    // 1. Customer entity
     public class Customer
     {
         public int Id { get; set; }
@@ -13,6 +12,7 @@ namespace EfCore10Sample
         public string Email { get; set; } = null!;
     }
 
+    // 2. Order entity
     public class Order
     {
         public int Id { get; set; }
@@ -21,7 +21,7 @@ namespace EfCore10Sample
         public DateTime OrderDate { get; set; }
     }
 
-    // DbContext
+    // 3. DbContext
     public class AppDbContext : DbContext
     {
         public DbSet<Customer> Customers => Set<Customer>();
@@ -33,24 +33,24 @@ namespace EfCore10Sample
         }
     }
 
-    // DTO
+    // 4. DTO record
     public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
-    // Query helper
+    // 5. Query helper using EF Core 10 LeftJoin
     public static class OrderQueries
     {
-        public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
+        public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
         {
             var query = db.Orders.LeftJoin(
                 db.Customers,
                 order => order.CustomerId,
                 customer => customer.Id,
                 (order, customer) => new OrderDto(
-                    OrderId: order.Id,
-                    Total: order.Total,
-                    CustomerName: customer == null ? "Unknown" : customer.Name));
+                    order.Id,
+                    order.Total,
+                    customer == null ? "Unknown" : customer.Name));
 
-            return await query.ToListAsync();
+            return query.ToList();
         }
     }
 }

@@ -48,7 +48,7 @@ public class NotificationServiceTests
     }
 
     [Fact]
-    public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
+    public async Task NotifyUserAsync_UserNotFound_Throws()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
@@ -64,18 +64,21 @@ public class NotificationServiceTests
     }
 
     [Fact]
-    public async Task NotifyUserAsync_GetUserFails_ThrowsInvalidOperationException()
+    public async Task NotifyUserAsync_GetUserCalled()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
         var email = Substitute.For<IEmailService>();
         var userId = 1;
-        repo.GetByIdAsync(userId).Returns(Task.FromResult((User?)null));
+        var user = new User { Id = userId, Email = "test@example.com" };
+        repo.GetByIdAsync(userId).Returns(user);
 
         var service = new NotificationService(repo, email);
 
-        // Act and Assert
-        await service.Invoking(s => s.NotifyUserAsync(userId))
-            .Should().ThrowAsync<InvalidOperationException>();
+        // Act
+        await service.NotifyUserAsync(userId);
+
+        // Assert
+        repo.Received(1).GetByIdAsync(userId);
     }
 }

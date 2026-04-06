@@ -38,7 +38,8 @@ public static class ProductOperations
             product.LastModified = DateTime.UtcNow;
         }
 
-        // SaveChangesAsync returns the number of state entries written to the database.
+        // SaveChangesAsync returns the number of state entries written to the database,
+        // which corresponds to the number of products updated in this case.
         return await db.SaveChangesAsync();
     }
 }

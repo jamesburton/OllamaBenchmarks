@@ -1,7 +1,8 @@
+global using Contracts;
 using MassTransit;
 using System;
-
-global using Contracts;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Contracts
 {
@@ -25,8 +26,8 @@ namespace Contracts
         }
 
         protected override void ConfigureConsumer(IReceiveEndpointConfigurator ep,
-            IConsumerConfigurator<SubmitOrderConsumer> consumer,
-            IRegistrationContext ctx)
+                                                  IConsumerConfigurator<SubmitOrderConsumer> consumer,
+                                                  IRegistrationContext ctx)
         {
             ep.UseMessageRetry(r => r.Interval(3, 1000));
         }

@@ -11,15 +11,15 @@ public class Order
 {
     public int Id { get; set; }
     public string CustomerName { get; set; } = null!;
-    public System.Collections.Generic.List<OrderItem> Items { get; set; } = new();
+    public List<OrderItem> Items { get; set; } = new();
     public decimal Total { get; set; }
-    public System.DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 public class CreateOrderRequest
 {
     public string CustomerName { get; set; } = null!;
-    public System.Collections.Generic.List<OrderItem> Items { get; set; } = new();
+    public List<OrderItem> Items { get; set; } = new();
 }
 
 public class ValidationError
@@ -58,14 +58,15 @@ public class OrderService
         {
             CustomerName = request.CustomerName,
             Items = request.Items,
-            CreatedAt = System.DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow
         };
 
-        decimal total = 0m;
+        decimal total = 0;
         foreach (var item in order.Items)
         {
             total += item.Quantity * item.UnitPrice;
         }
+
         order.Total = total;
 
         _repository.Save(order);

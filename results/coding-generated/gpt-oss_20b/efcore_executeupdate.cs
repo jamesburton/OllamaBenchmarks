@@ -1,7 +1,7 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 public class Product
 {
@@ -36,7 +36,6 @@ public static class ProductOperations
             product.LastModified = DateTime.UtcNow;
         }
 
-        var affected = await db.SaveChangesAsync();
-        return affected;
+        return await db.SaveChangesAsync();
     }
 }

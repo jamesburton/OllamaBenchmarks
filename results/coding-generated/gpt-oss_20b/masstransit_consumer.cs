@@ -1,7 +1,8 @@
 global using Contracts;
-using MassTransit;
+
 using System;
 using System.Threading.Tasks;
+using MassTransit;
 
 namespace Contracts;
 
@@ -13,8 +14,7 @@ public class SubmitOrderConsumer : IConsumer<SubmitOrder>
 {
     public async Task Consume(ConsumeContext<SubmitOrder> context)
     {
-        var msg = context.Message;
-        await context.Publish(new OrderSubmitted(msg.OrderId, DateTime.UtcNow));
+        await context.Publish(new OrderSubmitted(context.Message.OrderId, DateTime.UtcNow));
     }
 }
 

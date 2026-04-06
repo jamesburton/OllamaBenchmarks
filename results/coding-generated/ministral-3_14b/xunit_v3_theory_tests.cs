@@ -33,10 +33,10 @@ public class StringProcessorTests
 
     [Theory]
     [InlineData("", 10, "")]
+    [InlineData("hello", 10, "hello")]
     [InlineData("hello", 5, "hello")]
     [InlineData("hello", 3, "hel...")]
-    [InlineData("hello world", 5, "hell...")]
-    public void Truncate_ValidInputs_ReturnsExpected(string input, int maxLength, string expected)
+    public void Truncate_WithVariousInputs_ReturnsExpectedResult(string input, int maxLength, string expected)
     {
         var result = _processor.Truncate(input, maxLength);
         result.Should().Be(expected);
@@ -51,11 +51,11 @@ public class StringProcessorTests
 
     [Theory]
     [InlineData("", 0)]
+    [InlineData("   ", 0)]
     [InlineData("hello", 1)]
     [InlineData("hello world", 2)]
     [InlineData("  hello   world  ", 2)]
-    [InlineData("   ", 0)]
-    public void CountWords_ValidInputs_ReturnsExpected(string input, int expected)
+    public void CountWords_WithVariousInputs_ReturnsExpectedCount(string input, int expected)
     {
         var result = _processor.CountWords(input);
         result.Should().Be(expected);
@@ -75,8 +75,7 @@ public class StringProcessorTests
     [InlineData("RaceCar", true)]
     [InlineData("hello", false)]
     [InlineData("A man a plan a canal Panama", true)]
-    [InlineData("No lemon, no melon", true)]
-    public void IsPalindrome_ValidInputs_ReturnsExpected(string input, bool expected)
+    public void IsPalindrome_WithVariousInputs_ReturnsExpectedResult(string input, bool expected)
     {
         var result = _processor.IsPalindrome(input);
         result.Should().Be(expected);

@@ -1,23 +1,23 @@
 using System.Threading;
 
-public class SharedCounter : IAsyncLifetime
+public class SharedCounter : Xunit.IAsyncLifetime
 {
     private int counter;
 
-    public ValueTask InitializeAsync()
+    public System.Threading.Tasks.ValueTask InitializeAsync()
     {
         counter = 0;
         return default;
     }
 
-    public ValueTask DisposeAsync()
+    public System.Threading.Tasks.ValueTask DisposeAsync()
     {
         return default;
     }
 
     public int IncrementAndGet()
     {
-        return Interlocked.Increment(ref counter);
+        return System.Threading.Interlocked.Increment(ref counter);
     }
 }
 
@@ -33,7 +33,7 @@ public class FirstCounterTests
     [Fact]
     public void Increment_ShouldBeGreaterThanZero()
     {
-        var result = _counter.IncrementAndGet();
+        int result = _counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }
@@ -44,7 +44,7 @@ public class SecondCounterTests
     public void Increment_ShouldBeGreaterThanZero()
     {
         var counter = TestContext.Current.GetFixture<SharedCounter>();
-        var result = counter.IncrementAndGet();
+        int result = counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }

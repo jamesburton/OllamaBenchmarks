@@ -2,7 +2,9 @@ using System.Runtime.CompilerServices;
 
 public interface IDataSource
 {
-    System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string>> FetchBatchAsync(int batchNumber, System.Threading.CancellationToken ct);
+    System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string>> FetchBatchAsync(
+        int batchNumber,
+        System.Threading.CancellationToken ct);
 }
 
 public class DataProcessor

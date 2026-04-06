@@ -5,37 +5,32 @@ using Microsoft.Extensions.DependencyInjection;
 public class ProcessPaymentTests
 {
     [Fact]
-    public async Task ProcessPayment_consumer_processes_message_and_publishes_PaymentProcessed()
+    public void ProcessPaymentConsumer_HandlesMessage_AndPublishesPaymentProcessed()
     {
-        // Build test harness
-        var services = new ServiceCollection()
-            .AddMassTransitTestHarness(cfg =>
-            {
-                cfg.AddConsumer<ProcessPaymentConsumer>();
-            })
-            .BuildServiceProvider(true);
-
-        var harness = services.GetRequiredService<ITestHarness>();
-        await harness.Start();
-
         // Arrange
-        Guid orderId = Guid.NewGuid();
+        var services = new ServiceCollection();
+        services.AddMassTransitTestHarness(cfg =>
+        {
+            cfg.AddConsumer<ProcessPaymentConsumer>();
+        });
+        var provider = services.BuildServiceProvider(true);
+        var harness = provider.GetRequiredService<ITestHarness>();
 
         // Act
-        await harness.Bus.Publish(new ProcessPayment(orderId, 100m));
+        await harness.Start();
 
-        // Assert: consumer received the message
+        var orderId = Guid.NewGuid();
+        var amount = 100.00m;
+        var message = new ProcessPayment(orderId, amount);
+        await harness.Bus.Publish(message);
+
         bool received = await harness.Consumed.Any<ProcessPayment>();
-
-        // Assert: a PaymentProcessed event was published
         bool published = await harness.Published.Any<PaymentProcessed>();
-        PaymentProcessed publishedMsg = await harness.Published.Get<PaymentProcessed>(0);
 
-        // Combine assertions
+        // Assert
         Assert.Multiple(
             () => Assert.True(received),
-            () => Assert.True(published),
-            () => Assert.Equal(orderId, publishedMsg.OrderId)
+            () => Assert.True(published)
         );
     }
 }

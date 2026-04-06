@@ -1,10 +1,10 @@
 global using Contracts;
-using System;
+
 using MassTransit;
 using MassTransit.StateMachine;
 
 namespace Contracts
-
+{
     public class OrderState : SagaStateMachineInstance
     {
         public Guid CorrelationId { get; set; }
@@ -37,12 +37,12 @@ namespace Contracts
 
             Initially(
                 When(OrderSubmitted)
-                    .Then(ctx => ctx.Saga.OrderDate = ctx.Message.OrderDate)
+                    .Then(context => context.Saga.OrderDate = context.Message.OrderDate)
                     .TransitionTo(Submitted));
 
             During(Submitted,
                 When(OrderAccepted)
-                    .Then(ctx => ctx.Saga.AcceptedAt = ctx.Message.AcceptedAt)
+                    .Then(context => context.Saga.AcceptedAt = context.Message.AcceptedAt)
                     .TransitionTo(Accepted));
 
             During(Accepted,
@@ -52,3 +52,4 @@ namespace Contracts
             SetCompletedWhenFinalized();
         }
     }
+}

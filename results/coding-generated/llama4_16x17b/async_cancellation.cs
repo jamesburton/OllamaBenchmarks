@@ -22,7 +22,7 @@ public class DataProcessor
 
             var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
             if (batch.Count == 0)
-                break;
+                yield break;
 
             foreach (var item in batch)
                 yield item;

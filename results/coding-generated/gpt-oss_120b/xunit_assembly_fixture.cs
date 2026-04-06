@@ -18,7 +18,7 @@ public class SharedCounter : IAsyncLifetime
 public class FirstCounterTests(SharedCounter counter)
 {
     [Fact]
-    public void Increment_ShouldBeGreaterThanZero()
+    public void Increment_ShouldBePositive()
     {
         var result = counter.IncrementAndGet();
         Assert.True(result > 0);
@@ -28,7 +28,7 @@ public class FirstCounterTests(SharedCounter counter)
 public class SecondCounterTests
 {
     [Fact]
-    public void Increment_ShouldBeGreaterThanZero()
+    public void Increment_ShouldBePositive()
     {
         var counter = TestContext.Current.GetFixture<SharedCounter>();
         var result = counter.IncrementAndGet();

@@ -1,11 +1,8 @@
-using System;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
-public interface IOrderRepository
-{
-}
+public interface IOrderRepository { }
 
 public class OrderRepository : IOrderRepository
 {
@@ -14,9 +11,7 @@ public class OrderRepository : IOrderRepository
     }
 }
 
-public interface IOrderService
-{
-}
+public interface IOrderService { }
 
 public class OrderService : IOrderService
 {
@@ -25,9 +20,7 @@ public class OrderService : IOrderService
     }
 }
 
-public interface IEmailNotifier
-{
-}
+public interface IEmailNotifier { }
 
 public class EmailNotifier : IEmailNotifier
 {

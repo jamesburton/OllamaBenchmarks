@@ -17,7 +17,10 @@ public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
 
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
+    public ProductDbContext(DbContextOptions<ProductDbContext> options)
+        : base(options)
+    {
+    }
 }
 
 public static class ProductOperations
@@ -28,16 +31,15 @@ public static class ProductOperations
             .Where(p => p.Category == category)
             .ToListAsync();
 
-        int count = products.Count;
-
+        int count = 0;
         foreach (var p in products)
         {
             p.Price = p.Price * (1 - discountPct);
             p.LastModified = DateTime.UtcNow;
+            count++;
         }
 
         await db.SaveChangesAsync();
-
         return count;
     }
 }

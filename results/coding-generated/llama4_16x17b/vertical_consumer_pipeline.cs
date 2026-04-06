@@ -62,7 +62,7 @@ public class Tests
     }
 }
 
-public class TestHarness<T> where T : class, IConsumer
+public class TestHarness<T> where T : class
 {
     public async Task Start()
     {
@@ -82,7 +82,7 @@ public class TestHarnessOptions
 
 public static class TestHarnessExtensions
 {
-    public static async Task<ITestHarness> StartTestHarness(this IServiceCollection services)
+    public static async Task TestHarness(this IServiceProvider provider)
     {
         // Implementation
     }

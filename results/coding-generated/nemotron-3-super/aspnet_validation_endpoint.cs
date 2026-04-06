@@ -16,20 +16,14 @@ public class OrderService
 {
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        var validationResults = new System.Collections.Generic.List<System.ComponentModel.DataAnnotations.ValidationResult>();
-        var isValid = Validator.TryValidateObject(
-            request,
-            new System.ComponentModel.DataAnnotations.ValidationContext(request),
-            validationResults,
-            validateAllProperties: true);
-
-        if (!isValid)
+        var validationResults = new System.Collections.Generic.List<ValidationResult>();
+        var context = new ValidationContext(request);
+        if (!Validator.TryValidateObject(request, context, validationResults, validateAllProperties: true))
         {
-            var firstError = validationResults[0];
-            string errorMsg = firstError.ErrorMessage ?? "Validation failed";
-            throw new System.ArgumentException(errorMsg, nameof(request));
+            var firstError = validationResults.FirstOrDefault();
+            string errorMessage = firstError != null ? firstError.ErrorMessage : "Validation failed";
+            throw new System.ArgumentException(errorMessage);
         }
-
         return request;
     }
 }

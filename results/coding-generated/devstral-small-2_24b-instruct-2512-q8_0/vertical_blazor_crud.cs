@@ -85,15 +85,15 @@ public class TodoServiceTests
     public async Task AddAsync_CreatesItemWithCorrectTitle()
     {
         var service = new TodoService();
-        var item = await service.AddAsync("Test Todo");
-        item.Should().Be(new TodoItem(1, "Test Todo", false));
+        var item = await service.AddAsync("Test");
+        item.Should().Be(new TodoItem(1, "Test", false));
     }
 
     [Fact]
     public async Task DeleteAsync_RemovesItem()
     {
         var service = new TodoService();
-        await service.AddAsync("Test Todo");
+        await service.AddAsync("Test");
         await service.DeleteAsync(1);
         (await service.GetAllAsync()).Should().BeEmpty();
     }
@@ -102,7 +102,7 @@ public class TodoServiceTests
     public async Task ToggleAsync_FlipsIsCompleted()
     {
         var service = new TodoService();
-        await service.AddAsync("Test Todo");
+        await service.AddAsync("Test");
         await service.ToggleAsync(1);
         (await service.GetAllAsync())[0].IsCompleted.Should().BeTrue();
     }

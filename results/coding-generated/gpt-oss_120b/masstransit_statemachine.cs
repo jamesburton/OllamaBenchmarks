@@ -8,7 +8,7 @@ namespace Contracts;
 public class OrderState : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; }
+    public string CurrentState { get; set; } = default!;
     public DateTime OrderDate { get; set; }
     public DateTime? AcceptedAt { get; set; }
 }
@@ -19,13 +19,13 @@ public record OrderCompleted(Guid OrderId);
 
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
-    public State Submitted { get; private set; }
-    public State Accepted { get; private set; }
-    public State Completed { get; private set; }
+    public State Submitted { get; private set; } = default!;
+    public State Accepted { get; private set; } = default!;
+    public State Completed { get; private set; } = default!;
 
-    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
-    public Event<OrderAccepted> OrderAccepted { get; private set; }
-    public Event<OrderCompleted> OrderCompleted { get; private set; }
+    public Event<OrderSubmitted> OrderSubmitted { get; private set; } = default!;
+    public Event<OrderAccepted> OrderAccepted { get; private set; } = default!;
+    public Event<OrderCompleted> OrderCompleted { get; private set; } = default!;
 
     public OrderStateMachine()
     {

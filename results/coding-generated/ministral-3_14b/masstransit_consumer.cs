@@ -12,8 +12,8 @@ public class SubmitOrderConsumer : IConsumer<SubmitOrder>
 {
     public async Task Consume(ConsumeContext<SubmitOrder> context)
     {
-        var message = context.Message;
-        await context.Publish(new OrderSubmitted(message.OrderId, DateTime.UtcNow));
+        var msg = context.Message;
+        await context.Publish(new OrderSubmitted(msg.OrderId, DateTime.UtcNow));
     }
 }
 

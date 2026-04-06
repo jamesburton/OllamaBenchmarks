@@ -1,40 +1,86 @@
 using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.InMemory;
 
-public class Product
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public decimal Price { get; set; }
-    public string Category { get; set; }
-    public DateTime LastModified { get; set; }
-}
-
-public class ProductDbContext : DbContext
-{
-    public DbSet<Product> Products { get; set; }
-
-    public ProductDbContext(DbContextOptions<ProductDbContext> options)
-        : base(options)
+    public class Product
     {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public string Category { get; set; }
+        public DateTime LastModified { get; set; }
     }
-}
 
-public static class ProductOperations
-{
-    public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
+    public class ProductDbContext : DbContext
     {
-        var products = db.Products
-            .Where(p => p.Category == category)
-            .ToList();
+        public DbSet<Product> Products { get; set; }
 
-        foreach (var product in products)
+        public ProductDbContext(DbContextOptions<ProductDbContext> options)
+            : base(options)
         {
-            product.Price = product.Price * (1 - discountPct);
-            product.LastModified = DateTime.UtcNow;
         }
-
-        await db.SaveChangesAsync();
-
-        return products.Count;
     }
-}
+
+    public static class ProductOperations
+    {
+        public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
+        {
+            var products = db.Products
+                .Where(p => p.Category == category)
+                .ToList();
+
+            foreach (var product in products)
+            {
+                product.Price = product.Price * (1 - discountPct);
+                product.LastModified = DateTime.UtcNow;
+            }
+
+            await db.SaveChangesAsync();
+
+            return products.Count;
+        }
+    }
+
+using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.InMemory;
+
+    public class Product
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public string Category { get; set; }
+        public DateTime LastModified { get; set; }
+    }
+
+    public class ProductDbContext : DbContext
+    {
+        public DbSet<Product> Products { get; set; }
+
+        public ProductDbContext(DbContextOptions<ProductDbContext> options)
+            : base(options)
+        {
+        }
+    }
+
+    public static class ProductOperations
+    {
+        public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
+        {
+            var products = db.Products
+                .Where(p => p.Category == category)
+                .ToList();
+
+            foreach (var product in products)
+            {
+                product.Price = product.Price * (1 - discountPct);
+                product.LastModified = DateTime.UtcNow;
+            }
+
+            await db.SaveChangesAsync();
+
+            return products.Count;
+        }
+    }
+
+.
+    I will wrap it in

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
-using OneOf.AspNetCore;
+using OneOf.Types;
 
 public record NotFound;
 public record ValidationError(string Message);

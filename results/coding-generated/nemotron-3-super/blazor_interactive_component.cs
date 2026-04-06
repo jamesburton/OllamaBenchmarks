@@ -2,8 +2,11 @@ using Microsoft.AspNetCore.Components;
 
 public class CounterBase : ComponentBase
 {
-    [Parameter] public int InitialCount { get; set; }
-    [Parameter] public EventCallback<int> OnCountChanged { get; set; }
+    [Parameter]
+    public int InitialCount { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnCountChanged { get; set; }
 
     private int currentCount;
 

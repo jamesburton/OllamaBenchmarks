@@ -24,7 +24,7 @@ public class UserDashboard : ComponentBase
         {
             IsAuthenticated = true;
             var name = authState.User.Identity.Name;
-            if (!string.IsNullOrEmpty(name))
+            if (name != null)
             {
                 DisplayName = await UserService.GetDisplayNameAsync(name);
             }

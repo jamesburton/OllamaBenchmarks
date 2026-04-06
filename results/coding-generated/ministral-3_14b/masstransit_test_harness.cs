@@ -4,42 +4,36 @@ using Microsoft.Extensions.DependencyInjection;
 
 public class ProcessPaymentConsumerTests
 {
-    private readonly ITestHarness _harness;
-    private readonly IServiceProvider _provider;
-
-    public ProcessPaymentConsumerTests()
-    {
-        _provider = new ServiceCollection()
-            .AddMassTransitTestHarness(cfg => { cfg.AddConsumer<ProcessPaymentConsumer>(); })
-            .BuildServiceProvider(true);
-
-        _harness = _provider.GetRequiredService<ITestHarness>();
-    }
-
     [Fact]
     public async Task Consume_ProcessPayment_PublishesPaymentProcessed()
     {
+        // Arrange
+        var harness = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg => { cfg.AddConsumer<ProcessPaymentConsumer>(); })
+            .BuildServiceProvider(true);
+
         var orderId = Guid.NewGuid();
-        var amount = 100.00m;
+        var amount = 100.50m;
 
-        await _harness.Start();
+        // Act
+        await harness.Start();
+        await harness.Bus.Consume<ProcessPayment>(context =>
+            context.Message = new ProcessPayment(orderId, amount));
 
-        var message = new ProcessPayment(orderId, amount);
-        await _harness.Bus.Publish(message);
+        // Assert
+        var consumed = await harness.Consumed.Any<ProcessPayment>();
+        var published = await harness.Published.Any<PaymentProcessed>();
 
-        var consumed = await _harness.Consumed.Any<ProcessPayment>();
-        var published = await _harness.Published.Any<PaymentProcessed>();
-
-        Assert.Multiple(() =>
-        {
-            Assert.True(consumed, "Consumer should have received the ProcessPayment message");
-            Assert.True(published, "PaymentProcessed event should have been published");
-        });
+        Assert.Multiple(
+            () => Assert.True(consumed, "Consumer should have received ProcessPayment message"),
+            () => Assert.True(published, "PaymentProcessed event should have been published")
+        );
 
         if (published)
         {
-            var paymentProcessed = _harness.Published.GetLast<PaymentProcessed>();
-            Assert.Equal(orderId, paymentProcessed.OrderId, "OrderId should match in published event");
+            var paymentProcessed = await harness.Published.GetLast<PaymentProcessed>();
+            Assert.Equal(orderId, paymentProcessed.OrderId);
+            Assert.NotNull(paymentProcessed.TransactionId);
         }
     }
 }

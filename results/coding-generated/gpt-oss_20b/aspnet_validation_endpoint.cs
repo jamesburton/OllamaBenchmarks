@@ -22,7 +22,7 @@ public class OrderService
         if (!isValid)
         {
             var firstError = results[0];
-            throw new System.ArgumentException(firstError.ErrorMessage);
+            throw new ArgumentException(firstError.ErrorMessage);
         }
         return request;
     }

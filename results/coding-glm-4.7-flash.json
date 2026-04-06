@@ -6,10 +6,50 @@
     "layer3_weight": 0.6,
     "description": "EvalPlus HumanEval+ (Python) / MultiPL-E C# / Custom .NET 10 Suite"
   },
-  "run_finished_at": "2026-03-26T06:19:30.545155+00:00",
+  "run_finished_at": "2026-04-05T16:26:14.865716+00:00",
   "results": [
     {
       "rank": 1,
+      "model": "glm-5:cloud",
+      "composite_score": 0.512727,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.8545454545454545
+    },
+    {
+      "rank": 2,
+      "model": "qwen3-coder-next",
+      "composite_score": 0.512727,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.8545454545454545
+    },
+    {
+      "rank": 3,
+      "model": "hf.co/mradermacher/Qwen3-Coder-30B-A3B-Instruct-480B-Distill-V2-Fp32-i1-GGUF:Q4_K_M",
+      "composite_score": 0.33913,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.5652173913043478
+    },
+    {
+      "rank": 4,
+      "model": "rnj-1:8b",
+      "composite_score": 0.208696,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.34782608695652173
+    },
+    {
+      "rank": 5,
+      "model": "cogito:8b",
+      "composite_score": 0.130435,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.21739130434782608
+    },
+    {
+      "rank": 6,
       "model": "gemma3:12b",
       "composite_score": 0.078261,
       "layer1_pass_rate": 0.0,
@@ -17,7 +57,31 @@
       "layer3_weighted_score": 0.13043478260869565
     },
     {
-      "rank": 2,
+      "rank": 7,
+      "model": "LFM2-2.6b-tools",
+      "composite_score": 0.026087,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.043478260869565216
+    },
+    {
+      "rank": 8,
+      "model": "nemotron-3-nano:4b",
+      "composite_score": 0.026087,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.043478260869565216
+    },
+    {
+      "rank": 9,
+      "model": "qwen3.5:122b-a10b",
+      "composite_score": 0.026087,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.043478260869565216
+    },
+    {
+      "rank": 10,
       "model": "qwen3.5:9b",
       "composite_score": 0.026087,
       "layer1_pass_rate": 0.0,
@@ -25,7 +89,7 @@
       "layer3_weighted_score": 0.043478260869565216
     },
     {
-      "rank": 3,
+      "rank": 11,
       "model": "minicpm-v:8b",
       "composite_score": 0.0,
       "layer1_pass_rate": 0.0,
@@ -33,15 +97,7 @@
       "layer3_weighted_score": 0.0
     },
     {
-      "rank": 4,
-      "model": "nemotron-cascade-2",
-      "composite_score": 0.0,
-      "layer1_pass_rate": 0.0,
-      "layer2_pass_rate": 0.0,
-      "layer3_weighted_score": 0.0
-    },
-    {
-      "rank": 5,
+      "rank": 12,
       "model": "qwen2.5vl:7b",
       "composite_score": 0.0,
       "layer1_pass_rate": 0.0,

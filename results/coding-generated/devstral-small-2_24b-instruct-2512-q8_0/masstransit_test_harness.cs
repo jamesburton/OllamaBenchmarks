@@ -7,7 +7,6 @@ public class ProcessPaymentConsumerTests
     [Fact]
     public async Task ProcessPaymentConsumer_ShouldPublishPaymentProcessed()
     {
-        // Arrange
         var provider = new ServiceCollection()
             .AddMassTransitTestHarness(cfg => { cfg.AddConsumer<ProcessPaymentConsumer>(); })
             .BuildServiceProvider(true);
@@ -18,10 +17,8 @@ public class ProcessPaymentConsumerTests
         var orderId = Guid.NewGuid();
         var amount = 100.00m;
 
-        // Act
         await harness.Bus.Publish(new ProcessPayment(orderId, amount));
 
-        // Assert
         var consumed = await harness.Consumed.Any<ProcessPayment>();
         var published = await harness.Published.Any<PaymentProcessed>();
 
@@ -29,32 +26,8 @@ public class ProcessPaymentConsumerTests
             () => Assert.True(consumed, "ProcessPayment should be consumed"),
             () => Assert.True(published, "PaymentProcessed should be published")
         );
-    }
 
-    [Fact]
-    public async Task ProcessPaymentConsumer_ShouldPublishWithCorrectOrderId()
-    {
-        // Arrange
-        var provider = new ServiceCollection()
-            .AddMassTransitTestHarness(cfg => { cfg.AddConsumer<ProcessPaymentConsumer>(); })
-            .BuildServiceProvider(true);
-
-        var harness = provider.GetRequiredService<ITestHarness>();
-        await harness.Start();
-
-        var expectedOrderId = Guid.NewGuid();
-        var amount = 100.00m;
-
-        // Act
-        await harness.Bus.Publish(new ProcessPayment(expectedOrderId, amount));
-
-        // Assert
-        var publishedMessages = await harness.Published.Any<PaymentProcessed>();
-        var publishedMessage = await harness.Published.GetLastPublished<PaymentProcessed>();
-
-        Assert.Multiple(
-            () => Assert.True(publishedMessages, "PaymentProcessed should be published"),
-            () => Assert.Equal(expectedOrderId, publishedMessage.Message.OrderId, "OrderId should match")
-        );
+        var publishedMessage = await harness.Published.First<PaymentProcessed>();
+        Assert.Equal(orderId, publishedMessage.Context.Message.OrderId);
     }
 }

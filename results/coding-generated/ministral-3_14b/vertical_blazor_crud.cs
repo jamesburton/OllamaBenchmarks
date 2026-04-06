@@ -119,7 +119,7 @@ public class TodoListBaseTests
 
         var cut = ctx.RenderComponent<TodoListBase>(p => p.Add(x => x.TodoService, service));
 
-        await cut.WaitForAssert(() => cut.Instance.Todos.Should().NotBeEmpty());
-        await cut.WaitForAssert(() => service.Received(1).GetAllAsync());
+        await cut.Instance.OnInitializedAsync();
+        await service.Received().GetAllAsync();
     }
 }

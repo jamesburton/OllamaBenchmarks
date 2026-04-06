@@ -1,5 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 // Marker interface for OrderRepository
 public interface IOrderRepository { }
@@ -38,7 +38,7 @@ public class OrderSettings
 // Static class for service collection extensions
 public static class ServiceCollectionExtensions
 {
-    // Extension method to add order services and bind configuration
+    // Extension method to add order services and configure options
     public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config)
     {
         // Register IOrderRepository with OrderRepository as scoped

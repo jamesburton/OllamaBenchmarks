@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 public class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task ProcessPaymentConsumer_Should_Process_and_Publish_Event()
+    public async Task ProcessPaymentConsumer_ShouldPublishPaymentProcessed()
     {
         // Arrange
         var provider = new ServiceCollection()
@@ -29,11 +29,12 @@ public class ProcessPaymentConsumerTests
         var published = await harness.Published.Any<PaymentProcessed>();
         var publishedMessage = await harness.Published.Select<PaymentProcessed>().FirstOrDefaultAsync();
 
+        var correctOrderId = publishedMessage != null && publishedMessage.Message.OrderId == orderId;
+
         Assert.Multiple(
             () => Assert.True(consumed, "ProcessPayment was not consumed"),
             () => Assert.True(published, "PaymentProcessed was not published"),
-            () => Assert.NotNull(publishedMessage, "Published PaymentProcessed message is null"),
-            () => Assert.Equal(orderId, publishedMessage.Message.OrderId, "OrderId mismatch")
+            () => Assert.True(correctOrderId, "Published PaymentProcessed has incorrect OrderId")
         );
 
         await harness.Stop();

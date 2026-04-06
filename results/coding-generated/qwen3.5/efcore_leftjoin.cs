@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace MyApp
@@ -21,23 +20,23 @@ namespace MyApp
         public DateTime OrderDate { get; set; }
     }
 
-    public record OrderDto(int OrderId, decimal Total, string CustomerName);
-
     public class AppDbContext : DbContext
     {
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<Customer> Customers { get; set; }
     }
+
+    public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
     public static class OrderQueries
     {
-        public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
+        public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
         {
-            var query = db.Orders
+            return db.Orders
                 .LeftJoin(
                     db.Customers,
                     order => order.CustomerId,
@@ -47,9 +46,8 @@ namespace MyApp
                         order.Total,
                         customer == null ? "Unknown" : customer.Name
                     )
-                );
-
-            return await query.ToListAsync();
+                )
+                .ToList();
         }
     }
 }
