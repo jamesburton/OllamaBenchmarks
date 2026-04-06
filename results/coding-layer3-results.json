@@ -1,16 +1,16 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-04-06T15:34:19.592998+00:00",
-  "run_finished_at": "2026-04-06T16:33:44.698242+00:00",
+  "run_started_at": "2026-04-06T19:38:44.396072+00:00",
+  "run_finished_at": "2026-04-06T20:21:51.872523+00:00",
   "models": [
-    "trinity-mini:Q4_K_M"
+    "qwen3.5:9b"
   ],
   "results": [
     {
-      "model": "trinity-mini:Q4_K_M",
+      "model": "qwen3.5:9b",
       "benchmark": "coding",
-      "run_started_at": "2026-04-06T15:34:19.593539+00:00",
-      "run_finished_at": "2026-04-06T16:33:44.697596+00:00",
+      "run_started_at": "2026-04-06T19:38:44.398073+00:00",
+      "run_finished_at": "2026-04-06T20:21:51.862565+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
@@ -21,8 +21,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 96.89,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_oneof_controller.cs"
+          "generation_time_s": 134.2,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\aspnet_oneof_controller.cs"
         },
         {
           "task": "aspnet_validation_endpoint",
@@ -33,20 +33,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 75.45,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_validation_endpoint.cs"
+          "generation_time_s": 18.42,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\aspnet_validation_endpoint.cs"
         },
         {
           "task": "aspnet_service_di",
           "category": "aspnet",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.2,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_service_di.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 23.8,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\aspnet_service_di.cs"
         },
         {
           "task": "efcore_leftjoin",
@@ -57,44 +57,44 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 74.34,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_leftjoin.cs"
+          "generation_time_s": 30.5,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\efcore_leftjoin.cs"
         },
         {
           "task": "efcore_json_columns",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.32,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_json_columns.cs"
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 25.92,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\efcore_json_columns.cs"
         },
         {
           "task": "efcore_executeupdate",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.48,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_executeupdate.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 37.94,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\efcore_executeupdate.cs"
         },
         {
           "task": "masstransit_consumer",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 6.95,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_consumer.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 22.75,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\masstransit_consumer.cs"
         },
         {
           "task": "masstransit_statemachine",
@@ -105,8 +105,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 74.27,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_statemachine.cs"
+          "generation_time_s": 35.78,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\masstransit_statemachine.cs"
         },
         {
           "task": "masstransit_test_harness",
@@ -117,44 +117,44 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 76.23,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_test_harness.cs"
+          "generation_time_s": 93.86,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\masstransit_test_harness.cs"
         },
         {
           "task": "blazor_interactive_component",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.64,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_interactive_component.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 87.67,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\blazor_interactive_component.cs"
         },
         {
           "task": "blazor_streaming_render",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 15.37,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_streaming_render.cs"
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 22.08,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\blazor_streaming_render.cs"
         },
         {
           "task": "blazor_cascading_auth",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.63,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_cascading_auth.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 24.91,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\blazor_cascading_auth.cs"
         },
         {
           "task": "xunit_v3_theory_tests",
@@ -162,23 +162,23 @@
           "weight": 1,
           "passed": false,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 76.62,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_v3_theory_tests.cs"
+          "build_success": true,
+          "tests_passed": 28,
+          "tests_total": 30,
+          "generation_time_s": 53.83,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\xunit_v3_theory_tests.cs"
         },
         {
           "task": "xunit_awesome_nsubstitute",
           "category": "xunit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 76.25,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_awesome_nsubstitute.cs"
+          "build_success": true,
+          "tests_passed": 9,
+          "tests_total": 9,
+          "generation_time_s": 47.58,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\xunit_awesome_nsubstitute.cs"
         },
         {
           "task": "xunit_assembly_fixture",
@@ -189,32 +189,32 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 14.62,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_assembly_fixture.cs"
+          "generation_time_s": 19.14,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\xunit_assembly_fixture.cs"
         },
         {
           "task": "linq_complex_query",
           "category": "linq",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.08,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\linq_complex_query.cs"
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 56.61,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
           "category": "async",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.73,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\async_cancellation.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 19.19,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\async_cancellation.cs"
         },
         {
           "task": "vertical_order_service",
@@ -225,8 +225,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 158.36,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\vertical_order_service.cs"
+          "generation_time_s": 35.34,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\vertical_order_service.cs"
         },
         {
           "task": "vertical_consumer_pipeline",
@@ -237,8 +237,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 157.24,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\vertical_consumer_pipeline.cs"
+          "generation_time_s": 42.39,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\vertical_consumer_pipeline.cs"
         },
         {
           "task": "vertical_blazor_crud",
@@ -249,20 +249,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 158.41,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\vertical_blazor_crud.cs"
+          "generation_time_s": 39.97,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\vertical_blazor_crud.cs"
         },
         {
           "task": "linq_selectmany_flatten",
           "category": "linq",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 73.69,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\linq_selectmany_flatten.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 15.42,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\linq_selectmany_flatten.cs"
         },
         {
           "task": "linq_set_operations",
@@ -273,8 +273,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 73.18,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\linq_set_operations.cs"
+          "generation_time_s": 119.88,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\linq_set_operations.cs"
         },
         {
           "task": "linq_aggregate_stats",
@@ -285,8 +285,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 73.66,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\linq_aggregate_stats.cs"
+          "generation_time_s": 119.36,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\linq_aggregate_stats.cs"
         },
         {
           "task": "linq_todictionary_tolookup",
@@ -297,8 +297,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 74.08,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\linq_todictionary_tolookup.cs"
+          "generation_time_s": 119.72,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\linq_todictionary_tolookup.cs"
         },
         {
           "task": "async_whenall_parallel",
@@ -309,8 +309,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 73.67,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\async_whenall_parallel.cs"
+          "generation_time_s": 119.73,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\async_whenall_parallel.cs"
         },
         {
           "task": "async_semaphore_throttle",
@@ -321,8 +321,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 74.36,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\async_semaphore_throttle.cs"
+          "generation_time_s": 22.19,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\async_semaphore_throttle.cs"
         },
         {
           "task": "async_channel_pipeline",
@@ -333,8 +333,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 73.98,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\async_channel_pipeline.cs"
+          "generation_time_s": 14.33,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\async_channel_pipeline.cs"
         },
         {
           "task": "async_valuetask_cache",
@@ -345,8 +345,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 73.98,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\async_valuetask_cache.cs"
+          "generation_time_s": 25.8,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\async_valuetask_cache.cs"
         },
         {
           "task": "aspnet_minimal_api_endpoint",
@@ -357,8 +357,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 13.99,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_minimal_api_endpoint.cs"
+          "generation_time_s": 24.8,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\aspnet_minimal_api_endpoint.cs"
         },
         {
           "task": "aspnet_typed_httpclient",
@@ -369,68 +369,68 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 8.72,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_typed_httpclient.cs"
+          "generation_time_s": 20.25,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\aspnet_typed_httpclient.cs"
         },
         {
           "task": "aspnet_ioptions_config",
           "category": "aspnet",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 6.43,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_ioptions_config.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 26.99,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\aspnet_ioptions_config.cs"
         },
         {
           "task": "aspnet_problemdetails_handler",
           "category": "aspnet",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.59,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\aspnet_problemdetails_handler.cs"
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 25.39,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\aspnet_problemdetails_handler.cs"
         },
         {
           "task": "efcore_include_navigation",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.86,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_include_navigation.cs"
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 19.97,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\efcore_include_navigation.cs"
         },
         {
           "task": "efcore_softdelete_filter",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.85,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_softdelete_filter.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 28.3,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\efcore_softdelete_filter.cs"
         },
         {
           "task": "efcore_owned_entity",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.54,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_owned_entity.cs"
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 29.88,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\efcore_owned_entity.cs"
         },
         {
           "task": "efcore_value_conversion",
@@ -441,8 +441,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 16.63,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\efcore_value_conversion.cs"
+          "generation_time_s": 34.98,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\efcore_value_conversion.cs"
         },
         {
           "task": "masstransit_request_response",
@@ -453,32 +453,32 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 3.51,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_request_response.cs"
+          "generation_time_s": 36.69,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\masstransit_request_response.cs"
         },
         {
           "task": "masstransit_saga_events",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.39,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_saga_events.cs"
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 26.88,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\masstransit_saga_events.cs"
         },
         {
           "task": "masstransit_consumer_filter",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.78,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\masstransit_consumer_filter.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 23.02,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\masstransit_consumer_filter.cs"
         },
         {
           "task": "xunit_memberdata",
@@ -489,20 +489,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 75.8,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_memberdata.cs"
+          "generation_time_s": 30.92,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\xunit_memberdata.cs"
         },
         {
           "task": "xunit_class_fixture",
           "category": "xunit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 17.84,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_class_fixture.cs"
+          "build_success": true,
+          "tests_passed": 9,
+          "tests_total": 9,
+          "generation_time_s": 48.56,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\xunit_class_fixture.cs"
         },
         {
           "task": "xunit_async_collection",
@@ -513,44 +513,44 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 75.62,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\xunit_async_collection.cs"
+          "generation_time_s": 25.56,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\xunit_async_collection.cs"
         },
         {
           "task": "blazor_form_validation",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 75.03,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_form_validation.cs"
+          "build_success": true,
+          "tests_passed": 7,
+          "tests_total": 7,
+          "generation_time_s": 22.08,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\blazor_form_validation.cs"
         },
         {
           "task": "blazor_navigation_redirect",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 74.92,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_navigation_redirect.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 17.72,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\blazor_navigation_redirect.cs"
         },
         {
           "task": "blazor_parameter_lifecycle",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 3.0,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\blazor_parameter_lifecycle.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 20.11,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\blazor_parameter_lifecycle.cs"
         },
         {
           "task": "vertical_cqrs_handler",
@@ -561,59 +561,59 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 157.02,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\vertical_cqrs_handler.cs"
+          "generation_time_s": 237.83,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\vertical_cqrs_handler.cs"
         },
         {
           "task": "vertical_efcore_service",
           "category": "vertical",
           "weight": 2,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 157.68,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\vertical_efcore_service.cs"
+          "build_success": true,
+          "tests_passed": 8,
+          "tests_total": 8,
+          "generation_time_s": 37.5,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\vertical_efcore_service.cs"
         },
         {
           "task": "patterns_record_with",
           "category": "patterns",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 73.53,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\patterns_record_with.cs"
+          "build_success": true,
+          "tests_passed": 6,
+          "tests_total": 6,
+          "generation_time_s": 14.62,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\patterns_record_with.cs"
         },
         {
           "task": "patterns_json_serialization",
           "category": "patterns",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 73.59,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\patterns_json_serialization.cs"
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 11.61,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\patterns_json_serialization.cs"
         },
         {
           "task": "patterns_timeprovider",
           "category": "patterns",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 73.75,
-          "generated_code_path": "results\\coding-generated\\trinity-mini_Q4_K_M\\patterns_timeprovider.cs"
+          "build_success": true,
+          "tests_passed": 4,
+          "tests_total": 4,
+          "generation_time_s": 32.3,
+          "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\qwen3.5_9b\\patterns_timeprovider.cs"
         }
       ],
-      "layer3_weighted_score": 0.0
+      "layer3_weighted_score": 0.4909090909090909
     }
   ]
 }
