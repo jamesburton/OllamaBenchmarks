@@ -1,0 +1,7 @@
+{
+  "sampling": {
+    "temperature": 0.1,
+    "top_p": 1
+  },
+  "mutation": "slight_temp"
+}

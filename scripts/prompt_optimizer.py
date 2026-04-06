@@ -3,7 +3,7 @@
 
 Iterates on system prompts and sampling parameters per model to maximize
 benchmark scores. Uses a simple hill-climbing approach:
-  modify → benchmark → keep/discard → repeat
+  modify -> benchmark -> keep/discard -> repeat
 
 Optimizes two axes:
   1. System prompt (for coding L3 tasks)
@@ -21,6 +21,7 @@ import datetime
 import json
 import os
 import random
+import re
 import subprocess
 import sys
 import time
@@ -119,33 +120,20 @@ SAMPLING_MUTATIONS = [
 
 def run_quality_benchmark(model: str, timeout: int = 600) -> dict:
     """Run quality benchmark, return results dict."""
+    slug = re.sub(r"[^\w\.-]", "_", model.replace(":", "_").replace("/", "_"))
+    checkpoint = RESULTS_DIR / f"quality-{slug}.json"
+
     cmd = [
         sys.executable, str(REPO_ROOT / "scripts" / "benchmark_quality.py"),
         "--models", model,
         "--checkpoint-dir", str(RESULTS_DIR),
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-    if result.returncode != 0:
-        return {"score": 0, "score_max": 11, "error": result.stderr[:200]}
-
-    # Parse the JSON output
     try:
-        data = json.loads(result.stdout)
-        if data.get("results"):
-            r = data["results"][0]
-            return {
-                "score": r.get("score", 0),
-                "score_max": r.get("score_max", 11),
-                "coding_pass": r.get("coding_pass", 0),
-                "tool_pass": r.get("tool_pass", 0),
-                "agentic_pass": r.get("agentic_pass", 0),
-            }
-    except (json.JSONDecodeError, IndexError, KeyError):
+        subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
         pass
 
-    # Fallback: read the checkpoint file
-    slug = model.replace(":", "_").replace("/", "_")
-    checkpoint = RESULTS_DIR / f"quality-{slug}.json"
+    # Read from checkpoint file (written by the benchmark)
     if checkpoint.exists():
         data = json.loads(checkpoint.read_text())
         if data.get("results"):
@@ -160,20 +148,26 @@ def run_quality_benchmark(model: str, timeout: int = 600) -> dict:
     return {"score": 0, "score_max": 11, "error": "no results"}
 
 
-def run_coding_l3(model: str, max_tasks: int = 0, timeout: int = 3600) -> dict:
+def run_coding_l3(model: str, max_tasks: int = 0, timeout: int = 7200) -> dict:
     """Run coding L3 benchmark, return results dict."""
+    slug = re.sub(r"[^\w\.-]", "_", model.replace(":", "_").replace("/", "_").replace("\\", "_"))
+
+    # Delete existing checkpoint so we get fresh results with current config
+    checkpoint = RESULTS_DIR / f"coding-{slug}.json"
+    if checkpoint.exists():
+        checkpoint.unlink()
+
     cmd = [
         sys.executable, str(REPO_ROOT / "scripts" / "benchmark_coding_layer3.py"),
         "--models", model,
         "--checkpoint-dir", str(RESULTS_DIR),
     ]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    try:
+        subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        pass
 
-    # Parse from checkpoint file
-    slug = model.replace(":", "_").replace("/", "_").replace("\\", "_")
-    import re
-    slug = re.sub(r"[^\w\.-]", "_", slug)
-    checkpoint = RESULTS_DIR / f"coding-{slug}.json"
+    # Parse from checkpoint file (written by the benchmark)
     if checkpoint.exists():
         data = json.loads(checkpoint.read_text())
         results = data.get("layer3_results", [])
@@ -297,14 +291,22 @@ def main():
         kept = improved or (score == best_score and "prompt" in mutation and len(mutation.get("prompt", "")) < len(best.get("prompt", "")))
 
         if kept:
-            print(f"  Score: {score} (was {best_score}) → KEEP")
+            print(f"  Score: {score} (was {best_score}) -> KEEP")
             best = copy.deepcopy(result)
             best_score = score
+            # Save winning config
+            best["_config"] = load_prompt_config(args.model)
         else:
-            print(f"  Score: {score} (was {best_score}) → DISCARD")
-            # Restore previous config
+            print(f"  Score: {score} (was {best_score}) -> DISCARD")
+            # Restore best config
             if best.get("_config"):
                 write_prompt_config(args.model, best["_config"])
+            else:
+                # No config = baseline (delete override)
+                slug = re.sub(r"[^\w\.-]", "_", args.model.replace(":", "_").replace("/", "_"))
+                config_path = OPTIMIZER_DIR / f"{slug}.json"
+                if config_path.exists():
+                    config_path.unlink()
 
         history.append({"iteration": i, "mutation": name, "score": score, "kept": kept})
 
@@ -342,8 +344,8 @@ def main():
 
     print("\nIteration log:")
     for h in history:
-        mark = "✓" if h["kept"] else "✗"
-        print(f"  [{mark}] {h['iteration']:2d}. {h['mutation']:30s} → {h['score']}")
+        mark = "+" if h["kept"] else "-"
+        print(f"  [{mark}] {h['iteration']:2d}. {h['mutation']:30s} -> {h['score']}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,50 @@
+{
+  "model": "qwen3.5:9b",
+  "iterations": 6,
+  "baseline_score": 16,
+  "best_score": 29,
+  "history": [
+    {
+      "iteration": 0,
+      "mutation": "baseline",
+      "score": 16,
+      "kept": true
+    },
+    {
+      "iteration": 1,
+      "mutation": "slight_temp",
+      "score": 15,
+      "kept": false
+    },
+    {
+      "iteration": 2,
+      "mutation": "test_aware",
+      "score": 29,
+      "kept": true
+    },
+    {
+      "iteration": 3,
+      "mutation": "structured_output",
+      "score": 26,
+      "kept": false
+    },
+    {
+      "iteration": 4,
+      "mutation": "low_temp",
+      "score": 28,
+      "kept": false
+    },
+    {
+      "iteration": 5,
+      "mutation": "medium_temp",
+      "score": 27,
+      "kept": false
+    },
+    {
+      "iteration": 6,
+      "mutation": "baseline",
+      "score": 26,
+      "kept": false
+    }
+  ]
+}
