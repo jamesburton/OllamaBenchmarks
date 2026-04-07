@@ -37,18 +37,12 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
         Initially(
             When(OrderSubmitted)
-                .Then(context =>
-                {
-                    context.Saga.OrderDate = context.Message.OrderDate;
-                })
+                .Then(context => { context.Saga.OrderDate = context.Message.OrderDate; })
                 .TransitionTo(Submitted));
 
         During(Submitted,
             When(OrderAccepted)
-                .Then(context =>
-                {
-                    context.Saga.AcceptedAt = context.Message.AcceptedAt;
-                })
+                .Then(context => { context.Saga.AcceptedAt = context.Message.AcceptedAt; })
                 .TransitionTo(Accepted));
 
         During(Accepted,

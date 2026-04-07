@@ -1,28 +1,31 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
 
 public class Address
 {
-    public string Street { get; set; } = string.Empty;
-    public string City { get; set; } = string.Empty;
-    public string Zip { get; set; } = string.Empty;
+    public string Street { get; set; } = default!;
+    public string City { get; set; } = default!;
+    public string Zip { get; set; } = default!;
 }
 
 public class Customer
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = default!;
     public Address HomeAddress { get; set; } = new Address();
 }
 
 public class CustomerDbContext : DbContext
 {
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Customer> Customers { get; set; } = default!;
 
-    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options) { }
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options)
+        : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Customer>()
             .OwnsOne(c => c.HomeAddress);
     }

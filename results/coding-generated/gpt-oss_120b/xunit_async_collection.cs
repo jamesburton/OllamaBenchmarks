@@ -23,7 +23,7 @@ public class CounterFixture : IAsyncLifetime
 [CollectionDefinition("Counter")]
 public class CounterCollection : ICollectionFixture<CounterFixture>
 {
-    // No test methods – only the collection definition
+    // No test methods
 }
 
 [Collection("Counter")]

@@ -1,6 +1,6 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
+using System.Threading.Tasks;
 
 public class User
 {
@@ -10,7 +10,6 @@ public class User
 }
 
 public record NotFound;
-
 public record ValidationError(string Message);
 
 public interface IUserService
@@ -19,7 +18,7 @@ public interface IUserService
 }
 
 [ApiController]
-[Route("api/users")]
+[Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _service;
@@ -29,10 +28,10 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Get(int id)
     {
         var result = await _service.GetByIdAsync(id);
-        return result.Match<IActionResult>(
+        return result.Match(
             user => Ok(user),
             notFound => NotFound(),
-            validationError => BadRequest(validationError.Message)
+            err => BadRequest(err.Message)
         );
     }
 }

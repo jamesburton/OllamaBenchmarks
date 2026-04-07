@@ -41,8 +41,7 @@ public class NotificationServiceTests
         repo.GetByIdAsync(userId).Returns(user);
 
         // Act
-        Func<Task> act = () => service.NotifyUserAsync(userId);
-        await act.Should().NotThrowAsync();
+        await service.NotifyUserAsync(userId);
 
         // Assert
         repo.Received(1).GetByIdAsync(userId);
@@ -62,9 +61,9 @@ public class NotificationServiceTests
 
         // Act
         Func<Task> act = () => service.NotifyUserAsync(userId);
-        await act.Should().ThrowAsync<InvalidOperationException>();
 
         // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>();
         repo.Received(1).GetByIdAsync(userId);
         email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }

@@ -10,17 +10,30 @@ public class SharedCounter : IAsyncLifetime
         return default;
     }
 
-    public ValueTask DisposeAsync() => default;
+    public ValueTask DisposeAsync()
+    {
+        return default;
+    }
 
-    public int IncrementAndGet() => Interlocked.Increment(ref _counter);
+    public int IncrementAndGet()
+    {
+        return Interlocked.Increment(ref _counter);
+    }
 }
 
-public class FirstCounterTests(SharedCounter counter)
+public class FirstCounterTests
 {
-    [Fact]
-    public void Increment_ShouldBePositive()
+    private readonly SharedCounter _counter;
+
+    public FirstCounterTests(SharedCounter counter)
     {
-        var result = counter.IncrementAndGet();
+        _counter = counter;
+    }
+
+    [Fact]
+    public void Increment_ShouldBeGreaterThanZero()
+    {
+        var result = _counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }
@@ -28,7 +41,7 @@ public class FirstCounterTests(SharedCounter counter)
 public class SecondCounterTests
 {
     [Fact]
-    public void Increment_ShouldBePositive()
+    public void Increment_ShouldBeGreaterThanZero()
     {
         var counter = TestContext.Current.GetFixture<SharedCounter>();
         var result = counter.IncrementAndGet();

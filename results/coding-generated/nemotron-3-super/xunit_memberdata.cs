@@ -4,7 +4,10 @@ public static class MathValidator
     public static bool IsPrime(int n)
     {
         if (n < 2) return false;
-        for (int i = 2; i * i <= n; i++)
+        if (n == 2) return true;
+        if (n % 2 == 0) return false;
+        var limit = (int)Math.Sqrt(n);
+        for (int i = 3; i <= limit; i += 2)
         {
             if (n % i == 0) return false;
         }

@@ -45,12 +45,16 @@ public class OrderService
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
         if (string.IsNullOrEmpty(request.CustomerName))
+        {
             return new ValidationError { Message = "Customer name is required" };
+        }
 
         if (request.Items == null || request.Items.Count == 0)
+        {
             return new ValidationError { Message = "At least one item is required" };
+        }
 
-        decimal total = 0;
+        decimal total = 0m;
         foreach (var item in request.Items)
         {
             total += item.Quantity * item.UnitPrice;
@@ -58,6 +62,7 @@ public class OrderService
 
         var order = new Order
         {
+            Id = 0,
             CustomerName = request.CustomerName,
             Items = request.Items,
             Total = total,

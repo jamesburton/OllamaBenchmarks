@@ -17,7 +17,7 @@ public class TodoService : ITodoService
 
     public Task<List<TodoItem>> GetAllAsync()
     {
-        var copy = _items.Select(i => i).ToList();
+        var copy = _items.Select(i => i with { }).ToList();
         return Task.FromResult(copy);
     }
 
@@ -38,11 +38,11 @@ public class TodoService : ITodoService
 
     public Task ToggleAsync(int id)
     {
-        var item = _items.FirstOrDefault(i => i.Id == id);
-        if (item != null)
+        var index = _items.FindIndex(i => i.Id == id);
+        if (index >= 0)
         {
+            var item = _items[index];
             var toggled = item with { IsCompleted = !item.IsCompleted };
-            var index = _items.IndexOf(item);
             _items[index] = toggled;
         }
         return Task.CompletedTask;
@@ -54,6 +54,7 @@ public class TodoListBase : ComponentBase
     [Inject] public ITodoService TodoService { get; set; } = default!;
 
     public List<TodoItem> Todos { get; set; } = new();
+
     public string NewTitle { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
@@ -63,7 +64,8 @@ public class TodoListBase : ComponentBase
 
     private async Task LoadAsync()
     {
-        Todos = await TodoService.GetAllAsync();
+        var items = await TodoService.GetAllAsync();
+        Todos = items;
     }
 
     public async Task AddTodo()
@@ -89,63 +91,69 @@ public class TodoListBase : ComponentBase
     }
 }
 
+public class TodoListComponent : TodoListBase
+{
+    protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+    {
+        builder.OpenElement(0, "div");
+        builder.AddContent(1, "Todo List");
+        builder.CloseElement();
+    }
+}
+
+/* xUnit tests for TodoService */
 public class TodoServiceTests
 {
     [Fact]
     public async Task AddAsync_CreatesItemWithCorrectTitle()
     {
         var service = new TodoService();
-
         var item = await service.AddAsync("Test");
-
         item.Title.Should().Be("Test");
         item.Id.Should().Be(1);
-        item.IsCompleted.Should().BeFalse();
     }
 
     [Fact]
     public async Task DeleteAsync_RemovesItem()
     {
         var service = new TodoService();
-        var item1 = await service.AddAsync("One");
-        var item2 = await service.AddAsync("Two");
-
-        await service.DeleteAsync(item1.Id);
+        var a = await service.AddAsync("A");
+        var b = await service.AddAsync("B");
+        await service.DeleteAsync(a.Id);
         var all = await service.GetAllAsync();
-
-        all.Count.Should().Be(1);
-        all[0].Id.Should().Be(item2.Id);
+        all.Should().ContainSingle(i => i.Id == b.Id);
     }
 
     [Fact]
     public async Task ToggleAsync_FlipsIsCompleted()
     {
         var service = new TodoService();
-        var item = await service.AddAsync("Item");
+        var item = await service.AddAsync("C");
+        await service.ToggleAsync(item.Id);
+        var all = await service.GetAllAsync();
+        var toggled = all.First(i => i.Id == item.Id);
+        toggled.IsCompleted.Should().BeTrue();
 
         await service.ToggleAsync(item.Id);
-        var after = (await service.GetAllAsync()).First(i => i.Id == item.Id);
-        after.IsCompleted.Should().BeTrue();
-
-        await service.ToggleAsync(item.Id);
-        var after2 = (await service.GetAllAsync()).First(i => i.Id == item.Id);
-        after2.IsCompleted.Should().BeFalse();
+        all = await service.GetAllAsync();
+        toggled = all.First(i => i.Id == item.Id);
+        toggled.IsCompleted.Should().BeFalse();
     }
 }
 
-public class TodoListBaseTests
+/* bUnit test for TodoListComponent */
+public class TodoListComponentTests
 {
     [Fact]
-    public void OnInitialized_CallsGetAllAsync()
+    public async Task OnInitialized_CallsGetAllAsync()
     {
-        var service = Substitute.For<ITodoService>();
-        service.GetAllAsync().Returns(Task.FromResult(new List<TodoItem>()));
-
         using var ctx = new Bunit.TestContext();
-        Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddSingleton<ITodoService>(ctx.Services, service);
+        var service = Substitute.For<ITodoService>();
+        service.GetAllAsync().Returns(new List<TodoItem>());
+        ctx.Services.AddSingleton<ITodoService>(service);
 
-        var cut = ctx.RenderComponent<TodoListBase>();
+        var cut = ctx.RenderComponent<TodoListComponent>();
 
-        service.Received().GetAllAsync();
+        await service.Received(1).GetAllAsync();
     }
 }

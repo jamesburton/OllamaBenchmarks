@@ -44,7 +44,9 @@
     "glm-5:cloud",
     "minimax-m2.7:cloud",
     "cogito-2.1:671b-cloud",
-    "deepseek-v3.2:cloud"
+    "deepseek-v3.2:cloud",
+    "hf.co/bartowski/stepfun-ai_Step-3.5-Flash-GGUF:IQ2_XXS",
+    "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K"
   ],
   "local_installed": [
     "cogito:8b",
@@ -56,7 +58,9 @@
     "glm-5:cloud",
     "minimax-m2.7:cloud",
     "nemotron-3-nano:4b",
-    "rnj-1:8b"
+    "rnj-1:8b",
+    "hf.co/bartowski/stepfun-ai_Step-3.5-Flash-GGUF:IQ2_XXS",
+    "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K"
   ],
   "effective_models": [
     "cogito:8b",
@@ -170,6 +174,11 @@
     "cogito-2.1:671b-cloud": "Ollama cloud (provider: Essential AI). 671B, MIT-licensed. Coding L3: 13/20 (0.652). Interesting failure pattern — fails some basics (aspnet_oneof, efcore_json) but passes harder tasks (masstransit_test_harness, vertical_blazor_crud).",
     "deepseek-v3.2:cloud": "Ollama cloud (provider: DeepSeek). Coding L3: 16/20 (0.826) — #2 cloud model. Strong across the board, only failed aspnet_service_di, masstransit_statemachine, masstransit_test_harness, xunit_assembly_fixture.",
     "hf.co/Intel/Qwen3-235B-A22B-Instruct-2507-gguf-q2ks-mixed-AutoRound": "Strix candidate. Qwen3 235B MoE (22B active). Intel AutoRound mixed quant: 8-bit embeddings + 4-bit non-expert + 2-bit expert layers = 79.8GB. Fits Strix 128GB unified memory with ~48GB headroom for KV cache. Not yet tested.",
-    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0": "Framework: fails to load on Ollama 0.20.0-rc1 (qwen3.5 arch blob error). Via llama-server (llama.cpp b8645 CUDA 12.4): 14.7 tok/s, 3/5 quality (coding 0/2, tools 2/2, agentic 1/1), 9.77GB VRAM. Coding L3 not available (requires Ollama native API). Reasoning distill based on qwen3.5:9b."
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0": "Framework: fails to load on Ollama 0.20.0-rc1 (qwen3.5 arch blob error). Via llama-server (llama.cpp b8645 CUDA 12.4): 14.7 tok/s, 3/5 quality (coding 0/2, tools 2/2, agentic 1/1), 9.77GB VRAM. Coding L3 not available (requires Ollama native API). Reasoning distill based on qwen3.5:9b.",
+    "gpt-oss:120b": "Strix: Coding L3 43/50 (0.873) — tied #1 with qwen3-coder-next and glm-5:cloud. 65GB model, 100% GPU on Strix with OLLAMA_GPU_MEMORY=120G. Failed: efcore_leftjoin, xunit_assembly_fixture, linq_complex_query, async_semaphore_throttle, async_valuetask_cache, aspnet_minimal_api_endpoint, xunit_async_collection.",
+    "nemotron-3-super": "Strix: Coding L3 36/50 (0.727) — #4. 86GB model, 28%/72% CPU/GPU split (93GB loaded). 120B MoE 12B active. Strong finish — last 20 tasks 19/20 PASS. Uses temperature=1.0. Failed early tasks (aspnet_oneof, efcore_leftjoin, masstransit_statemachine/test_harness, xunit tasks) but swept EF Core 33-36, MassTransit 37-39, all Blazor, vertical, and patterns tasks.",
+    "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K": "Strix: 85GB model, 24%/76% CPU/GPU split. Qwen3 235B MoE (22B active), i1-Q2_K quant. Very slow (~7 min/task). L3 benchmark in progress. Q2_K quality significantly degrades code generation — 50% pass rate at task 13. The abliterated (uncensored) variant is not optimal for coding benchmarks.",
+    "hf.co/bartowski/stepfun-ai_Step-3.5-Flash-GGUF:IQ2_XXS": "BLOCKED: Ollama 0.20.2 does not support Step-3.5-Flash architecture (GitHub issue #14043, llama.cpp PRs merged but not in Ollama yet). 48GB IQ2_XXS downloaded, 500 error on load. 197B MoE (11B active), Apache 2.0. StepFun official Q4_K_S (111GB) explicitly targets 128GB unified memory (AMD Ryzen AI Max+ 395). REAP pruned variant (149B/11B) available at Q4_K_S 85GB. Needs llama-server or Ollama update.",
+    "deepseek-v3.2:cloud": "Ollama cloud (provider: DeepSeek). 685B MoE, ~37B active. Coding L3 (20-task): 16/20 (0.826). NOT runnable locally — smallest GGUF is 161GB (unsloth UD-TQ1_0), exceeds 128GB. Cloud-only on Ollama."
   }
 }

@@ -29,42 +29,33 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 public class NotificationServiceTests
 {
     [Fact]
-    public async Task NotifyUserAsync_UserFound_SendsWelcomeEmail()
+    public async Task NotifyUserAsync_HappyPath_SendsEmail()
     {
-        // Arrange
         var repo = Substitute.For<IUserRepository>();
-        var email = Substitute.For<IEmailService>();
-        var userId = 42;
-        var user = new User { Id = userId, Name = "Ada", Email = "ada@example.com" };
+        var emailService = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, emailService);
+        int userId = 42;
+        var user = new User { Id = userId, Name = "Alice", Email = "alice@example.com" };
         repo.GetByIdAsync(userId).Returns(user);
 
-        var service = new NotificationService(repo, email);
-
-        // Act
         await service.NotifyUserAsync(userId);
 
-        // Assert
-        await repo.Received().GetByIdAsync(userId);
-        await email.Received().SendWelcomeAsync(user.Email);
-        user.Email.Should().Be("ada@example.com");
+        await repo.Received(1).GetByIdAsync(userId);
+        await emailService.Received(1).SendWelcomeAsync(user.Email);
     }
 
     [Fact]
-    public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
+    public async Task NotifyUserAsync_UserNotFound_Throws()
     {
-        // Arrange
         var repo = Substitute.For<IUserRepository>();
-        var email = Substitute.For<IEmailService>();
-        var userId = 99;
-        repo.GetByIdAsync(userId).Returns((User?)null);
+        var emailService = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, emailService);
+        int userId = 99;
+        repo.GetByIdAsync(userId).Returns(null as User?);
 
-        var service = new NotificationService(repo, email);
-
-        // Act
-        Func<Task> act = async () => await service.NotifyUserAsync(userId);
-
-        // Assert
+        Func<Task> act = () => service.NotifyUserAsync(userId);
         await act.Should().ThrowAsync<InvalidOperationException>();
-        await email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+        await repo.Received(1).GetByIdAsync(userId);
+        await emailService.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 }

@@ -1,6 +1,7 @@
 global using Contracts;
-using System;
 using MassTransit;
+using System;
+using System.Threading.Tasks;
 
 namespace Contracts
 {
@@ -25,8 +26,7 @@ namespace Contracts
             ConcurrentMessageLimit = 2;
         }
 
-        protected override void ConfigureConsumer(
-            IReceiveEndpointConfigurator ep,
+        protected override void ConfigureConsumer(IReceiveEndpointConfigurator ep,
             IConsumerConfigurator<ProcessPaymentConsumer> consumer,
             IRegistrationContext ctx)
         {

@@ -41,7 +41,7 @@ public class OrderService
 
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request?.CustomerName))
+        if (request == null || string.IsNullOrWhiteSpace(request.CustomerName))
         {
             return new ValidationError { Message = "Customer name is required" };
         }

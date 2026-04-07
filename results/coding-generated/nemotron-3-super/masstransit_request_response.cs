@@ -1,7 +1,6 @@
 global using Contracts;
+
 using MassTransit;
-using System;
-using System.Threading.Tasks;
 
 namespace Contracts
 {

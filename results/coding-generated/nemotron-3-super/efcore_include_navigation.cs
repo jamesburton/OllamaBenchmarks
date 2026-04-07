@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 public class Comment
 {
     public int Id { get; set; }
-    public string Text { get; set; } = default!;
+    public string? Text { get; set; }
     public int PostId { get; set; }
     public Post? Post { get; set; }
 }
@@ -14,7 +12,7 @@ public class Comment
 public class Post
 {
     public int Id { get; set; }
-    public string Content { get; set; } = default!;
+    public string? Content { get; set; }
     public int BlogId { get; set; }
     public Blog? Blog { get; set; }
     public List<Comment> Comments { get; set; } = new();
@@ -23,7 +21,7 @@ public class Post
 public class Blog
 {
     public int Id { get; set; }
-    public string Title { get; set; } = default!;
+    public string? Title { get; set; }
     public List<Post> Posts { get; set; } = new();
 }
 
@@ -57,11 +55,11 @@ public class BlogRepository
         _context = context;
     }
 
-    public async Task<Blog?> GetWithPostsAndCommentsAsync(int blogId)
+    public Task<Blog?> GetWithPostsAndCommentsAsync(int blogId)
     {
-        return await _context.Blogs
+        return _context.Blogs
             .Include(b => b.Posts)
-                .ThenInclude(p => p.Comments)
+            .ThenInclude(p => p.Comments)
             .FirstOrDefaultAsync(b => b.Id == blogId);
     }
 }

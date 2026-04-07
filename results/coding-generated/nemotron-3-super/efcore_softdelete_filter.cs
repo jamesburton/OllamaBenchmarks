@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 public interface ISoftDeletable
 {
@@ -19,7 +19,10 @@ public class ArticleDbContext : DbContext
 {
     public DbSet<Article> Articles { get; set; }
 
-    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options) { }
+    public ArticleDbContext(DbContextOptions<ArticleDbContext> options)
+        : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,8 +42,10 @@ public class ArticleRepository
 
     public async Task SoftDeleteAsync(int id)
     {
-        var article = await _context.Articles.IgnoreQueryFilters()
-                                            .FirstOrDefaultAsync(a => a.Id == id);
+        var article = await _context.Articles
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(a => a.Id == id);
+
         if (article != null)
         {
             article.IsDeleted = true;
@@ -48,13 +53,13 @@ public class ArticleRepository
         }
     }
 
-    public Task<List<Article>> GetAllAsync()
+    public async Task<List<Article>> GetAllAsync()
     {
-        return _context.Articles.ToListAsync();
+        return await _context.Articles.ToListAsync();
     }
 
-    public Task<List<Article>> GetAllIncludingDeletedAsync()
+    public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        return _context.Articles.IgnoreQueryFilters().ToListAsync();
+        return await _context.Articles.IgnoreQueryFilters().ToListAsync();
     }
 }

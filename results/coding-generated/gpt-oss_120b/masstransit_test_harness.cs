@@ -1,42 +1,45 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-public class ProcessPaymentConsumerTests
+public sealed class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task Consumer_Processes_ProcessPayment_And_Publishes_PaymentProcessed()
+    public async Task ProcessPayment_IsConsumed_And_PaymentProcessed_IsPublished()
     {
-        // Arrange
-        var services = new ServiceCollection()
+        // Arrange: build the test harness with the consumer
+        var provider = new ServiceCollection()
             .AddMassTransitTestHarness(cfg =>
             {
                 cfg.AddConsumer<ProcessPaymentConsumer>();
-            });
+            })
+            .BuildServiceProvider(true);
 
-        await using var provider = services.BuildServiceProvider(true);
         var harness = provider.GetRequiredService<ITestHarness>();
-
         await harness.Start();
 
         var orderId = Guid.NewGuid();
         var amount = 99.99m;
 
-        // Act
+        // Act: publish the ProcessPayment command
         await harness.Bus.Publish(new ProcessPayment(orderId, amount));
 
-        // Allow the message pipeline to process
-        // (optional small delay can be added if needed)
-
-        // Assert
+        // Assert: verify consumption and publication
         var consumed = await harness.Consumed.Any<ProcessPayment>();
-        var published = await harness.Published.Any<PaymentProcessed>(x => x.Context.Message.OrderId == orderId);
+        var published = await harness.Published.Any<PaymentProcessed>();
+        var publishedMessage = harness.Published
+            .Select<PaymentProcessed>()
+            .FirstOrDefault()
+            ?.Context
+            .Message;
 
         Assert.Multiple(
-            () => Assert.True(consumed, "ProcessPayment message was not consumed by the consumer."),
-            () => Assert.True(published, "PaymentProcessed event was not published with the correct OrderId.")
+            () => Assert.True(consumed, "ProcessPayment message was not consumed."),
+            () => Assert.True(published, "PaymentProcessed event was not published."),
+            () => Assert.Equal(orderId, publishedMessage?.OrderId)
         );
     }
 }

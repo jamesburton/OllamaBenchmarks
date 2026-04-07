@@ -7,33 +7,30 @@ class ThrottledProcessor
         _semaphore = new System.Threading.SemaphoreSlim(maxConcurrent, maxConcurrent);
     }
 
-    public async System.Threading.Tasks.Task<System.Collections.Generic.List<T>> ProcessAllAsync<T>(
+    public System.Threading.Tasks.Task<System.Collections.Generic.List<T>> ProcessAllAsync<T>(
         System.Collections.Generic.IEnumerable<System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>>> tasks,
         System.Threading.CancellationToken ct)
     {
-        var taskList = new System.Collections.Generic.List<System.Threading.Tasks.Task<T>>();
+        var tasksList = new System.Collections.Generic.List<System.Threading.Tasks.Task<T>>();
 
         foreach (var factory in tasks)
         {
-            taskList.Add(RunWithSemaphore(factory, ct));
+            var t = System.Threading.Tasks.Task.Run(async () =>
+            {
+                await _semaphore.WaitAsync(ct).ConfigureAwait(false);
+                try
+                {
+                    return await factory(ct).ConfigureAwait(false);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }, ct);
+            tasksList.Add(t);
         }
 
-        var results = await System.Threading.Tasks.Task.WhenAll(taskList);
-        return new System.Collections.Generic.List<T>(results);
-    }
-
-    private async System.Threading.Tasks.Task<T> RunWithSemaphore<T>(
-        System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>> factory,
-        System.Threading.CancellationToken ct)
-    {
-        await _semaphore.WaitAsync(ct);
-        try
-        {
-            return await factory(ct);
-        }
-        finally
-        {
-            _semaphore.Release();
-        }
+        return System.Threading.Tasks.Task.WhenAll(tasksList)
+            .ContinueWith(t => new System.Collections.Generic.List<T>(t.Result), System.Threading.Tasks.TaskContinuationOptions.ExecuteSynchronously);
     }
 }

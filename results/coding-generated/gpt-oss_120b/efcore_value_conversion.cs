@@ -7,13 +7,13 @@ public record Money(decimal Amount, string Currency);
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = default!;
+    public string Name { get; set; } = string.Empty;
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
 public class ProductDbContext : DbContext
 {
-    public DbSet<Product> Products { get; set; } = default!;
+    public DbSet<Product> Products { get; set; } = null!;
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options)
         : base(options)
@@ -24,7 +24,7 @@ public class ProductDbContext : DbContext
     {
         var parts = s.Split(':');
         if (parts.Length != 2)
-            throw new FormatException($"Invalid money format: '{s}'. Expected 'amount:currency'.");
+            throw new FormatException($"Invalid money format: '{s}'");
 
         var amount = decimal.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture);
         var currency = parts[1];

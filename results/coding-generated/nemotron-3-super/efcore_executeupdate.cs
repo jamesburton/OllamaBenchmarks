@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,15 +30,13 @@ public static class ProductOperations
             .Where(p => p.Category == category)
             .ToListAsync();
 
-        int count = 0;
-        foreach (var p in products)
+        foreach (var product in products)
         {
-            p.Price = p.Price * (1 - discountPct);
-            p.LastModified = DateTime.UtcNow;
-            count++;
+            product.Price = product.Price * (1 - discountPct);
+            product.LastModified = DateTime.UtcNow;
         }
 
         await db.SaveChangesAsync();
-        return count;
+        return products.Count;
     }
 }

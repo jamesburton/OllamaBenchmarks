@@ -1,25 +1,32 @@
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 public interface IDataSource
 {
-    System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string>> FetchBatchAsync(
-        int batchNumber,
-        System.Threading.CancellationToken ct);
+    Task<IReadOnlyList<string>> FetchBatchAsync(int batchNumber, CancellationToken ct);
 }
 
 public class DataProcessor
 {
-    public async System.Collections.Generic.IAsyncEnumerable<string> ProcessAllBatchesAsync(
+    public async IAsyncEnumerable<string> ProcessAllBatchesAsync(
         IDataSource source,
-        [EnumeratorCancellation] System.Threading.CancellationToken ct = default)
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
         int batchNumber = 0;
+
         while (true)
         {
+            // Cancellation check BEFORE fetching the next batch
             if (ct.IsCancellationRequested)
                 yield break;
 
-            var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
+            var batch = await source
+                .FetchBatchAsync(batchNumber, ct)
+                .ConfigureAwait(false);
+
+            // Stop when an empty batch is returned
             if (batch == null || batch.Count == 0)
                 break;
 

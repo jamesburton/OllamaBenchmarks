@@ -1,32 +1,33 @@
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 public record Money(decimal Amount, string Currency);
 
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = default!;
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
 public class ProductDbContext : DbContext
 {
-    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Product> Products { get; set; } = default!;
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
 
     private static Money ParseMoney(string s)
     {
         var parts = s.Split(':');
-        var amount = decimal.Parse(parts[0]);
-        var currency = parts[1];
-        return new Money(amount, currency);
+        if (parts.Length != 2 || !decimal.TryParse(parts[0], out var amount))
+            throw new FormatException("Invalid money format");
+        return new Money(amount, parts[1]);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
             .HasConversion(m => $"{m.Amount}:{m.Currency}", s => ParseMoney(s));

@@ -4,8 +4,7 @@ public class NotFoundException : Exception
 {
     public string ResourceName { get; }
 
-    public NotFoundException(string resourceName)
-        : base($"Resource not found: {resourceName}")
+    public NotFoundException(string resourceName) : base($"Resource not found: {resourceName}")
     {
         ResourceName = resourceName;
     }
@@ -15,34 +14,36 @@ public class ConflictException : Exception
 {
     public string ConflictReason { get; }
 
-    public ConflictException(string conflictReason)
-        : base($"Conflict: {conflictReason}")
+    public ConflictException(string conflictReason) : base($"Conflict: {conflictReason}")
     {
         ConflictReason = conflictReason;
     }
 }
 
-public static class ApiExceptionMapper
+static class ApiExceptionMapper
 {
-    public static ProblemDetails MapException(Exception ex) => ex switch
+    public static ProblemDetails MapException(Exception ex)
     {
-        NotFoundException nf => new ProblemDetails
+        return ex switch
         {
-            Status = 404,
-            Title = "Not Found",
-            Detail = nf.ResourceName
-        },
-        ConflictException cf => new ProblemDetails
-        {
-            Status = 409,
-            Title = "Conflict",
-            Detail = cf.ConflictReason
-        },
-        _ => new ProblemDetails
-        {
-            Status = 500,
-            Title = "Internal Server Error",
-            Detail = ex.Message
-        }
-    };
+            NotFoundException nf => new ProblemDetails
+            {
+                Status = 404,
+                Title = "Not Found",
+                Detail = nf.ResourceName
+            },
+            ConflictException cf => new ProblemDetails
+            {
+                Status = 409,
+                Title = "Conflict",
+                Detail = cf.ConflictReason
+            },
+            _ => new ProblemDetails
+            {
+                Status = 500,
+                Title = "Internal Server Error",
+                Detail = ex.Message
+            }
+        };
+    }
 }

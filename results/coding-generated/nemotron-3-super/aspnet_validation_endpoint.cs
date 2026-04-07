@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 public class CreateOrderRequest
 {
     [Required]
-    public string Name { get; set; } = default!;
+    public string Name { get; set; }
 
     [Range(0.01, 10000)]
     public decimal Price { get; set; }
@@ -16,13 +16,13 @@ public class OrderService
 {
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
+        var validationContext = new ValidationContext(request);
         var validationResults = new System.Collections.Generic.List<ValidationResult>();
-        var context = new ValidationContext(request);
-        if (!Validator.TryValidateObject(request, context, validationResults, validateAllProperties: true))
+        if (!Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true))
         {
-            var firstError = validationResults.FirstOrDefault();
-            string errorMessage = firstError != null ? firstError.ErrorMessage : "Validation failed";
-            throw new System.ArgumentException(errorMessage);
+            var firstError = validationResults[0];
+            string errorMessage = firstError.ErrorMessage ?? "Validation failed";
+            throw new ArgumentException(errorMessage);
         }
         return request;
     }

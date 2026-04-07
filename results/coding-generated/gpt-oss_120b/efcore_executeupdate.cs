@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 public class Product
 {
@@ -23,10 +24,7 @@ public class ProductDbContext : DbContext
 
 public static class ProductOperations
 {
-    public static async Task<int> ApplyDiscount(
-        ProductDbContext db,
-        string category,
-        decimal discountPct)
+    public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
         var products = await db.Products
             .Where(p => p.Category == category)
@@ -38,8 +36,6 @@ public static class ProductOperations
             product.LastModified = DateTime.UtcNow;
         }
 
-        // SaveChangesAsync returns the number of state entries written to the database,
-        // which corresponds to the number of products updated in this case.
         return await db.SaveChangesAsync();
     }
 }

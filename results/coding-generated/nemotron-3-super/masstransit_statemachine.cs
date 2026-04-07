@@ -1,5 +1,4 @@
 global using Contracts;
-
 using MassTransit;
 using MassTransit.StateMachine;
 
@@ -31,20 +30,24 @@ namespace Contracts
         {
             InstanceState(x => x.CurrentState);
 
+            // Correlation configuration
             Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId));
             Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId));
             Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId));
 
+            // Initially
             Initially(
                 When(OrderSubmitted)
-                    .Then(context => context.Saga.OrderDate = context.Message.OrderDate)
+                    .Then(ctx => ctx.Saga.OrderDate = ctx.Message.OrderDate)
                     .TransitionTo(Submitted));
 
+            // During Submitted
             During(Submitted,
                 When(OrderAccepted)
-                    .Then(context => context.Saga.AcceptedAt = context.Message.AcceptedAt)
+                    .Then(ctx => ctx.Saga.AcceptedAt = ctx.Message.AcceptedAt)
                     .TransitionTo(Accepted));
 
+            // During Accepted
             During(Accepted,
                 When(OrderCompleted)
                     .Finalize());
