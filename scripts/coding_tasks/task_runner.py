@@ -156,6 +156,54 @@ def call_ollama(
             return ""
 
 
+def call_llama_server(
+    model: str,
+    prompt: str,
+    max_tokens: int = 4096,
+    num_ctx: int = 12288,
+    seed: int = 42,
+    timeout: int = 600,
+    base_url: str = "http://127.0.0.1:8080",
+) -> str:
+    """POST to llama-server OpenAI-compatible /v1/chat/completions endpoint.
+
+    Used for models that Ollama can't load (e.g., Step-3.5-Flash).
+    Handles reasoning_content field from thinking models.
+    Returns empty string on timeout or connection error.
+    """
+    messages = [{"role": "user", "content": prompt}]
+    payload = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": max_tokens,
+        "temperature": 0,
+        "top_p": 1,
+        "seed": seed,
+    }
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        f"{base_url}/v1/chat/completions",
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+        msg = body.get("choices", [{}])[0].get("message", {})
+        content = msg.get("content", "")
+        # Fall back to reasoning_content for thinking models (e.g., Step-3.5-Flash)
+        if not content:
+            content = msg.get("reasoning_content", "")
+        # Strip thinking tags if present
+        if "<think>" in content:
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+        return content
+    except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+        print(f"    [call_llama_server] Error: {type(exc).__name__}: {exc}")
+        return ""
+
+
 def setup_template_cache(template_dir: str, cache_dir: str) -> str:
     """Copy template to cache_dir and run dotnet restore once.
 
@@ -276,15 +324,31 @@ def run_task(
         # Determine generation timeout
         gen_timeout = 600 if weight >= 2 else 600
 
-        # Call Ollama and measure time
+        # Use llama-server if LLAMA_SERVER_URL is set, otherwise Ollama
+        llama_server_url = os.environ.get("LLAMA_SERVER_URL")
+
+        # Call LLM and measure time
         t0 = time.monotonic()
-        raw_response = call_ollama(
-            model,
-            task_def["prompt"],
-            max_tokens=max_tokens,
-            num_ctx=num_ctx,
-            timeout=gen_timeout,
-        )
+        if llama_server_url:
+            # Thinking models (e.g., Step-3.5-Flash) need more tokens for
+            # reasoning + code output.  Double the budget, minimum 8192.
+            llama_max_tokens = max(max_tokens * 2, 8192)
+            raw_response = call_llama_server(
+                model,
+                task_def["prompt"],
+                max_tokens=llama_max_tokens,
+                num_ctx=num_ctx,
+                timeout=gen_timeout,
+                base_url=llama_server_url,
+            )
+        else:
+            raw_response = call_ollama(
+                model,
+                task_def["prompt"],
+                max_tokens=max_tokens,
+                num_ctx=num_ctx,
+                timeout=gen_timeout,
+            )
         generation_time = time.monotonic() - t0
 
         # Extract C# code
