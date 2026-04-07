@@ -29,14 +29,14 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 public class NotificationServiceTests
 {
     [Fact]
-    public async Task NotifyUserAsync_UserFound_SendsEmail()
+    public async Task NotifyUserAsync_WhenUserExists_SendsWelcomeEmail()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
         var emailService = Substitute.For<IEmailService>();
         var sut = new NotificationService(repo, emailService);
 
-        var user = new User { Id = 1, Email = "test@example.com" };
+        var user = new User { Id = 1, Name = "Test User", Email = "test@example.com" };
         repo.GetByIdAsync(user.Id).Returns(user);
 
         // Act
@@ -48,7 +48,7 @@ public class NotificationServiceTests
     }
 
     [Fact]
-    public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
+    public async Task NotifyUserAsync_WhenUserNotFound_ThrowsInvalidOperationException()
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
@@ -58,7 +58,7 @@ public class NotificationServiceTests
         repo.GetByIdAsync(Arg.Any<int>()).Returns((User?)null);
 
         // Act
-        Func<Task> act = () => sut.NotifyUserAsync(1);
+        Func<Task> act = () => sut.NotifyUserAsync(999);
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>();

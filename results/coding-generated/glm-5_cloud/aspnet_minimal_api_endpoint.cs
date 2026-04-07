@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using System.Threading;
 
 public record CreateProductRequest(string Name, decimal Price);
 
@@ -14,12 +16,12 @@ public static class ProductEndpoints
 
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            errors["Name"] = ["Name is required."];
+            errors["Name"] = new[] { "Name is required." };
         }
 
         if (request.Price <= 0)
         {
-            errors["Price"] = ["Price must be greater than 0."];
+            errors["Price"] = new[] { "Price must be greater than 0." };
         }
 
         if (errors.Count > 0)
@@ -27,7 +29,7 @@ public static class ProductEndpoints
             return Results.ValidationProblem(errors);
         }
 
-        int id = ++_counter;
+        var id = Interlocked.Increment(ref _counter);
         return Results.Ok(new ProductResponse(id, request.Name, request.Price));
     }
 }

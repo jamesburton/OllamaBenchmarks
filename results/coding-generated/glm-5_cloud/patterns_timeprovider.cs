@@ -11,6 +11,11 @@ public class FakeTimeProvider : System.TimeProvider
     {
         return _fixedUtcNow;
     }
+
+    public override long GetTimestamp()
+    {
+        throw new System.NotImplementedException();
+    }
 }
 
 public class ExpiryChecker

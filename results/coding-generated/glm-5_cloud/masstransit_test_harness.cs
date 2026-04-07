@@ -1,57 +1,34 @@
 using MassTransit;
-        using MassTransit.Testing;
-        using Microsoft.Extensions.DependencyInjection;
+using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
-        public class ProcessPaymentConsumerTests
-        {
-            [Fact]
-            public async Task Should_Consume_ProcessPayment_And_Publish_PaymentProcessed()
+public class ProcessPaymentConsumerTests
+{
+    [Fact]
+    public async Task Should_Consume_ProcessPayment_And_Publish_PaymentProcessed()
+    {
+        var provider = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg =>
             {
-                // Arrange
-                var provider = new ServiceCollection()
-                    .AddMassTransitTestHarness(cfg =>
-                    {
-                        cfg.AddConsumer<ProcessPaymentConsumer>();
-                    })
-                    .BuildServiceProvider(true);
+                cfg.AddConsumer<ProcessPaymentConsumer>();
+            })
+            .BuildServiceProvider(true);
 
-                var harness = provider.GetRequiredService<ITestHarness>();
-                await harness.Start();
+        var harness = provider.GetRequiredService<ITestHarness>();
 
-                var orderId = Guid.NewGuid();
-                var amount = 100.50m;
+        await harness.Start();
 
-                // Act
-                await harness.Bus.Publish(new ProcessPayment(orderId, amount));
+        var orderId = Guid.NewGuid();
+        var amount = 100.50m;
 
-                // Assert
-                var consumed = await harness.Consumed.Any<ProcessPayment>();
-                var published = await harness.Published.Any<PaymentProcessed>(x => x.Message.OrderId == orderId);
+        await harness.Bus.Publish(new ProcessPayment(orderId, amount));
 
-                Assert.Multiple(() =>
-                {
-                    Assert.True(consumed);
-                    Assert.True(published);
-                });
-            }
-        }
-
-var consumed = await harness.Consumed.Any<ProcessPayment>();
-        var published = await harness.Published.Any<PaymentProcessed>();
-        // We need to verify the OrderId.
-        // We can get the message context synchronously now.
-        var publishedMessage = harness.Published.Select<PaymentProcessed>().FirstOrDefault()?.Context.Message;
+        bool consumed = await harness.Consumed.Any<ProcessPayment>();
+        bool published = await harness.Published.Any<PaymentProcessed>(x => x.Context.Message.OrderId == orderId);
 
         Assert.Multiple(
-            () => Assert.True(consumed),
-            () => Assert.True(published),
-            () => Assert.NotNull(publishedMessage),
-            () => Assert.Equal(orderId, publishedMessage.OrderId)
+            () => Assert.True(consumed, "ProcessPayment message was not consumed"),
+            () => Assert.True(published, "PaymentProcessed message was not published with the correct OrderId")
         );
-
-var consumed = await harness.Consumed.Any<ProcessPayment>();
-        var published = await harness.Published.Any<PaymentProcessed>();
-        // We can't easily check OrderId with just Any() unless we use Select.
-        // But the prompt says "Use ... Any()".
-        // It doesn't say "Don't use Select".
-        // But checking "correct OrderId" is a requirement.
+    }
+}

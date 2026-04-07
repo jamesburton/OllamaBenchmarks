@@ -1,37 +1,37 @@
 {
   "model": "glm-5:cloud",
   "iterations": 6,
-  "baseline_score": 0,
-  "best_score": 0,
+  "baseline_score": 44,
+  "best_score": 44,
   "history": [
     {
       "iteration": 0,
       "mutation": "baseline",
-      "score": 0,
+      "score": 44,
       "kept": true
     },
     {
       "iteration": 1,
       "mutation": "slight_temp",
-      "score": 0,
+      "score": 42,
       "kept": false
     },
     {
       "iteration": 2,
       "mutation": "test_aware",
-      "score": 0,
+      "score": 44,
       "kept": false
     },
     {
       "iteration": 3,
       "mutation": "structured_output",
-      "score": 0,
+      "score": 39,
       "kept": false
     },
     {
       "iteration": 4,
       "mutation": "low_temp",
-      "score": 0,
+      "score": 42,
       "kept": false
     },
     {
@@ -43,7 +43,7 @@
     {
       "iteration": 6,
       "mutation": "baseline",
-      "score": 0,
+      "score": 42,
       "kept": false
     }
   ]

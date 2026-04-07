@@ -33,7 +33,7 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 
         Initially(
             When(InvoiceCreated)
-                .Then(ctx => { ctx.Saga.Amount = ctx.Message.Amount; })
+                .Then(ctx => ctx.Saga.Amount = ctx.Message.Amount)
                 .TransitionTo(Pending));
 
         During(Pending,

@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
-    public string Category { get; set; }
+    public string Category { get; set; } = string.Empty;
     public DateTime LastModified { get; set; }
 }
 
@@ -18,23 +18,25 @@ public class ProductDbContext : DbContext
     {
     }
 
-    public DbSet<Product> Products { get; set; }
+    public DbSet<Product> Products { get; set; } = null!;
 }
 
 public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        var productsToUpdate = await db.Products
+        var products = await db.Products
             .Where(p => p.Category == category)
             .ToListAsync();
 
-        foreach (var product in productsToUpdate)
+        foreach (var product in products)
         {
             product.Price = product.Price * (1 - discountPct);
             product.LastModified = DateTime.UtcNow;
         }
 
-        return await db.SaveChangesAsync();
+        await db.SaveChangesAsync();
+
+        return products.Count;
     }
 }

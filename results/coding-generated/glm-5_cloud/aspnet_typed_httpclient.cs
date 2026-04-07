@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 
 public record GitHubUser(
-    [JsonPropertyName("login")] string Login,
-    [JsonPropertyName("name")] string Name,
-    [JsonPropertyName("public_repos")] int PublicRepos
+    [property: JsonPropertyName("login")] string Login,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("public_repos")] int PublicRepos
 );
 
 public interface IGitHubClient

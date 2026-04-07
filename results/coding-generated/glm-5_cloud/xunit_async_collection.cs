@@ -1,10 +1,16 @@
 public class CounterService
 {
-    public int Count { get; private set; } = 0;
+    public int Count { get; private set; }
 
-    public void Increment() => Count++;
+    public void Increment()
+    {
+        Count++;
+    }
 
-    public void Reset() => Count = 0;
+    public void Reset()
+    {
+        Count = 0;
+    }
 }
 
 public class CounterFixture : IAsyncLifetime
@@ -17,12 +23,16 @@ public class CounterFixture : IAsyncLifetime
         return default;
     }
 
-    public ValueTask DisposeAsync() => default;
+    public ValueTask DisposeAsync()
+    {
+        return default;
+    }
 }
 
 [CollectionDefinition("Counter")]
 public class CounterCollection : ICollectionFixture<CounterFixture>
 {
+    // This class is never instantiated. It serves as the definition for the "Counter" collection.
 }
 
 [Collection("Counter")]

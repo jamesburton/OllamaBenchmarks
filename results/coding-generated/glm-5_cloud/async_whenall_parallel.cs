@@ -22,13 +22,8 @@ public class ParallelDataService
         var taskB = _loaderB.LoadAsync("sourceB", ct);
         var taskC = _loaderC.LoadAsync("sourceC", ct);
 
-        await System.Threading.Tasks.Task.WhenAll(taskA, taskB, taskC);
+        var results = await System.Threading.Tasks.Task.WhenAll(taskA, taskB, taskC);
 
-        return new System.Collections.Generic.List<string>
-        {
-            await taskA,
-            await taskB,
-            await taskC
-        };
+        return new System.Collections.Generic.List<string>(results);
     }
 }
