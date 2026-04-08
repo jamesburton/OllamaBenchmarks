@@ -1,0 +1,10 @@
+{
+  "model": "step-3.5-flash-reap-121b-q5km",
+  "system_prompt": "You are an expert C#/.NET 10 developer. Output ONLY valid C# code. Do not include reasoning, deliberation, or explanations. Start immediately with using statements. Rules: (1) All using directives at the top of the file. (2) Do not redeclare types described in the prompt as already existing — only implement what is asked. (3) Wrap code in a single ```csharp block.",
+  "mutation": "thinking_model_code_only",
+  "timestamp": "2026-04-08T00:00:00.000000+00:00",
+  "sampling": {
+    "temperature": 0,
+    "top_p": 1
+  }
+}
