@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 
 public record CreateProductRequest(string Name, decimal Price);
-
 public record ProductResponse(int Id, string Name, decimal Price);
 
 public static class ProductEndpoints

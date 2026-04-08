@@ -1,5 +1,5 @@
 global using Contracts;
-
+using System.Threading.Tasks;
 using MassTransit;
 
 namespace Contracts;
@@ -23,10 +23,10 @@ public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsu
     }
 
     protected override void ConfigureConsumer(
-        IReceiveEndpointConfigurator endpointConfigurator,
-        IConsumerConfigurator<SubmitOrderConsumer> consumerConfigurator,
-        IRegistrationContext context)
+        IReceiveEndpointConfigurator ep,
+        IConsumerConfigurator<SubmitOrderConsumer> consumer,
+        IRegistrationContext ctx)
     {
-        endpointConfigurator.UseMessageRetry(r => r.Interval(3, 1000));
+        ep.UseMessageRetry(r => r.Interval(3, TimeSpan.FromMilliseconds(1000)));
     }
 }

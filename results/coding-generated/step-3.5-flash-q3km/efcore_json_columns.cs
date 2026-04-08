@@ -1,5 +1,6 @@
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Address
 {
@@ -21,10 +22,9 @@ public class CompanyDbContext : DbContext
 
     public DbSet<Company> Companies { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.Entity<Company>()
-            .OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
+        modelBuilder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
     }
 }
 
@@ -33,9 +33,7 @@ public static class CompanyQueries
     public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
         return db.Companies
-            .Include(c => c.HeadquartersAddress)
             .Where(c => c.HeadquartersAddress.City == city)
-            .AsNoTracking()
             .ToList();
     }
 }

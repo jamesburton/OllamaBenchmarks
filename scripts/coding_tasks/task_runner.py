@@ -171,13 +171,23 @@ def call_llama_server(
     Handles reasoning_content field from thinking models.
     Returns empty string on timeout or connection error.
     """
-    messages = [{"role": "user", "content": prompt}]
+    # Check for prompt optimizer config override
+    config = _load_prompt_config(model)
+    messages = []
+    if config and config.get("system_prompt"):
+        messages.append({"role": "system", "content": config["system_prompt"]})
+    temperature = 0
+    top_p = 1
+    if config and config.get("sampling"):
+        temperature = config["sampling"].get("temperature", temperature)
+        top_p = config["sampling"].get("top_p", top_p)
+    messages.append({"role": "user", "content": prompt})
     payload = {
         "model": model,
         "messages": messages,
         "max_tokens": max_tokens,
-        "temperature": 0,
-        "top_p": 1,
+        "temperature": temperature,
+        "top_p": top_p,
         "seed": seed,
     }
     data = json.dumps(payload).encode("utf-8")

@@ -39,7 +39,11 @@ public class StoreService
     }
 }
 
-public class StoreServiceTests : IClassFixture<InMemoryStore>
+[CollectionDefinition("Store collection")]
+public class StoreCollection : ICollectionFixture<InMemoryStore> { }
+
+[Collection("Store collection")]
+public class StoreServiceTests
 {
     private readonly StoreService _service;
 

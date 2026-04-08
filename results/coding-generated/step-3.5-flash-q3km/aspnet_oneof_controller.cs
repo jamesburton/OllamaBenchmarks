@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
 
@@ -27,11 +28,9 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
-    [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
         var result = await _userService.GetByIdAsync(id);
-
         return result.Match<IActionResult>(
             user => Ok(user),
             _ => NotFound(),

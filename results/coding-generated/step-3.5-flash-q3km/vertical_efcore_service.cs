@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 public class TodoItem
 {
     public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
+    public string Title { get; set; }
     public bool IsComplete { get; set; }
     public DateTime CreatedAt { get; set; }
 }
@@ -11,7 +11,6 @@ public class TodoItem
 public class TodoDbContext : DbContext
 {
     public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options) { }
-
     public DbSet<TodoItem> TodoItems { get; set; }
 }
 
@@ -27,7 +26,6 @@ public interface ITodoService
 public class TodoService : ITodoService
 {
     private readonly TodoDbContext _db;
-
     public TodoService(TodoDbContext db) => _db = db;
 
     public async Task<TodoItem> CreateAsync(string title)
@@ -38,23 +36,21 @@ public class TodoService : ITodoService
             IsComplete = false,
             CreatedAt = DateTime.UtcNow
         };
-
         _db.TodoItems.Add(item);
         await _db.SaveChangesAsync();
         return item;
     }
 
-    public async Task<List<TodoItem>> GetAllAsync() => 
+    public async Task<List<TodoItem>> GetAllAsync() =>
         await _db.TodoItems.ToListAsync();
 
-    public async Task<TodoItem?> GetByIdAsync(int id) => 
+    public async Task<TodoItem?> GetByIdAsync(int id) =>
         await _db.TodoItems.FindAsync(id);
 
     public async Task<bool> CompleteAsync(int id)
     {
         var item = await _db.TodoItems.FindAsync(id);
         if (item == null) return false;
-
         item.IsComplete = true;
         await _db.SaveChangesAsync();
         return true;
@@ -64,7 +60,6 @@ public class TodoService : ITodoService
     {
         var item = await _db.TodoItems.FindAsync(id);
         if (item == null) return false;
-
         _db.TodoItems.Remove(item);
         await _db.SaveChangesAsync();
         return true;

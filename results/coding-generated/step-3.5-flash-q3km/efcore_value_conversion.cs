@@ -1,24 +1,24 @@
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 public record Money(decimal Amount, string Currency);
 
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
 public class ProductDbContext : DbContext
 {
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
+    public DbSet<Product> Products { get; set; }
 
-    public DbSet<Product> Products { get; set; } = null!;
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
 
     private static Money ParseMoney(string s)
     {
         var parts = s.Split(':');
-        if (parts.Length != 2) throw new FormatException($"Invalid money format: {s}");
         var amount = decimal.Parse(parts[0]);
         var currency = parts[1];
         return new Money(amount, currency);
@@ -30,8 +30,7 @@ public class ProductDbContext : DbContext
             .Property(p => p.Price)
             .HasConversion(
                 m => $"{m.Amount}:{m.Currency}",
-                s => ParseMoney(s)
-            );
+                s => ParseMoney(s));
     }
 }
 

@@ -1,11 +1,9 @@
-global using Contracts;
-
 using MassTransit;
+global using Contracts;
 
 namespace Contracts;
 
 public record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
-
 public record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
 
 public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
@@ -17,8 +15,7 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
 
         await context.Publish(new PaymentProcessed(
             context.Message.OrderId,
-            DateTime.UtcNow
-        ));
+            DateTime.UtcNow));
     }
 }
 

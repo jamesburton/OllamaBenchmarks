@@ -1,5 +1,3 @@
-using AwesomeAssertions;
-
 public class CounterService
 {
     public int Count { get; private set; } = 0;
@@ -10,11 +8,13 @@ public class CounterService
 public class CounterFixture : IAsyncLifetime
 {
     public CounterService Counter { get; private set; } = null!;
+
     public ValueTask InitializeAsync()
     {
         Counter = new CounterService();
         return default;
     }
+
     public ValueTask DisposeAsync() => default;
 }
 
@@ -25,13 +25,14 @@ public class CounterCollection : ICollectionFixture<CounterFixture> { }
 public class CounterFirstTests
 {
     private readonly CounterFixture _fixture;
+
     public CounterFirstTests(CounterFixture fixture) => _fixture = fixture;
 
     [Fact]
-    public void IncrementOnce_ShouldIncreaseCount()
+    public void Increment_ShouldIncreaseCount()
     {
         _fixture.Counter.Increment();
-        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(1);
+        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
     }
 }
 
@@ -39,6 +40,7 @@ public class CounterFirstTests
 public class CounterSecondTests
 {
     private readonly CounterFixture _fixture;
+
     public CounterSecondTests(CounterFixture fixture) => _fixture = fixture;
 
     [Fact]
@@ -46,6 +48,6 @@ public class CounterSecondTests
     {
         _fixture.Counter.Increment();
         _fixture.Counter.Increment();
-        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(2);
+        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 }

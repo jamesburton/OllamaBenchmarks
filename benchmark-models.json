@@ -45,6 +45,7 @@
     "minimax-m2.7:cloud",
     "cogito-2.1:671b-cloud",
     "deepseek-v3.2:cloud",
+    "glm-5.1:cloud",
     "hf.co/bartowski/stepfun-ai_Step-3.5-Flash-GGUF:IQ2_XXS",
     "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K"
   ],

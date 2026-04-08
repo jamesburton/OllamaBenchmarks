@@ -31,36 +31,32 @@ public class NotificationServiceTests
     [Fact]
     public async Task NotifyUserAsync_UserFound_SendsWelcomeEmail()
     {
-        var userId = 42;
-        var user = new User { Id = userId, Name = "Test", Email = "test@example.com" };
+        var userId = 1;
+        var user = new User { Id = userId, Email = "test@example.com" };
         var repo = Substitute.For<IUserRepository>();
         var email = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, email);
 
         repo.GetByIdAsync(userId).Returns(user);
 
-        var service = new NotificationService(repo, email);
-
         await service.NotifyUserAsync(userId);
 
-        await repo.Received().GetByIdAsync(userId);
-        await email.Received().SendWelcomeAsync(user.Email);
+        email.Received(1).SendWelcomeAsync("test@example.com");
     }
 
     [Fact]
     public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
     {
-        var userId = 42;
+        var userId = 1;
         var repo = Substitute.For<IUserRepository>();
         var email = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, email);
 
         repo.GetByIdAsync(userId).Returns((User?)null);
-
-        var service = new NotificationService(repo, email);
 
         Func<Task> act = () => service.NotifyUserAsync(userId);
 
         await act.Should().ThrowAsync<InvalidOperationException>();
-        await repo.Received().GetByIdAsync(userId);
-        await email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+        email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 }

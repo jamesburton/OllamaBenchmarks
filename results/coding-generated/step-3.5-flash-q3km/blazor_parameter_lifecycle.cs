@@ -4,7 +4,7 @@ public record UserProfile(int Id, string DisplayName, string Email);
 
 public interface IUserService
 {
-    System.Threading.Tasks.Task<UserProfile?> GetProfileAsync(int userId);
+    Task<UserProfile?> GetProfileAsync(int userId);
 }
 
 public class UserProfileBase : ComponentBase
@@ -16,7 +16,7 @@ public class UserProfileBase : ComponentBase
     public UserProfile? Profile { get; set; }
     public bool IsLoading { get; set; }
 
-    protected override async System.Threading.Tasks.Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
         IsLoading = true;
         Profile = await UserService.GetProfileAsync(UserId);

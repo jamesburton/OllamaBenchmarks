@@ -13,11 +13,10 @@ public static class SalesAnalyzer
         return sales
             .GroupBy(sale => sale.Category)
             .Select(group => new CategorySummary(
-                Category: group.Key,
-                TotalAmount: group.Sum(sale => sale.Amount),
-                AverageAmount: group.Average(sale => sale.Amount),
-                Count: group.Count()
-            ))
+                group.Key,
+                group.Sum(sale => sale.Amount),
+                group.Average(sale => sale.Amount),
+                group.Count()))
             .OrderByDescending(summary => summary.TotalAmount)
             .ToList();
     }

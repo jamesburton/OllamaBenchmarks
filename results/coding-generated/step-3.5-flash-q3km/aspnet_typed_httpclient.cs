@@ -1,11 +1,12 @@
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 public record GitHubUser(
-    [System.Text.Json.Serialization.JsonPropertyName("login")] string Login,
-    [System.Text.Json.Serialization.JsonPropertyName("name")] string Name,
-    [System.Text.Json.Serialization.JsonPropertyName("public_repos")] int PublicRepos
-);
+    [property: System.Text.Json.Serialization.JsonPropertyName("login")] string Login,
+    [property: System.Text.Json.Serialization.JsonPropertyName("name")] string Name,
+    [property: System.Text.Json.Serialization.JsonPropertyName("public_repos")] int PublicRepos);
 
 public interface IGitHubClient
 {

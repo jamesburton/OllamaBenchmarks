@@ -1,8 +1,9 @@
 global using Contracts;
 
-namespace Contracts;
-
 using MassTransit;
+using MassTransit.StateMachine;
+
+namespace Contracts;
 
 public class OrderState : SagaStateMachineInstance
 {
@@ -38,7 +39,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(OrderSubmitted)
                 .Then(context =>
                 {
-                    context.Saga.OrderDate = context.Data.OrderDate;
+                    context.Saga.OrderDate = context.Message.OrderDate;
                 })
                 .TransitionTo(Submitted));
 
@@ -46,7 +47,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
             When(OrderAccepted)
                 .Then(context =>
                 {
-                    context.Saga.AcceptedAt = context.Data.AcceptedAt;
+                    context.Saga.AcceptedAt = context.Message.AcceptedAt;
                 })
                 .TransitionTo(Accepted));
 

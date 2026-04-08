@@ -9,8 +9,11 @@ public interface IUserService
 
 public class UserDashboard : ComponentBase
 {
-    [CascadingParameter] public Task<AuthenticationState> AuthState { get; set; }
-    [Inject] public IUserService UserService { get; set; }
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    [Inject]
+    public IUserService UserService { get; set; }
 
     public string? DisplayName { get; set; }
     public bool IsAuthenticated { get; set; }
@@ -23,8 +26,8 @@ public class UserDashboard : ComponentBase
         if (user.Identity?.IsAuthenticated == true)
         {
             IsAuthenticated = true;
-            var userId = user.Identity.Name;
-            DisplayName = await UserService.GetDisplayNameAsync(userId);
+            var nameClaim = user.Identity.Name;
+            DisplayName = await UserService.GetDisplayNameAsync(nameClaim);
         }
         else
         {
