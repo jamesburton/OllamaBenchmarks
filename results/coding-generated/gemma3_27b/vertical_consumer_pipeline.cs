@@ -34,7 +34,11 @@ public class ConsumerTests
     public async Task PlaceOrderConsumer_Publishes_OrderPlaced()
     {
         var harness = new MassTransitTestHarness();
-        harness.AddConsumer<PlaceOrderConsumer>();
+        harness.Configure(cfg =>
+        {
+            cfg.AddConsumer<PlaceOrderConsumer>();
+        });
+
         await harness.Start();
 
         var orderId = Guid.NewGuid();
@@ -53,8 +57,12 @@ public class ConsumerTests
     public async Task FullPipeline_PlaceOrder_Publishes_OrderPlaced_And_CustomerNotified()
     {
         var harness = new MassTransitTestHarness();
-        harness.AddConsumer<PlaceOrderConsumer>();
-        harness.AddConsumer<NotifyCustomerConsumer>();
+        harness.Configure(cfg =>
+        {
+            cfg.AddConsumer<PlaceOrderConsumer>();
+            cfg.AddConsumer<NotifyCustomerConsumer>();
+        });
+
         await harness.Start();
 
         var orderId = Guid.NewGuid();

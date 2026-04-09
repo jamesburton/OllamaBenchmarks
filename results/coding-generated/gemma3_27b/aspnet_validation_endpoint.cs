@@ -30,7 +30,7 @@ public class OrderService
             }
             else
             {
-                throw new ArgumentException("Validation failed.");
+                throw new ArgumentException("Validation failed, but no specific errors found.");
             }
         }
 

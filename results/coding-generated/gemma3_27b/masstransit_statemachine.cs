@@ -28,23 +28,19 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     {
         InstanceState(x => x.CurrentState);
 
-        Initially(
-            When(OrderSubmitted)
-                .Then(context => { context.Saga.OrderDate = context.Message.OrderDate; })
-                .TransitionTo(Submitted));
+        Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId))
+            .Then(context => { context.Saga.OrderDate = context.Message.OrderDate; })
+            .TransitionTo(Submitted);
 
         During(Submitted,
-            When(OrderAccepted)
+            Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId))
                 .Then(context => { context.Saga.AcceptedAt = context.Message.AcceptedAt; })
                 .TransitionTo(Accepted));
 
         During(Accepted,
-            When(OrderCompleted)
+            Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId))
                 .Finalize());
-    }
 
-    protected override void ConfigureSaga(SagaConfiguration<OrderState> configuration)
-    {
-        configuration.CorrelateById(s => s.CorrelationId);
+        SetCompletedWhenFinalized();
     }
 }

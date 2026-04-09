@@ -6,7 +6,7 @@ record ProductResponse(int Id, string Name, decimal Price);
 
 static class ProductEndpoints
 {
-    private static int _nextId = 0;
+    private static int _idCounter = 0;
 
     public static IResult CreateProduct(CreateProductRequest request)
     {
@@ -27,8 +27,8 @@ static class ProductEndpoints
             return Results.ValidationProblem(errors);
         }
 
-        _nextId++;
-        var response = new ProductResponse(_nextId, request.Name, request.Price);
+        _idCounter++;
+        var response = new ProductResponse(_idCounter, request.Name, request.Price);
         return Results.Ok(response);
     }
 }

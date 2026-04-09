@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+
 public class Address
 {
     public string Street { get; set; }
@@ -11,8 +15,6 @@ public class Company
     public string Name { get; set; }
     public Address HeadquartersAddress { get; set; }
 }
-
-using Microsoft.EntityFrameworkCore;
 
 public class CompanyDbContext : DbContext
 {

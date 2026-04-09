@@ -6,7 +6,7 @@ public record Money(decimal Amount, string Currency);
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = "";
+    public string Name { get; set; }
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
@@ -29,15 +29,15 @@ public class ProductDbContext : DbContext
             throw new FormatException($"Invalid amount: {parts[0]}");
         }
 
-        return new Money(amount, parts[1]);
+        var currency = parts[1];
+        return new Money(amount, currency);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Product>().Property(p => p.Price).HasConversion(
             m => $"{m.Amount}:{m.Currency}",
-            s => ParseMoney(s)
-        );
+            s => ParseMoney(s));
     }
 }
 

@@ -26,7 +26,7 @@ public static class MathValidator
 public class MathValidatorTests
 {
     public static IEnumerable<object[]> EvenTestData =>
-        new object[]
+        new[]
         {
             new object[] { 2, true },
             new object[] { 3, false },
@@ -35,26 +35,29 @@ public class MathValidatorTests
             new object[] { 7, false }
         };
 
-    [Theory, MemberData(nameof(EvenTestData))]
+    [Theory]
+    [MemberData(nameof(EvenTestData))]
     public void IsEven_WithMemberData(int n, bool expected)
     {
         MathValidator.IsEven(n).Should().Be(expected);
     }
 
-    [Theory, InlineData(2, true)]
-    [Theory, InlineData(3, true)]
-    [Theory, InlineData(4, false)]
-    [Theory, InlineData(1, false)]
-    [Theory, InlineData(17, true)]
-    [Theory, InlineData(0, false)]
+    [Theory]
+    [InlineData(2, true)]
+    [InlineData(3, true)]
+    [InlineData(4, false)]
+    [InlineData(1, false)]
+    [InlineData(17, true)]
+    [InlineData(0, false)]
     public void IsPrime_WithInlineData(int n, bool expected)
     {
         MathValidator.IsPrime(n).Should().Be(expected);
     }
 
-    [Theory, InlineData(-5, "negative")]
-    [Theory, InlineData(0, "zero")]
-    [Theory, InlineData(3, "positive")]
+    [Theory]
+    [InlineData(-5, "negative")]
+    [InlineData(0, "zero")]
+    [InlineData(3, "positive")]
     public void Classify_WithInlineData(int n, string expected)
     {
         MathValidator.Classify(n).Should().Be(expected);

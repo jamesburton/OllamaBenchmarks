@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 public class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task ShouldReceiveProcessPaymentAndPublishPaymentProcessed()
+    public async Task Should_Receive_ProcessPayment_And_Publish_PaymentProcessed()
     {
         var provider = new ServiceCollection()
             .AddMassTransitTestHarness(cfg => { cfg.AddConsumer<ProcessPaymentConsumer>(); })
@@ -23,12 +23,12 @@ public class ProcessPaymentConsumerTests
         var consumed = await harness.Consumed.Any<ProcessPayment>();
         var published = await harness.Published.Any<PaymentProcessed>();
 
-        var publishedMessage = await harness.Published.First<PaymentProcessed>();
+        var publishedMessage = (await harness.Published.GetMessages<PaymentProcessed>()).FirstOrDefault();
 
         Assert.Multiple(
             () => Assert.True(consumed),
             () => Assert.True(published),
-            () => Assert.Equal(orderId, publishedMessage.Message.OrderId)
+            () => Assert.Equal(orderId, publishedMessage?.OrderId)
         );
     }
 }

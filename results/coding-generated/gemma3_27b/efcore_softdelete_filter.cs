@@ -18,7 +18,9 @@ public class ArticleDbContext : DbContext
 {
     public DbSet<Article> Articles { get; set; }
 
-    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options) { }
+    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

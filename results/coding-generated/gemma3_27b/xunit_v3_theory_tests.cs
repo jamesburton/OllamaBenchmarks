@@ -48,7 +48,7 @@ public class StringProcessorTests
         }
     }
 
-    [Theory, InlineData(null, 0), InlineData("", 0), InlineData("word", 1), InlineData("multiple words", 2), InlineData("  multiple   words  ", 2)]
+    [Theory, InlineData(null, 0), InlineData("", 0), InlineData("hello", 0), InlineData("hello", 1), InlineData("hello world", 1), InlineData("  hello   world  ", 1)]
     public void CountWords_Should_ReturnCorrectCount(string input, int expectedCount)
     {
         var processor = new StringProcessor();
@@ -56,7 +56,7 @@ public class StringProcessorTests
         result.Should().Be(expectedCount);
     }
 
-    [Theory, InlineData(null, false), InlineData("", false), InlineData("a", true), InlineData("madam", true), InlineData("hello", false), InlineData("Race car", true)]
+    [Theory, InlineData(null, false), InlineData("", false), InlineData("a", true), InlineData("racecar", true), InlineData("hello", false), InlineData("A man a plan a canal Panama", true)]
     public void IsPalindrome_Should_ReturnCorrectResult(string input, bool expectedResult)
     {
         var processor = new StringProcessor();

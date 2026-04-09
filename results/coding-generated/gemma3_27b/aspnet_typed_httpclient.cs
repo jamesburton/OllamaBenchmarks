@@ -32,14 +32,7 @@ public class GitHubClient : IGitHubClient
 
     public async Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
     {
-        try
-        {
-            return await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
-        }
-        catch
-        {
-            return null;
-        }
+        return await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
     }
 }
 

@@ -8,13 +8,11 @@ public class CounterService
 public class CounterFixture : IAsyncLifetime
 {
     public CounterService Counter { get; private set; } = null!;
-
     public ValueTask InitializeAsync()
     {
         Counter = new CounterService();
         return default;
     }
-
     public ValueTask DisposeAsync()
     {
         return default;
