@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -6,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
     public decimal Price { get; set; }
-    public string Category { get; set; } = string.Empty;
+    public string Category { get; set; }
     public DateTime LastModified { get; set; }
 }
 
@@ -18,7 +17,7 @@ public class ProductDbContext : DbContext
     {
     }
 
-    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Product> Products { get; set; }
 }
 
 public static class ProductOperations
@@ -35,8 +34,6 @@ public static class ProductOperations
             product.LastModified = DateTime.UtcNow;
         }
 
-        await db.SaveChangesAsync();
-
-        return products.Count;
+        return await db.SaveChangesAsync();
     }
 }

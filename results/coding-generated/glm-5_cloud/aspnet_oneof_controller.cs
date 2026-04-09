@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
 
+public record NotFound;
+
+public record ValidationError(string Message);
+
 public class User
 {
     public int Id { get; set; }
@@ -8,17 +12,13 @@ public class User
     public string Email { get; set; } = string.Empty;
 }
 
-public record NotFound;
-
-public record ValidationError(string Message);
-
 public interface IUserService
 {
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;

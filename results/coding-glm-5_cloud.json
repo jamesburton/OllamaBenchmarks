@@ -8,25 +8,23 @@
       "task": "aspnet_oneof_controller",
       "category": "aspnet",
       "weight": 1,
-      "passed": false,
-      "harness_error": "Empty code after extraction",
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 451.06,
-      "generated_code_path": null
+      "passed": true,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\glm-5_cloud\\aspnet_oneof_controller.cs"
     },
     {
       "task": "aspnet_validation_endpoint",
       "category": "aspnet",
       "weight": 1,
-      "passed": false,
-      "harness_error": "Empty code after extraction",
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 451.03,
-      "generated_code_path": null
+      "passed": true,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\glm-5_cloud\\aspnet_validation_endpoint.cs"
     },
     {
       "task": "aspnet_service_di",
@@ -605,6 +603,6 @@
       "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\glm-5_cloud\\patterns_timeprovider.cs"
     }
   ],
-  "layer3_weighted_score": 0.8363636363636363,
+  "layer3_weighted_score": 0.8727272727272727,
   "composite_score": 0.501818
 }
