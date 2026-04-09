@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 
 public record Sale(string Product, string Category, decimal Amount, DateOnly Date);
 
@@ -18,7 +18,7 @@ public static class SalesAnalyzer
                 g.Average(s => s.Amount),
                 g.Count()
             ))
-            .OrderByDescending(s => s.TotalAmount)
+            .OrderByDescending(x => x.TotalAmount)
             .ToList();
     }
 }

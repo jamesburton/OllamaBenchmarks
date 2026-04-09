@@ -4,10 +4,9 @@ public class NotFoundException : Exception
 {
     public string ResourceName { get; }
 
-    public NotFoundException(string resourceName)
+    public NotFoundException(string resourceName) : base($"Resource not found: {resourceName}")
     {
         ResourceName = resourceName;
-        base($"Resource not found: {resourceName}");
     }
 }
 
@@ -15,10 +14,9 @@ public class ConflictException : Exception
 {
     public string ConflictReason { get; }
 
-    public ConflictException(string conflictReason)
+    public ConflictException(string conflictReason) : base($"Conflict: {conflictReason}")
     {
         ConflictReason = conflictReason;
-        base($"Conflict: {conflictReason}");
     }
 }
 
@@ -28,17 +26,17 @@ public static class ApiExceptionMapper
     {
         return ex switch
         {
-            NotFoundException nex => new ProblemDetails
+            NotFoundException notFound => new ProblemDetails
             {
                 Status = 404,
                 Title = "Not Found",
-                Detail = nex.ResourceName
+                Detail = notFound.ResourceName
             },
-            ConflictException cex => new ProblemDetails
+            ConflictException conflict => new ProblemDetails
             {
                 Status = 409,
                 Title = "Conflict",
-                Detail = cex.ConflictReason
+                Detail = conflict.ConflictReason
             },
             _ => new ProblemDetails
             {

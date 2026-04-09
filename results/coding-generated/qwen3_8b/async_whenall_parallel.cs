@@ -1,9 +1,9 @@
-interface IDataLoader
+public interface IDataLoader
 {
     Task<string> LoadAsync(string source, CancellationToken ct);
 }
 
-class ParallelDataService
+public class ParallelDataService
 {
     private readonly IDataLoader loaderA;
     private readonly IDataLoader loaderB;

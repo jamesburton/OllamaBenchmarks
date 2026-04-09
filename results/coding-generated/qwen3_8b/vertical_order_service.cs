@@ -58,10 +58,9 @@ public class OrderService
         {
             CustomerName = request.CustomerName,
             Items = request.Items,
+            Total = request.Items.Sum(item => item.Quantity * item.UnitPrice),
             CreatedAt = DateTime.UtcNow
         };
-
-        order.Total = order.Items.Sum(item => item.Quantity * item.UnitPrice);
 
         _repository.Save(order);
 

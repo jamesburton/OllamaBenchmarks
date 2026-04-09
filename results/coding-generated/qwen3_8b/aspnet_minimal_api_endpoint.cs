@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 
 public record CreateProductRequest(string Name, decimal Price);
+
 public record ProductResponse(int Id, string Name, decimal Price);
 
 public static class ProductEndpoints
@@ -26,7 +27,6 @@ public static class ProductEndpoints
         }
 
         idCounter++;
-        var product = new ProductResponse(idCounter, request.Name, request.Price);
-        return Results.Ok(product);
+        return Results.Ok(new ProductResponse(idCounter, request.Name, request.Price));
     }
 }

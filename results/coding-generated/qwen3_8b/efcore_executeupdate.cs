@@ -1,91 +1,48 @@
-Okay, let's see. The user wants me to generate a C# file with specific classes and methods based on their instructions. Let me break down the requirements step by step.
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+    public string Category { get; set; }
+    public DateTime LastModified { get; set; }
+}
 
-First, the Product entity. They need public get/set properties: Id (int), Name (string), Price (decimal), Category (string), and LastModified (DateTime). So I'll create a class Product with these properties. All are public, so no need for access modifiers, just the properties.
+public class ProductDbContext : DbContext
+{
+    public DbSet<Product> Products { get; set; }
 
-Next, the ProductDbContext. It should inherit from DbContext and have a DbSet<Product> named Products. The constructor needs to accept DbContextOptions<ProductDbContext>. Also, they mentioned not to override OnModelCreating, so I'll leave that out. The InMemory provider doesn't need explicit mappings, so that's fine.
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
+    {
+    }
+}
 
-Then, the ProductOperations static class with an async method ApplyDiscount. The method takes a ProductDbContext, a category, and a discountPct. The goal is to bulk update products in that category. But there's a catch: the InMemory provider doesn't support ExecuteUpdateAsync. So for the InMemory case, we need to query the products, loop through them, update each, and save changes. For other providers, use ExecuteUpdateAsync.
-
-Wait, the user says that ApplyDiscount should use ExecuteUpdateAsync for the bulk update. But since InMemory can't use that, we have to handle it differently. So the method needs to check if the context is using InMemory. How can I check that? Maybe by looking at the database provider. But how to do that in EF Core?
-
-Alternatively, the user says that for InMemory, we should manually query, update each, and save. So the ApplyDiscount method should have two different implementations based on the provider. But how to detect that?
-
-Hmm, maybe the user expects that when using InMemory, the method will use the manual approach, and for other providers, use ExecuteUpdateAsync. So the method needs to check if the context is using InMemory. How to do that? Well, perhaps by checking the database provider name. For example, in the options, maybe the provider is set. But in the code, the ProductDbContext is constructed with options, so maybe we can check the options.
-
-Wait, the user's example for InMemory uses services.AddDbContext with UseInMemoryDatabase. So in the ApplyDiscount method, perhaps we can check if the database is InMemory. But how to get that information from the DbContext?
-
-Alternatively, maybe the user wants that when using InMemory, the method uses the manual approach, and for other providers, uses ExecuteUpdateAsync. So the code for ApplyDiscount would have a conditional based on the provider.
-
-But how to determine the provider? Maybe by checking the database name or the provider name. For example, InMemoryDatabase uses a specific provider, so perhaps checking if the database name starts with "TestDb" or something. Wait, the user's example for InMemory uses "TestDb" as the database name. But that's just an example. Maybe the actual check is whether the provider is InMemory.
-
-Alternatively, perhaps the user expects that when using InMemory, the method will use the manual approach, and for other providers, use ExecuteUpdateAsync. So the code would have a conditional based on whether the context is using InMemory.
-
-But how to check that in code? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that when using InMemory, the method will use the manual approach, and for other providers, use Execute, but that's not possible. Wait, the user says that the InMemory provider does not support ExecuteUpdateAsync, so for that case, we need to implement it manually. So the ApplyDiscount method should check if the context is using InMemory, and then use the manual approach, else use ExecuteUpdateAsync.
-
-But how to check that in code? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that when using InMemory, the method will use the manual approach, and for other providers, use ExecuteUpdateAsync. So the code would have a conditional based on whether the context is using InMemory.
-
-Wait, perhaps the user wants that the ApplyDiscount method uses ExecuteUpdateAsync for all providers except InMemory, where it uses the manual approach. So the code would have a check for the provider. But how to do that?
-
-Alternatively, maybe the user wants that the ApplyDiscount method uses ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. So the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check if the context is using InMemory? Maybe by checking the database name. For example, in the InMemory setup, the database name is "TestDb" as per the example. But that's just an example. Alternatively, maybe the user expects that when using InMemory, the method will use the manual approach, and for other providers, use ExecuteUpdateAsync. So the code would have a conditional based on whether the context is using InMemory.
-
-But how to determine that in code? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the Apply and Discount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider. For example, in the DbContext options, there's a way to get the provider. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but when using InMemory, it's not supported, so we have to implement it manually. Therefore, the code would have a conditional that checks if the context is using InMemory, and then uses the manual approach, else uses ExecuteUpdateAsync.
-
-But how to check that? Maybe by checking the database provider name. For example, in the options, the provider might be set. But I'm not sure. Alternatively, maybe the user expects that the ApplyDiscount method will use ExecuteUpdateAsync, but
+public static class ProductOperations
+{
+    public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
+    {
+        if (db.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+        {
+            var products = await db.Products
+                .Where(p => p.Category == category)
+                .ToListAsync();
+            int count = 0;
+            foreach (var product in products)
+            {
+                product.Price *= (1 - discountPct);
+                product.LastModified = DateTime.UtcNow;
+                count++;
+            }
+            await db.SaveChangesAsync();
+            return count;
+        }
+        else
+        {
+            return await db.Products
+                .Where(p => p.Category == category)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(p => p.Price, p => p.Price * (1 - discountPct))
+                    .SetProperty(p => p.LastModified, DateTime.UtcNow)
+                );
+        }
+    }
+}

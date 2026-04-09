@@ -1,6 +1,7 @@
 public class CounterService
 {
     public int Count { get; private set; } = 0;
+
     public void Increment() => Count++;
     public void Reset() => Count = 0;
 }
@@ -12,49 +13,51 @@ public class CounterFixture : IAsyncLifetime
     public ValueTask InitializeAsync()
     {
         Counter = new CounterService();
-        return ValueTask.CompletedTask;
+        return default;
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask DisposeAsync() => default;
 }
 
 [CollectionDefinition("Counter")]
 public class CounterCollection : ICollectionFixture<CounterFixture>
 {
-    // No test methods
+    // No test methods here
 }
 
+[Collection("Counter")]
 public class CounterFirstTests
 {
-    private readonly CounterFixture fixture;
+    private readonly CounterFixture _fixture;
 
     public CounterFirstTests(CounterFixture fixture)
     {
-        this.fixture = fixture;
+        _fixture = fixture;
     }
 
     [Fact]
-    public void TestIncrement()
+    public void Test()
     {
-        fixture.Counter.Increment();
-        fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
+        _fixture.Counter.Increment();
+        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
     }
 }
 
+[Collection("Counter")]
 public class CounterSecondTests
 {
-    private readonly CounterFixture fixture;
+    private readonly CounterFixture _fixture;
 
     public CounterSecondTests(CounterFixture fixture)
     {
-        this.fixture = fixture;
+        _fixture = fixture;
     }
 
     [Fact]
-    public void TestIncrementTwice()
+    public void Test()
     {
-        fixture.Counter.Increment();
-        fixture.Counter.Increment();
-        fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
+        _fixture.Counter.Increment();
+        _fixture.Counter.Increment();
+        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 }

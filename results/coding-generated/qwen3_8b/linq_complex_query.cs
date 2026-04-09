@@ -1,5 +1,10 @@
-record Sale(string Product, string Category, decimal Amount, DateOnly Date);
-record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public record Sale(string Product, string Category, decimal Amount, DateOnly Date);
+
+public record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
 
 public static class SalesAnalyzer
 {

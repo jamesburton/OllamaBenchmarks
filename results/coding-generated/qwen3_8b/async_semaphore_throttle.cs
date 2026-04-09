@@ -1,33 +1,32 @@
-class ThrottledProcessor
+public class ThrottledProcessor
 {
-    private readonly SemaphoreSlim semaphore;
+    private readonly SemaphoreSlim _semaphore;
 
     public ThrottledProcessor(int maxConcurrent)
     {
-        semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
+        _semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
     }
 
     public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
-        var throttledTasks = new List<Task<T>>();
-
+        var wrappedTasks = new List<Task<T>>();
         foreach (var taskFactory in tasks)
         {
-            throttledTasks.Add(Task.Run(async () =>
+            var task = Task.Run(async () =>
             {
+                await _semaphore.WaitAsync(ct);
                 try
                 {
-                    await semaphore.WaitAsync(ct);
                     return await taskFactory(ct);
                 }
                 finally
                 {
-                    semaphore.Release();
+                    _semaphore.Release();
                 }
-            }, ct));
+            });
+            wrappedTasks.Add(task);
         }
-
-        var results = await Task.WhenAll(throttledTasks);
+        var results = await Task.WhenAll(wrappedTasks);
         return results.ToList();
     }
 }

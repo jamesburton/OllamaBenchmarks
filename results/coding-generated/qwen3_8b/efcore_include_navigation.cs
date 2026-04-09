@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 public class Comment
 {
     public int Id { get; set; }
-    public string Text { get; set; }
+    public string Text { get; set; } = null!;
     public int PostId { get; set; }
     public Post? Post { get; set; }
 }
@@ -11,37 +11,39 @@ public class Comment
 public class Post
 {
     public int Id { get; set; }
-    public string Content { get; set; }
+    public string Content { get; set; } = null!;
     public int BlogId { get; set; }
     public Blog? Blog { get; set; }
-    public List<Comment> Comments { get; set; } = new List<Comment>();
+    public List<Comment> Comments { get; set; } = new();
 }
 
 public class Blog
 {
     public int Id { get; set; }
-    public string Title { get; set; }
-    public List<Post> Posts { get; set; } = new List<Post>();
+    public string Title { get; set; } = null!;
+    public List<Post> Posts { get; set; } = new();
 }
 
 public class BlogDbContext : DbContext
 {
+    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
+
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<Comment> Comments { get; set; }
 
-    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.Entity<Post>()
-            .HasOne(p => p.Blog)
-            .WithMany(b => b.Posts)
+        base.OnModelCreating(builder);
+
+        builder.Entity<Blog>()
+            .HasMany(b => b.Posts)
+            .WithOne(p => p.Blog)
             .HasForeignKey(p => p.BlogId);
 
-        modelBuilder.Entity<Comment>()
-            .HasOne(c => c.Post)
-            .WithMany(p => p.Comments)
+        builder.Entity<Post>()
+            .HasMany(p => p.Comments)
+            .WithOne(c => c.Post)
             .HasForeignKey(c => c.PostId);
     }
 }

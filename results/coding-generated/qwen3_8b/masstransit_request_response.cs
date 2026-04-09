@@ -1,17 +1,15 @@
-using MassTransit;
 global using Contracts;
+using MassTransit;
 
 namespace Contracts
 {
-    // Positional records for request/response
     public record GetProduct(Guid ProductId);
     public record ProductResult(Guid ProductId, string Name, decimal Price);
     public record ProductNotFound();
 
-    // Consumer implementation
     public class GetProductConsumer : IConsumer<GetProduct>
     {
-        public static readonly Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        public static Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
         public async Task Consume(ConsumeContext<GetProduct> context)
         {

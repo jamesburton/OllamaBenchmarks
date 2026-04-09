@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 public class Customer
@@ -37,7 +40,7 @@ public static class OrderQueries
                 (order, customer) => new OrderDto(
                     order.Id,
                     order.Total,
-                    customer?.Name ?? "Unknown"
+                    customer == null ? "Unknown" : customer.Name
                 )
             )
             .ToList();

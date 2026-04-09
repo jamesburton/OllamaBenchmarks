@@ -10,8 +10,9 @@ public static class MathValidator
 
         var sqrt = (int)Math.Sqrt(n);
         for (int i = 3; i <= sqrt; i += 2)
+        {
             if (n % i == 0) return false;
-
+        }
         return true;
     }
 

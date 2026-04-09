@@ -3,11 +3,9 @@ global using Contracts;
 
 namespace Contracts
 {
-    // Positional records for messages and events
     public record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
     public record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
 
-    // Consumer that handles ProcessPayment messages
     public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
     {
         public async Task Consume(ConsumeContext<ProcessPayment> context)
@@ -21,7 +19,6 @@ namespace Contracts
         }
     }
 
-    // Consumer definition with retry configuration
     public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymentConsumer>
     {
         public ProcessPaymentConsumerDefinition()

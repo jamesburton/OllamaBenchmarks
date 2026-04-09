@@ -2,6 +2,10 @@ global using Contracts;
 
 namespace Contracts
 {
+    public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+    public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+    public record OrderCompleted(Guid OrderId);
+
     public class OrderState : SagaStateMachineInstance
     {
         public Guid CorrelationId { get; set; }
@@ -9,10 +13,6 @@ namespace Contracts
         public DateTime OrderDate { get; set; }
         public DateTime? AcceptedAt { get; set; }
     }
-
-    public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
-    public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
-    public record OrderCompleted(Guid OrderId);
 
     public class OrderStateMachine : MassTransitStateMachine<OrderState>
     {
@@ -34,13 +34,13 @@ namespace Contracts
 
             Initially(
                 When(OrderSubmitted)
-                    .Then(context => context.Saga.OrderDate = context.Message.OrderDate)
+                    .Then(context => { context.Saga.OrderDate = context.Message.OrderDate; })
                     .TransitionTo(Submitted)
             );
 
             During(Submitted,
                 When(OrderAccepted)
-                    .Then(context => context.Saga.AcceptedAt = context.Message.AcceptedAt)
+                    .Then(context => { context.Saga.AcceptedAt = context.Message.AcceptedAt; })
                     .TransitionTo(Accepted)
             );
 

@@ -1,56 +1,33 @@
-public class InMemoryStore : IAsyncLifetime
+public class InMemoryStore
 {
     public Dictionary<string, string> Data { get; private set; } = new();
 
-    public ValueTask InitializeAsync()
-    {
-        Data = new Dictionary<string, string>
-        {
-            { "key1", "value1" },
-            { "key2", "value2" }
-        };
-        return default;
-    }
+    public ValueTask InitializeAsync() => 
+        ValueTask.CompletedTask;
 
-    public ValueTask DisposeAsync()
-    {
-        Data.Clear();
-        return default;
-    }
+    public ValueTask DisposeAsync() => 
+        ValueTask.CompletedTask;
 }
 
 public class StoreService
 {
     private readonly InMemoryStore _store;
 
-    public StoreService(InMemoryStore store)
-    {
-        _store = store;
-    }
+    public StoreService(InMemoryStore store) => _store = store;
 
-    public string? Get(string key)
-    {
-        if (_store.Data.TryGetValue(key, out var value))
-        {
-            return value;
-        }
-        return null;
-    }
+    public string? Get(string key) => 
+        _store.Data.TryGetValue(key, out var value) ? value : null;
 
-    public void Set(string key, string value)
-    {
+    public void Set(string key, string value) => 
         _store.Data[key] = value;
-    }
 }
 
-public class StoreServiceTests
+public class StoreServiceTests : IClassFixture<InMemoryStore>
 {
     private readonly StoreService _service;
 
-    public StoreServiceTests(InMemoryStore store)
-    {
+    public StoreServiceTests(InMemoryStore store) => 
         _service = new StoreService(store);
-    }
 
     [Fact]
     public void Get_ExistingKey_ReturnsValue()

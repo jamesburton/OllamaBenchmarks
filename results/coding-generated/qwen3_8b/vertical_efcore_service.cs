@@ -24,7 +24,7 @@ public interface ITodoService
     Task<bool> DeleteAsync(int id);
 }
 
-public class TodoService : ITodoService
+public class TodoService
 {
     private readonly TodoDbContext _db;
 
@@ -41,8 +41,10 @@ public class TodoService : ITodoService
             IsComplete = false,
             CreatedAt = DateTime.UtcNow
         };
+
         _db.TodoItems.Add(item);
         await _db.SaveChangesAsync();
+
         return item;
     }
 
@@ -61,6 +63,7 @@ public class TodoService : ITodoService
         var item = await _db.TodoItems.FindAsync(id);
         if (item == null)
             return false;
+
         item.IsComplete = true;
         await _db.SaveChangesAsync();
         return true;
@@ -71,6 +74,7 @@ public class TodoService : ITodoService
         var item = await _db.TodoItems.FindAsync(id);
         if (item == null)
             return false;
+
         _db.TodoItems.Remove(item);
         await _db.SaveChangesAsync();
         return true;

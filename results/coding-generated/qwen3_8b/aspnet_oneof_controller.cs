@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
 using System.Threading.Tasks;
 
 public record NotFound;
@@ -21,20 +20,21 @@ public interface IUserService
 [Route("api/users")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _service;
+    private readonly IUserService _userService;
 
-    public UsersController(IUserService service)
+    public UsersController(IUserService userService)
     {
-        _service = service;
+        _userService = userService;
     }
 
+    [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        var result = await _service.GetByIdAsync(id);
-        return result.Match(
-            user => Results.Ok(user),
-            _ => Results.NotFound(),
-            err => Results.BadRequest(err.Message)
+        var result = await _userService.GetByIdAsync(id);
+        return result.Match<IActionResult>(
+            user => Ok(user),
+            _ => NotFound(),
+            err => BadRequest(err.Message)
         );
     }
 }
