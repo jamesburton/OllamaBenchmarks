@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 public class Address
 {
-    public string Street { get; set; } = default!;
-    public string City { get; set; } = default!;
-    public string Zip { get; set; } = default!;
+    public string Street { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string Zip { get; set; } = string.Empty;
 }
 
 public class Customer
 {
     public int Id { get; set; }
-    public string Name { get; set; } = default!;
+    public string Name { get; set; } = string.Empty;
     public Address HomeAddress { get; set; } = new Address();
 }
 
@@ -42,13 +42,14 @@ public class CustomerRepository
 
     public async Task<Customer> CreateAsync(Customer customer)
     {
-        _context.Customers.Add(customer);
+        await _context.Customers.AddAsync(customer);
         await _context.SaveChangesAsync();
         return customer;
     }
 
     public async Task<Customer?> GetByIdAsync(int id)
     {
-        return await _context.Customers.FindAsync(id);
+        return await _context.Customers
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
 }

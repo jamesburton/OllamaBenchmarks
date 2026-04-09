@@ -27,33 +27,12 @@ public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
     }
 }
 
+// Test classes (outside namespace)
 public class ConsumerPipelineTests
 {
-    [Fact]
-    public async Task PlaceOrderConsumer_Publishes_OrderPlaced()
-    {
-        var services = new ServiceCollection();
-        services.AddMassTransitTestHarness(cfg =>
-        {
-            cfg.AddConsumer<PlaceOrderConsumer>();
-        });
+    private readonly ITestHarness _harness;
 
-        using var provider = services.BuildServiceProvider();
-        var harness = provider.GetRequiredService<ITestHarness>();
-        await harness.Start();
-
-        var orderId = Guid.NewGuid();
-        var customerName = "John Doe";
-        await harness.Bus.Publish(new PlaceOrder(orderId, customerName));
-
-        Assert.True(await harness.Consumed.Any<PlaceOrder>());
-        Assert.True(await harness.Published.Any<OrderPlaced>());
-
-        await harness.Stop();
-    }
-
-    [Fact]
-    public async Task FullConsumerPipeline_Publishes_OrderPlaced_And_CustomerNotified()
+    public ConsumerPipelineTests()
     {
         var services = new ServiceCollection();
         services.AddMassTransitTestHarness(cfg =>
@@ -62,25 +41,47 @@ public class ConsumerPipelineTests
             cfg.AddConsumer<NotifyCustomerConsumer>();
         });
 
-        using var provider = services.BuildServiceProvider();
-        var harness = provider.GetRequiredService<ITestHarness>();
-        await harness.Start();
+        var provider = services.BuildServiceProvider();
+        _harness = provider.GetRequiredService<ITestHarness>();
+    }
 
+    [Fact]
+    public async Task PlaceOrderConsumer_Publishes_OrderPlaced()
+    {
+        // Arrange
+        var orderId = Guid.NewGuid();
+        var customerName = "John Doe";
+
+        // Act
+        await _harness.Bus.Publish(new PlaceOrder(orderId, customerName));
+
+        // Assert
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
+
+        var publishedOrderPlaced = await _harness.Published.First<OrderPlaced>();
+        Assert.Equal(orderId, publishedOrderPlaced.Message.OrderId);
+        Assert.Equal(customerName, publishedOrderPlaced.Message.CustomerName);
+    }
+
+    [Fact]
+    public async Task FullConsumerPipeline_Publishes_CustomerNotified()
+    {
+        // Arrange
         var orderId = Guid.NewGuid();
         var customerName = "Jane Smith";
-        await harness.Bus.Publish(new PlaceOrder(orderId, customerName));
 
-        Assert.True(await harness.Consumed.Any<PlaceOrder>());
-        Assert.True(await harness.Published.Any<OrderPlaced>());
-        Assert.True(await harness.Consumed.Any<OrderPlaced>());
-        Assert.True(await harness.Published.Any<CustomerNotified>());
+        // Act
+        await _harness.Bus.Publish(new PlaceOrder(orderId, customerName));
 
-        // Verify the CustomerNotified message content
-        var notifiedMessages = await harness.Published.GetConsumedMessagesAsync<CustomerNotified>();
-        var notifiedMessage = notifiedMessages.FirstOrDefault();
-        Assert.NotNull(notifiedMessage);
-        Assert.Equal($"Order {orderId} confirmed for {customerName}", notifiedMessage.Context.Message.NotificationMessage);
+        // Assert
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
+        Assert.True(await _harness.Consumed.Any<OrderPlaced>());
+        Assert.True(await _harness.Published.Any<CustomerNotified>());
 
-        await harness.Stop();
+        var publishedCustomerNotified = await _harness.Published.First<CustomerNotified>();
+        Assert.Equal(orderId, publishedCustomerNotified.Message.OrderId);
+        Assert.Equal($"Order {orderId} confirmed for {customerName}", publishedCustomerNotified.Message.NotificationMessage);
     }
 }

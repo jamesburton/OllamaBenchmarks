@@ -9,10 +9,12 @@ public class OrderState : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
     public string CurrentState { get; set; } = default!;
+
     public DateTime OrderDate { get; set; }
     public DateTime? AcceptedAt { get; set; }
 }
 
+// Event records
 public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
 public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
 public record OrderCompleted(Guid OrderId);
@@ -32,7 +34,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         InstanceState(x => x.CurrentState);
 
         Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId));
-        Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId));
+        Event(() => OrderAccepted,  x => x.CorrelateById(m => m.Message.OrderId));
         Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId));
 
         Initially(

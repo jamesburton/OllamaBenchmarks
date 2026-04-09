@@ -16,11 +16,11 @@ public class CounterBase : ComponentBase
         currentCount = InitialCount;
     }
 
+    public int CurrentCount => currentCount;
+
     public async Task IncrementCount()
     {
         currentCount++;
         await OnCountChanged.InvokeAsync(currentCount);
     }
-
-    public int CurrentCount => currentCount;
 }

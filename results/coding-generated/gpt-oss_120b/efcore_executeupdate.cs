@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 public class Product
 {
@@ -36,6 +35,7 @@ public static class ProductOperations
             product.LastModified = DateTime.UtcNow;
         }
 
+        // SaveChangesAsync returns the number of state entries written to the database.
         return await db.SaveChangesAsync();
     }
 }

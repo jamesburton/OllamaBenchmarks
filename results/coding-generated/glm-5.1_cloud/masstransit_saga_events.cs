@@ -1,7 +1,10 @@
 global using Contracts;
 using MassTransit;
-
 namespace Contracts;
+
+public record InvoiceCreated(Guid InvoiceId, decimal Amount);
+public record InvoiceApproved(Guid InvoiceId);
+public record InvoicePaid(Guid InvoiceId);
 
 public class InvoiceSaga : SagaStateMachineInstance
 {
@@ -9,10 +12,6 @@ public class InvoiceSaga : SagaStateMachineInstance
     public string CurrentState { get; set; } = null!;
     public decimal Amount { get; set; }
 }
-
-public record InvoiceCreated(Guid InvoiceId, decimal Amount);
-public record InvoiceApproved(Guid InvoiceId);
-public record InvoicePaid(Guid InvoiceId);
 
 public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 {
@@ -34,7 +33,7 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 
         Initially(
             When(InvoiceCreated)
-                .Then(ctx => { ctx.Saga.Amount = ctx.Message.Amount; })
+                .Then(ctx => ctx.Saga.Amount = ctx.Message.Amount)
                 .TransitionTo(Pending));
 
         During(Pending,

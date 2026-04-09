@@ -31,14 +31,21 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
     public async Task<OneOf<Product, ValidationError, DuplicateError>> HandleAsync(CreateProductCommand command)
     {
         if (string.IsNullOrWhiteSpace(command.Name))
+        {
             return new ValidationError("Name is required");
+        }
 
         if (command.Price <= 0)
+        {
             return new ValidationError("Price must be positive");
+        }
 
         if (await _repository.ExistsAsync(command.Name))
+        {
             return new DuplicateError(command.Name);
+        }
 
-        return await _repository.AddAsync(new Product(0, command.Name, command.Price));
+        var product = await _repository.AddAsync(new Product(0, command.Name, command.Price));
+        return product;
     }
 }

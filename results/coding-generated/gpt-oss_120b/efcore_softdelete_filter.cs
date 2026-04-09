@@ -27,8 +27,6 @@ public class ArticleDbContext : DbContext
     {
         modelBuilder.Entity<Article>()
             .HasQueryFilter(a => !a.IsDeleted);
-
-        base.OnModelCreating(modelBuilder);
     }
 }
 
@@ -47,7 +45,7 @@ public class ArticleRepository
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
 
-        if (article != null)
+        if (article != null && !article.IsDeleted)
         {
             article.IsDeleted = true;
             await _context.SaveChangesAsync();

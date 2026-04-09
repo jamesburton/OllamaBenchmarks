@@ -11,42 +11,27 @@ public class ThrottledProcessor
         System.Collections.Generic.IEnumerable<System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>>> tasks,
         System.Threading.CancellationToken ct)
     {
-        // Materialize the factories to preserve order and allow indexing
-        var factories = new System.Collections.Generic.List<System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>>>(tasks);
-        var results = new System.Threading.Tasks.Task<T>[factories.Count];
+        var runningTasks = new System.Collections.Generic.List<System.Threading.Tasks.Task<T>>();
 
-        // Local function that respects the semaphore
-        async System.Threading.Tasks.Task<T> RunFactoryAsync(
-            System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>> factory,
-            System.Threading.CancellationToken token)
+        foreach (var taskFactory in tasks)
         {
-            await _semaphore.WaitAsync(token).ConfigureAwait(false);
-            try
+            async System.Threading.Tasks.Task<T> Run()
             {
-                return await factory(token).ConfigureAwait(false);
+                await _semaphore.WaitAsync(ct).ConfigureAwait(false);
+                try
+                {
+                    return await taskFactory(ct).ConfigureAwait(false);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
             }
-            finally
-            {
-                _semaphore.Release();
-            }
+
+            runningTasks.Add(Run());
         }
 
-        // Start all tasks (concurrency limited by the semaphore)
-        for (int i = 0; i < factories.Count; i++)
-        {
-            results[i] = RunFactoryAsync(factories[i], ct);
-        }
-
-        // Await completion of all tasks
-        await System.Threading.Tasks.Task.WhenAll(results).ConfigureAwait(false);
-
-        // Collect results preserving the original order
-        var orderedResults = new System.Collections.Generic.List<T>(results.Length);
-        foreach (var task in results)
-        {
-            orderedResults.Add(task.Result);
-        }
-
-        return orderedResults;
+        var results = await System.Threading.Tasks.Task.WhenAll(runningTasks).ConfigureAwait(false);
+        return new System.Collections.Generic.List<T>(results);
     }
 }

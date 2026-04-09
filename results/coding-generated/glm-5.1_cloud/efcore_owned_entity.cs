@@ -16,11 +16,9 @@ public class Customer
 
 public class CustomerDbContext : DbContext
 {
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Customer> Customers => Set<Customer>();
 
-    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options)
-    {
-    }
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,7 +37,7 @@ public class CustomerRepository
 
     public async Task<Customer> CreateAsync(Customer customer)
     {
-        _context.Customers.Add(customer);
+        await _context.Customers.AddAsync(customer);
         await _context.SaveChangesAsync();
         return customer;
     }

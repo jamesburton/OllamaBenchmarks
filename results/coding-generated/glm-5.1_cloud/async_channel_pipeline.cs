@@ -11,14 +11,14 @@ public class DataPipeline
 
     public ChannelWriter<string> Writer => _channel.Writer;
 
-    public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
+    public System.Collections.Generic.IAsyncEnumerable<string> ReadAllAsync(System.Threading.CancellationToken ct)
     {
         return _channel.Reader.ReadAllAsync(ct);
     }
 
-    public Task CompleteAsync()
+    public System.Threading.Tasks.Task CompleteAsync()
     {
         Writer.Complete();
-        return Task.CompletedTask;
+        return System.Threading.Tasks.Task.CompletedTask;
     }
 }

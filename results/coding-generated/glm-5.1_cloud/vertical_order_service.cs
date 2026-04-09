@@ -54,17 +54,11 @@ public class OrderService
             return new ValidationError { Message = "At least one item is required" };
         }
 
-        decimal total = 0;
-        foreach (var item in request.Items)
-        {
-            total += item.Quantity * item.UnitPrice;
-        }
-
         var order = new Order
         {
             CustomerName = request.CustomerName,
             Items = request.Items,
-            Total = total,
+            Total = request.Items.Sum(item => item.Quantity * item.UnitPrice),
             CreatedAt = DateTime.UtcNow
         };
 

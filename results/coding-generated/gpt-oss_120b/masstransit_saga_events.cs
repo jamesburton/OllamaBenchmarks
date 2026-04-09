@@ -1,7 +1,6 @@
 global using Contracts;
 using System;
 using MassTransit;
-
 namespace Contracts;
 
 public class InvoiceSaga : SagaStateMachineInstance

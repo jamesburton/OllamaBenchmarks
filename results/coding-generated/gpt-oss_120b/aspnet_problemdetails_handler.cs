@@ -25,25 +25,28 @@ public class ConflictException : Exception
 
 public static class ApiExceptionMapper
 {
-    public static ProblemDetails MapException(Exception ex) => ex switch
-    {
-        NotFoundException nfe => new ProblemDetails
+    public static ProblemDetails MapException(Exception ex) =>
+        ex switch
         {
-            Status = 404,
-            Title = "Not Found",
-            Detail = nfe.ResourceName
-        },
-        ConflictException ce => new ProblemDetails
-        {
-            Status = 409,
-            Title = "Conflict",
-            Detail = ce.ConflictReason
-        },
-        _ => new ProblemDetails
-        {
-            Status = 500,
-            Title = "Internal Server Error",
-            Detail = ex.Message
-        }
-    };
+            NotFoundException notFound => new ProblemDetails
+            {
+                Status = 404,
+                Title = "Not Found",
+                Detail = notFound.ResourceName
+            },
+
+            ConflictException conflict => new ProblemDetails
+            {
+                Status = 409,
+                Title = "Conflict",
+                Detail = conflict.ConflictReason
+            },
+
+            _ => new ProblemDetails
+            {
+                Status = 500,
+                Title = "Internal Server Error",
+                Detail = ex.Message
+            }
+        };
 }

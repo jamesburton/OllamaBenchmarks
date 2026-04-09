@@ -11,9 +11,9 @@ public class Product
 
 public class ProductDbContext : DbContext
 {
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
-
     public DbSet<Product> Products { get; set; } = null!;
+
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
 
     private static Money ParseMoney(string s)
     {
@@ -49,6 +49,8 @@ public class ProductRepository
 
     public async Task<Product?> GetByIdAsync(int id)
     {
-        return await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+        return await _context.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 }

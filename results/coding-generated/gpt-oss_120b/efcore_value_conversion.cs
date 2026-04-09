@@ -24,7 +24,7 @@ public class ProductDbContext : DbContext
     {
         var parts = s.Split(':');
         if (parts.Length != 2)
-            throw new FormatException($"Invalid money format: '{s}'");
+            throw new FormatException($"Invalid money format: '{s}'. Expected 'amount:currency'.");
 
         var amount = decimal.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture);
         var currency = parts[1];

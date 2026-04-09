@@ -30,7 +30,6 @@ public static class GitHubClientExtensions
 {
     public static IServiceCollection AddGitHubClient(this IServiceCollection services)
     {
-        services.AddHttpClient<IGitHubClient, GitHubClient>();
-        return services;
+        return services.AddHttpClient<IGitHubClient, GitHubClient>();
     }
 }

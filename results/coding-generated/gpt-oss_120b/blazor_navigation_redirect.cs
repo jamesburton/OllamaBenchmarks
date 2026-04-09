@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 
 public interface IProductService
 {
-    Task<bool> DeleteAsync(int id);
+    System.Threading.Tasks.Task<bool> DeleteAsync(int id);
 }
 
 public class ProductDetailBase : ComponentBase
@@ -18,7 +18,7 @@ public class ProductDetailBase : ComponentBase
 
     public string? ErrorMessage { get; set; }
 
-    public async Task DeleteProduct()
+    public async System.Threading.Tasks.Task DeleteProduct()
     {
         var result = await ProductService.DeleteAsync(ProductId);
         if (result)

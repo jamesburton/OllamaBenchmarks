@@ -31,7 +31,7 @@ public class FirstCounterTests
     }
 
     [Fact]
-    public void IncrementAndGet_ShouldBeGreaterThanZero()
+    public void IncrementAndGet_ShouldReturnPositiveValue()
     {
         var result = _counter.IncrementAndGet();
         Assert.True(result > 0);
@@ -41,7 +41,7 @@ public class FirstCounterTests
 public class SecondCounterTests
 {
     [Fact]
-    public void IncrementAndGet_ShouldBeGreaterThanZero()
+    public void IncrementAndGet_ShouldReturnPositiveValue()
     {
         var counter = TestContext.Current.GetFixture<SharedCounter>();
         var result = counter.IncrementAndGet();

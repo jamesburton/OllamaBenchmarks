@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 public class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task ProcessPaymentConsumer_Should_ConsumeAndPublishEvent()
+    public async Task Should_Consume_ProcessPayment_And_Publish_PaymentProcessed()
     {
         var provider = new ServiceCollection()
             .AddMassTransitTestHarness(cfg =>
@@ -27,178 +27,199 @@ public class ProcessPaymentConsumerTests
         var published = await harness.Published.Any<PaymentProcessed>();
 
         Assert.Multiple(
-            () => Assert.True(consumed, "ProcessPayment was not consumed"),
-            () =>
+            () => Assert.True(consumed, "ProcessPayment message was not consumed"),
+            () => Assert.True(published, "PaymentProcessed event was not published")
+        );
+
+        // Also verify the OrderId matches
+        var paymentProcessed = await harness.Published.SelectAsync<PaymentProcessed>().First();
+        Assert.Equal(orderId, paymentProcessed.Context.Message.OrderId);
+    }
+}
+
+var publishedMessage = await harness.Published.SelectAsync<PaymentProcessed>().First();
+
+var consumed = await harness.Consumed.Any<ProcessPayment>();
+var paymentProcessed = await harness.Published.SelectAsync<PaymentProcessed>().First();
+var actualOrderId = paymentProcessed.Context.Message.OrderId;
+
+Assert.Multiple(
+    () => Assert.True(consumed, "ProcessPayment was not consumed"),
+    () => Assert.Equal(orderId, actualOrderId)
+);
+
+using MassTransit;
+using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
+
+public class ProcessPaymentConsumerTests
+{
+    [Fact]
+    public async Task Should_Consume_ProcessPayment_And_Publish_PaymentProcessed_With_Correct_OrderId()
+    {
+        var provider = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg =>
             {
-                Assert.True(published, "PaymentProcessed was not published");
-                // Need to check the OrderId of the published message
-                // Wait, harness.Published.Any<T>() returns bool. To check the OrderId, I need to get the message.
-                // Actually, harness.Published.SelectAsync or harness.Published.Any with a filter?
-                // Wait, the prompt says: "Use `await harness.Consumed.Any<T>()` and `await harness.Published.Any<T>()` (these return `Task<bool>`)."
-                // But I also need to verify "A PaymentProcessed event is published with the correct OrderId".
-                // If I only use `Any<T>()`, I can't check the OrderId.
-                // Let me look at how to get the published message context.
-                // Actually, I can use `await harness.Published.Any<PaymentProcessed>(x => x.Context.Message.OrderId == orderId)`? No, `Any` doesn't take a filter in this way, or maybe it does?
-                // Wait, `IPublishedMessageList.Any<T>(Func<IPublishedMessage<T>, bool>)` exists? No, `Any<T>()` is parameterless in the quick reference.
-                // Let's check `harness.Published.SelectAsync` or just `harness.Published.Any<T>()`.
-                // Wait, if I must use `await harness.Published.Any<T>()` and store the result, how do I check the OrderId?
-                // Maybe I can get the message from `harness.Published.Select(x => x.Context.Message)`? No, `harness.Published` is `IPublishedMessageList`.
-                // Let's look at the MassTransit API. `harness.Published.SelectAsync<T>()` or `harness.Published.Any<T>()`.
-                // Wait, `harness.Published.Any<T>()` returns bool. If I need to check the OrderId, I can do:
-                // `var publishedMessage = await harness.Published.SelectAsync<PaymentProcessed>().FirstOrDefaultAsync();`? No, that's not standard.
-                // Actually, `harness.Published.Any<T>(x => ...)` is not standard.
-                // Wait, `harness.Published.Select<T>()`? No.
-                // Let's just use `harness.Published.Any<PaymentProcessed>()` to check if it was published, and then maybe check the context?
-                // Wait, `harness.Published` has a `Select` method? No, it's `IPublishedMessageList`.
-                // Let's look at `harness.Consumed.Any<ProcessPayment>()`.
-                // If I just use `Any<T>()`, I can't check the OrderId.
-                // Wait, I can use `harness.Published.SelectAsync<PaymentProcessed>()`? No, `harness.Published` is an `IPublishedMessageList`.
-                // Let's use `harness.Published.Any<PaymentProcessed>()` and then maybe `harness.Published.Select(x => x)`?
-                // Actually, `harness.Published.Select<T>()` doesn't exist.
-                // Wait, `harness.Published` is `IPublishedMessageList`. It has `Any<T>()` and `SelectAsync<T>()`.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's just use `harness.Published.Any<PaymentProcessed>()` and then check the OrderId using `harness.Published.SelectAsync`? No, `harness.Published` doesn't have `SelectAsync`.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's look at the MassTransit Test Harness API.
-                // `harness.Published.Select<T>()` is not available.
-                // `harness.Published.Any<T>()` is available.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()` and then `harness.Published.Select<T>()`? No.
-                // Wait, `harness.Published` has `FirstOrDefault<T>()`? No.
-                // Let's check `harness.Published.SelectAsync<T>()`? No.
-                // Wait, `harness.Published` has `Select`? No.
-                // Let's check `harness.Published.Any<T>()
+                cfg.AddConsumer<ProcessPaymentConsumer>();
+            })
+            .BuildServiceProvider(true);
+
+        var harness = provider.GetRequiredService<ITestHarness>();
+
+        await harness.Start();
+
+        var orderId = Guid.NewGuid();
+        var amount = 100.50m;
+
+        await harness.Bus.Publish(new ProcessPayment(orderId, amount));
+
+        var consumed = await harness.Consumed.Any<ProcessPayment>();
+        var published = await harness.Published.Any<PaymentProcessed>();
+        var paymentProcessedMessage = await harness.Published.SelectAsync<PaymentProcessed>().First();
+        var actualOrderId = paymentProcessedMessage.Context.Message.OrderId;
+
+        Assert.Multiple(
+            () => Assert.True(consumed, "ProcessPayment was not consumed"),
+            () => Assert.Equal(orderId, actualOrderId)
+        );
+    }
+}
+
+Assert.Multiple(
+    () => Assert.True(consumed, "ProcessPayment was not consumed"),
+    () => Assert.Equal(orderId, actualOrderId)
+);
+
+Assert.Multiple(
+    () => Assert.True(consumed, "ProcessPayment was not consumed"),
+    () => Assert.True(published, "PaymentProcessed was not published"),
+    () => Assert.Equal(orderId, actualOrderId)
+);
+
+await foreach (var msg in harness.Published.SelectAsync<PaymentProcessed>())
+{
+    // get first
+    break;
+}
+
+var publishedMessages = harness.Published.SelectAsync<PaymentProcessed>();
+PaymentProcessed? publishedMessage = null;
+await foreach (var msg in publishedMessages)
+{
+    publishedMessage = msg.Context.Message;
+    break;
+}
+
+var message = harness.Published.SelectAsync<PaymentProcessed>().FirstOrDefault();
+
+await harness.Published.Any<PaymentProcessed>(); // wait for it
+var publishedMessage = harness.Published.SelectAsync<PaymentProcessed>().FirstAsync();
+
+PaymentProcessed publishedEvent = null!;
+await foreach (var msg in harness.Published.SelectAsync<PaymentProcessed>())
+{
+    publishedEvent = msg.Context.Message;
+    break;
+}
+
+var consumed = await harness.Consumed.Any<ProcessPayment>();
+var published = await harness.Published.Any<PaymentProcessed>();
+
+// Get the published message to check OrderId
+PaymentProcessed? publishedEvent = null;
+await foreach (var msg in harness.Published.SelectAsync<PaymentProcessed>())
+{
+    publishedEvent = msg.Context.Message;
+    break;
+}
+
+Assert.Multiple(
+    () => Assert.True(consumed, "ProcessPayment was not consumed"),
+    () => Assert.Equal(orderId, publishedEvent!.OrderId)
+);
+
+await using var provider = new ServiceCollection()
+    .AddMassTransitTestHarness(cfg =>
+    {
+        cfg.AddConsumer<ProcessPaymentConsumer>();
+    })
+    .BuildServiceProvider(true);
+
+using MassTransit;
+using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
+
+public class ProcessPaymentConsumerTests
+{
+    [Fact]
+    public async Task Should_Consume_ProcessPayment_And_Publish_PaymentProcessed()
+    {
+        await using var provider = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg =>
+            {
+                cfg.AddConsumer<ProcessPaymentConsumer>();
+            })
+            .BuildServiceProvider(true);
+
+        var harness = provider.GetRequiredService<ITestHarness>();
+
+        await harness.Start();
+
+        var orderId = Guid.NewGuid();
+        var amount = 100.50m;
+
+        await harness.Bus.Publish(new ProcessPayment(orderId, amount));
+
+        var consumed = await harness.Consumed.Any<ProcessPayment>();
+        var published = await harness.Published.Any<PaymentProcessed>();
+
+        PaymentProcessed? publishedEvent = null;
+        await foreach (var msg in harness.Published.SelectAsync<PaymentProcessed>())
+        {
+            publishedEvent = msg.Context.Message;
+            break;
+        }
+
+        Assert.Multiple(
+            () => Assert.True(consumed, "ProcessPayment was not consumed"),
+            () => Assert.Equal(orderId, publishedEvent!.OrderId)
+        );
+    }
+}
+
+Assert.Multiple(
+    () => Assert.True(consumed, "ProcessPayment was not consumed"),
+    () => Assert.True(published, "PaymentProcessed was not published"),
+    () => Assert.Equal(orderId, publishedEvent!.OrderId)
+);
+
+Assert.Multiple(
+    () => Assert.True(consumed, "ProcessPayment was not consumed"),
+    () => Assert.Equal(orderId, publishedEvent!.OrderId)
+);
+
+Assert.Multiple(
+    () => Assert.True(consumed, "ProcessPayment was not consumed"),
+    () => Assert.NotNull(publishedEvent),
+    () => Assert.Equal(orderId, publishedEvent!.OrderId)
+);
+
+Assert.Multiple(
+    () => Assert.True(consumed),
+    () => Assert.Equal(orderId, publishedEvent!.OrderId)
+);
+
+var consumed = await harness.Consumed.Any<ProcessPayment>();
+await harness.Published.Any<PaymentProcessed>(); // ensure it was published
+
+PaymentProcessed publishedEvent = default!;
+await foreach (var msg in harness.Published.SelectAsync<PaymentProcessed>())
+{
+    publishedEvent = msg.Context.Message;
+    break;
+}
+
+Assert.Multiple(
+    () => Assert.True(consumed),
+    () => Assert.Equal(orderId, publishedEvent.OrderId)
+);

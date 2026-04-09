@@ -25,15 +25,14 @@ public static class MathValidator
 
 public class MathValidatorTests
 {
-    public static IEnumerable<object[]> EvenTestData =>
-        new List<object[]>
-        {
-            new object[] { 2, true },
-            new object[] { 3, false },
-            new object[] { 0, true },
-            new object[] { -4, true },
-            new object[] { 7, false }
-        };
+    public static IEnumerable<object[]> EvenTestData => new List<object[]>
+    {
+        new object[] { 2, true },
+        new object[] { 3, false },
+        new object[] { 0, true },
+        new object[] { -4, true },
+        new object[] { 7, false }
+    };
 
     [Theory]
     [MemberData(nameof(EvenTestData))]

@@ -22,17 +22,16 @@ public class StringProcessor
 
 public class StringProcessorTests
 {
-    private readonly StringProcessor _sut = new();
-
     [Theory]
     [InlineData(null, 5, "")]
     [InlineData("", 5, "")]
     [InlineData("abc", 5, "abc")]
     [InlineData("abcde", 5, "abcde")]
-    [InlineData("abcdef", 3, "abc...")]
-    public void Truncate_ReturnsExpectedResult(string input, int maxLength, string expected)
+    [InlineData("abcdef", 5, "abcde...")]
+    public void Truncate_ReturnsExpected(string input, int maxLength, string expected)
     {
-        var result = _sut.Truncate(input, maxLength);
+        var sut = new StringProcessor();
+        var result = sut.Truncate(input, maxLength);
         result.Should().Be(expected);
     }
 
@@ -42,9 +41,10 @@ public class StringProcessorTests
     [InlineData("hello", 1)]
     [InlineData("hello world", 2)]
     [InlineData("  hello   world  ", 2)]
-    public void CountWords_ReturnsExpectedCount(string input, int expected)
+    public void CountWords_ReturnsExpected(string input, int expected)
     {
-        var result = _sut.CountWords(input);
+        var sut = new StringProcessor();
+        var result = sut.CountWords(input);
         result.Should().Be(expected);
     }
 
@@ -52,12 +52,14 @@ public class StringProcessorTests
     [InlineData(null, false)]
     [InlineData("", false)]
     [InlineData("a", true)]
-    [InlineData("Racecar", true)]
+    [InlineData("madam", true)]
+    [InlineData("MadAm", true)]
     [InlineData("hello", false)]
     [InlineData("A man a plan a canal Panama", true)]
-    public void IsPalindrome_ReturnsExpectedResult(string input, bool expected)
+    public void IsPalindrome_ReturnsExpected(string input, bool expected)
     {
-        var result = _sut.IsPalindrome(input);
+        var sut = new StringProcessor();
+        var result = sut.IsPalindrome(input);
         result.Should().Be(expected);
     }
 }

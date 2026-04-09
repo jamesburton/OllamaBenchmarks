@@ -5,9 +5,7 @@ public static class MathValidator
     public static bool IsPrime(int n)
     {
         if (n < 2) return false;
-        if (n == 2) return true;
-        if (n % 2 == 0) return false;
-        for (int i = 3; i * i <= n; i += 2)
+        for (int i = 2; i * i <= n; i++)
         {
             if (n % i == 0) return false;
         }
@@ -25,14 +23,13 @@ public static class MathValidator
 public class MathValidatorTests
 {
     public static IEnumerable<object[]> EvenTestData =>
-        new List<object[]>
-        {
-            new object[] { 2, true },
-            new object[] { 3, false },
-            new object[] { 0, true },
-            new object[] { -4, true },
-            new object[] { 7, false }
-        };
+    [
+        [2, true],
+        [3, false],
+        [0, true],
+        [-4, true],
+        [7, false]
+    ];
 
     [Theory]
     [MemberData(nameof(EvenTestData))]

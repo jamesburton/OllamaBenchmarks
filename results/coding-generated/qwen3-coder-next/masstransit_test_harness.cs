@@ -17,13 +17,17 @@ public class ProcessPaymentConsumerTests
     [Fact]
     public async Task ProcessPaymentConsumer_Should_Process_Message_And_Publish_Event()
     {
+        // Arrange
         var orderId = Guid.NewGuid();
         var amount = 99.99m;
+        var message = new ProcessPayment(orderId, amount);
 
         await harness.Start();
-        await harness.Bus.Publish(new ProcessPayment(orderId, amount));
 
-        // Await checks before Assert.Multiple since it doesn't support async lambdas
+        // Act
+        await harness.Bus.Publish(message);
+
+        // Assert
         var consumed = await harness.Consumed.Any<ProcessPayment>();
         var published = await harness.Published.Any<PaymentProcessed>();
 
@@ -32,5 +36,10 @@ public class ProcessPaymentConsumerTests
             Assert.True(consumed);
             Assert.True(published);
         });
+
+        // Verify the published message has the correct OrderId
+        var publishedMessages = await harness.Published.GetConsumedMessages<PaymentProcessed>();
+        Assert.Single(publishedMessages);
+        Assert.Equal(orderId, publishedMessages[0].Message.OrderId);
     }
 }

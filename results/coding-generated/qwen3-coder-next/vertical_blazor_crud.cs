@@ -126,15 +126,15 @@ public class TodoServiceTests
     {
         // Arrange
         var service = new TodoService();
-        var item = await service.AddAsync("Todo");
-        item.IsCompleted.Should().BeFalse();
+        await service.AddAsync("Todo");
+        var item = (await service.GetAllAsync())[0];
 
         // Act
         await service.ToggleAsync(item.Id);
 
         // Assert
-        var updatedItems = await service.GetAllAsync();
-        updatedItems[0].IsCompleted.Should().BeTrue();
+        var updatedItem = (await service.GetAllAsync())[0];
+        updatedItem.IsCompleted.Should().BeTrue();
     }
 }
 
@@ -146,10 +146,7 @@ public class TodoListBaseTests
     {
         // Arrange
         var mockService = NSubstitute.Substitute.For<ITodoService>();
-        var initialTodos = new List<TodoItem>
-        {
-            new(1, "Test Todo", false)
-        };
+        var initialTodos = new List<TodoItem> { new(1, "Test", false) };
         mockService.GetAllAsync().Returns(Task.FromResult(initialTodos));
 
         var ctx = new Bunit.TestContext();
@@ -159,6 +156,9 @@ public class TodoListBaseTests
         var cut = ctx.RenderComponent<TodoListBase>();
 
         // Assert
-        await mockService.Received().GetAllAsync();
+        await Task.Delay(10); // Allow async initialization to complete
+        mockService.Received(1).GetAllAsync();
+        cut.Instance.Todos.Count.Should().Be(1);
+        cut.Instance.Todos[0].Title.Should().Be("Test");
     }
 }

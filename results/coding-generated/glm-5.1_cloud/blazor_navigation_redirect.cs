@@ -24,11 +24,4 @@ public class ProductDetailBase : ComponentBase
 
         if (result)
         {
-            Nav.NavigateTo("/products");
-        }
-        else
-        {
-            ErrorMessage = "Delete failed";
-        }
-    }
-}
+            Nav.Navigate

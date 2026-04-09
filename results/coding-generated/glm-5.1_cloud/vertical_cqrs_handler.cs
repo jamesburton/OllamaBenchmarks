@@ -50,20 +50,20 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
 public class CreateProductCommandHandlerTests
 {
     private readonly IProductRepository _repository;
-    private readonly CreateProductCommandHandler _handler;
+    private readonly CreateProductCommandHandler _sut;
 
     public CreateProductCommandHandlerTests()
     {
         _repository = Substitute.For<IProductRepository>();
-        _handler = new CreateProductCommandHandler(_repository);
+        _sut = new CreateProductCommandHandler(_repository);
     }
 
     [Fact]
     public async Task HandleAsync_WhenNameIsNull_ReturnsValidationError()
     {
-        var command = new CreateProductCommand(null!, 10m);
+        var command = new CreateProductCommand(null, 10m);
 
-        var result = await _handler.HandleAsync(command);
+        var result = await _sut.HandleAsync(command);
 
         result.IsT1.Should().Be(true);
         result.AsT1.Message.Should().Be("Name is required");
@@ -74,7 +74,7 @@ public class CreateProductCommandHandlerTests
     {
         var command = new CreateProductCommand("   ", 10m);
 
-        var result = await _handler.HandleAsync(command);
+        var result = await _sut.HandleAsync(command);
 
         result.IsT1.Should().Be(true);
         result.AsT1.Message.Should().Be("Name is required");
@@ -85,7 +85,7 @@ public class CreateProductCommandHandlerTests
     {
         var command = new CreateProductCommand("Widget", 0m);
 
-        var result = await _handler.HandleAsync(command);
+        var result = await _sut.HandleAsync(command);
 
         result.IsT1.Should().Be(true);
         result.AsT1.Message.Should().Be("Price must be positive");
@@ -96,7 +96,7 @@ public class CreateProductCommandHandlerTests
     {
         var command = new CreateProductCommand("Widget", -5m);
 
-        var result = await _handler.HandleAsync(command);
+        var result = await _sut.HandleAsync(command);
 
         result.IsT1.Should().Be(true);
         result.AsT1.Message.Should().Be("Price must be positive");
@@ -108,36 +108,24 @@ public class CreateProductCommandHandlerTests
         var command = new CreateProductCommand("Widget", 10m);
         _repository.ExistsAsync("Widget").Returns(true);
 
-        var result = await _handler.HandleAsync(command);
+        var result = await _sut.HandleAsync(command);
 
         result.IsT2.Should().Be(true);
         result.AsT2.ExistingName.Should().Be("Widget");
     }
 
     [Fact]
-    public async Task HandleAsync_WhenValid_ReturnsProduct()
+    public async Task HandleAsync_WhenValid_CallsRepositoryAndReturnsProduct()
     {
         var command = new CreateProductCommand("Widget", 10m);
-        var added = new Product(1, "Widget", 10m);
+        var addedProduct = new Product(1, "Widget", 10m);
         _repository.ExistsAsync("Widget").Returns(false);
-        _repository.AddAsync(new Product(0, "Widget", 10m)).Returns(added);
+        _repository.AddAsync(Arg.Any<Product>()).Returns(addedProduct);
 
-        var result = await _handler.HandleAsync(command);
+        var result = await _sut.HandleAsync(command);
 
         result.IsT0.Should().Be(true);
-        result.AsT0.Should().Be(added);
-    }
-
-    [Fact]
-    public async Task HandleAsync_WhenValid_CallsRepositoryWithCorrectProduct()
-    {
-        var command = new CreateProductCommand("Gadget", 25m);
-        _repository.ExistsAsync("Gadget").Returns(false);
-        _repository.AddAsync(Arg.Any<Product>()).Returns(new Product(1, "Gadget", 25m));
-
-        await _handler.HandleAsync(command);
-
-        await _repository.Received(1).AddAsync(Arg.Is<Product>(p =>
-            p.Id == 0 && p.Name == "Gadget" && p.Price == 25m));
+        result.AsT0.Should().Be(addedProduct);
+        await _repository.Received(1).AddAsync(Arg.Any<Product>());
     }
 }

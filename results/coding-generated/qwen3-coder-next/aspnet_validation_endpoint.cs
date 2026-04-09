@@ -22,10 +22,7 @@ public class OrderService
         if (!Validator.TryValidateObject(request, context, validationResults, validateAllProperties: true))
         {
             var firstError = validationResults.FirstOrDefault();
-            if (firstError != null)
-            {
-                throw new ArgumentException(firstError.ErrorMessage);
-            }
+            throw new ArgumentException(firstError?.ErrorMessage ?? "Validation failed");
         }
 
         return request;

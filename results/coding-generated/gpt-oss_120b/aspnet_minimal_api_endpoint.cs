@@ -1,6 +1,5 @@
-using System.Collections.Generic;
-using System.Threading;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 public record CreateProductRequest(string Name, decimal Price);
 
@@ -30,7 +29,7 @@ public static class ProductEndpoints
                 });
         }
 
-        int id = Interlocked.Increment(ref _counter);
+        var id = ++_counter;
         var response = new ProductResponse(id, request.Name, request.Price);
         return Results.Ok(response);
     }

@@ -1,22 +1,12 @@
 global using Contracts;
-
-using System;
-using System.Threading.Tasks;
 using MassTransit;
-using MassTransit.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using Xunit;
-
-using MassTransit; // required before the Contracts namespace
 
 namespace Contracts;
 
-// Message records
 public record PlaceOrder(Guid OrderId, string CustomerName);
 public record OrderPlaced(Guid OrderId, string CustomerName);
 public record CustomerNotified(Guid OrderId, string NotificationMessage);
 
-// Consumers
 public class PlaceOrderConsumer : IConsumer<PlaceOrder>
 {
     public async Task Consume(ConsumeContext<PlaceOrder> context)
@@ -35,9 +25,19 @@ public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
     }
 }
 
-public class PipelineTests
+using System;
+using System.Threading.Tasks;
+using MassTransit;
+using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
+
+public class OrderPipelineTests : IAsyncLifetime
 {
-    private static ServiceProvider BuildServiceProvider()
+    private ITestHarness _harness = null!;
+    private IBus _bus = null!;
+
+    public async ValueTask InitializeAsync()
     {
         var services = new ServiceCollection();
 
@@ -47,42 +47,38 @@ public class PipelineTests
             cfg.AddConsumer<NotifyCustomerConsumer>();
         });
 
-        return services.BuildServiceProvider(true);
+        var provider = services.BuildServiceProvider(true);
+        _harness = provider.GetRequiredService<ITestHarness>();
+        _bus = provider.GetRequiredService<IBus>();
+
+        await _harness.Start();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _harness.Stop();
     }
 
     [Fact]
     public async Task PlaceOrder_Should_Consume_And_Publish_OrderPlaced()
     {
-        await using var provider = BuildServiceProvider();
-
-        var harness = provider.GetRequiredService<ITestHarness>();
-        await harness.Start();
-
         var orderId = Guid.NewGuid();
-        await harness.Bus.Publish(new PlaceOrder(orderId, "Alice"));
 
-        // Verify PlaceOrderConsumer consumed the command
-        Assert.True(await harness.Consumed.Any<PlaceOrder>());
+        await _bus.Publish(new PlaceOrder(orderId, "Alice"));
 
-        // Verify OrderPlaced was published
-        Assert.True(await harness.Published.Any<OrderPlaced>());
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
     }
 
     [Fact]
-    public async Task Full_Pipeline_Should_Publish_OrderPlaced_And_CustomerNotified()
+    public async Task FullPipeline_Should_Publish_OrderPlaced_And_CustomerNotified()
     {
-        await using var provider = BuildServiceProvider();
-
-        var harness = provider.GetRequiredService<ITestHarness>();
-        await harness.Start();
-
         var orderId = Guid.NewGuid();
-        await harness.Bus.Publish(new PlaceOrder(orderId, "Bob"));
 
-        // Verify the whole pipeline ran
-        Assert.True(await harness.Consumed.Any<PlaceOrder>());
-        Assert.True(await harness.Consumed.Any<OrderPlaced>());
-        Assert.True(await harness.Published.Any<OrderPlaced>());
-        Assert.True(await harness.Published.Any<CustomerNotified>());
+        await _bus.Publish(new PlaceOrder(orderId, "Bob"));
+
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
+        Assert.True(await _harness.Published.Any<CustomerNotified>());
     }
 }

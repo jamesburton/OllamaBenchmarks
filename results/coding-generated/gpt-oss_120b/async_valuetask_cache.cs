@@ -1,25 +1,30 @@
-public interface IExpensiveService
+interface IExpensiveService
 {
     System.Threading.Tasks.Task<string> ComputeAsync(string key);
 }
 
-public class CachingService
+class CachingService
 {
     private readonly IExpensiveService _inner;
-    private readonly System.Collections.Generic.Dictionary<string, string> _cache = new();
+    private readonly System.Collections.Generic.Dictionary<string, string> _cache = new System.Collections.Generic.Dictionary<string, string>();
 
     public CachingService(IExpensiveService inner)
     {
         _inner = inner;
     }
 
-    public async System.Threading.Tasks.ValueTask<string> GetAsync(string key)
+    public System.Threading.Tasks.ValueTask<string> GetAsync(string key)
     {
         if (_cache.TryGetValue(key, out var cachedValue))
         {
             return new System.Threading.Tasks.ValueTask<string>(cachedValue);
         }
 
+        return GetAndCacheAsync(key);
+    }
+
+    private async System.Threading.Tasks.ValueTask<string> GetAndCacheAsync(string key)
+    {
         var result = await _inner.ComputeAsync(key).ConfigureAwait(false);
         _cache[key] = result;
         return result;

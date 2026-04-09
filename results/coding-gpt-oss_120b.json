@@ -1,8 +1,8 @@
 {
   "model": "gpt-oss:120b",
   "benchmark": "coding",
-  "run_started_at": "2026-04-06T21:49:46.699753+00:00",
-  "run_finished_at": "2026-04-06T22:14:44.479256+00:00",
+  "run_started_at": "2026-04-09T16:28:33.125627+00:00",
+  "run_finished_at": "2026-04-09T17:48:43.259611+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
@@ -13,7 +13,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 19.68,
+      "generation_time_s": 189.77,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\aspnet_oneof_controller.cs"
     },
     {
@@ -25,7 +25,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 27.92,
+      "generation_time_s": 87.13,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\aspnet_validation_endpoint.cs"
     },
     {
@@ -37,7 +37,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 12.29,
+      "generation_time_s": 59.39,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\aspnet_service_di.cs"
     },
     {
@@ -49,7 +49,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 24.16,
+      "generation_time_s": 68.34,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\efcore_leftjoin.cs"
     },
     {
@@ -61,7 +61,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 15.87,
+      "generation_time_s": 60.19,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\efcore_json_columns.cs"
     },
     {
@@ -73,7 +73,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 19.09,
+      "generation_time_s": 70.48,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\efcore_executeupdate.cs"
     },
     {
@@ -85,7 +85,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 21.41,
+      "generation_time_s": 91.12,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\masstransit_consumer.cs"
     },
     {
@@ -97,7 +97,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 43.74,
+      "generation_time_s": 71.75,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\masstransit_statemachine.cs"
     },
     {
@@ -109,7 +109,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 26.31,
+      "generation_time_s": 166.3,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\masstransit_test_harness.cs"
     },
     {
@@ -121,7 +121,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 12.4,
+      "generation_time_s": 43.33,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\blazor_interactive_component.cs"
     },
     {
@@ -133,7 +133,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 14.5,
+      "generation_time_s": 39.06,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\blazor_streaming_render.cs"
     },
     {
@@ -145,7 +145,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 16.65,
+      "generation_time_s": 40.15,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\blazor_cascading_auth.cs"
     },
     {
@@ -155,9 +155,9 @@
       "passed": true,
       "harness_error": null,
       "build_success": true,
-      "tests_passed": 24,
-      "tests_total": 24,
-      "generation_time_s": 43.38,
+      "tests_passed": 25,
+      "tests_total": 25,
+      "generation_time_s": 165.44,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\xunit_v3_theory_tests.cs"
     },
     {
@@ -169,7 +169,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 26.08,
+      "generation_time_s": 116.84,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\xunit_awesome_nsubstitute.cs"
     },
     {
@@ -181,7 +181,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 21.3,
+      "generation_time_s": 63.58,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\xunit_assembly_fixture.cs"
     },
     {
@@ -193,7 +193,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 14.31,
+      "generation_time_s": 55.38,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\linq_complex_query.cs"
     },
     {
@@ -205,7 +205,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 14.21,
+      "generation_time_s": 93.61,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\async_cancellation.cs"
     },
     {
@@ -217,31 +217,31 @@
       "build_success": true,
       "tests_passed": 6,
       "tests_total": 6,
-      "generation_time_s": 41.17,
+      "generation_time_s": 168.35,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\vertical_order_service.cs"
     },
     {
       "task": "vertical_consumer_pipeline",
       "category": "vertical",
       "weight": 2,
-      "passed": true,
+      "passed": false,
       "harness_error": null,
-      "build_success": true,
-      "tests_passed": 4,
-      "tests_total": 4,
-      "generation_time_s": 43.9,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 202.73,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\vertical_consumer_pipeline.cs"
     },
     {
       "task": "vertical_blazor_crud",
       "category": "vertical",
       "weight": 2,
-      "passed": true,
+      "passed": false,
       "harness_error": null,
-      "build_success": true,
-      "tests_passed": 7,
-      "tests_total": 7,
-      "generation_time_s": 100.69,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 238.81,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\vertical_blazor_crud.cs"
     },
     {
@@ -253,7 +253,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 23.78,
+      "generation_time_s": 90.11,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\linq_selectmany_flatten.cs"
     },
     {
@@ -265,7 +265,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 21.08,
+      "generation_time_s": 62.87,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\linq_set_operations.cs"
     },
     {
@@ -277,7 +277,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 29.11,
+      "generation_time_s": 112.0,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\linq_aggregate_stats.cs"
     },
     {
@@ -289,7 +289,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 13.61,
+      "generation_time_s": 50.58,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\linq_todictionary_tolookup.cs"
     },
     {
@@ -301,7 +301,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 22.54,
+      "generation_time_s": 77.55,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\async_whenall_parallel.cs"
     },
     {
@@ -313,7 +313,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 39.89,
+      "generation_time_s": 124.87,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\async_semaphore_throttle.cs"
     },
     {
@@ -325,7 +325,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 19.93,
+      "generation_time_s": 47.99,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\async_channel_pipeline.cs"
     },
     {
@@ -334,10 +334,10 @@
       "weight": 1,
       "passed": false,
       "harness_error": null,
-      "build_success": false,
+      "build_success": true,
       "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 18.69,
+      "tests_total": 4,
+      "generation_time_s": 134.89,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\async_valuetask_cache.cs"
     },
     {
@@ -349,7 +349,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 3,
-      "generation_time_s": 16.01,
+      "generation_time_s": 68.62,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\aspnet_minimal_api_endpoint.cs"
     },
     {
@@ -361,7 +361,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 18.35,
+      "generation_time_s": 59.32,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\aspnet_typed_httpclient.cs"
     },
     {
@@ -373,7 +373,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 12.92,
+      "generation_time_s": 36.76,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\aspnet_ioptions_config.cs"
     },
     {
@@ -385,7 +385,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 16.86,
+      "generation_time_s": 47.68,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\aspnet_problemdetails_handler.cs"
     },
     {
@@ -397,7 +397,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 22.41,
+      "generation_time_s": 98.69,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\efcore_include_navigation.cs"
     },
     {
@@ -409,7 +409,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 22.72,
+      "generation_time_s": 64.63,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\efcore_softdelete_filter.cs"
     },
     {
@@ -421,7 +421,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 21.56,
+      "generation_time_s": 52.85,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\efcore_owned_entity.cs"
     },
     {
@@ -433,7 +433,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 24.29,
+      "generation_time_s": 83.13,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\efcore_value_conversion.cs"
     },
     {
@@ -445,7 +445,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 20.11,
+      "generation_time_s": 78.3,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\masstransit_request_response.cs"
     },
     {
@@ -457,7 +457,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 25.68,
+      "generation_time_s": 108.98,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\masstransit_saga_events.cs"
     },
     {
@@ -469,7 +469,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 22.3,
+      "generation_time_s": 68.36,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\masstransit_consumer_filter.cs"
     },
     {
@@ -481,7 +481,7 @@
       "build_success": true,
       "tests_passed": 25,
       "tests_total": 25,
-      "generation_time_s": 34.06,
+      "generation_time_s": 152.43,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\xunit_memberdata.cs"
     },
     {
@@ -493,7 +493,7 @@
       "build_success": true,
       "tests_passed": 9,
       "tests_total": 9,
-      "generation_time_s": 26.36,
+      "generation_time_s": 87.6,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\xunit_class_fixture.cs"
     },
     {
@@ -505,7 +505,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 27.02,
+      "generation_time_s": 96.89,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\xunit_async_collection.cs"
     },
     {
@@ -517,7 +517,7 @@
       "build_success": true,
       "tests_passed": 7,
       "tests_total": 7,
-      "generation_time_s": 11.73,
+      "generation_time_s": 41.21,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\blazor_form_validation.cs"
     },
     {
@@ -529,7 +529,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 9.34,
+      "generation_time_s": 49.75,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\blazor_navigation_redirect.cs"
     },
     {
@@ -541,7 +541,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 10.41,
+      "generation_time_s": 58.7,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\blazor_parameter_lifecycle.cs"
     },
     {
@@ -553,7 +553,7 @@
       "build_success": true,
       "tests_passed": 12,
       "tests_total": 12,
-      "generation_time_s": 73.01,
+      "generation_time_s": 201.35,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\vertical_cqrs_handler.cs"
     },
     {
@@ -565,7 +565,7 @@
       "build_success": true,
       "tests_passed": 8,
       "tests_total": 8,
-      "generation_time_s": 47.75,
+      "generation_time_s": 155.04,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\vertical_efcore_service.cs"
     },
     {
@@ -577,7 +577,7 @@
       "build_success": true,
       "tests_passed": 6,
       "tests_total": 6,
-      "generation_time_s": 11.0,
+      "generation_time_s": 45.0,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\patterns_record_with.cs"
     },
     {
@@ -589,7 +589,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 10.26,
+      "generation_time_s": 30.26,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\patterns_json_serialization.cs"
     },
     {
@@ -601,9 +601,9 @@
       "build_success": true,
       "tests_passed": 4,
       "tests_total": 4,
-      "generation_time_s": 21.86,
+      "generation_time_s": 53.36,
       "generated_code_path": "results\\coding-generated\\gpt-oss_120b\\patterns_timeprovider.cs"
     }
   ],
-  "layer3_weighted_score": 0.8727272727272727
+  "layer3_weighted_score": 0.8
 }

@@ -20,11 +20,16 @@ public class StoreService
 {
     private readonly InMemoryStore _store;
 
-    public StoreService(InMemoryStore store) => _store = store;
+    public StoreService(InMemoryStore store)
+    {
+        _store = store;
+    }
 
-    public string? Get(string key) => _store.Data.TryGetValue(key, out var v) ? v : null;
+    public string? Get(string key) =>
+        _store.Data.TryGetValue(key, out var value) ? value : null;
 
-    public void Set(string key, string value) => _store.Data[key] = value;
+    public void Set(string key, string value) =>
+        _store.Data[key] = value;
 }
 
 public class StoreServiceTests : IClassFixture<InMemoryStore>

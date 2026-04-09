@@ -1,8 +1,8 @@
 {
   "model": "qwen3-coder-next",
   "benchmark": "coding",
-  "run_started_at": "2026-04-05T11:10:54.077365+00:00",
-  "run_finished_at": "2026-04-05T11:22:58.752970+00:00",
+  "run_started_at": "2026-04-09T19:03:39.645550+00:00",
+  "run_finished_at": "2026-04-09T19:40:13.397700+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
@@ -13,7 +13,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 44.36,
+      "generation_time_s": 82.15,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_oneof_controller.cs"
     },
     {
@@ -25,7 +25,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 6.99,
+      "generation_time_s": 30.99,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_validation_endpoint.cs"
     },
     {
@@ -37,19 +37,19 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 7.88,
+      "generation_time_s": 31.89,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_service_di.cs"
     },
     {
       "task": "efcore_leftjoin",
       "category": "efcore",
       "weight": 1,
-      "passed": true,
+      "passed": false,
       "harness_error": null,
-      "build_success": true,
-      "tests_passed": 1,
-      "tests_total": 1,
-      "generation_time_s": 9.69,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 42.2,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_leftjoin.cs"
     },
     {
@@ -61,7 +61,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 8.44,
+      "generation_time_s": 35.51,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_json_columns.cs"
     },
     {
@@ -73,7 +73,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 9.21,
+      "generation_time_s": 40.88,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_executeupdate.cs"
     },
     {
@@ -85,7 +85,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 6.76,
+      "generation_time_s": 32.34,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_consumer.cs"
     },
     {
@@ -97,19 +97,19 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 12.79,
+      "generation_time_s": 54.9,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_statemachine.cs"
     },
     {
       "task": "masstransit_test_harness",
       "category": "masstransit",
       "weight": 1,
-      "passed": true,
+      "passed": false,
       "harness_error": null,
-      "build_success": true,
-      "tests_passed": 1,
-      "tests_total": 1,
-      "generation_time_s": 8.84,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 47.55,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_test_harness.cs"
     },
     {
@@ -121,7 +121,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 4.64,
+      "generation_time_s": 21.16,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_interactive_component.cs"
     },
     {
@@ -133,7 +133,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 5.01,
+      "generation_time_s": 23.02,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_streaming_render.cs"
     },
     {
@@ -145,19 +145,19 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 6.91,
+      "generation_time_s": 30.32,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_cascading_auth.cs"
     },
     {
       "task": "xunit_v3_theory_tests",
       "category": "xunit",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 15.54,
+      "build_success": true,
+      "tests_passed": 24,
+      "tests_total": 24,
+      "generation_time_s": 69.23,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_v3_theory_tests.cs"
     },
     {
@@ -169,7 +169,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 16.24,
+      "generation_time_s": 66.81,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_awesome_nsubstitute.cs"
     },
     {
@@ -181,7 +181,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 10.4,
+      "generation_time_s": 32.38,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_assembly_fixture.cs"
     },
     {
@@ -193,7 +193,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 4.64,
+      "generation_time_s": 18.84,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\linq_complex_query.cs"
     },
     {
@@ -205,7 +205,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 5.41,
+      "generation_time_s": 22.87,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\async_cancellation.cs"
     },
     {
@@ -217,7 +217,7 @@
       "build_success": true,
       "tests_passed": 6,
       "tests_total": 6,
-      "generation_time_s": 15.25,
+      "generation_time_s": 66.84,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\vertical_order_service.cs"
     },
     {
@@ -229,7 +229,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 20.05,
+      "generation_time_s": 88.51,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\vertical_consumer_pipeline.cs"
     },
     {
@@ -241,7 +241,7 @@
       "build_success": true,
       "tests_passed": 7,
       "tests_total": 7,
-      "generation_time_s": 31.91,
+      "generation_time_s": 139.08,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\vertical_blazor_crud.cs"
     },
     {
@@ -253,7 +253,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 2.32,
+      "generation_time_s": 9.88,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\linq_selectmany_flatten.cs"
     },
     {
@@ -265,7 +265,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 3.41,
+      "generation_time_s": 14.41,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\linq_set_operations.cs"
     },
     {
@@ -277,7 +277,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 5.49,
+      "generation_time_s": 22.58,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\linq_aggregate_stats.cs"
     },
     {
@@ -289,7 +289,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 2.83,
+      "generation_time_s": 11.92,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\linq_todictionary_tolookup.cs"
     },
     {
@@ -301,7 +301,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 6.08,
+      "generation_time_s": 25.68,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\async_whenall_parallel.cs"
     },
     {
@@ -313,7 +313,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 8.34,
+      "generation_time_s": 35.79,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\async_semaphore_throttle.cs"
     },
     {
@@ -325,7 +325,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 3.8,
+      "generation_time_s": 14.65,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\async_channel_pipeline.cs"
     },
     {
@@ -337,7 +337,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 4.54,
+      "generation_time_s": 19.07,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\async_valuetask_cache.cs"
     },
     {
@@ -349,19 +349,19 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 3,
-      "generation_time_s": 7.05,
+      "generation_time_s": 31.24,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_minimal_api_endpoint.cs"
     },
     {
       "task": "aspnet_typed_httpclient",
       "category": "aspnet",
       "weight": 1,
-      "passed": true,
+      "passed": false,
       "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 8.09,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 35.57,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_typed_httpclient.cs"
     },
     {
@@ -373,7 +373,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 6.98,
+      "generation_time_s": 30.7,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_ioptions_config.cs"
     },
     {
@@ -385,7 +385,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 8.72,
+      "generation_time_s": 38.67,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\aspnet_problemdetails_handler.cs"
     },
     {
@@ -397,7 +397,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 14.04,
+      "generation_time_s": 59.39,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_include_navigation.cs"
     },
     {
@@ -409,7 +409,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 10.03,
+      "generation_time_s": 44.15,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_softdelete_filter.cs"
     },
     {
@@ -421,7 +421,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 9.22,
+      "generation_time_s": 40.49,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_owned_entity.cs"
     },
     {
@@ -433,7 +433,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 10.32,
+      "generation_time_s": 44.77,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\efcore_value_conversion.cs"
     },
     {
@@ -445,7 +445,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 7.29,
+      "generation_time_s": 31.17,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_request_response.cs"
     },
     {
@@ -457,7 +457,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 12.62,
+      "generation_time_s": 55.53,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_saga_events.cs"
     },
     {
@@ -469,7 +469,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 7.46,
+      "generation_time_s": 31.98,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\masstransit_consumer_filter.cs"
     },
     {
@@ -481,7 +481,7 @@
       "build_success": true,
       "tests_passed": 25,
       "tests_total": 25,
-      "generation_time_s": 15.25,
+      "generation_time_s": 64.2,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_memberdata.cs"
     },
     {
@@ -493,7 +493,7 @@
       "build_success": true,
       "tests_passed": 9,
       "tests_total": 9,
-      "generation_time_s": 11.45,
+      "generation_time_s": 47.09,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_class_fixture.cs"
     },
     {
@@ -505,7 +505,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 8.41,
+      "generation_time_s": 41.05,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\xunit_async_collection.cs"
     },
     {
@@ -517,7 +517,7 @@
       "build_success": true,
       "tests_passed": 7,
       "tests_total": 7,
-      "generation_time_s": 6.98,
+      "generation_time_s": 29.02,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_form_validation.cs"
     },
     {
@@ -529,7 +529,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 6.34,
+      "generation_time_s": 26.45,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_navigation_redirect.cs"
     },
     {
@@ -541,7 +541,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 6.19,
+      "generation_time_s": 25.42,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\blazor_parameter_lifecycle.cs"
     },
     {
@@ -553,7 +553,7 @@
       "build_success": true,
       "tests_passed": 8,
       "tests_total": 8,
-      "generation_time_s": 10.46,
+      "generation_time_s": 49.26,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\vertical_cqrs_handler.cs"
     },
     {
@@ -565,7 +565,7 @@
       "build_success": true,
       "tests_passed": 8,
       "tests_total": 8,
-      "generation_time_s": 16.82,
+      "generation_time_s": 73.55,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\vertical_efcore_service.cs"
     },
     {
@@ -577,7 +577,7 @@
       "build_success": true,
       "tests_passed": 6,
       "tests_total": 6,
-      "generation_time_s": 3.22,
+      "generation_time_s": 13.07,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\patterns_record_with.cs"
     },
     {
@@ -589,7 +589,7 @@
       "build_success": true,
       "tests_passed": 5,
       "tests_total": 5,
-      "generation_time_s": 3.75,
+      "generation_time_s": 14.97,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\patterns_json_serialization.cs"
     },
     {
@@ -601,10 +601,9 @@
       "build_success": true,
       "tests_passed": 4,
       "tests_total": 4,
-      "generation_time_s": 4.6,
+      "generation_time_s": 17.73,
       "generated_code_path": "results\\coding-generated\\qwen3-coder-next\\patterns_timeprovider.cs"
     }
   ],
-  "layer3_weighted_score": 0.8545454545454545,
-  "composite_score": 0.512727
+  "layer3_weighted_score": 0.8181818181818182
 }

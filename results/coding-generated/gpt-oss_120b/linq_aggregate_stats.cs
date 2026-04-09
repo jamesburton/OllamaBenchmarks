@@ -2,24 +2,30 @@ public static class SurveyAnalyzer
 {
     public static (double Mean, double Median, double Min, double Max) ComputeStats(System.Collections.Generic.IEnumerable<double> values)
     {
-        var list = System.Linq.Enumerable.ToList(values);
+        if (values == null)
+            throw new System.ArgumentNullException(nameof(values));
+
+        // Materialize the sequence to allow multiple passes and sorting
+        var list = new System.Collections.Generic.List<double>(values);
         if (list.Count == 0)
-            throw new System.ArgumentException("The input sequence is empty.");
+            throw new System.ArgumentException("The input sequence must contain at least one element.");
 
-        double mean = System.Linq.Enumerable.Average(list);
-        double min = System.Linq.Enumerable.Min(list);
-        double max = System.Linq.Enumerable.Max(list);
+        double mean = System.Linq.Enumerable.Average(values);
+        double min = System.Linq.Enumerable.Min(values);
+        double max = System.Linq.Enumerable.Max(values);
 
+        // Ensure the list is sorted for median calculation
         list.Sort();
-        int n = list.Count;
+
         double median;
-        if (n % 2 == 1)
+        int count = list.Count;
+        if (count % 2 == 1) // odd number of elements
         {
-            median = list[n / 2];
+            median = list[count / 2];
         }
-        else
+        else // even number of elements
         {
-            median = (list[n / 2 - 1] + list[n / 2]) / 2.0;
+            median = (list[count / 2 - 1] + list[count / 2]) / 2.0;
         }
 
         return (Mean: mean, Median: median, Min: min, Max: max);

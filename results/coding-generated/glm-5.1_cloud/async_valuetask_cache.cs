@@ -14,15 +14,9 @@ public class CachingService
         _cache = new System.Collections.Generic.Dictionary<string, string>();
     }
 
-    public async System.Threading.Tasks.ValueTask<string> GetAsync(string key)
+    public System.Threading.Tasks.ValueTask<string> GetAsync(string key)
     {
-        if (_cache.TryGetValue(key, out var cachedValue))
+        if (_cache.TryGetValue(key, out string cachedValue))
         {
-            return new System.Threading.Tasks.ValueTask<string>(cachedValue);
+            return new ValueTask<string>(cachedValue);
         }
-
-        var result = await _inner.ComputeAsync(key);
-        _cache[key] = result;
-        return result;
-    }
-}

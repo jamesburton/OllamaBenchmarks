@@ -16,9 +16,12 @@ public class Customer
 
 public class CustomerDbContext : DbContext
 {
-    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options) { }
-
     public DbSet<Customer> Customers { get; set; } = null!;
+
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options)
+        : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

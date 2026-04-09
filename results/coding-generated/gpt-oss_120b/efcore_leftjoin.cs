@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace EfCore10Demo
+namespace EfCore10Sample
 {
-    // -----------------------------------------------------------------
     // Entity classes
-    // -----------------------------------------------------------------
     public class Customer
     {
         public int Id { get; set; }
@@ -23,9 +20,7 @@ namespace EfCore10Demo
         public DateTime OrderDate { get; set; }
     }
 
-    // -----------------------------------------------------------------
     // DbContext
-    // -----------------------------------------------------------------
     public class AppDbContext : DbContext
     {
         public DbSet<Customer> Customers => Set<Customer>();
@@ -35,53 +30,25 @@ namespace EfCore10Demo
             : base(options)
         {
         }
-
-        // Optional: configure model (not required for this example)
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
     }
 
-    // -----------------------------------------------------------------
     // DTO
-    // -----------------------------------------------------------------
     public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
-    // -----------------------------------------------------------------
     // Query helper
-    // -----------------------------------------------------------------
     public static class OrderQueries
     {
-        /// <summary>
-        /// Retrieves all orders together with the associated customer name.
-        /// If an order has no matching customer, the name is reported as "Unknown".
-        /// </summary>
-        public static async Task<List<OrderDto>> GetOrdersWithCustomersAsync(AppDbContext db)
-        {
-            var query = db.Orders.LeftJoin(
-                db.Customers,
-                order => order.CustomerId,
-                customer => customer.Id,
-                (order, customer) => new OrderDto(
-                    OrderId: order.Id,
-                    Total: order.Total,
-                    CustomerName: customer == null ? "Unknown" : customer.Name));
-
-            return await query.ToListAsync();
-        }
-
-        // Synchronous version (if preferred)
         public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
         {
-            var query = db.Orders.LeftJoin(
-                db.Customers,
-                order => order.CustomerId,
-                customer => customer.Id,
-                (order, customer) => new OrderDto(
-                    OrderId: order.Id,
-                    Total: order.Total,
-                    CustomerName: customer == null ? "Unknown" : customer.Name));
+            var query = db.Orders
+                .LeftJoin(
+                    db.Customers,
+                    order => order.CustomerId,
+                    customer => customer.Id,
+                    (order, customer) => new OrderDto(
+                        OrderId: order.Id,
+                        Total: order.Total,
+                        CustomerName: customer == null ? "Unknown" : customer.Name));
 
             return query.ToList();
         }
