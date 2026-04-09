@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
 public class ThrottledProcessor
 {
     private readonly SemaphoreSlim _semaphore;
@@ -11,25 +7,25 @@ public class ThrottledProcessor
         _semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
     }
 
-    public async Task<List> ProcessAllAsync(IEnumerable<Func<CancellationToken, Task>> tasks, CancellationToken ct)
+    public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
-        var launchedTasks = new List<Task>();
+        var taskList = new List<Task<T>>();
 
-        foreach (var taskFactory in tasks)
+        foreach (var factory in tasks)
         {
-            launchedTasks.Add(ProcessOneAsync(taskFactory, ct));
+            taskList.Add(ProcessItemAsync(factory, ct));
         }
 
-        var results = await Task.WhenAll(launchedTasks);
-        return new List(results);
+        T[] results = await Task.WhenAll(taskList);
+        return new List<T>(results);
     }
 
-    private async Task ProcessOneAsync(Func<CancellationToken, Task> taskFactory, CancellationToken ct)
+    private async Task<T> ProcessItemAsync<T>(Func<CancellationToken, Task<T>> factory, CancellationToken ct)
     {
         await _semaphore.WaitAsync(ct);
         try
         {
-            await taskFactory(ct);
+            return await factory(ct);
         }
         finally
         {

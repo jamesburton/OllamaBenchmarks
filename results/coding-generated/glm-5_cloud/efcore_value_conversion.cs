@@ -5,7 +5,7 @@ public record Money(decimal Amount, string Currency);
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
     public Money Price { get; set; } = new Money(0, "USD");
 }
 

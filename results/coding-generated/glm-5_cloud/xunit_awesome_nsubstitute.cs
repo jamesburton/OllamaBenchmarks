@@ -34,17 +34,17 @@ public class NotificationServiceTests
         // Arrange
         var repo = Substitute.For<IUserRepository>();
         var emailService = Substitute.For<IEmailService>();
-        var sut = new NotificationService(repo, emailService);
-
         var user = new User { Id = 1, Name = "Test User", Email = "test@example.com" };
+
         repo.GetByIdAsync(user.Id).Returns(user);
+
+        var sut = new NotificationService(repo, emailService);
 
         // Act
         await sut.NotifyUserAsync(user.Id);
 
         // Assert
-        await repo.Received().GetByIdAsync(user.Id);
-        await emailService.Received().SendWelcomeAsync(user.Email);
+        await emailService.Received(1).SendWelcomeAsync(user.Email);
     }
 
     [Fact]
@@ -53,12 +53,14 @@ public class NotificationServiceTests
         // Arrange
         var repo = Substitute.For<IUserRepository>();
         var emailService = Substitute.For<IEmailService>();
+        var userId = 999;
+
+        repo.GetByIdAsync(userId).Returns((User?)null);
+
         var sut = new NotificationService(repo, emailService);
 
-        repo.GetByIdAsync(Arg.Any<int>()).Returns((User?)null);
-
         // Act
-        Func<Task> act = () => sut.NotifyUserAsync(999);
+        Func<Task> act = () => sut.NotifyUserAsync(userId);
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>();

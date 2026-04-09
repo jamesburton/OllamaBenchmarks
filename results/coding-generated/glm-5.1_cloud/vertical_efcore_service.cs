@@ -85,60 +85,53 @@ public class TodoServiceTests
     }
 
     [Fact]
-    public async Task CreateAsync_SetsDefaultsAndSaves()
+    public async Task CreateAsync_SetsDefaultsAndPersists()
     {
-        var db = CreateContext();
+        using var db = CreateContext();
         var service = new TodoService(db);
 
-        var result = await service.CreateAsync("Test item");
+        var result = await service.CreateAsync("Buy milk");
 
         result.Should().NotBeNull();
-        result.Title.Should().Be("Test item");
+        result.Id.Should().BeGreaterThan(0);
+        result.Title.Should().Be("Buy milk");
         result.IsComplete.Should().BeFalse();
         result.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
-        result.Id.Should().BeGreaterThan(0);
-
-        var all = await service.GetAllAsync();
-        all.Should().HaveCount(1);
-        all[0].Should().BeEquivalentTo(result);
+        (await db.TodoItems.CountAsync()).Should().Be(1);
     }
 
     [Fact]
     public async Task GetAllAsync_ReturnsAllItems()
     {
-        var db = CreateContext();
+        using var db = CreateContext();
         var service = new TodoService(db);
-
-        await service.CreateAsync("First");
-        await service.CreateAsync("Second");
-        await service.CreateAsync("Third");
+        await service.CreateAsync("A");
+        await service.CreateAsync("B");
 
         var result = await service.GetAllAsync();
 
-        result.Should().HaveCount(3);
-        result.Should().Contain(x => x.Title == "First");
-        result.Should().Contain(x => x.Title == "Second");
-        result.Should().Contain(x => x.Title == "Third");
+        result.Should().HaveCount(2);
+        result.Should().Contain(x => x.Title == "A");
+        result.Should().Contain(x => x.Title == "B");
     }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsItem_WhenExists()
     {
-        var db = CreateContext();
+        using var db = CreateContext();
         var service = new TodoService(db);
-
-        var created = await service.CreateAsync("Find me");
+        var created = await service.CreateAsync("Test");
 
         var result = await service.GetByIdAsync(created.Id);
 
         result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(created);
+        result!.Title.Should().Be("Test");
     }
 
     [Fact]
     public async Task GetByIdAsync_ReturnsNull_WhenNotFound()
     {
-        var db = CreateContext();
+        using var db = CreateContext();
         var service = new TodoService(db);
 
         var result = await service.GetByIdAsync(999);
@@ -147,24 +140,24 @@ public class TodoServiceTests
     }
 
     [Fact]
-    public async Task CompleteAsync_SetsIsComplete_AndReturnsTrue()
+    public async Task CompleteAsync_MarksCompleteAndReturnsTrue_WhenExists()
     {
-        var db = CreateContext();
+        using var db = CreateContext();
         var service = new TodoService(db);
-
-        var created = await service.CreateAsync("To complete");
+        var created = await service.CreateAsync("Test");
 
         var result = await service.CompleteAsync(created.Id);
 
         result.Should().BeTrue();
-        var updated = await service.GetByIdAsync(created.Id);
-        updated!.IsComplete.Should().BeTrue();
+        var item = await db.TodoItems.FindAsync(created.Id);
+        item.Should().NotBeNull();
+        item!.IsComplete.Should().BeTrue();
     }
 
     [Fact]
     public async Task CompleteAsync_ReturnsFalse_WhenNotFound()
     {
-        var db = CreateContext();
+        using var db = CreateContext();
         var service = new TodoService(db);
 
         var result = await service.CompleteAsync(999);
@@ -173,24 +166,22 @@ public class TodoServiceTests
     }
 
     [Fact]
-    public async Task DeleteAsync_RemovesItem_AndReturnsTrue()
+    public async Task DeleteAsync_RemovesItemAndReturnsTrue_WhenExists()
     {
-        var db = CreateContext();
+        using var db = CreateContext();
         var service = new TodoService(db);
-
-        var created = await service.CreateAsync("To delete");
+        var created = await service.CreateAsync("Test");
 
         var result = await service.DeleteAsync(created.Id);
 
         result.Should().BeTrue();
-        var all = await service.GetAllAsync();
-        all.Should().BeEmpty();
+        (await db.TodoItems.FindAsync(created.Id)).Should().BeNull();
     }
 
     [Fact]
     public async Task DeleteAsync_ReturnsFalse_WhenNotFound()
     {
-        var db = CreateContext();
+        using var db = CreateContext();
         var service = new TodoService(db);
 
         var result = await service.DeleteAsync(999);

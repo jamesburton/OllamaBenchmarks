@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 public class Customer
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 }
 
 public class Order
@@ -21,8 +21,8 @@ public class Order
 
 public class AppDbContext : DbContext
 {
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Customer> Customers => Set<Customer>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 }
@@ -31,9 +31,9 @@ public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
 public static class OrderQueries
 {
-    public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
+    public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
     {
-        return await db.Orders
+        return db.Orders
             .LeftJoin(
                 db.Customers,
                 order => order.CustomerId,
@@ -43,6 +43,6 @@ public static class OrderQueries
                     order.Total,
                     customer == null ? "Unknown" : customer.Name
                 ))
-            .ToListAsync();
+            .ToList();
     }
 }

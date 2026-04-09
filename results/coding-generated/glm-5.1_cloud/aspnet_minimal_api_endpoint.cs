@@ -27,7 +27,7 @@ public static class ProductEndpoints
             return Results.ValidationProblem(errors);
         }
 
-        var id = ++_counter;
+        var id = Interlocked.Increment(ref _counter);
         return Results.Ok(new ProductResponse(id, request.Name, request.Price));
     }
 }

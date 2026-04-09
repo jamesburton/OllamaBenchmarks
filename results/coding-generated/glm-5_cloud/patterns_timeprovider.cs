@@ -1,33 +1,28 @@
-public class FakeTimeProvider : System.TimeProvider
+public class FakeTimeProvider : TimeProvider
 {
-    private readonly System.DateTimeOffset _fixedUtcNow;
+    private readonly DateTimeOffset _fixedUtcNow;
 
-    public FakeTimeProvider(System.DateTimeOffset fixedUtcNow)
+    public FakeTimeProvider(DateTimeOffset fixedUtcNow)
     {
         _fixedUtcNow = fixedUtcNow;
     }
 
-    public override System.DateTimeOffset GetUtcNow()
+    public override DateTimeOffset GetUtcNow()
     {
         return _fixedUtcNow;
-    }
-
-    public override long GetTimestamp()
-    {
-        throw new System.NotImplementedException();
     }
 }
 
 public class ExpiryChecker
 {
-    private readonly System.TimeProvider _timeProvider;
+    private readonly TimeProvider _timeProvider;
 
-    public ExpiryChecker(System.TimeProvider timeProvider)
+    public ExpiryChecker(TimeProvider timeProvider)
     {
         _timeProvider = timeProvider;
     }
 
-    public bool IsExpired(System.DateTimeOffset expiresAt)
+    public bool IsExpired(DateTimeOffset expiresAt)
     {
         return expiresAt < _timeProvider.GetUtcNow();
     }

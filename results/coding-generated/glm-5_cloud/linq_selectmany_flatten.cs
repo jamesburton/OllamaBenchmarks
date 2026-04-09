@@ -6,7 +6,7 @@ public static class StaffDirectory
     {
         return departments
             .SelectMany(d => d.Employees)
-            .OrderBy(name => name)
+            .OrderBy(e => e)
             .ToList();
     }
 }

@@ -22,9 +22,9 @@ public class GitHubClient : IGitHubClient
         _httpClient = httpClient;
     }
 
-    public Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
+    public async Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
     {
-        return _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
+        return await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
     }
 }
 

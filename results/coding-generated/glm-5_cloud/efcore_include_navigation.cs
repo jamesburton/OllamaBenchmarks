@@ -26,9 +26,9 @@ public class Blog
 
 public class BlogDbContext : DbContext
 {
-    public DbSet<Blog> Blogs { get; set; }
-    public DbSet<Post> Posts { get; set; }
-    public DbSet<Comment> Comments { get; set; }
+    public DbSet<Blog> Blogs { get; set; } = null!;
+    public DbSet<Post> Posts { get; set; } = null!;
+    public DbSet<Comment> Comments { get; set; } = null!;
 
     public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options)
     {

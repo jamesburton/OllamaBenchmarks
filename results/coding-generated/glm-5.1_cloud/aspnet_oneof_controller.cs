@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
-using System.Threading.Tasks;
 
 public class User
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 }
 
 public record NotFound;
@@ -31,7 +30,7 @@ public class UsersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        OneOf<User, NotFound, ValidationError> result = await _userService.GetByIdAsync(id);
+        var result = await _userService.GetByIdAsync(id);
 
         return result.Match<IActionResult>(
             user => Ok(user),

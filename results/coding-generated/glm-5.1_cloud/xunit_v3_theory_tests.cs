@@ -27,10 +27,10 @@ public class StringProcessorTests
     [Theory]
     [InlineData(null, 5, "")]
     [InlineData("", 5, "")]
-    [InlineData("Hi", 5, "Hi")]
-    [InlineData("Hello", 5, "Hello")]
-    [InlineData("Hello World", 5, "Hello...")]
-    public void Truncate_ShouldReturnExpectedResult(string input, int maxLength, string expected)
+    [InlineData("hi", 5, "hi")]
+    [InlineData("hello", 5, "hello")]
+    [InlineData("hello world", 5, "hello...")]
+    public void Truncate_ReturnsExpectedResult(string input, int maxLength, string expected)
     {
         var result = _sut.Truncate(input, maxLength);
         result.Should().Be(expected);
@@ -41,8 +41,8 @@ public class StringProcessorTests
     [InlineData("", 0)]
     [InlineData("hello", 1)]
     [InlineData("hello world", 2)]
-    [InlineData("  hello   world  foo  ", 3)]
-    public void CountWords_ShouldReturnExpectedCount(string input, int expected)
+    [InlineData("  hello   world  ", 2)]
+    public void CountWords_ReturnsExpectedCount(string input, int expected)
     {
         var result = _sut.CountWords(input);
         result.Should().Be(expected);
@@ -55,7 +55,7 @@ public class StringProcessorTests
     [InlineData("racecar", true)]
     [InlineData("hello", false)]
     [InlineData("RaceCar", true)]
-    public void IsPalindrome_ShouldReturnExpectedResult(string input, bool expected)
+    public void IsPalindrome_ReturnsExpectedResult(string input, bool expected)
     {
         var result = _sut.IsPalindrome(input);
         result.Should().Be(expected);

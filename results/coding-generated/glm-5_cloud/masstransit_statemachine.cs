@@ -1,9 +1,7 @@
 global using Contracts;
+using MassTransit;
 
 namespace Contracts;
-
-using MassTransit;
-using System;
 
 public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
 public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);

@@ -39,8 +39,7 @@ public class CounterFirstTests
     public void Increment_ShouldIncreaseCount()
     {
         _fixture.Counter.Increment();
-
-        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
+        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(1);
     }
 }
 
@@ -55,11 +54,10 @@ public class CounterSecondTests
     }
 
     [Fact]
-    public void IncrementTwice_ShouldIncreaseCount()
+    public void Increment_Twice_ShouldIncreaseCount()
     {
         _fixture.Counter.Increment();
         _fixture.Counter.Increment();
-
-        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
+        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(2);
     }
 }

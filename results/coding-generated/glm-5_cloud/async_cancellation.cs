@@ -15,18 +15,22 @@ public class DataProcessor
 
         while (true)
         {
+            // 1. Check cancellation BEFORE fetching next batch
             if (ct.IsCancellationRequested)
             {
                 yield break;
             }
 
+            // 2. Fetch batch
             var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
 
-            if (batch.Count == 0)
+            // 3. Break if empty
+            if (batch == null || batch.Count == 0)
             {
                 yield break;
             }
 
+            // 4. Yield items
             foreach (var item in batch)
             {
                 yield return item;
