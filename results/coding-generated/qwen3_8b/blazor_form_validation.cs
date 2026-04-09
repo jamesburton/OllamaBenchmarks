@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 public class ContactModel
 {
     [Required] public string Name { get; set; } = "";
-    [EmailAddress] public string Email { get; set, set; } = "";
+    [EmailAddress] public string Email { get; set; } = "";
     [Range(1, 120)] public int Age { get; set; }
 }
 

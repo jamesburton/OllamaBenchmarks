@@ -3,18 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 public class NotFoundException : Exception
 {
     public string ResourceName { get; }
-    public NotFoundException(string resourceName) : base($"Resource not found: {resourceName}")
+
+    public NotFoundException(string resourceName)
     {
         ResourceName = resourceName;
+        base($"Resource not found: {resourceName}");
     }
 }
 
 public class ConflictException : Exception
 {
     public string ConflictReason { get; }
-    public ConflictException(string conflictReason) : base($"Conflict: {conflictReason}")
+
+    public ConflictException(string conflictReason)
     {
         ConflictReason = conflictReason;
+        base($"Conflict: {conflictReason}");
     }
 }
 
@@ -24,17 +28,17 @@ public static class ApiExceptionMapper
     {
         return ex switch
         {
-            NotFoundException notFound => new ProblemDetails
+            NotFoundException nex => new ProblemDetails
             {
                 Status = 404,
                 Title = "Not Found",
-                Detail = notFound.ResourceName
+                Detail = nex.ResourceName
             },
-            ConflictException conflict => new ProblemDetails
+            ConflictException cex => new ProblemDetails
             {
                 Status = 409,
                 Title = "Conflict",
-                Detail = conflict.ConflictReason
+                Detail = cex.ConflictReason
             },
             _ => new ProblemDetails
             {

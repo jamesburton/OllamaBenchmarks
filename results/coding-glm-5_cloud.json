@@ -605,5 +605,6 @@
       "generated_code_path": "C:\\Development\\OllamaBenchmarks\\results\\coding-generated\\glm-5_cloud\\patterns_timeprovider.cs"
     }
   ],
-  "layer3_weighted_score": 0.8363636363636363
+  "layer3_weighted_score": 0.8363636363636363,
+  "composite_score": 0.501818
 }

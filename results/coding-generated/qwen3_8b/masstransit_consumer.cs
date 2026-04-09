@@ -11,8 +11,8 @@ namespace Contracts
     {
         public async Task Consume(ConsumeContext<SubmitOrder> context)
         {
-            var message = context.Message;
-            await context.Publish(new OrderSubmitted(message.OrderId, DateTime.UtcNow));
+            var msg = context.Message;
+            await context.Publish(new OrderSubmitted(msg.OrderId, DateTime.UtcNow));
         }
     }
 
@@ -23,7 +23,10 @@ namespace Contracts
             ConcurrentMessageLimit = 4;
         }
 
-        protected override void ConfigureConsumer(IReceiveEndpointConfigurator ep, IConsumerConfigurator<SubmitOrderConsumer> consumer, IRegistrationContext ctx)
+        protected override void ConfigureConsumer(
+            IReceiveEndpointConfigurator ep,
+            IConsumerConfigurator<SubmitOrderConsumer> consumer,
+            IRegistrationContext ctx)
         {
             ep.UseMessageRetry(r => r.Interval(3, 1000));
         }

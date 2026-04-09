@@ -3,22 +3,24 @@ using System.Threading.Channels;
 public class DataPipeline
 {
     private readonly Channel<string> _channel;
+    private readonly ChannelWriter<string> _writer;
 
     public DataPipeline(int capacity)
     {
         _channel = Channel.CreateBounded<string>(capacity);
+        _writer = _channel.Writer;
     }
 
-    public ChannelWriter<string> Writer => _channel.Writer;
+    public ChannelWriter<string> Writer => _writer;
 
     public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
     {
         return _channel.Reader.ReadAllAsync(ct);
     }
 
-    public async Task CompleteAsync()
+    public Task CompleteAsync()
     {
-        _channel.Writer.Complete();
-        await Task.CompletedTask;
+        _writer.Complete();
+        return Task.CompletedTask;
     }
 }

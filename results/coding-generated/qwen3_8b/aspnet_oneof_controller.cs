@@ -1,3 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
+using OneOf;
+using System.Threading.Tasks;
+
+public record NotFound;
+public record ValidationError(string Message);
+
 public class User
 {
     public int Id { get; set; }
@@ -5,31 +12,29 @@ public class User
     public string Email { get; set; }
 }
 
-public record NotFound;
-
-public record ValidationError(string Message);
-
 public interface IUserService
 {
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
+[ApiController]
+[Route("api/users")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUserService _service;
 
-    public UsersController(IUserService userService)
+    public UsersController(IUserService service)
     {
-        _userService = userService;
+        _service = service;
     }
 
     public async Task<IActionResult> Get(int id)
     {
-        var result = await _userService.GetByIdAsync(id);
+        var result = await _service.GetByIdAsync(id);
         return result.Match(
-            user => Ok(user),
-            _ => NotFound(),
-            error => BadRequest(error.Message)
+            user => Results.Ok(user),
+            _ => Results.NotFound(),
+            err => Results.BadRequest(err.Message)
         );
     }
 }

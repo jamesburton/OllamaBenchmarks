@@ -7,11 +7,11 @@ public static class MathValidator
         if (n < 2) return false;
         if (n == 2) return true;
         if (n % 2 == 0) return false;
+
         var sqrt = (int)Math.Sqrt(n);
         for (int i = 3; i <= sqrt; i += 2)
-        {
             if (n % i == 0) return false;
-        }
+
         return true;
     }
 
@@ -26,7 +26,7 @@ public static class MathValidator
 public class MathValidatorTests
 {
     public static IEnumerable<object[]> EvenTestData =>
-        new List<object[]>
+        new[]
         {
             new object[] { 2, true },
             new object[] { 3, false },

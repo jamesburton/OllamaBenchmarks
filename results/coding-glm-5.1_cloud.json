@@ -1,0 +1,164 @@
+{
+  "benchmark": "coding",
+  "scoring": {
+    "layer1_weight": 0.15,
+    "layer2_weight": 0.25,
+    "layer3_weight": 0.6,
+    "description": "EvalPlus HumanEval+ (Python) / MultiPL-E C# / Custom .NET 10 Suite"
+  },
+  "run_finished_at": "2026-04-09T16:45:32.766902+00:00",
+  "results": [
+    {
+      "rank": 1,
+      "model": "gpt-oss:120b",
+      "composite_score": 0.523636,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.8727272727272727
+    },
+    {
+      "rank": 2,
+      "model": "qwen3-coder-next",
+      "composite_score": 0.512727,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.8545454545454545
+    },
+    {
+      "rank": 3,
+      "model": "glm-5:cloud",
+      "composite_score": 0.501818,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.8363636363636363
+    },
+    {
+      "rank": 4,
+      "model": "nemotron-3-super",
+      "composite_score": 0.436364,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.7272727272727273
+    },
+    {
+      "rank": 5,
+      "model": "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K",
+      "composite_score": 0.381818,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.6363636363636364
+    },
+    {
+      "rank": 6,
+      "model": "gemma3:27b",
+      "composite_score": 0.370909,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.6181818181818182
+    },
+    {
+      "rank": 7,
+      "model": "hf.co/mradermacher/Qwen3-Coder-30B-A3B-Instruct-480B-Distill-V2-Fp32-i1-GGUF:Q4_K_M",
+      "composite_score": 0.33913,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.5652173913043478
+    },
+    {
+      "rank": 8,
+      "model": "gemma3:12b",
+      "composite_score": 0.327273,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.5454545454545454
+    },
+    {
+      "rank": 9,
+      "model": "qwen3.5:9b",
+      "composite_score": 0.294545,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.4909090909090909
+    },
+    {
+      "rank": 10,
+      "model": "granite4:32b-a9b-h",
+      "composite_score": 0.24,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.4
+    },
+    {
+      "rank": 11,
+      "model": "rnj-1:8b",
+      "composite_score": 0.208696,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.34782608695652173
+    },
+    {
+      "rank": 12,
+      "model": "gemma3:4b",
+      "composite_score": 0.163636,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.2727272727272727
+    },
+    {
+      "rank": 13,
+      "model": "qwen3.5:122b-a10b",
+      "composite_score": 0.141818,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.23636363636363636
+    },
+    {
+      "rank": 14,
+      "model": "cogito:8b",
+      "composite_score": 0.130435,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.21739130434782608
+    },
+    {
+      "rank": 15,
+      "model": "qwen3.5",
+      "composite_score": 0.098182,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.16363636363636364
+    },
+    {
+      "rank": 16,
+      "model": "omnicoder:9b-q4_k_m",
+      "composite_score": 0.076364,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.12727272727272726
+    },
+    {
+      "rank": 17,
+      "model": "gemma4:26b",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    },
+    {
+      "rank": 18,
+      "model": "minicpm-v:8b",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    },
+    {
+      "rank": 19,
+      "model": "qwen2.5vl:7b",
+      "composite_score": 0.0,
+      "layer1_pass_rate": 0.0,
+      "layer2_pass_rate": 0.0,
+      "layer3_weighted_score": 0.0
+    }
+  ]
+}

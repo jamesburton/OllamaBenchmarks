@@ -14,14 +14,14 @@ public class Post
     public string Content { get; set; }
     public int BlogId { get; set; }
     public Blog? Blog { get; set; }
-    public List<Comment> Comments { get; set; } = new();
+    public List<Comment> Comments { get; set; } = new List<Comment>();
 }
 
 public class Blog
 {
     public int Id { get; set; }
     public string Title { get; set; }
-    public List<Post> Posts { get; set; } = new();
+    public List<Post> Posts { get; set; } = new List<Post>();
 }
 
 public class BlogDbContext : DbContext
@@ -32,14 +32,14 @@ public class BlogDbContext : DbContext
 
     public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.Entity<Post>()
+        modelBuilder.Entity<Post>()
             .HasOne(p => p.Blog)
             .WithMany(b => b.Posts)
             .HasForeignKey(p => p.BlogId);
 
-        builder.Entity<Comment>()
+        modelBuilder.Entity<Comment>()
             .HasOne(c => c.Post)
             .WithMany(p => p.Comments)
             .HasForeignKey(c => c.PostId);
