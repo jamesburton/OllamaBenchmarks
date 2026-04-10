@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
 public class ThrottledProcessor
 {
     private readonly SemaphoreSlim _semaphore;
@@ -9,34 +14,26 @@ public class ThrottledProcessor
 
     public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
-        var taskList = new List<Task<T>>();
+        var tasksList = new List<Task<T>>();
 
         foreach (var taskFactory in tasks)
         {
-            // Create a task that handles the throttling logic
-            var throttledTask = async () =>
+            var task = async () =>
             {
                 await _semaphore.WaitAsync(ct);
                 try
                 {
-                    // Execute the actual work
                     return await taskFactory(ct);
                 }
                 finally
                 {
-                    // Ensure release happens even if the task fails
                     _semaphore.Release();
                 }
-            };
-
-            // Start the task and add it to the list
-            taskList.Add(throttledTask());
+            }();
+            tasksList.Add(task);
         }
 
-        // Wait for all tasks to complete concurrently
-        var resultsArray = await Task.WhenAll(taskList);
-
-        // Convert the array of results to a List<T>
-        return new List<T>(resultsArray);
+        var results = await Task.WhenAll(tasksList);
+        return new List<T>(results);
     }
 }

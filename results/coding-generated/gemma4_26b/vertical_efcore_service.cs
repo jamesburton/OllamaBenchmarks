@@ -81,12 +81,12 @@ public class TodoServiceTests
     private DbContextOptions<TodoDbContext> CreateOptions()
     {
         return new DbContextOptionsBuilder<TodoDbContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
     }
 
     [Xunit.Fact]
-    public async Task CreateAsync_ShouldAddTodoItem()
+    public async Task CreateAsync_ShouldSaveItem()
     {
         var options = CreateOptions();
         using var db = new TodoDbContext(options);
@@ -97,22 +97,22 @@ public class TodoServiceTests
         result.Should().NotBeNull();
         result.Title.Should().Be("Test Task");
         result.IsComplete.Should().BeFalse();
-        (await db.TodoItems.CountAsync()).Should().Be(1);
+
+        var savedItem = await db.TodoItems.FindAsync(result.Id);
+        savedItem.Should().NotBeNull();
     }
 
     [Xunit.Fact]
-    public async Task CompleteAsync_ShouldMarkAsComplete()
+    public async Task CompleteAsync_ShouldUpdateStatus()
     {
         var options = CreateOptions();
         using var db = new TodoDbContext(options);
-        var item = new TodoItem { Title = "Task", IsComplete = false };
-        db.TodoItems.Add(item);
-        await db.SaveChangesAsync();
         var service = new TodoService(db);
+        var item = await service.CreateAsync("Pending Task");
 
-        var result = await service.CompleteAsync(item.Id);
+        var success = await service.CompleteAsync(item.Id);
 
-        result.Should().BeTrue();
+        success.Should().BeTrue();
         item.IsComplete.Should().BeTrue();
     }
 
@@ -121,19 +121,18 @@ public class TodoServiceTests
     {
         var options = CreateOptions();
         using var db = new TodoDbContext(options);
-        var item = new TodoItem { Title = "To Delete" };
-        db.TodoItems.Add(item);
-        await db.SaveChangesAsync();
         var service = new TodoService(db);
+        var item = await service.CreateAsync("To Delete");
 
-        var result = await service.DeleteAsync(item.Id);
+        var success = await service.DeleteAsync(item.Id);
 
-        result.Should().BeTrue();
-        (await db.TodoItems.CountAsync()).Should().Be(0);
+        success.Should().BeTrue();
+        var deletedItem = await db.TodoItems.FindAsync(item.Id);
+        deletedItem.Should().BeNull();
     }
 
     [Xunit.Fact]
-    public async Task GetByIdAsync_ShouldReturnNull_WhenNotFound()
+    public async Task GetByIdAsync_ShouldReturnNullIfNotFound()
     {
         var options = CreateOptions();
         using var db = new TodoDbContext(options);

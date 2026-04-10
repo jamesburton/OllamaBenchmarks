@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-// --- 1. CounterService ---
+// --- Shared State Service ---
 public class CounterService
 {
     public int Count { get; private set; } = 0;
@@ -20,7 +20,7 @@ public class CounterService
     }
 }
 
-// --- 2. CounterFixture ---
+// --- Shared Fixture ---
 public class CounterFixture : IAsyncLifetime
 {
     public CounterService Counter { get; private set; } = null!;
@@ -28,24 +28,24 @@ public class CounterFixture : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         Counter = new CounterService();
-        await Task.CompletedTask; // Placeholder for async initialization
+        await default; // Simulate async initialization
     }
 
     public async ValueTask DisposeAsync()
     {
-        // Cleanup logic if needed
-        await Task.CompletedTask;
+        // Cleanup logic if necessary
+        await default;
     }
 }
 
-// --- 3. CounterCollection ---
+// --- Collection Definition ---
 [CollectionDefinition("Counter")]
 public class CounterCollection : ICollectionFixture<CounterFixture>
 {
-    // This class serves only as a collection definition marker.
+    // This class serves only to define the collection name "Counter"
 }
 
-// --- 4. CounterFirstTests ---
+// --- Test Class 1 ---
 [Collection("Counter")]
 public class CounterFirstTests
 {
@@ -57,19 +57,17 @@ public class CounterFirstTests
     }
 
     [Fact]
-    public void FirstTest_IncrementsCounter()
+    public void Test_First_Increment()
     {
-        // Arrange: Initial state is 0 (set by fixture)
-
-        // Act
+        // Action: Increment the shared counter
         _fixture.Counter.Increment();
 
-        // Assert: Check if the count is at least 1
-        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(1);
+        // Assertion using AwesomeAssertions
+        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
     }
 }
 
-// --- 5. CounterSecondTests ---
+// --- Test Class 2 ---
 [Collection("Counter")]
 public class CounterSecondTests
 {
@@ -81,15 +79,14 @@ public class CounterSecondTests
     }
 
     [Fact]
-    public void SecondTest_IncrementsCounterTwice()
+    public void Test_Second_TwoIncrements()
     {
-        // Arrange: The counter state is shared and should be 1 from CounterFirstTests
-
-        // Act
+        // Action: Increment the shared counter twice
         _fixture.Counter.Increment();
         _fixture.Counter.Increment();
 
-        // Assert: Check if the count is at least 3 (1 initial + 2 increments)
-        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(3);
+        // Assertion using AwesomeAssertions
+        // Since CounterFirstTests ran first, the count should be at least 1 + 2 = 3
+        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 }

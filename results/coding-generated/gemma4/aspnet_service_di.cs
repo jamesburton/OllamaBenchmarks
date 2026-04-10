@@ -1,38 +1,33 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 
 // 1. IOrderRepository interface
-public interface IOrderRepository
-{
-}
+public interface IOrderRepository { }
 
 // 2. OrderRepository class
 public class OrderRepository : IOrderRepository
 {
-    // Parameterless constructor required
+    // Parameterless constructor
 }
 
 // 3. IOrderService interface
-public interface IOrderService
-{
-}
+public interface IOrderService { }
 
 // 4. OrderService class
 public class OrderService : IOrderService
 {
-    // Parameterless constructor required
+    // Parameterless constructor
 }
 
 // 5. IEmailNotifier interface
-public interface IEmailNotifier
-{
-}
+public interface IEmailNotifier { }
 
 // 6. EmailNotifier class
 public class EmailNotifier : IEmailNotifier
 {
-    // Parameterless constructor required
+    // Parameterless constructor
 }
 
 // 7. OrderSettings class

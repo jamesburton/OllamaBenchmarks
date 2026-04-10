@@ -20,8 +20,8 @@ public class ProductDetailBase : ComponentBase
 
     public async System.Threading.Tasks.Task DeleteProduct()
     {
-        var result = await ProductService.DeleteAsync(ProductId);
-        if (result)
+        var success = await ProductService.DeleteAsync(ProductId);
+        if (success)
         {
             Nav.NavigateTo("/products");
         }

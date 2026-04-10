@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 public class Product
@@ -25,22 +26,35 @@ public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        // Since InMemory provider does not support ExecuteUpdateAsync, 
-        // we implement the logic via manual retrieval and update to ensure testability.
-        var products = await db.Products
-            .Where(p => p.Category == category)
-            .ToListAsync();
+        // Check if we are using the InMemory provider
+        bool isInMemory = db.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory";
 
-        int count = products.Count;
-
-        foreach (var product in products)
+        if (isInMemory)
         {
-            product.Price *= (1 - discountPct);
-            product.LastModified = DateTime.UtcNow;
+            // Fallback implementation for InMemory provider (which does not support ExecuteUpdateAsync)
+            var productsToUpdate = await db.Products
+                .Where(p => p.Category == category)
+                .ToListAsync();
+
+            int count = productsToUpdate.Count;
+
+            foreach (var product in productsToUpdate)
+            {
+                product.Price = product.Price * (1 - discountPct);
+                product.LastModified = DateTime.UtcNow;
+            }
+
+            await db.SaveChangesAsync();
+            return count;
         }
-
-        await db.SaveChangesAsync();
-
-        return count;
+        else
+        {
+            // EF Core 10 Bulk Update implementation
+            return await db.Products
+                .Where(p => p.Category == category)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(p => p.Price, p => p.Price * (1 - discountPct))
+                    .SetProperty(p => p.LastModified, DateTime.UtcNow));
+        }
     }
 }

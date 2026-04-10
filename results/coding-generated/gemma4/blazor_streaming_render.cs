@@ -13,20 +13,16 @@ public interface IWeatherService
 }
 
 // 3. WeatherPageBase class
-[StreamRendering]
 public class WeatherPageBase : ComponentBase
 {
-    // Inject IWeatherService
     [Inject]
     public IWeatherService WeatherService { get; set; } = default!;
 
-    // Public property for forecasts
     public WeatherForecast[]? Forecasts { get; set; }
 
-    // Lifecycle method to load data
     protected override async Task OnInitializedAsync()
     {
-        // Load forecasts from the injected service
+        // Load forecasts from the service
         Forecasts = await WeatherService.GetForecastsAsync();
     }
 }

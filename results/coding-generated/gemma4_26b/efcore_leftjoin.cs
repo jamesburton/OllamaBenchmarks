@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 public class Customer
@@ -34,17 +35,18 @@ public static class OrderQueries
 {
     public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
     {
-        return db.Orders
+        var query = db.Orders
             .LeftJoin(
                 db.Customers,
                 order => order.CustomerId,
                 customer => customer.Id,
                 (order, customer) => new OrderDto(
-                    order.Id,
-                    order.Total,
+                    order.Id, 
+                    order.Total, 
                     customer == null ? "Unknown" : customer.Name
                 )
-            )
-            .ToList();
+            );
+
+        return query.ToList();
     }
 }

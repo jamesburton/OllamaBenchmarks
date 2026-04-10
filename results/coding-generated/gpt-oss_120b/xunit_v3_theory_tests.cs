@@ -22,44 +22,47 @@ public class StringProcessor
 
 public class StringProcessorTests
 {
+    private readonly StringProcessor _sut = new();
+
+    // Truncate tests
     [Theory]
     [InlineData(null, 5, "")]
     [InlineData("", 5, "")]
     [InlineData("abc", 5, "abc")]
     [InlineData("abcde", 5, "abcde")]
     [InlineData("abcdef", 5, "abcde...")]
-    public void Truncate_ReturnsExpected(string input, int maxLength, string expected)
+    public void Truncate_ReturnsExpectedResult(string input, int maxLength, string expected)
     {
-        var sut = new StringProcessor();
-        var result = sut.Truncate(input, maxLength);
+        var result = _sut.Truncate(input, maxLength);
         result.Should().Be(expected);
     }
 
+    // CountWords tests
     [Theory]
     [InlineData(null, 0)]
     [InlineData("", 0)]
     [InlineData("hello", 1)]
     [InlineData("hello world", 2)]
     [InlineData("  hello   world  ", 2)]
-    public void CountWords_ReturnsExpected(string input, int expected)
+    [InlineData("one two three", 3)]
+    public void CountWords_ReturnsExpectedCount(string input, int expectedCount)
     {
-        var sut = new StringProcessor();
-        var result = sut.CountWords(input);
-        result.Should().Be(expected);
+        var result = _sut.CountWords(input);
+        result.Should().Be(expectedCount);
     }
 
+    // IsPalindrome tests
     [Theory]
     [InlineData(null, false)]
     [InlineData("", false)]
     [InlineData("a", true)]
-    [InlineData("madam", true)]
-    [InlineData("MadAm", true)]
+    [InlineData("racecar", true)]
     [InlineData("hello", false)]
     [InlineData("A man a plan a canal Panama", true)]
-    public void IsPalindrome_ReturnsExpected(string input, bool expected)
+    [InlineData("Was it a cat I saw", true)]
+    public void IsPalindrome_ReturnsExpectedResult(string input, bool expected)
     {
-        var sut = new StringProcessor();
-        var result = sut.IsPalindrome(input);
+        var result = _sut.IsPalindrome(input);
         result.Should().Be(expected);
     }
 }

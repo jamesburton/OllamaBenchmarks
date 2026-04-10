@@ -5,20 +5,28 @@ public static class MathValidator
     public static bool IsPrime(int n)
     {
         if (n < 2) return false;
-        for (int i = 2; i * i <= n; i++)
+        if (n == 2) return true;
+        if (n % 2 == 0) return false;
+
+        int limit = (int)System.Math.Sqrt(n);
+        for (int i = 3; i <= limit; i += 2)
+        {
             if (n % i == 0) return false;
+        }
         return true;
     }
 
-    public static string Classify(int n) =>
-        n < 0 ? "negative" :
-        n == 0 ? "zero" :
-        "positive";
+    public static string Classify(int n)
+    {
+        if (n < 0) return "negative";
+        if (n == 0) return "zero";
+        return "positive";
+    }
 }
 
 public class MathValidatorTests
 {
-    public static System.Collections.Generic.IEnumerable<object[]> EvenTestData => new[]
+    public static System.Collections.Generic.IEnumerable<object[]> EvenTestData => new object[][]
     {
         new object[] { 2, true },
         new object[] { 3, false },
@@ -27,7 +35,8 @@ public class MathValidatorTests
         new object[] { 7, false }
     };
 
-    [Theory, MemberData(nameof(EvenTestData))]
+    [Theory]
+    [MemberData(nameof(EvenTestData))]
     public void IsEven_WithMemberData(int n, bool expected)
     {
         MathValidator.IsEven(n).Should().Be(expected);

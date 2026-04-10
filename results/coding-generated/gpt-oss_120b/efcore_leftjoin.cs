@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace EfCore10Sample
+namespace EfCore10Example
 {
     // Entity classes
     public class Customer
@@ -40,17 +40,16 @@ namespace EfCore10Sample
     {
         public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
         {
-            var query = db.Orders
+            return db.Orders
                 .LeftJoin(
                     db.Customers,
                     order => order.CustomerId,
                     customer => customer.Id,
                     (order, customer) => new OrderDto(
-                        OrderId: order.Id,
-                        Total: order.Total,
-                        CustomerName: customer == null ? "Unknown" : customer.Name));
-
-            return query.ToList();
+                        order.Id,
+                        order.Total,
+                        customer == null ? "Unknown" : customer.Name))
+                .ToList();
         }
     }
 }

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Threading.Tasks;
-using System.Security.Claims;
 
 public interface IUserService
 {
@@ -23,11 +21,12 @@ public class UserDashboard : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthState;
+        var user = authState.User;
 
-        if (authState.User.Identity?.IsAuthenticated == true)
+        if (user.Identity?.IsAuthenticated == true)
         {
             IsAuthenticated = true;
-            var name = authState.User.Identity.Name;
+            string name = user.Identity.Name ?? string.Empty;
             DisplayName = await UserService.GetDisplayNameAsync(name);
         }
         else

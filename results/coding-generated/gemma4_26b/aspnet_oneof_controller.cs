@@ -1,16 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
-using System.Threading.Tasks;
 
 public class User
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
 }
 
 public record NotFound;
-
 public record ValidationError(string Message);
 
 public interface IUserService
@@ -19,12 +17,12 @@ public interface IUserService
 }
 
 [ApiController]
-[Route("api/users")]
+[Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
 
-    public UsersController(IUserService userService)
+    public UsersলেUsersController(IUserService userService)
     {
         _userService = userService;
     }
@@ -37,7 +35,7 @@ public class UsersController : ControllerBase
         return result.Match<IActionResult>(
             user => Ok(user),
             notFound => NotFound(),
-            error => BadRequest(error.Message)
+            validationError => BadRequest(validationError.Message)
         );
     }
 }

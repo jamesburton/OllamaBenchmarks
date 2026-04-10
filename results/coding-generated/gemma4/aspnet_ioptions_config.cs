@@ -17,10 +17,16 @@ public interface IEmailSender
     Task SendAsync(string to, string subject, string body);
 }
 
-// 3. SmtpEmailSender implementation
+// 3. SmtpEmailSender class
 public class SmtpEmailSender : IEmailSender
 {
     private readonly IOptions<SmtpOptions> _options;
+
+    // Public property to expose configuration for testing
+    public SmtpOptions Options => _options.Value;
+
+    // Public property to track the last recipient
+    public string? LastSentTo { get; set; }
 
     // Constructor taking IOptions<SmtpOptions>
     public SmtpEmailSender(IOptions<SmtpOptions> options)
@@ -28,18 +34,14 @@ public class SmtpEmailSender : IEmailSender
         _options = options;
     }
 
-    // Public property to expose resolved options
-    public SmtpOptions Options => _options.Value;
-
-    // Public property for tracking the last recipient
-    public string? LastSentTo { get; set; }
-
-    public async Task SendAsync(string to, string subject, string body)
+    public Task SendAsync(string to, string subject, string body)
     {
-        // Simulate sending logic and update the tracking property
+        // Implementation detail: store 'to' in LastSentTo
         LastSentTo = to;
 
-        // In a real scenario, actual sending logic would go here.
-        await Task.CompletedTask;
+        // Simulate sending logic
+        Console.WriteLine($"Sending email to {to} with subject: {subject}");
+
+        return Task.CompletedTask;
     }
 }

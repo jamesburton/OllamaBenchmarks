@@ -33,19 +33,17 @@ public class NotificationServiceTests
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
-        var email = Substitute.For<IEmailService>();
-        var sut = new NotificationService(repo, email);
+        var emailService = Substitute.For<IEmailService>();
+        var sut = new NotificationService(repo, emailService);
 
-        var userId = 1;
-        var user = new User { Id = userId, Name = "John Doe", Email = "john@example.com" };
-
-        repo.GetByIdAsync(userId).Returns(user);
+        var user = new User { Id = 1, Name = "John Doe", Email = "john@example.com" };
+        repo.GetByIdAsync(1).Returns(user);
 
         // Act
-        await sut.NotifyUserAsync(userId);
+        await sut.NotifyUserAsync(1);
 
         // Assert
-        await email.Received().SendWelcomeAsync(user.Email);
+        await emailService.Received().SendWelcomeAsync("john@example.com");
     }
 
     [Fact]
@@ -53,17 +51,16 @@ public class NotificationServiceTests
     {
         // Arrange
         var repo = Substitute.For<IUserRepository>();
-        var email = Substitute.For<IEmailService>();
-        var sut = new NotificationService(repo, email);
+        var emailService = Substitute.For<IEmailService>();
+        var sut = new NotificationService(repo, emailService);
 
-        int userId = 99;
-        repo.GetByIdAsync(userId).Returns((User?)null);
+        repo.GetByIdAsync(Arg.Any<int>()).Returns((User?)null);
 
         // Act
-        Func<Task> act = () => sut.NotifyUserAsync(userId);
+        Func<Task> act = () => sut.NotifyUserAsync(99);
 
         // Assert
         await act.Should().ThrowAsync<InvalidOperationException>();
-        await email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+        await emailService.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 }

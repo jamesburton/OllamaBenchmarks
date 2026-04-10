@@ -1,6 +1,6 @@
 public class CounterService
 {
-    public int Count { get; private set; } = 0;
+    public int Count { get; private set; }
 
     public void Increment() => Count++;
 
@@ -23,7 +23,7 @@ public class CounterFixture : IAsyncLifetime
 [CollectionDefinition("Counter")]
 public class CounterCollection : ICollectionFixture<CounterFixture>
 {
-    // No test methods
+    // No test methods – serves only as collection definition
 }
 
 [Collection("Counter")]

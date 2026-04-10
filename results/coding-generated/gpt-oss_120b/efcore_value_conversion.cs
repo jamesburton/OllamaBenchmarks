@@ -7,7 +7,7 @@ public record Money(decimal Amount, string Currency);
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; } = null!;
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
@@ -24,9 +24,11 @@ public class ProductDbContext : DbContext
     {
         var parts = s.Split(':');
         if (parts.Length != 2)
-            throw new FormatException($"Invalid money format: '{s}'. Expected 'amount:currency'.");
+        {
+            throw new FormatException($"Invalid money format: '{s}'");
+        }
 
-        var amount = decimal.Parse(parts[0], System.Globalization.CultureInfo.InvariantCulture);
+        var amount = decimal.Parse(parts[0]);
         var currency = parts[1];
         return new Money(amount, currency);
     }
@@ -36,7 +38,7 @@ public class ProductDbContext : DbContext
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
             .HasConversion(
-                m => $"{m.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture)}:{m.Currency}",
+                m => $"{m.Amount}:{m.Currency}",
                 s => ParseMoney(s));
     }
 }

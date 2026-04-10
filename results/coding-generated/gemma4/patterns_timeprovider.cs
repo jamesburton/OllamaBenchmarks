@@ -24,7 +24,6 @@ public class ExpiryChecker
 
     public bool IsExpired(DateTimeOffset expiresAt)
     {
-        // Returns true if expiresAt is strictly before TimeProvider.GetUtcNow()
         return expiresAt < _timeProvider.GetUtcNow();
     }
 }

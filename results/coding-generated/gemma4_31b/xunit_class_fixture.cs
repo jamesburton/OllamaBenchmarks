@@ -38,29 +38,32 @@ public class StoreService
 
 public class StoreServiceTests : IClassFixture<InMemoryStore>
 {
-    private readonly StoreService _service;
+    private readonly StoreService _sut;
 
     public StoreServiceTests(InMemoryStore store)
     {
-        _service = new StoreService(store);
+        _sut = new StoreService(store);
     }
 
     [Fact]
     public void Get_ExistingKey_ReturnsValue()
     {
-        _service.Get("key1").Should().Be("value1");
+        var result = _sut.Get("key1");
+        result.Should().Be("value1");
     }
 
     [Fact]
     public void Set_ThenGet_ReturnsSetValue()
     {
-        _service.Set("key3", "value3");
-        _service.Get("key3").Should().Be("value3");
+        _sut.Set("key3", "value3");
+        var result = _sut.Get("key3");
+        result.Should().Be("value3");
     }
 
     [Fact]
     public void Get_NonexistentKey_ReturnsNull()
     {
-        _service.Get("nonexistent").Should().BeNull();
+        var result = _sut.Get("nonexistent");
+        result.Should().BeNull();
     }
 }

@@ -26,17 +26,17 @@ public static class ApiExceptionMapper
     {
         return ex switch
         {
-            NotFoundException nf => new ProblemDetails
+            NotFoundException nfEx => new ProblemDetails
             {
                 Status = 404,
                 Title = "Not Found",
-                Detail = nf.ResourceName
+                Detail = nfEx.ResourceName
             },
-            ConflictException c => new ProblemDetails
+            ConflictException cEx => new ProblemDetails
             {
                 Status = 409,
                 Title = "Conflict",
-                Detail = c.ConflictReason
+                Detail = cEx.ConflictReason
             },
             _ => new ProblemDetails
             {

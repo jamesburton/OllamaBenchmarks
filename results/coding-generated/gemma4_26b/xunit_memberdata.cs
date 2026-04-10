@@ -5,7 +5,7 @@ public static class MathValidator
     public static bool IsPrime(int n)
     {
         if (n < 2) return false;
-        for (int i = 2; i * i <= n; i++)
+        for (int i = 2; i <= Math.Sqrt(n); i++)
         {
             if (n % i == 0) return false;
         }
@@ -22,7 +22,7 @@ public static class MathValidator
 
 public class MathValidatorTests
 {
-    public static IEnumerable<object[]> EvenTestData => new[]
+    public static IEnumerable<object[]> EvenTestData => new List<object[]>
     {
         new object[] { 2, true },
         new object[] { 3, false },

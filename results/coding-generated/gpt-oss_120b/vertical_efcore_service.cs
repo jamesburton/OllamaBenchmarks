@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 public class TodoItem
 {
     public int Id { get; set; }
-    public string Title { get; set; } = default!;
+    public string Title { get; set; } = null!;
     public bool IsComplete { get; set; }
     public DateTime CreatedAt { get; set; }
 }
@@ -12,7 +12,7 @@ public class TodoDbContext : DbContext
 {
     public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options) { }
 
-    public DbSet<TodoItem> TodoItems { get; set; } = default!;
+    public DbSet<TodoItem> TodoItems { get; set; } = null!;
 }
 
 public interface ITodoService
@@ -42,8 +42,9 @@ public class TodoService : ITodoService
             CreatedAt = DateTime.UtcNow
         };
 
-        _db.TodoItems.Add(item);
+        await _db.TodoItems.AddAsync(item);
         await _db.SaveChangesAsync();
+
         return item;
     }
 
@@ -60,7 +61,7 @@ public class TodoService : ITodoService
     public async Task<bool> CompleteAsync(int id)
     {
         var item = await _db.TodoItems.FindAsync(id);
-        if (item is null)
+        if (item == null)
             return false;
 
         item.IsComplete = true;
@@ -71,7 +72,7 @@ public class TodoService : ITodoService
     public async Task<bool> DeleteAsync(int id)
     {
         var item = await _db.TodoItems.FindAsync(id);
-        if (item is null)
+        if (item == null)
             return false;
 
         _db.TodoItems.Remove(item);

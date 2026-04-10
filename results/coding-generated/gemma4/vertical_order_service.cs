@@ -53,7 +53,7 @@ public class OrderService
 
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
-        // Validation 1: Customer Name
+        // Validation 1: CustomerName
         if (string.IsNullOrWhiteSpace(request.CustomerName))
         {
             return new ValidationError { Message = "Customer name is required" };
@@ -68,12 +68,10 @@ public class OrderService
         // Calculation
         decimal total = request.Items.Sum(item => item.Quantity * item.UnitPrice);
 
-        // Creation
+        // Construction
         var order = new Order
         {
-            // Assuming ID generation happens here or in the repository, 
-            // but for simplicity in this slice, we'll use a placeholder ID.
-            Id = 0, 
+            Id = new Random().Next(1000, 9999), // Mock ID generation
             CustomerName = request.CustomerName,
             Items = request.Items,
             Total = total,
@@ -83,7 +81,6 @@ public class OrderService
         // Persistence
         _repository.Save(order);
 
-        // Success return
         return order;
     }
 }

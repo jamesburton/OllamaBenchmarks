@@ -13,18 +13,13 @@ public class CachingService
         _inner = inner;
     }
 
-    public System.Threading.Tasks.ValueTask<string> GetAsync(string key)
+    public async System.Threading.Tasks.ValueTask<string> GetAsync(string key)
     {
         if (_cache.TryGetValue(key, out var cachedValue))
         {
             return new System.Threading.Tasks.ValueTask<string>(cachedValue);
         }
 
-        return GetAsyncInternal(key);
-    }
-
-    private async System.Threading.Tasks.ValueTask<string> GetAsyncInternal(string key)
-    {
         string result = await _inner.ComputeAsync(key);
         _cache[key] = result;
         return result;

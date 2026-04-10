@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 public record CreateProductRequest(string Name, decimal Price);
 
@@ -11,22 +12,21 @@ public static class ProductEndpoints
 
     public static IResult CreateProduct(CreateProductRequest request)
     {
+        var errors = new Dictionary<string, string[]>();
+
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            return Results.ValidationProblem(
-                new Dictionary<string, string[]>
-                {
-                    ["Name"] = new[] { "Name is required." }
-                });
+            errors["Name"] = new[] { "Name is required." };
         }
 
         if (request.Price <= 0)
         {
-            return Results.ValidationProblem(
-                new Dictionary<string, string[]>
-                {
-                    ["Price"] = new[] { "Price must be greater than zero." }
-                });
+            errors["Price"] = new[] { "Price must be greater than zero." };
+        }
+
+        if (errors.Count > 0)
+        {
+            return Results.ValidationProblem(errors);
         }
 
         var id = ++_counter;

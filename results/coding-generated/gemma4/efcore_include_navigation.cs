@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Threading.Tasks;
 
 // 1. Comment Class
@@ -8,9 +10,7 @@ public class Comment
     public int Id { get; set; }
     public string Text { get; set; }
     public int PostId { get; set; }
-
-    // Navigation property (must be nullable)
-    public Post? Post { get; set; }
+    public Post? Post { get; set; } // Nullable navigation property
 }
 
 // 2. Post Class
@@ -19,12 +19,8 @@ public class Post
     public int Id { get; set; }
     public string Content { get; set; }
     public int BlogId { get; set; }
-
-    // Navigation property (must be nullable)
-    public Blog? Blog { get; set; }
-
-    // Collection property
-    public List<Comment> Comments { get; set; } = new List<Comment>();
+    public Blog? Blog { get; set; } // Nullable navigation property
+    public List<Comment> Comments { get; set; } = new();
 }
 
 // 3. Blog Class
@@ -32,12 +28,10 @@ public class Blog
 {
     public int Id { get; set; }
     public string Title { get; set; }
-
-    // Collection property
-    public List<Post> Posts { get; set; } = new List<Post>();
+    public List<Post> Posts { get; set; } = new();
 }
 
-// 4. DbContext Class
+// 4. BlogDbContext Class
 public class BlogDbContext : DbContext
 {
     public DbSet<Blog> Blogs { get; set; }
@@ -48,21 +42,23 @@ public class BlogDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure Blog -> Post relationship
+        // Blog has many Posts (with foreign key BlogId)
         modelBuilder.Entity<Post>()
             .HasOne(p => p.Blog)
             .WithMany(b => b.Posts)
-            .HasForeignKey(p => p.BlogId);
+            .HasForeignKey(p => p.BlogId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        // Configure Post -> Comment relationship
+        // Post has many Comments (with foreign key PostId)
         modelBuilder.Entity<Comment>()
             .HasOne(c => c.Post)
             .WithMany(p => p.Comments)
-            .HasForeignKey(c => c.PostId);
+            .HasForeignKey(c => c.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
-// 5. Repository Class
+// 5. BlogRepository Class
 public class BlogRepository
 {
     private readonly BlogDbContext _context;

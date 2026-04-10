@@ -1,8 +1,7 @@
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 public interface ISoftDeletable
 {
@@ -14,19 +13,28 @@ public class Article : ISoftDeletable
     public int Id { get; set; }
     public string Title { get; set; }
     public bool IsDeleted { get; set; }
+    public ISoftDeletable IsDeleted { get; set; } // Note: Property name matches interface requirement
+}
+
+// Re-defining Article to strictly follow the prompt's property list and interface requirements
+public class ArticleEntity : ISoftDeletable
+{
+    public int Id { get; set; }
+    public string Title { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
 public class ArticleDbContext : DbContext
 {
-    public DbSet<Article> Articles { get; set; }
+    public DbSet<ArticleEntity> Articles { get; set; }
 
-    public ArticleDbContext(DbContextOptions<Article<ArticleDbContext>> options) : base(options)
+    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options)
     {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
+        modelBuilder.Entity<ArticleEntity>().HasQueryFilter(a => !a.IsDeleted);
     }
 }
 
@@ -52,12 +60,12 @@ public class ArticleRepository
         }
     }
 
-    public async Task<List<Article>> GetAllAsync()
+    public async Task<List<ArticleEntity>> GetAllAsync()
     {
         return await _context.Articles.ToListAsync();
     }
 
-    public async Task<List<Article>> GetAllIncludingDeletedAsync()
+    public async Task<List<ArticleEntity>> GetAllIncludingDeletedAsync()
     {
         return await _context.Articles
             .IgnoreQueryFilters()

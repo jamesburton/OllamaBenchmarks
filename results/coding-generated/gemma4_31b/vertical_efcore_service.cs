@@ -40,7 +40,6 @@ public class TodoService : ITodoService
             IsComplete = false,
             CreatedAt = DateTime.UtcNow
         };
-
         db.TodoItems.Add(item);
         await db.SaveChangesAsync();
         return item;

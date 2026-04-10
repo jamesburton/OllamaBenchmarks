@@ -1,8 +1,6 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 
 public record GitHubUser(
     [property: JsonPropertyName("login")] string Login,
@@ -17,16 +15,16 @@ public interface IGitHubClient
 
 public class GitHubClient : IGitHubClient
 {
-    private readonly HttpClient httpClient;
+    private readonly HttpClient _httpClient;
 
     public GitHubClient(HttpClient httpClient)
     {
-        this.httpClient = httpClient;
+        _httpClient = httpClient;
     }
 
     public async Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
     {
-        return await httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
+        return await _httpClient.GetFromJsonAsync<GitHubUSer>($"/users/{username}", ct);
     }
 }
 

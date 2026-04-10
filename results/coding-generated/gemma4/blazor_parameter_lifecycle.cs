@@ -9,7 +9,7 @@ public interface IUserService
     Task<UserProfile?> GetProfileAsync(int userId);
 }
 
-// 3. UserProfileBase component
+// 3. UserProfileBase class
 public class UserProfileBase : ComponentBase
 {
     [Parameter]
@@ -23,13 +23,8 @@ public class UserProfileBase : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
-        // 1. Set IsLoading = true
         IsLoading = true;
-
-        // Simulate the asynchronous call
         Profile = await UserService.GetProfileAsync(UserId);
-
-        // 3. Set IsLoading = false
         IsLoading = false;
     }
 }

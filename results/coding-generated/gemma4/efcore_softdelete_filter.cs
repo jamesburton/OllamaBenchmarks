@@ -9,7 +9,7 @@ public interface ISoftDeletable
     bool IsDeleted { get; set; }
 }
 
-// 2. Article class
+// 2. Article class implementing ISoftDeletable
 public class Article : ISoftDeletable
 {
     public int Id { get; set; }
@@ -28,7 +28,7 @@ public class ArticleDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply the query filter: only retrieve articles where IsDeleted is false
+        // Apply query filter for soft deletion
         modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
     }
 }
@@ -43,13 +43,9 @@ public class ArticleRepository
         _context = context;
     }
 
-    /// <summary>
-    /// Soft deletes an article by setting IsDeleted = true.
-    /// Uses IgnoreQueryFilters to find the record even if it was already deleted.
-    /// </summary>
     public async Task SoftDeleteAsync(int id)
     {
-        // Use IgnoreQueryFilters() to bypass the global filter and find the record regardless of its IsDeleted status.
+        // Use IgnoreQueryFilters() to find the record regardless of the active filter
         var article = await _context.Articles
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
@@ -61,21 +57,15 @@ public class ArticleRepository
         }
     }
 
-    /// <summary>
-    /// Retrieves all active articles (respects the global query filter).
-    /// </summary>
     public async Task<List<Article>> GetAllAsync()
     {
-        // The query filter (a => !a.IsDeleted) handles filtering automatically.
+        // The query filter automatically handles filtering for IsDeleted == false
         return await _context.Articles.ToListAsync();
     }
 
-    /// <summary>
-    /// Retrieves all articles, including soft-deleted ones.
-    /// </summary>
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        // Use IgnoreQueryFilters() to bypass the global filter.
+        // Use IgnoreQueryFilters() to bypass the soft delete filter
         return await _context.Articles
             .IgnoreQueryFilters()
             .ToListAsync();

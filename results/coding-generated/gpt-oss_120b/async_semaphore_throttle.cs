@@ -11,27 +11,38 @@ public class ThrottledProcessor
         System.Collections.Generic.IEnumerable<System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>>> tasks,
         System.Threading.CancellationToken ct)
     {
-        var runningTasks = new System.Collections.Generic.List<System.Threading.Tasks.Task<T>>();
+        var taskList = new System.Collections.Generic.List<System.Threading.Tasks.Task<(int index, T result)>>();
 
-        foreach (var taskFactory in tasks)
+        int i = 0;
+        foreach (var factory in tasks)
         {
-            async System.Threading.Tasks.Task<T> Run()
+            int currentIndex = i;
+            var wrapperTask = System.Threading.Tasks.Task.Run(async () =>
             {
                 await _semaphore.WaitAsync(ct).ConfigureAwait(false);
                 try
                 {
-                    return await taskFactory(ct).ConfigureAwait(false);
+                    var res = await factory(ct).ConfigureAwait(false);
+                    return (currentIndex, res);
                 }
                 finally
                 {
                     _semaphore.Release();
                 }
-            }
+            }, ct);
 
-            runningTasks.Add(Run());
+            taskList.Add(wrapperTask);
+            i++;
         }
 
-        var results = await System.Threading.Tasks.Task.WhenAll(runningTasks).ConfigureAwait(false);
-        return new System.Collections.Generic.List<T>(results);
+        var results = await System.Threading.Tasks.Task.WhenAll(taskList).ConfigureAwait(false);
+
+        var ordered = new T[results.Length];
+        foreach (var tuple in results)
+        {
+            ordered[tuple.index] = tuple.result;
+        }
+
+        return new System.Collections.Generic.List<T>(ordered);
     }
 }

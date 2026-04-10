@@ -2,17 +2,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
 
-// Domain models
+// Result types
+public record NotFound;
+public record ValidationError(string Message);
+
+// Domain model
 public class User
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
     public string Email { get; set; } = default!;
 }
-
-public record NotFound;
-
-public record ValidationError(string Message);
 
 // Service contract
 public interface IUserService
@@ -27,10 +27,8 @@ public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
 
-    public UsersController(IUserService userService)
-    {
+    public UsersController(IUserService userService) =>
         _userService = userService;
-    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
@@ -39,8 +37,8 @@ public class UsersController : ControllerBase
 
         return result.Match<IActionResult>(
             user => Ok(user),
-            notFound => NotFound(),
-            validationError => BadRequest(validationError.Message)
+            _ => NotFound(),
+            err => BadRequest(err.Message)
         );
     }
 }

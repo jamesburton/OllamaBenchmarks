@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using System.Linq;
 
 public record Money(decimal Amount, string Currency);
 
@@ -15,9 +13,7 @@ public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
 
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
-    {
-    }
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
 
     private static Money ParseMoney(string s)
     {

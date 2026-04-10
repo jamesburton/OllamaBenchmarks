@@ -39,9 +39,10 @@ public class StringProcessorTests
     [Theory]
     [InlineData(null, 0)]
     [InlineData("", 0)]
+    [InlineData("   ", 0)]
     [InlineData("Hello", 1)]
     [InlineData("Hello World", 2)]
-    [InlineData("  Hello   World  ", 2)]
+    [InlineData("  Multiple   spaces  here  ", 3)]
     public void CountWords_ShouldReturnExpectedCount(string input, int expected)
     {
         var result = _sut.CountWords(input);
@@ -55,6 +56,7 @@ public class StringProcessorTests
     [InlineData("racecar", true)]
     [InlineData("hello", false)]
     [InlineData("RaceCar", true)]
+    [InlineData("A man a plan a canal Panama", true)]
     public void IsPalindrome_ShouldReturnExpectedResult(string input, bool expected)
     {
         var result = _sut.IsPalindrome(input);

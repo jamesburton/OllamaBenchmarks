@@ -9,11 +9,14 @@ public class DataPipeline
         _channel = Channel.CreateBounded<string>(capacity);
     }
 
-    public ChannelWriter<string> Writer { get; } = _channel.Writer;
+    public ChannelWriter<string> Writer => _channel.Writer;
 
-    public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
+    public async IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
     {
-        return _channel.Reader.ReadAllAsync(ct);
+        await foreach (var item in _channel.Reader.ReadAllAsync(ct))
+        {
+            yield return item;
+        }
     }
 
     public Task CompleteAsync()

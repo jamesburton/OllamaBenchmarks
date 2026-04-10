@@ -5,22 +5,22 @@ using MassTransit;
 
 namespace Contracts;
 
-public record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
+record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
+record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
 
-public record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
-
-public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
+class ProcessPaymentConsumer : IConsumer<ProcessPayment>
 {
     public async Task Consume(ConsumeContext<ProcessPayment> context)
     {
-        if (context.Message.Amount <= 0)
+        var msg = context.Message;
+        if (msg.Amount <= 0)
             return;
 
-        await context.Publish(new PaymentProcessed(context.Message.OrderId, DateTime.UtcNow));
+        await context.Publish(new PaymentProcessed(msg.OrderId, DateTime.UtcNow));
     }
 }
 
-public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymentConsumer>
+class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymentConsumer>
 {
     public ProcessPaymentConsumerDefinition()
     {

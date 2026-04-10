@@ -2,26 +2,24 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
-// 1. Money Record
+// 1. Money record
 public record Money(decimal Amount, string Currency);
 
-// 2. Product Class
+// 2. Product class
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    // Price must be initialized to avoid null issues
+    public string Name { get; set; }
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
-// 3. ProductDbContext Class
+// 3. ProductDbContext class
 public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
 
-    // Private static method for value conversion
     private static Money ParseMoney(string s)
     {
         if (string.IsNullOrEmpty(s))
@@ -32,12 +30,13 @@ public class ProductDbContext : DbContext
         var parts = s.Split(':');
         if (parts.Length != 2)
         {
-            throw new FormatException("Money string must be in 'amount:currency' format.");
+            // Fallback or error handling for unexpected format
+            return new Money(0, "USD");
         }
 
-        if (!decimal.TryParse(parts[0], out var amount))
+        if (!decimal.TryParse(parts[0], out decimal amount))
         {
-            throw new FormatException("Invalid amount format.");
+            return new Money(0, "USD");
         }
 
         return new Money(amount, parts[1]);
@@ -52,14 +51,14 @@ public class ProductDbContext : DbContext
             .Property(p => p.Price)
             .HasConversion(
                 // Convert to database value (string)
-                m => $"{m.Amount}:{m.Currency}", 
+                m => $"{m.Amount}:{m.Currency}",
                 // Convert from database value (string)
                 s => ParseMoney(s)
             );
     }
 }
 
-// 4. ProductRepository Class
+// 4. ProductRepository class
 public class ProductRepository
 {
     private readonly ProductDbContext _context;
@@ -69,9 +68,6 @@ public class ProductRepository
         _context = context;
     }
 
-    /// <summary>
-    /// Adds and saves the product to the database.
-    /// </summary>
     public async Task<Product> SaveAsync(Product product)
     {
         _context.Products.Add(product);
@@ -79,15 +75,9 @@ public class ProductRepository
         return product;
     }
 
-    /// <summary>
-    /// Retrieves a product by ID without tracking changes.
-    /// </summary>
     public async Task<Product?> GetByIdAsync(int id)
     {
-        // Using AsNoTracking() ensures EF Core reads the raw data, 
-        // but the conversion logic (HasConversion) is still applied upon materialization.
-        return await _context.Products
-            .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == id);
+        // Use AsNoTracking() as required
+        return await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
     }
 }

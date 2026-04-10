@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 public record CreateProductRequest(string Name, decimal Price);
 
@@ -6,7 +7,7 @@ public record ProductResponse(int Id, string Name, decimal Price);
 
 public static class ProductEndpoints
 {
-    private static int _counter = 0;
+    private static int _idCounter = 0;
 
     public static IResult CreateProduct(CreateProductRequest request)
     {
@@ -26,7 +27,7 @@ public static class ProductEndpoints
             });
         }
 
-        int id = ++_counter;
+        int id = ++_idCounter;
         return Results.Ok(new ProductResponse(id, request.Name, request.Price));
     }
 }

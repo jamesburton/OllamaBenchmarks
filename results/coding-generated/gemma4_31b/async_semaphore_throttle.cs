@@ -9,26 +9,27 @@ public class ThrottledProcessor
 
     public async System.Threading.Tasks.Task<System.Collections.Generic.List<T>> ProcessAllAsync<T>(System.Collections.Generic.IEnumerable<System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>>> tasks, System.Threading.CancellationToken ct)
     {
-        async System.Threading.Tasks.Task<T> WrapAsync(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>> factory)
-        {
-            await _semaphore.WaitAsync(ct);
-            try
-            {
-                return await factory(ct);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
-
         var taskList = new System.Collections.Generic.List<System.Threading.Tasks.Task<T>>();
-        foreach (var factory in tasks)
+
+        foreach (var taskFactory in tasks)
         {
-            taskList.Add(WrapAsync(factory));
+            taskList.Add(ExecuteThrottledAsync(taskFactory, ct));
         }
 
         T[] results = await System.Threading.Tasks.Task.WhenAll(taskList);
         return new System.Collections.Generic.List<T>(results);
+    }
+
+    private async System.Threading.Tasks.Task<T> ExecuteThrottledAsync<T>(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>> taskFactory, System.Threading.CancellationToken ct)
+    {
+        await _semaphore.WaitAsync(ct);
+        try
+        {
+            return await taskFactory(ct);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }

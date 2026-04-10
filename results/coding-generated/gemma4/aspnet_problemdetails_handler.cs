@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 
-// 1. NotFoundException
 public class NotFoundException : Exception
 {
     public string ResourceName { get; }
@@ -12,7 +11,6 @@ public class NotFoundException : Exception
     }
 }
 
-// 2. ConflictException
 public class ConflictException : Exception
 {
     public string ConflictReason { get; }
@@ -23,7 +21,6 @@ public class ConflictException : Exception
     }
 }
 
-// 3. ApiExceptionMapper
 public static class ApiExceptionMapper
 {
     public static ProblemDetails MapException(Exception ex)
@@ -32,20 +29,23 @@ public static class ApiExceptionMapper
         {
             NotFoundException nfe => new ProblemDetails
             {
-                Status = 404,
+                Type = "https://httpstatuses.com/404",
                 Title = "Not Found",
+                Status = 404,
                 Detail = nfe.ResourceName
             },
             ConflictException cfe => new ProblemDetails
             {
-                Status = 409,
+                Type = "https://httpstatuses.com/409",
                 Title = "Conflict",
+                Status = 409,
                 Detail = cfe.ConflictReason
             },
             _ => new ProblemDetails
             {
-                Status = 500,
+                Type = "https://httpstatuses.com/500",
                 Title = "Internal Server Error",
+                Status = 500,
                 Detail = ex.Message
             }
         };

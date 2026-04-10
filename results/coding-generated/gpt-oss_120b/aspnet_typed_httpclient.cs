@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
@@ -21,7 +22,7 @@ public class GitHubClient : IGitHubClient
 
     public GitHubClient(HttpClient httpClient)
     {
-        _httpClient = httpClient;
+        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
     }
 
     public Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default) =>

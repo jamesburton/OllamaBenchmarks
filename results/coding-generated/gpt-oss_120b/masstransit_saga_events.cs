@@ -1,18 +1,17 @@
 global using Contracts;
-using System;
 using MassTransit;
 namespace Contracts;
 
 public class InvoiceSaga : SagaStateMachineInstance
 {
-    public Guid CorrelationId { get; set; }
+    public System.Guid CorrelationId { get; set; }
     public string CurrentState { get; set; } = default!;
     public decimal Amount { get; set; }
 }
 
-public record InvoiceCreated(Guid InvoiceId, decimal Amount);
-public record InvoiceApproved(Guid InvoiceId);
-public record InvoicePaid(Guid InvoiceId);
+public record InvoiceCreated(System.Guid InvoiceId, decimal Amount);
+public record InvoiceApproved(System.Guid InvoiceId);
+public record InvoicePaid(System.Guid InvoiceId);
 
 public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 {
@@ -34,7 +33,7 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 
         Initially(
             When(InvoiceCreated)
-                .Then(ctx => ctx.Saga.Amount = ctx.Message.Amount)
+                .Then(context => context.Saga.Amount = context.Message.Amount)
                 .TransitionTo(Pending));
 
         During(Pending,

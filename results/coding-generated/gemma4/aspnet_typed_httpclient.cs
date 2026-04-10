@@ -15,7 +15,7 @@ public interface IGitHubClient
     Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default);
 }
 
-// 3. GitHubClient implementation
+// 3. GitHubClient class
 public class GitHubClient : IGitHubClient
 {
     private readonly HttpClient _httpClient;
@@ -27,8 +27,7 @@ public class GitHubClient : IGitHubClient
 
     public async Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
     {
-        // The API reference suggests using the typed client pattern, 
-        // which typically involves calling GetFromJsonAsync on the base client.
+        // Assuming the base address is already set up via AddHttpClient
         return await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
     }
 }
@@ -38,12 +37,8 @@ public static class GitHubClientExtensions
 {
     public static IServiceCollection AddGitHubClient(this IServiceCollection services)
     {
-        // This mimics the usage shown in the API reference:
-        // services.AddHttpClient<IGitHubClient, GitHubClient>(c => c.BaseAddress = new Uri("https://api.github.com/"));
-        services.AddHttpClient<IGitHubClient, GitHubClient>(client =>
-        {
-            client.BaseAddress = new Uri("https://api.github.com/");
-        });
+        services.AddHttpClient<IGitHubClient, GitHubClient>(c =>
+            c.BaseAddress = new Uri("https://api.github.com/"));
         return services;
     }
 }

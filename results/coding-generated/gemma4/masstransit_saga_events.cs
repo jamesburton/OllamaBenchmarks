@@ -1,5 +1,6 @@
 global using Contracts;
 using MassTransit;
+using System;
 
 namespace Contracts;
 
@@ -33,15 +34,15 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
     {
         InstanceState(x => x.CurrentState);
 
-        // Configure Event Correlation
+        // Event Correlation
         Event(InvoiceCreated, x => x.CorrelateById(m => m.Message.InvoiceId));
         Event(InvoiceApproved, x => x.CorrelateById(m => m.Message.InvoiceId));
         Event(InvoicePaid, x => x.CorrelateById(m => m.Message.InvoiceId));
 
-        // Define State Machine Flow
+        // State Machine Definition
         Initially(
             When(InvoiceCreated)
-                .Then(ctx => { ctx.Saga.Amount = ctx.Message.Amount; })
+                .Then(ctx => ctx.Saga.Amount = ctx.Message.Amount)
                 .TransitionTo(Pending)
         );
 

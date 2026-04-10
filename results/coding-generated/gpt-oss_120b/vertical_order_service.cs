@@ -11,15 +11,15 @@ public class Order
 {
     public int Id { get; set; }
     public string CustomerName { get; set; }
-    public System.Collections.Generic.List<OrderItem> Items { get; set; }
+    public List<OrderItem> Items { get; set; }
     public decimal Total { get; set; }
-    public System.DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 public class CreateOrderRequest
 {
     public string CustomerName { get; set; }
-    public System.Collections.Generic.List<OrderItem> Items { get; set; }
+    public List<OrderItem> Items { get; set; }
 }
 
 public class ValidationError
@@ -37,11 +37,14 @@ public class OrderService
 {
     private readonly IOrderRepository _repository;
 
-    public OrderService(IOrderRepository repository) => _repository = repository;
+    public OrderService(IOrderRepository repository)
+    {
+        _repository = repository;
+    }
 
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request?.CustomerName))
+        if (request == null || string.IsNullOrWhiteSpace(request.CustomerName))
         {
             return new ValidationError { Message = "Customer name is required" };
         }
@@ -51,19 +54,19 @@ public class OrderService
             return new ValidationError { Message = "At least one item is required" };
         }
 
+        decimal total = 0;
+        foreach (var item in request.Items)
+        {
+            total += item.Quantity * item.UnitPrice;
+        }
+
         var order = new Order
         {
             CustomerName = request.CustomerName,
             Items = request.Items,
-            CreatedAt = System.DateTime.UtcNow
+            Total = total,
+            CreatedAt = DateTime.UtcNow
         };
-
-        decimal total = 0m;
-        foreach (var item in order.Items)
-        {
-            total += item.Quantity * item.UnitPrice;
-        }
-        order.Total = total;
 
         _repository.Save(order);
         return order;

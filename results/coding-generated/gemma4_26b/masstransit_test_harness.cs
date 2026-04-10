@@ -2,40 +2,63 @@ using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-public class ProcessPaymentConsumerTests
+public class ProcessPaymentConsumerTests : IAsyncLifetime
 {
+    private readonly ServiceProvider _provider;
+    private ITestHarness _harness;
+
+    public ProcessPaymentConsumerTests()
+    {
+        var services = new ServiceCollection();
+        services.AddMassTransitTestHarness(cfg =>
+        {
+            cfg.AddConsumer<ProcessPaymentConsumer>();
+        });
+        _provider = services.BuildServiceProvider(true);
+    }
+
+    public ValueTask InitializeAsync()
+    {
+        _harness = _provider.GetRequiredService<ITestHarness>();
+        return _harness.Start();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return _provider.DisposeAsync().AsValueTask();
+    }
+
     [Fact]
     public async Task Consume_Should_ProcessPayment_And_Publish_PaymentProcessed()
     {
         // Arrange
-        var provider = new ServiceCollection()
-            .AddMassTransitTestHarness(cfg =>
-            {
-                cfg.AddConsumer<ProcessPaymentConsumer>();
-            })
-            .BuildServiceProvider(true);
-
-        var harness = provider.GetRequiredService<ITestHarness>();
-        await harness.Start();
-
         var orderId = Guid.NewGuid();
         var amount = 99.99m;
         var message = new ProcessPayment(orderId, amount);
 
         // Act
-        await harness.Bus.Publish(message);
+        await _harness.Bus.Publish(message);
 
-        // Assert - Await results individually before Assert.Multiple as it does not support async lambdas
-        bool wasConsumed = await harness.Consumed.Any<ProcessPayment>();
-        bool wasPublished = await harness.Published.Any<PaymentProcessed>();
+        // Assert
+        // We must await the harness checks individually before Assert.Multiple 
+        // because Assert.Multiple does not support async lambdas.
+        bool wasConsumed = await _harness.Consumed.Any<ProcessPayment>();
 
-        var publishedContext = harness.Published.Select<PaymentProcessed>().FirstOrDefault();
-        bool orderIdMatches = publishedContext != null && publishedContext.Context.Message.OrderId == orderId;
+        // Find the published message to verify the OrderId
+        var publishedMessage = await _harness.Published.Any<PaymentProcessed>();
+        bool hasCorrectOrderId = false;
+        if (publishedMessage)
+        {
+            var publishedContext = _harness.Published.Select<PaymentProcessed>().FirstOrDefault();
+            if (publishedContext != null)
+            {
+                hasCorrectOrderId = publishedContext.Context.Message.OrderId == orderId;
+            }
+        }
 
         Assert.Multiple(
-            () => Assert.True(wasConsumed, "The consumer did not receive the ProcessPayment message."),
-            () => Assert.True(wasPublished, "The PaymentProcessed event was not published."),
-            () => Assert.True(orderIdMatches, "The published PaymentProcessed event does not contain the correct OrderId.")
+            () => Assert.True(wasConsumed, "The ProcessPayment message was not consumed."),
+            () => Assert.True(hasCorrectOrderId, $"The published PaymentProcessed event did not contain the correct OrderId. Expected: {orderId}")
         );
     }
 }

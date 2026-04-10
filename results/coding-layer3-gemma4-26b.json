@@ -1,7 +1,7 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-04-10T09:40:28.125465+00:00",
-  "run_finished_at": "2026-04-10T10:42:48.302518+00:00",
+  "run_started_at": "2026-04-10T15:46:58.363702+00:00",
+  "run_finished_at": "2026-04-10T15:58:20.325842+00:00",
   "models": [
     "gemma4:26b"
   ],
@@ -9,19 +9,19 @@
     {
       "model": "gemma4:26b",
       "benchmark": "coding",
-      "run_started_at": "2026-04-10T09:40:28.125928+00:00",
-      "run_finished_at": "2026-04-10T10:42:48.301845+00:00",
+      "run_started_at": "2026-04-10T15:46:58.364118+00:00",
+      "run_finished_at": "2026-04-10T15:58:20.324632+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
           "category": "aspnet",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 93.08,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 20.94,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\aspnet_oneof_controller.cs"
         },
         {
@@ -33,7 +33,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 73.71,
+          "generation_time_s": 5.99,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\aspnet_validation_endpoint.cs"
         },
         {
@@ -45,7 +45,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 36.32,
+          "generation_time_s": 5.95,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\aspnet_service_di.cs"
         },
         {
@@ -57,7 +57,7 @@
           "build_success": true,
           "tests_passed": 1,
           "tests_total": 1,
-          "generation_time_s": 39.89,
+          "generation_time_s": 7.83,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\efcore_leftjoin.cs"
         },
         {
@@ -69,7 +69,7 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 41.45,
+          "generation_time_s": 6.57,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\efcore_json_columns.cs"
         },
         {
@@ -81,7 +81,7 @@
           "build_success": true,
           "tests_passed": 1,
           "tests_total": 1,
-          "generation_time_s": 42.93,
+          "generation_time_s": 10.21,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\efcore_executeupdate.cs"
         },
         {
@@ -93,7 +93,7 @@
           "build_success": true,
           "tests_passed": 1,
           "tests_total": 1,
-          "generation_time_s": 44.79,
+          "generation_time_s": 5.88,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\masstransit_consumer.cs"
         },
         {
@@ -105,19 +105,19 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 94.86,
+          "generation_time_s": 10.16,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\masstransit_statemachine.cs"
         },
         {
           "task": "masstransit_test_harness",
           "category": "masstransit",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 1,
-          "tests_total": 1,
-          "generation_time_s": 80.0,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 12.29,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\masstransit_test_harness.cs"
         },
         {
@@ -129,19 +129,19 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 29.04,
+          "generation_time_s": 3.86,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_interactive_component.cs"
         },
         {
           "task": "blazor_streaming_render",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 93.8,
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 3.48,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_streaming_render.cs"
         },
         {
@@ -153,19 +153,19 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 61.28,
+          "generation_time_s": 5.87,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_cascading_auth.cs"
         },
         {
           "task": "xunit_v3_theory_tests",
           "category": "xunit",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 24,
-          "tests_total": 24,
-          "generation_time_s": 87.87,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 14.21,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\xunit_v3_theory_tests.cs"
         },
         {
@@ -177,7 +177,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 96.66,
+          "generation_time_s": 12.56,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\xunit_awesome_nsubstitute.cs"
         },
         {
@@ -189,7 +189,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 71.73,
+          "generation_time_s": 6.12,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\xunit_assembly_fixture.cs"
         },
         {
@@ -201,43 +201,43 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 29.78,
+          "generation_time_s": 10.65,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
           "category": "async",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 92.05,
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 4.85,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\async_cancellation.cs"
         },
         {
           "task": "vertical_order_service",
           "category": "vertical",
           "weight": 2,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 6,
-          "tests_total": 6,
-          "generation_time_s": 88.64,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 23.62,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\vertical_order_service.cs"
         },
         {
           "task": "vertical_consumer_pipeline",
           "category": "vertical",
           "weight": 2,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 4,
-          "tests_total": 4,
-          "generation_time_s": 192.81,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 16.64,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\vertical_consumer_pipeline.cs"
         },
         {
@@ -249,19 +249,19 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 193.54,
+          "generation_time_s": 27.06,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\vertical_blazor_crud.cs"
         },
         {
           "task": "linq_selectmany_flatten",
           "category": "linq",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 91.13,
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 2.01,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\linq_selectmany_flatten.cs"
         },
         {
@@ -273,19 +273,19 @@
           "build_success": true,
           "tests_passed": 5,
           "tests_total": 5,
-          "generation_time_s": 48.08,
+          "generation_time_s": 3.39,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\linq_set_operations.cs"
         },
         {
           "task": "linq_aggregate_stats",
           "category": "linq",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 91.33,
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 5.19,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\linq_aggregate_stats.cs"
         },
         {
@@ -297,7 +297,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 91.4,
+          "generation_time_s": 3.21,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\linq_todictionary_tolookup.cs"
         },
         {
@@ -309,7 +309,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 48.62,
+          "generation_time_s": 6.25,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\async_whenall_parallel.cs"
         },
         {
@@ -321,7 +321,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 91.69,
+          "generation_time_s": 5.09,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\async_semaphore_throttle.cs"
         },
         {
@@ -333,7 +333,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 49.11,
+          "generation_time_s": 3.4,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\async_channel_pipeline.cs"
         },
         {
@@ -345,7 +345,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 91.32,
+          "generation_time_s": 4.34,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\async_valuetask_cache.cs"
         },
         {
@@ -355,21 +355,21 @@
           "passed": false,
           "harness_error": null,
           "build_success": true,
-          "tests_passed": 0,
+          "tests_passed": 1,
           "tests_total": 3,
-          "generation_time_s": 63.66,
+          "generation_time_s": 6.63,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\aspnet_minimal_api_endpoint.cs"
         },
         {
           "task": "aspnet_typed_httpclient",
           "category": "aspnet",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 2,
-          "tests_total": 2,
-          "generation_time_s": 32.01,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 6.27,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\aspnet_typed_httpclient.cs"
         },
         {
@@ -381,7 +381,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 36.76,
+          "generation_time_s": 5.6,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\aspnet_ioptions_config.cs"
         },
         {
@@ -393,7 +393,7 @@
           "build_success": true,
           "tests_passed": 5,
           "tests_total": 5,
-          "generation_time_s": 36.13,
+          "generation_time_s": 6.66,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\aspnet_problemdetails_handler.cs"
         },
         {
@@ -405,7 +405,7 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 54.47,
+          "generation_time_s": 12.17,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\efcore_include_navigation.cs"
         },
         {
@@ -417,7 +417,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 36.21,
+          "generation_time_s": 11.03,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\efcore_softdelete_filter.cs"
         },
         {
@@ -429,7 +429,7 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 36.55,
+          "generation_time_s": 7.89,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\efcore_owned_entity.cs"
         },
         {
@@ -441,7 +441,7 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 95.0,
+          "generation_time_s": 9.43,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\efcore_value_conversion.cs"
         },
         {
@@ -453,19 +453,19 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 64.55,
+          "generation_time_s": 5.54,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\masstransit_request_response.cs"
         },
         {
           "task": "masstransit_saga_events",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 95.49,
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 9.92,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\masstransit_saga_events.cs"
         },
         {
@@ -477,7 +477,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 32.76,
+          "generation_time_s": 6.08,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\masstransit_consumer_filter.cs"
         },
         {
@@ -489,31 +489,31 @@
           "build_success": true,
           "tests_passed": 25,
           "tests_total": 25,
-          "generation_time_s": 73.61,
+          "generation_time_s": 12.36,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\xunit_memberdata.cs"
         },
         {
           "task": "xunit_class_fixture",
           "category": "xunit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 96.29,
+          "build_success": true,
+          "tests_passed": 9,
+          "tests_total": 9,
+          "generation_time_s": 15.83,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\xunit_class_fixture.cs"
         },
         {
           "task": "xunit_async_collection",
           "category": "xunit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 96.36,
+          "build_success": true,
+          "tests_passed": 8,
+          "tests_total": 8,
+          "generation_time_s": 14.12,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\xunit_async_collection.cs"
         },
         {
@@ -525,7 +525,7 @@
           "build_success": true,
           "tests_passed": 7,
           "tests_total": 7,
-          "generation_time_s": 41.93,
+          "generation_time_s": 8.47,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_form_validation.cs"
         },
         {
@@ -537,7 +537,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 59.67,
+          "generation_time_s": 7.51,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_navigation_redirect.cs"
         },
         {
@@ -549,7 +549,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 74.03,
+          "generation_time_s": 7.22,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_parameter_lifecycle.cs"
         },
         {
@@ -561,7 +561,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 193.47,
+          "generation_time_s": 32.47,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\vertical_cqrs_handler.cs"
         },
         {
@@ -573,7 +573,7 @@
           "build_success": true,
           "tests_passed": 12,
           "tests_total": 12,
-          "generation_time_s": 133.86,
+          "generation_time_s": 39.63,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\vertical_efcore_service.cs"
         },
         {
@@ -585,19 +585,19 @@
           "build_success": true,
           "tests_passed": 6,
           "tests_total": 6,
-          "generation_time_s": 25.43,
+          "generation_time_s": 4.9,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\patterns_record_with.cs"
         },
         {
           "task": "patterns_json_serialization",
           "category": "patterns",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 5,
-          "tests_total": 5,
-          "generation_time_s": 17.36,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 5.21,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\patterns_json_serialization.cs"
         },
         {
@@ -609,11 +609,11 @@
           "build_success": true,
           "tests_passed": 4,
           "tests_total": 4,
-          "generation_time_s": 28.93,
+          "generation_time_s": 5.85,
           "generated_code_path": "results\\coding-generated\\gemma4_26b\\patterns_timeprovider.cs"
         }
       ],
-      "layer3_weighted_score": 0.6363636363636364
+      "layer3_weighted_score": 0.6
     }
   ]
 }

@@ -1,8 +1,6 @@
 using MassTransit;
-using System;
-using System.Threading.Tasks;
 
-// Global using statement to make types in Contracts accessible
+// Global using for easy access to types defined in the Contracts namespace
 global using Contracts;
 
 namespace Contracts;
@@ -20,7 +18,7 @@ public record ProductNotFound();
 public class GetProductConsumer : IConsumer<GetProduct>
 {
     // Hardcoded known product ID
-    public static Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+    public static readonly Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
     public async Task Consume(ConsumeContext<GetProduct> context)
     {
@@ -28,12 +26,12 @@ public class GetProductConsumer : IConsumer<GetProduct>
 
         if (message.ProductId == KnownId)
         {
-            // Respond with the known product result
+            // Respond with ProductResult
             await context.RespondAsync(new ProductResult(KnownId, "Test Widget", 19.99m));
         }
         else
         {
-            // Respond with not found
+            // Respond with ProductNotFound
             await context.RespondAsync(new ProductNotFound());
         }
     }

@@ -1,88 +1,33 @@
-public static (double Mean, double Median, double Min, double Max) ComputeStats(System.Collections.Generic.IEnumerable<double> values)
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+public static class SurveyAnalyzer
+{
+    public static (double Mean, double Median, double Min, double Max) ComputeStats(IEnumerable<double> values)
     {
-        var list = System.Linq.Enumerable.ToList(values);
-        if (list.Count == 0)
+        if (values == null || !values.Any())
         {
-            throw new System.ArgumentException();
+            throw new ArgumentException("The input sequence cannot be empty.");
         }
 
-        double mean = System.Linq.Enumerable.Average(list);
-        double min = System.Linq.Enumerable.Min(list);
-        double max = System.Linq.Enumerable.Max(list);
+        double mean = values.Average();
+        double min = values.Min();
+        double max = values.Max();
 
-        var sorted = System.Linq.Enumerable.OrderBy(list, x => x).ToList();
-        int count = sorted.Count;
+        var sortedList = values.OrderBy(v => v).ToList();
+        int count = sortedList.Count;
         double median;
+
         if (count % 2 == 0)
         {
-            median = (sorted[count / 2 - 1] + sorted[count / 2]) / 2.0;
+            median = (sortedList[count / 2 - 1] + sortedList[count / 2]) / 2.0;
         }
         else
         {
-            median = sorted[count / 2];
+            median = sortedList[count / 2];
         }
 
-        return (Mean: mean, Median: median, Min: min, Max: max);
+        return (mean, median, min, max);
     }
-
-public static class SurveyAnalyzer
-    {
-        public static (double Mean, double Median, double Min, double Max) ComputeStats(System.Collections.Generic.IEnumerable<double> values)
-        {
-            var list = System.Linq.Enumerable.ToList(values);
-            if (list.Count == 0)
-            {
-                throw new System.ArgumentException();
-            }
-
-            double mean = System.Linq.Enumerable.Average(list);
-            double min = System.Linq.Enumerable.Min(list);
-            double max = System.Linq.Enumerable.Max(list);
-
-            var sorted = System.Linq.Enumerable.OrderBy(list, x => x).ToList();
-            int count = sorted.Count;
-            double median;
-
-            if (count % 2 == 0)
-            {
-                median = (sorted[count / 2 - 1] + sorted[count / 2]) / 2.0;
-            }
-            else
-            {
-                median = sorted[count / 2];
-            }
-
-            return (mean, median, min, max);
-        }
-    }
-
-public static class SurveyAnalyzer
-    {
-        public static (double Mean, double Median, double Min, double Max) ComputeStats(System.Collections.Generic.IEnumerable<double> values)
-        {
-            var list = System.Linq.Enumerable.ToList(values);
-            if (list.Count == 0)
-            {
-                throw new System.ArgumentException();
-            }
-
-            double mean = System.Linq.Enumerable.Average(list);
-            double min = System.Linq.Enumerable.Min(list);
-            double max = System.Linq.Enumerable.Max(list);
-
-            var sorted = System.Linq.Enumerable.OrderBy(list, x => x).ToList();
-            int count = sorted.Count;
-            double median;
-
-            if (count % 2 == 0)
-            {
-                median = (sorted[count / 2 - 1] + sorted[count / 2]) / 2.0;
-            }
-            else
-            {
-                median = sorted[count / 2];
-            }
-
-            return (mean, median, min, max);
-        }
-    }
+}

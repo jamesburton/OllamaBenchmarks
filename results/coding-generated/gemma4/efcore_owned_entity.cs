@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
-// 1. Address Class (Owned Type)
+// 1. Address class (Owned Type)
 public class Address
 {
     public string Street { get; set; }
@@ -10,34 +10,35 @@ public class Address
     public string Zip { get; set; }
 }
 
-// 2. Customer Class
+// 2. Customer class
 public class Customer
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    // Initialize HomeAddress to avoid null reference issues
+    // Must be initialized to avoid null reference issues when EF Core hydrates
     public Address HomeAddress { get; set; } = new Address();
 }
 
-// 3. DbContext
+// 3. CustomerDbContext class
 public class CustomerDbContext : DbContext
 {
     public DbSet<Customer> Customers { get; set; }
 
-    public CustomerDbContext(DbContextOptions<CustomerDbContext> options)
-        : base(options)
-    {
-    }
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure HomeAddress as an owned type
+        // Configure Address as an Owned Type
         modelBuilder.Entity<Customer>()
-            .OwnsOne(c => c.HomeAddress);
+            .OwnsOne(c => c.HomeAddress, addressBuilder =>
+            {
+                // Optionally rename the JSON column if needed, but for simplicity, we let EF handle it.
+                addressBuilder.ToJson(); 
+            });
     }
 }
 
-// 4. Repository Class
+// 4. CustomerRepository class
 public class CustomerRepository
 {
     private readonly CustomerDbContext _context;

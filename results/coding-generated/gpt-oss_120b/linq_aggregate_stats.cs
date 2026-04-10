@@ -5,27 +5,25 @@ public static class SurveyAnalyzer
         if (values == null)
             throw new System.ArgumentNullException(nameof(values));
 
-        // Materialize the sequence to allow multiple passes and sorting
-        var list = new System.Collections.Generic.List<double>(values);
-        if (list.Count == 0)
-            throw new System.ArgumentException("The input sequence must contain at least one element.");
+        var array = System.Linq.Enumerable.ToArray(values);
+        if (array.Length == 0)
+            throw new System.ArgumentException("Sequence contains no elements.");
 
-        double mean = System.Linq.Enumerable.Average(values);
-        double min = System.Linq.Enumerable.Min(values);
-        double max = System.Linq.Enumerable.Max(values);
+        double mean = System.Linq.Enumerable.Average(array);
+        double min = System.Linq.Enumerable.Min(array);
+        double max = System.Linq.Enumerable.Max(array);
 
-        // Ensure the list is sorted for median calculation
-        list.Sort();
-
+        var sorted = (double[])array.Clone();
+        System.Array.Sort(sorted);
         double median;
-        int count = list.Count;
-        if (count % 2 == 1) // odd number of elements
+        int n = sorted.Length;
+        if (n % 2 == 1)
         {
-            median = list[count / 2];
+            median = sorted[n / 2];
         }
-        else // even number of elements
+        else
         {
-            median = (list[count / 2 - 1] + list[count / 2]) / 2.0;
+            median = (sorted[n / 2 - 1] + sorted[n / 2]) / 2.0;
         }
 
         return (Mean: mean, Median: median, Min: min, Max: max);

@@ -1,8 +1,6 @@
 using MassTransit;
-using System;
-using System.Threading.Tasks;
 
-// Global using statement for file-scoped namespace access
+// Global using directive for easy access to types defined in this file's namespace
 global using Contracts;
 
 namespace Contracts;
@@ -20,14 +18,13 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
     {
         var message = context.Message;
 
-        // Check if amount is zero or negative
+        // If Amount <= 0, return immediately
         if (message.Amount <= 0)
         {
-            // Return immediately if amount is invalid
             return;
         }
 
-        // Publish the event
+        // Otherwise, publish PaymentProcessed event
         await context.Publish(new PaymentProcessed(message.OrderId, DateTime.UtcNow));
     }
 }
@@ -37,7 +34,7 @@ public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymen
 {
     public ProcessPaymentConsumerDefinition()
     {
-        // Set ConcurrentMessageLimit
+        // Set ConcurrentMessageLimit = 2
         this.ConcurrentMessageLimit = 2;
     }
 
@@ -46,7 +43,7 @@ public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymen
         IConsumerConfigurator<ProcessPaymentConsumer> consumer,
         IRegistrationContext ctx)
     {
-        // Configure retry policy
+        // UseMessageRetry(r => r.Interval(2, 500))
         ep.UseMessageRetry(r => r.Interval(2, 500));
     }
 }

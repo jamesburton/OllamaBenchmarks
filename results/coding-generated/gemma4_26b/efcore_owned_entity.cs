@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
 
 public class Address
@@ -17,15 +18,16 @@ public class Customer
 
 public class CustomerDbContext : DbContext
 {
-    public DbSet<Customer> Customers { get; set; }
-
     public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options)
     {
     }
 
+    public DbSet<Customer> Customers { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Customer>().OwnsOne(c => c.HomeAddress);
+        modelBuilder.Entity<Customer>()
+            .OwnsOne(c => c.HomeAddress);
     }
 }
 

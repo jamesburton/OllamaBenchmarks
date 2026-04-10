@@ -45,7 +45,7 @@ public class ArticleRepository
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
 
-        if (article != null && !article.IsDeleted)
+        if (article != null)
         {
             article.IsDeleted = true;
             await _context.SaveChangesAsync();

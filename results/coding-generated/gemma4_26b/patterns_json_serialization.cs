@@ -21,5 +21,5 @@ public class PersonDto
     public string InternalId { get; set; }
 
     [JsonPropertyName("status")]
-    public Status Status { get; set; }
+    public Status Status { get; set;
 }

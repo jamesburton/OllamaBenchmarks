@@ -1,18 +1,23 @@
+using Xunit;
+using AwesomeAssertions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 public class InMemoryStore : IAsyncLifetime
 {
     public Dictionary<string, string> Data { get; private set; } = new();
 
-    public ValueTask InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        Data.Add("key1", "value1");
-        Data.Add("key2", "value2");
-        return default;
+        Data["key1"] = "value1";
+        Data["key2"] = "value2";
+        await default;
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         Data.Clear();
-        return default;
+        await default;
     }
 }
 
@@ -59,12 +64,9 @@ public class StoreServiceTests : IClassFixture<InMemoryStore>
     [Fact]
     public void Set_ThenGet_ReturnsSetValue()
     {
-        const string key = "key3";
-        const string value = "value3";
-
-        _service.Set(key, value);
-        var result = _service.Get(key);
-        result.Should().Be(value);
+        _service.Set("key3", "value3");
+        var result = _service.Get("key3");
+        result.Should().Be("value3");
     }
 
     [Fact]

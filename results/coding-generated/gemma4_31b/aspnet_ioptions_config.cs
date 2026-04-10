@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
 public class SmtpOptions
 {
@@ -16,16 +15,13 @@ public interface IEmailSender
 
 public class SmtpEmailSender : IEmailSender
 {
-    private readonly IOptions<SmtpOptions> _options;
+    public SmtpOptions Options { get; }
+    public string? LastSentTo { get; set; }
 
     public SmtpEmailSender(IOptions<SmtpOptions> options)
     {
-        _options = options;
+        Options = options.Value;
     }
-
-    public SmtpOptions Options => _options.Value;
-
-    public string? LastSentTo { get; set; }
 
     public Task SendAsync(string to, string subject, string body)
     {

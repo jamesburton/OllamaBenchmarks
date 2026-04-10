@@ -15,16 +15,14 @@ class CachingService
 
     public async ValueTask<string> GetAsync(string key)
     {
-        if (_cache.TryGetValue(key, out var cachedValue))
+        if (_cache.ContainsKey(key))
         {
+            string cachedValue = _cache[key];
             return new ValueTask<string>(cachedValue);
         }
 
-        var result = await _inner.ComputeAsync(key);
-
-        // Store the result (we assume the result string is the value to cache)
+        string result = await _inner.ComputeAsync(key);
         _cache[key] = result;
-
         return new ValueTask<string>(result);
     }
 }

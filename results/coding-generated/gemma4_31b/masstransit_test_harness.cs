@@ -5,28 +5,37 @@ using Microsoft.Extensions.DependencyInjection;
 public class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task ShouldProcessPaymentAndPublishEvent()
+    public async Task Should_ProcessPayment_And_Publish_PaymentProcessed()
     {
-        var provider = new ServiceCollection()
-            .AddMassTransitTestHarness(cfg => { cfg.AddConsumer<ProcessPaymentConsumer>(); })
-            .BuildServiceProvider(true);
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddMassTransitTestHarness(cfg => 
+        { 
+            cfg.AddConsumer<ProcessPaymentConsumer>(); 
+        });
 
+        var provider = services.BuildServiceProvider(true);
         var harness = provider.GetRequiredService<ITestHarness>();
+
         await harness.Start();
 
         var orderId = Guid.NewGuid();
-        var amount = 99.99m;
+        var message = new ProcessPayment(orderId, 99.99m);
 
-        await harness.Bus.Publish(new ProcessPayment(orderId, amount));
+        // Act
+        await harness.Bus.Publish(message);
 
-        bool isConsumed = await harness.Consumed.Any<ProcessPayment>();
-        bool isPublished = await harness.Published.Any<PaymentProcessed>();
-        var publishedMessage = await harness.Published.Select<PaymentProcessed>().First();
+        // Assert
+        var consumed = await harness.Consumed.Any<ProcessPayment>();
+        var published = await harness.Published.Any<PaymentProcessed>();
+
+        // Retrieve the published message to verify the OrderId
+        var publishedMessage = harness.Published.Select<PaymentProcessed>().FirstOrDefault();
 
         Assert.Multiple(
-            () => Assert.True(isConsumed),
-            () => Assert.True(isPublished),
-            () => Assert.Equal(orderId, publishedMessage.OrderId)
+            () => Assert.True(consumed, "ProcessPayment message should be consumed"),
+            () => Assert.True(published, "PaymentProcessed event should be published"),
+            () => Assert.Equal(orderId, publishedMessage?.OrderId)
         );
     }
 }

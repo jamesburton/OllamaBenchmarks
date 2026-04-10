@@ -1,10 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
 
-// 1. Model
 public class TodoItem
 {
     public int Id { get; set; }
@@ -13,17 +8,13 @@ public class TodoItem
     public DateTime CreatedAt { get; set; }
 }
 
-// 2. DbContext
 public class TodoDbContext : DbContext
 {
     public DbSet<TodoItem> TodoItems { get; set; }
 
-    public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options)
-    {
-    }
+    public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options) { }
 }
 
-// 3. Interface
 public interface ITodoService
 {
     Task<TodoItem> CreateAsync(string title);
@@ -33,7 +24,6 @@ public interface ITodoService
     Task<bool> DeleteAsync(int id);
 }
 
-// 4. Implementation
 public class TodoService : ITodoService
 {
     private readonly TodoDbContext _context;
@@ -45,15 +35,15 @@ public class TodoService : ITodoService
 
     public async Task<TodoItem> CreateAsync(string title)
     {
-        var item = new TodoItem
+        var newItem = new TodoItem
         {
             Title = title,
             IsComplete = false,
             CreatedAt = DateTime.UtcNow
         };
-        _context.TodoItems.Add(item);
+        _context.TodoItems.Add(newItem);
         await _context.SaveChangesAsync();
-        return item;
+        return newItem;
     }
 
     public async Task<List<TodoItem>> GetAllAsync()
@@ -73,7 +63,6 @@ public class TodoService : ITodoService
         {
             return false;
         }
-
         item.IsComplete = true;
         await _context.SaveChangesAsync();
         return true;
@@ -86,7 +75,6 @@ public class TodoService : ITodoService
         {
             return false;
         }
-
         _context.TodoItems.Remove(item);
         await _context.SaveChangesAsync();
         return true;
