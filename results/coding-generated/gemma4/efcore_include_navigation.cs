@@ -42,19 +42,21 @@ public class BlogDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Blog has many Posts (with foreign key BlogId)
-        modelBuilder.Entity<Post>()
-            .HasOne(p => p.Blog)
-            .WithMany(b => b.Posts)
-            .HasForeignKey(p => p.BlogId)
-            .OnDelete(DeleteBehavior.Cascade);
+        // Configure Blog to have many Posts
+        modelBuilder.Entity<Blog>()
+            .HasMany(b => b.Posts)
+            .WithOne(p => p.Blog)
+            .HasForeignKey(p => p.BlogId);
 
-        // Post has many Comments (with foreign key PostId)
-        modelBuilder.Entity<Comment>()
-            .HasOne(c => c.Post)
-            .WithMany(p => p.Comments)
-            .HasForeignKey(c => c.PostId)
-            .OnDelete(DeleteBehavior.Cascade);
+        // Configure Post to have many Comments
+        modelBuilder.Entity<Post>()
+            .HasMany(p => p.Comments)
+            .WithOne(c => c.Post)
+            .HasForeignKey(c => c.PostId);
+
+        // Ensure collections are initialized (though C# initialization handles this, explicit configuration is good practice)
+        modelBuilder.Entity<Blog>().Property(b => b.Posts).IsRequired().HasDefaultValue(null);
+        modelBuilder.Entity<Post>().Property(p => p.Comments).IsRequired().HasDefaultValue(null);
     }
 }
 

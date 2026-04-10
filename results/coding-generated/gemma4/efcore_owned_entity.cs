@@ -28,7 +28,7 @@ public class CustomerDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure Address as an Owned Type
+        // Configure Address as an owned type for Customer
         modelBuilder.Entity<Customer>()
             .OwnsOne(c => c.HomeAddress, addressBuilder =>
             {

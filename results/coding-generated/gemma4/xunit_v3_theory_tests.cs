@@ -22,44 +22,43 @@ public class StringProcessor
 
 public class StringProcessorTests
 {
-    private readonly StringProcessor _processor = new StringProcessor();
-
     [Theory]
-    [InlineData(null, 10, "")] // null input
-    [InlineData("", 10, "")]    // empty string
-    [InlineData("abc", 5, "abc")] // shorter than max
-    [InlineData("abcd", 4, "abcd")] // equal to max
-    [InlineData("abcdef", 3, "abc...")] // longer than max
-    public void Truncate_ShouldHandleVariousLengths(string input, int maxLength, string expected)
+    [InlineData(null, 5, "")] // null input
+    [InlineData("", 5, "")]   // empty string
+    [InlineData("short", 10, "short")] // shorter than max
+    [InlineData("abcde", 5, "abcde")] // equal to max
+    [InlineData("toolongstring", 5, "tool...")] // longer than max
+    public void Truncate_ShouldHandleVariousInputs(string input, int maxLength, string expected)
     {
-        var actual = _processor.Truncate(input, maxLength);
+        var processor = new StringProcessor();
+        var actual = processor.Truncate(input, maxLength);
         actual.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData(null)] // null input
-    [InlineData("")]    // empty string
-    [InlineData("   ")] // only spaces
-    [InlineData("singleword")] // single word
-    [InlineData("hello world")] // multiple words
-    [InlineData("  leading space and   multiple spaces ")] // extra spaces
-    public void CountWords_ShouldCountWordsCorrectly(string input)
+    [InlineData(null, 0)] // null input
+    [InlineData("", 0)]   // empty string
+    [InlineData("word", 1)] // single word
+    [InlineData("hello world", 2)] // multiple words
+    [InlineData("  multiple   spaces ", 3)] // extra spaces
+    public void CountWords_ShouldCountWordsCorrectly(string input, int expectedCount)
     {
-        var actual = _processor.CountWords(input);
-        actual.Should().Be(expected);
+        var processor = new StringProcessor();
+        var actual = processor.CountWords(input);
+        actual.Should().Be(expectedCount);
     }
 
     [Theory]
-    [InlineData(null)] // null input
-    [InlineData("")]    // empty string
-    [InlineData("a")]   // single character
-    [InlineData("racecar")] // palindrome
-    [InlineData("hello")] // non-palindrome
-    [InlineData("RaceCar")] // mixed case palindrome
-    [InlineData("a b a")] // palindrome with spaces
-    public void IsPalindrome_ShouldDeterminePalindromeStatus(string input)
+    [InlineData(null, false)] // null input
+    [InlineData("", false)]   // empty string
+    [InlineData("a", true)]   // single character
+    [InlineData("racecar", true)] // palindrome
+    [InlineData("hello", false)] // non-palindrome
+    [InlineData("A man a plan a canal Panama", true)] // palindrome with mixed case and spaces
+    public void IsPalindrome_ShouldDetectPalindromes(string input, bool expected)
     {
-        var actual = _processor.IsPalindrome(input);
+        var processor = new StringProcessor();
+        var actual = processor.IsPalindrome(input);
         actual.Should().Be(expected);
     }
 }

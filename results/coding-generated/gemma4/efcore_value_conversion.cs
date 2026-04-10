@@ -20,6 +20,7 @@ public class ProductDbContext : DbContext
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
 
+    // Private static method for parsing
     private static Money ParseMoney(string s)
     {
         if (string.IsNullOrEmpty(s))

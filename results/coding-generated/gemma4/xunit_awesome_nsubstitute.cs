@@ -34,19 +34,19 @@ public class NotificationServiceTests
         // Arrange
         var mockRepo = Substitute.For<IUserRepository>();
         var mockEmail = Substitute.For<IEmailService>();
-        var testUser = new User(Id: 1, Name: "Alice", Email: "alice@example.com");
+        var testUser = new User { Id = 1, Name = "Test User", Email = "test@example.com" };
 
-        // Setup successful retrieval
-        mockRepo.GetByIdAsync(1).Returns(Task.FromResult(testUser));
+        mockRepo.GetByIdAsync(1).Returns(Task.FromResult<User?>(testUser));
 
         var service = new NotificationService(mockRepo, mockEmail);
 
         // Act
         await service.NotifyUserAsync(1);
 
-        // Assert (Using AwesomeAssertions for verification)
-        // We verify the email service was called with the correct email
-        await mockEmail.Received(1).SendWelcomeAsync("alice@example.com");
+        // Assert
+        // Verify calls
+        await mockRepo.Received().GetByIdAsync(1);
+        await mockEmail.Received().SendWelcomeAsync("test@example.com");
     }
 
     [Fact]
@@ -56,18 +56,16 @@ public class NotificationServiceTests
         var mockRepo = Substitute.For<IUserRepository>();
         var mockEmail = Substitute.For<IEmailService>();
 
-        // Setup retrieval failure (returns null)
+        // Simulate user not found (returns null)
         mockRepo.GetByIdAsync(99).Returns(Task.FromResult<User?>(null));
 
         var service = new NotificationService(mockRepo, mockEmail);
 
-        // Act & Assert (Using AwesomeAssertions for exception handling)
+        // Act & Assert
         var act = async () => await service.NotifyUserAsync(99);
+        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("User not found");
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("User not found");
-
-        // Verify that the email service was never called
+        // Verify that email service was never called
         await mockEmail.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 }

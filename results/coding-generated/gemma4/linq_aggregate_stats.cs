@@ -4,7 +4,7 @@ public static class SurveyAnalyzer
     {
         var list = values.ToList();
 
-        if (list.Count == 0)
+        if (!list.Any())
         {
             throw new ArgumentException("Input sequence cannot be empty.");
         }

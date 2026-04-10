@@ -73,7 +73,7 @@ public class OrderService
         {
             Id = new Random().Next(1000, 9999), // Mock ID generation
             CustomerName = request.CustomerName,
-            Items = request.Items,
+            Items = new List<OrderItem>(request.Items),
             Total = total,
             CreatedAt = DateTime.UtcNow
         };

@@ -86,7 +86,8 @@ public class CounterSecondTests
         _fixture.Counter.Increment();
 
         // Assertion using AwesomeAssertions
-        // Since CounterFirstTests ran first, the count should be at least 1 + 2 = 3
+        // Note: Because the fixture is shared, the count will be 1 (from Test 1) + 2 = 3
+        // The test asserts against the final state after both tests run.
         _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 }

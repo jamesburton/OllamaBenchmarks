@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 // 1. SmtpOptions class
 public class SmtpOptions
 {
-    public string Host { get; set; } = string.Empty;
+    public string? Host { get; set; }
     public int Port { get; set; }
     public string? Username { get; set; }
 }
@@ -34,14 +34,11 @@ public class SmtpEmailSender : IEmailSender
         _options = options;
     }
 
-    public Task SendAsync(string to, string subject, string body)
+    public async Task SendAsync(string to, string subject, string body)
     {
-        // Implementation detail: store 'to' in LastSentTo
-        LastSentTo = to;
-
         // Simulate sending logic
-        Console.WriteLine($"Sending email to {to} with subject: {subject}");
-
-        return Task.CompletedTask;
+        LastSentTo = to;
+        // In a real scenario, actual SMTP sending logic would go here.
+        await Task.CompletedTask;
     }
 }

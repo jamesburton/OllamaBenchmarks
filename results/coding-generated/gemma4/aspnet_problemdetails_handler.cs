@@ -29,23 +29,20 @@ public static class ApiExceptionMapper
         {
             NotFoundException nfe => new ProblemDetails
             {
-                Type = "https://httpstatuses.com/404",
-                Title = "Not Found",
                 Status = 404,
+                Title = "Not Found",
                 Detail = nfe.ResourceName
             },
             ConflictException cfe => new ProblemDetails
             {
-                Type = "https://httpstatuses.com/409",
-                Title = "Conflict",
                 Status = 409,
+                Title = "Conflict",
                 Detail = cfe.ConflictReason
             },
             _ => new ProblemDetails
             {
-                Type = "https://httpstatuses.com/500",
-                Title = "Internal Server Error",
                 Status = 500,
+                Title = "Internal Server Error",
                 Detail = ex.Message
             }
         };

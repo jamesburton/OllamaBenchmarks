@@ -1,6 +1,6 @@
 using MassTransit;
 
-// Global using for easy access to types defined in the Contracts namespace
+// Global using directive to make types in the Contracts namespace accessible
 global using Contracts;
 
 namespace Contracts;

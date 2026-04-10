@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using System.Linq;
 
 // 1. ISoftDeletable interface
 public interface ISoftDeletable
@@ -43,29 +44,42 @@ public class ArticleRepository
         _context = context;
     }
 
+    /// <summary>
+    /// Soft deletes an article by setting IsDeleted to true.
+    /// Uses IgnoreQueryFilters() to find the record regardless of its current IsDeleted state.
+    /// </summary>
     public async Task SoftDeleteAsync(int id)
     {
-        // Use IgnoreQueryFilters() to find the record regardless of the active filter
+        // Use IgnoreQueryFilters() to find the record even if it's already marked deleted
         var article = await _context.Articles
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
 
-        if (article != null && !article.IsDeleted)
+        if (article != null)
         {
-            article.IsDeleted = true;
-            await _context.SaveChangesAsync();
+            if (article.IsDeleted == false)
+            {
+                article.IsDeleted = true;
+                await _context.SaveChangesAsync();
+            }
         }
     }
 
+    /// <summary>
+    /// Retrieves all active articles (respects the query filter).
+    /// </summary>
     public async Task<List<Article>> GetAllAsync()
     {
-        // The query filter automatically handles filtering for IsDeleted == false
+        // The query filter automatically handles filtering out deleted items
         return await _context.Articles.ToListAsync();
     }
 
+    /// <summary>
+    /// Retrieves all articles, including soft-deleted ones.
+    /// </summary>
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        // Use IgnoreQueryFilters() to bypass the soft delete filter
+        // Use IgnoreQueryFilters() to bypass the default filter
         return await _context.Articles
             .IgnoreQueryFilters()
             .ToListAsync();

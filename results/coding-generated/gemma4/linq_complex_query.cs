@@ -12,7 +12,7 @@ public record CategorySummary(string Category, decimal TotalAmount, decimal Aver
 public static class SalesAnalyzer
 {
     /// <summary>
-    /// Groups sales by Category, computes summary statistics, and orders the results by TotalAmount descending.
+    /// Groups sales by Category, computes summary statistics, and returns a sorted list.
     /// </summary>
     /// <param name="sales">The collection of sales records.</param>
     /// <returns>A list of CategorySummary, ordered by TotalAmount descending.</returns>
@@ -37,7 +37,7 @@ public static class SalesAnalyzer
 // Example usage (optional, for testing purposes)
 public class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
         var salesData = new List<Sale>
         {
@@ -46,8 +46,7 @@ public class Program
             new Sale("Mouse Pad", "Electronics", 15.00m, new DateOnly(2023, 10, 3)),
             new Sale("Jeans", "Apparel", 75.00m, new DateOnly(2023, 10, 4)),
             new Sale("Book A", "Books", 20.00m, new DateOnly(2023, 10, 5)),
-            new Sale("Monitor Y", "Electronics", 300.00m, new DateOnly(2023, 10, 6)),
-            new Sale("Book B", "Books", 30.00m, new DateOnly(2023, 10, 7))
+            new Sale("Book B", "Books", 30.00m, new DateOnly(2023, 10, 6))
         };
 
         var summary = SalesAnalyzer.SummarizeByCategory(salesData);
@@ -55,10 +54,11 @@ public class Program
         Console.WriteLine("--- Sales Summary by Category ---");
         foreach (var item in summary)
         {
-            Console.WriteLine($"\nCategory: {item.Category}");
+            Console.WriteLine($"Category: {item.Category}");
             Console.WriteLine($"  Total Amount: {item.TotalAmount:C}");
             Console.WriteLine($"  Average Amount: {item.AverageAmount:C}");
             Console.WriteLine($"  Count: {item.Count}");
+            Console.WriteLine("---------------------------------");
         }
     }
 }

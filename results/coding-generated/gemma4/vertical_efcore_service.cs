@@ -1,5 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System;
+using System.Linq;
 
+// 1. TodoItem class
 public class TodoItem
 {
     public int Id { get; set; }
@@ -8,6 +13,7 @@ public class TodoItem
     public DateTime CreatedAt { get; set; }
 }
 
+// 2. TodoDbContext class
 public class TodoDbContext : DbContext
 {
     public DbSet<TodoItem> TodoItems { get; set; }
@@ -15,6 +21,7 @@ public class TodoDbContext : DbContext
     public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options) { }
 }
 
+// 3. ITodoService interface
 public interface ITodoService
 {
     Task<TodoItem> CreateAsync(string title);
@@ -24,6 +31,7 @@ public interface ITodoService
     Task<bool> DeleteAsync(int id);
 }
 
+// 4. TodoService class
 public class TodoService : ITodoService
 {
     private readonly TodoDbContext _context;

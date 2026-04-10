@@ -1,6 +1,25 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.Features.Query;
+using Microsoft.AspNetCore.Http.Features.Form;
+using Microsoft.AspNetCore.Http.Features.Cookie;
+using Microsoft.AspNetCore.Http.Features.Forwarded;
+using Microsoft.AspNetCore.Http.Features.HttpRequest;
+using Microsoft.AspNetCore.Http.Features.HttpContext;
+using Microsoft.AspNetCore.Http.Features.Connection;
+using Microsoft.AspNetCore.Http.Features.RequestHeaders;
+using Microsoft.AspNetCore.Http.Features.ResponseHeaders;
+using Microsoft.AspNetCore.Http.Features.RequestCookies;
+using Microsoft.AspNetCore.Http.Features.ResponseCookies;
+using Microsoft.AspNetCore.Http.Features.IHeaderDictionary;
+using Microsoft.AspNetCore.Http.Features.IFormCollection;
+using Microsoft.AspNetCore.Http.Features.IQueryCollection;
+using Microsoft.AspNetCore.Http.Features.IConnectionFeature;
+using Microsoft.AspNetCore.Http.Features.IHttpContextFeature;
+using Microsoft.AspNetCore.Http.Features.IRequestFeature;
+using Microsoft.AspNetCore.Http.Features.IResponseFeature;
+using Microsoft.AspNetCore.Http.Features.IConnectionFeature;
 
 // 1. CreateProductRequest record
 public record CreateProductRequest(string Name, decimal Price);
@@ -15,29 +34,32 @@ public static class ProductEndpoints
 
     public static IResult CreateProduct(CreateProductRequest request)
     {
-        // Validation for Name (null or whitespace)
+        var validationErrors = new Dictionary<string, string[]>();
+
+        // Validate Name (required, must be non-empty)
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            var errors = new Dictionary<string, string[]>
-            {
-                { "Name", new[] { "Name is required and cannot be empty." } }
-            };
-            return Results.ValidationProblem(errors);
+            validationErrors["Name"] = new[] { "Name is required and cannot be empty." };
         }
 
-        // Validation for Price (must be > 0)
+        // Validate Price (must be > 0)
         if (request.Price <= 0)
         {
-            var errors = new Dictionary<string, string[]>
-            {
-                { "Price", new[] { "Price must be greater than zero." } }
-            };
-            return Results.ValidationProblem(errors);
+            validationErrors["Price"] = new[] { "Price must be greater than zero." };
+        }
+
+        // Check if any validation errors occurred
+        if (validationErrors.Count > 0)
+        {
+            // Return ValidationProblem if validation fails
+            return Results.ValidationProblem(validationErrors);
         }
 
         // Success path
         _nextId++;
         var response = new ProductResponse(_nextId, request.Name, request.Price);
+
+        // Return Ok(payload)
         return Results.Ok(response);
     }
 }

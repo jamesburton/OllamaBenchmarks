@@ -58,9 +58,9 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
     }
 }
 
-// --- Test/Usage Context (Not required for the final output, but useful for context) ---
+// --- Test Class Structure (For context, though not required in output, it shows usage) ---
 /*
-public class ProductServiceTests
+public class ProductCommandHandlerTests
 {
     [Fact]
     public async Task HandleAsync_ValidCommand_ReturnsProduct()
@@ -68,21 +68,17 @@ public class ProductServiceTests
         // Arrange
         var mockRepo = Substitute.For<IProductRepository>();
         mockRepo.ExistsAsync(Arg.Any<string>()).Returns(Task.FromResult(false));
-        mockRepo.AddAsync(Arg.Any<Product>()).Returns(new Product(1, "Test", 10.00m));
+        mockRepo.AddAsync(Arg.Any<Product>()).Returns(new Product(1, "Test", 10.0m));
 
         var handler = new CreateProductCommandHandler(mockRepo);
-        var command = new CreateProductCommand("Test", 10.00m);
+        var command = new CreateProductCommand("Test", 10.0m);
 
         // Act
         var result = await handler.HandleAsync(command);
 
         // Assert
-        result.Should().IsT0();
-        var product = result.AsT0();
-        product.Should().BeEquivalentTo(new Product(1, "Test", 10.00m));
-
-        // Verify interaction
-        await mockRepo.Received(1).AddAsync(Arg.Is<Product>(p => p.Name == "Test" && p.Price == 10.00m));
+        result.Should().IsT0().AsT0().Should().BeEquivalentTo(new Product(1, "Test", 10.0m));
+        await mockRepo.Received(1).AddAsync(Arg.Is<Product>(p => p.Name == "Test" && p.Price == 10.0m));
     }
 
     [Fact]
@@ -91,18 +87,29 @@ public class ProductServiceTests
         // Arrange
         var mockRepo = Substitute.For<IProductRepository>();
         var handler = new CreateProductCommandHandler(mockRepo);
-        var command = new CreateProductCommand(null, 10.00m);
+        var command = new CreateProductCommand(null, 10.0m);
 
         // Act
         var result = await handler.HandleAsync(command);
 
         // Assert
-        result.Should().IsT1();
-        var error = result.AsT1();
-        error.Should().BeOfType<ValidationError>().And.HaveMessage("Name is required");
-
-        // Verify no repository calls were made
+        result.Should().IsT1().AsT1().Should().BeEquivalentTo(new ValidationError("Name is required"));
         await mockRepo.DidNotReceive().ExistsAsync(Arg.Any<string>());
+    }
+
+    [Fact]
+    public async Task HandleAsync_NegativePrice_ReturnsValidationError()
+    {
+        // Arrange
+        var mockRepo = Substitute.For<IProductRepository>();
+        var handler = new CreateProductCommandHandler(mockRepo);
+        var command = new CreateProductCommand("Test", -5.0m);
+
+        // Act
+        var result = await handler.HandleAsync(command);
+
+        // Assert
+        result.Should().IsT1().AsT1().Should().BeEquivalentTo(new ValidationError("Price must be positive"));
     }
 
     [Fact]
@@ -112,15 +119,14 @@ public class ProductServiceTests
         var mockRepo = Substitute.For<IProductRepository>();
         mockRepo.ExistsAsync("Existing").Returns(Task.FromResult(true));
         var handler = new CreateProductCommandHandler(mockRepo);
-        var command = new CreateProductCommand("Existing", 10.00m);
+        var command = new CreateProductCommand("Existing", 10.0m);
 
         // Act
         var result = await handler.HandleAsync(command);
 
         // Assert
-        result.Should().IsT2();
-        var error = result.AsT2();
-        error.Should().BeOfType<DuplicateError>().And.HaveExistingName("Existing");
+        result.Should().IsT2().AsT2().Should().BeEquivalentTo(new DuplicateError("Existing"));
+        await mockRepo.Received(1).ExistsAsync("Existing");
     }
 }
 */

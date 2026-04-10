@@ -32,11 +32,8 @@ public class StoreService
 
     public string? Get(string key)
     {
-        if (_store.Data.TryGetValue(key, out var v))
-        {
-            return v;
-        }
-        return null;
+        _store.Data.TryGetValue(key, out var v);
+        return v;
     }
 
     public void Set(string key, string value)

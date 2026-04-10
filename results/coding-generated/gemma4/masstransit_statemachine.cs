@@ -23,73 +23,45 @@ public record OrderCompleted(Guid OrderId);
 // 3. OrderStateMachine class
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
-    // States
     public State Submitted { get; private set; }
     public State Accepted { get; private set; }
     public State Completed { get; private set; }
 
-    // Events
-    public Event<OrderSubmitted> OrderSubmittedEvent { get; private set; }
-    public Event<OrderAccepted> OrderAcceptedEvent { get; private set; }
-    public Event<OrderCompleted> OrderCompletedEvent { get; private set; }
+    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
+    public Event<OrderAccepted> OrderAccepted { get; private set; }
+    public Event<OrderCompleted> OrderCompleted { get; private set; }
 
     public OrderStateMachine()
     {
         InstanceState(x => x.CurrentState);
 
-        // Initial State: Submitted
+        // Initially: When OrderSubmitted -> set OrderDate, TransitionTo Submitted
         Initially(
-            When(OrderSubmittedEvent)
+            When(OrderSubmitted)
                 .Then(context =>
                 {
                     context.Saga.OrderDate = context.Message.OrderDate;
                 })
                 .TransitionTo(Submitted)
-                .OnEnter(context =>
-                {
-                    context.Saga.CurrentState = "Submitted";
-                })
-                .Publish(context => new OrderSubmitted(context.Message.OrderId, context.Message.OrderDate)) // Example publish if needed, though not strictly required by prompt
+                .CorrelateById(context => context.Message.OrderId)
         );
 
-        // Transition from Submitted to Accepted
+        // During Submitted: When OrderAccepted -> set AcceptedAt, TransitionTo Accepted
         During(Submitted,
-            When(OrderAcceptedEvent)
+            When(OrderAccepted)
                 .Then(context =>
                 {
                     context.Saga.AcceptedAt = context.Message.AcceptedAt;
                 })
                 .TransitionTo(Accepted)
-                .OnEnter(context =>
-                {
-                    context.Saga.CurrentState = "Accepted";
-                })
-                .Publish(context => new OrderAccepted(context.Message.OrderId, context.Message.AcceptedAt))
+                .CorrelateById(context => context.Message.OrderId)
         );
 
-        // Transition from Accepted to Completed (Finalize)
+        // During Accepted: When OrderCompleted -> Finalize
         During(Accepted,
-            When(OrderCompletedEvent)
-                .Then(context =>
-                {
-                    // No specific property setting required for completion based on prompt, just finalizing
-                })
-                .TransitionTo(Completed)
-                .OnEnter(context =>
-                {
-                    context.Saga.CurrentState = "Completed";
-                })
+            When(OrderCompleted)
                 .Finalize()
-                .Publish(context => new OrderCompleted(context.Message.OrderId))
+                .CorrelateById(context => context.Message.OrderId)
         );
-    }
-}
-
-// Helper extension to satisfy the requirement of using Event(...) with correlation
-public static class StateMachineExtensions
-{
-    public static Event<T> Event<T>(this OrderStateMachine stateMachine, Func<Event<T>> eventFactory)
-    {
-        return stateMachine.Event(eventFactory);
     }
 }

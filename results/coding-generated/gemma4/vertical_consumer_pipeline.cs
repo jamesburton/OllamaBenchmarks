@@ -95,10 +95,10 @@ public class PipelineTests
         // but we wait briefly to ensure async processing completes before assertions)
         await Task.Delay(100); 
 
-        // Assert 1: Verify PlaceOrderConsumer consumed PlaceOrder
+        // Assert 1: Verify PlaceOrderConsumer consumed the message
         await Assert.True(await harness.Consumed.Any<PlaceOrder>());
 
-        // Assert 2: Verify PlaceOrderConsumer published OrderPlaced
+        // Assert 2: Verify OrderPlaced was published (by PlaceOrderConsumer)
         var publishedOrderPlaced = await harness.Published.FirstOrDefaultAsync<OrderPlaced>(p => 
             p.OrderId == testOrderId && p.CustomerName == testCustomerName);
         await Assert.NotNull(publishedOrderPlaced);
@@ -106,7 +106,7 @@ public class PipelineTests
         // Assert 3: Verify NotifyCustomerConsumer consumed OrderPlaced
         await Assert.True(await harness.Consumed.Any<OrderPlaced>());
 
-        // Assert 4: Verify NotifyCustomerConsumer published CustomerNotified
+        // Assert 4: Verify CustomerNotified was published (by NotifyCustomerConsumer)
         var publishedCustomerNotified = await harness.Published.FirstOrDefaultAsync<CustomerNotified>(p => 
             p.OrderId == testOrderId && p.NotificationMessage == $"Order {testOrderId} confirmed for {testCustomerName}");
         await Assert.NotNull(publishedCustomerNotified);
