@@ -110,9 +110,7 @@ def call_ollama(
         "model": model,
         "messages": messages,
         "stream": False,
-        # Note: do NOT set "think": false — some models (qwen3-coder-next on
-        # Ollama 0.20.2) crash with 500 error when thinking is disabled.
-        # Instead, we read from message.thinking as fallback below.
+        "think": False,  # Disable thinking to avoid wasting tokens on CoT
         "options": {
             "num_predict": max_tokens,
             "num_ctx": num_ctx,
