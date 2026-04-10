@@ -1,7 +1,7 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-04-03T11:53:29.7689053+01:00",
-    "run_finished_at":  "2026-04-03T11:59:52.0336442+01:00",
+    "run_started_at":  "2026-04-10T11:20:03.8423548+01:00",
+    "run_finished_at":  "2026-04-10T11:40:00.8293157+01:00",
     "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-gemma4_26b.json",
     "host":  "FRAMEWORK",
     "ollama_host":  "http://127.0.0.1:11434",
@@ -11,15 +11,6 @@
     "models":  [
                    "gemma4:26b"
                ],
-    "completed_models":  [
-                             "gemma4:26b"
-                         ],
-    "failed_models":  [
-
-                      ],
-    "incomplete_models":  [
-
-                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,
@@ -27,17 +18,17 @@
                     {
                         "model":  "gemma4:26b",
                         "eval_count":  192,
-                        "eval_s":  21.787,
-                        "toks_per_s":  8.81,
-                        "total_s":  33.926,
-                        "load_s":  10.79,
-                        "cpu_avg_pct":  3.1,
-                        "cpu_peak_pct":  21.6,
-                        "ram_peak_gb":  13.77,
-                        "gpu_util_avg":  0,
-                        "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  10.71,
-                        "ollama_ps":  "gemma4:26b size=22.9GB vram=10.37GB ctx=65536 quant=Q4_K_M"
+                        "eval_s":  57.463,
+                        "toks_per_s":  3.34,
+                        "total_s":  657.22,
+                        "load_s":  595.191,
+                        "cpu_avg_pct":  15.6,
+                        "cpu_peak_pct":  23.7,
+                        "ram_peak_gb":  18.85,
+                        "gpu_util_avg":  3.1,
+                        "gpu_util_peak":  21.6,
+                        "gpu_mem_peak_gb":  10.82,
+                        "ollama_ps":  null
                     }
                 ]
 }
