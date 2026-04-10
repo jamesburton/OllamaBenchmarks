@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 public enum Status { Active, Inactive, Pending }
 
-[JsonObject(MemberSerialization = MemberSerialization.OptOut)]
-public class PersonDto {
+public class PersonDto
+{
     [JsonPropertyName("full_name")]
     public string FullName { get; set; }
 

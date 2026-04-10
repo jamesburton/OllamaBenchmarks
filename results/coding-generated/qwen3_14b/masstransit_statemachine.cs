@@ -10,9 +10,9 @@ public class OrderState : SagaStateMachineInstance
     public DateTime? AcceptedAt { get; set; }
 }
 
-record OrderSubmitted(Guid OrderId, DateTime OrderDate);
-record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
-record OrderCompleted(Guid OrderId);
+public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+public record OrderCompleted(Guid OrderId);
 
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
@@ -39,16 +39,19 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         Initially(
             When(OrderSubmitted)
                 .Then(context => context.Saga.OrderDate = context.Message.OrderDate)
-                .TransitionTo(Submitted));
+                .TransitionTo(Submitted)
+        );
 
         During(Submitted,
             When(OrderAccepted)
                 .Then(context => context.Saga.AcceptedAt = context.Message.AcceptedAt)
-                .TransitionTo(Accepted));
+                .TransitionTo(Accepted)
+        );
 
         During(Accepted,
             When(OrderCompleted)
-                .Finalize());
+                .Finalize()
+        );
 
         SetCompletedWhenFinalized();
     }

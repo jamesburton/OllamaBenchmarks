@@ -7,12 +7,12 @@ public interface IWeatherService
     Task<WeatherForecast[]> GetForecastsAsync();
 }
 
-[StreamRendering]
 public class WeatherPageBase : ComponentBase
 {
     [Inject]
     public IWeatherService WeatherService { get; set; } = default!;
 
+    [StreamRendering]
     public WeatherForecast[]? Forecasts { get; set; } = null;
 
     protected override async Task OnInitializedAsync()

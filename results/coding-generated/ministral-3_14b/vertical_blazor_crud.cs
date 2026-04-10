@@ -17,25 +17,25 @@ public class TodoService : ITodoService
 
     public Task<List<TodoItem>> GetAllAsync() => Task.FromResult(new List<TodoItem>(_todos));
 
-    public Task<TodoItem> AddAsync(string title)
+    public async Task<TodoItem> AddAsync(string title)
     {
         var todo = new TodoItem(_nextId++, title, false);
         _todos.Add(todo);
-        return Task.FromResult(todo);
+        return await Task.FromResult(todo);
     }
 
-    public Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
         var todo = _todos.FirstOrDefault(t => t.Id == id);
         if (todo != null) _todos.Remove(todo);
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
-    public Task ToggleAsync(int id)
+    public async Task ToggleAsync(int id)
     {
         var todo = _todos.FirstOrDefault(t => t.Id == id);
         if (todo != null) todo.IsCompleted = !todo.IsCompleted;
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 }
 
@@ -101,10 +101,10 @@ public class TodoServiceTests
     {
         var service = new TodoService();
         var todo = await service.AddAsync("Test Title");
-        todo.IsCompleted.Should().BeFalse();
-
         await service.ToggleAsync(todo.Id);
-        (await service.GetAllAsync()).First().IsCompleted.Should().BeTrue();
+
+        var toggledTodo = (await service.GetAllAsync()).First();
+        toggledTodo.IsCompleted.Should().BeTrue();
     }
 }
 
@@ -113,13 +113,24 @@ public class TodoListBaseTests
     [Fact]
     public async Task OnInitializedAsync_CallsGetAllAsync()
     {
-        var ctx = Bunit.TestContext.Create();
         var service = Substitute.For<ITodoService>();
-        service.GetAllAsync().Returns(new List<TodoItem> { new(1, "Test", false) });
+        var component = new TodoListBase { TodoService = service };
+        await component.OnInitializedAsync();
 
-        var cut = ctx.RenderComponent<TodoListBase>(p => p.Add(x => x.TodoService, service));
+        await service.Received(1).GetAllAsync();
+    }
 
-        await cut.Instance.OnInitializedAsync();
-        await service.Received().GetAllAsync();
+    [Fact]
+    public async Task AddTodo_CallsAddAsyncAndReloadsList()
+    {
+        var service = Substitute.For<ITodoService>();
+        var component = new TodoListBase { TodoService = service, NewTitle = "Test" };
+        component.Todos = new List<TodoItem>();
+
+        await component.AddTodo();
+
+        await service.Received(1).AddAsync("Test");
+        await service.Received(1).GetAllAsync();
+        component.NewTitle.Should().BeEmpty();
     }
 }

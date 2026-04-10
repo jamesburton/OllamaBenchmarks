@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 public interface IOrderRepository { }
 
@@ -24,7 +26,7 @@ public class OrderSettings
     public int MaxRetries { get; set; }
 }
 
-static class ServiceCollectionExtensions
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config)
     {
@@ -32,7 +34,6 @@ static class ServiceCollectionExtensions
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddTransient<IEmailNotifier, EmailNotifier>();
-
         return services;
     }
 }

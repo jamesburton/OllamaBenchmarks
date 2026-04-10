@@ -18,8 +18,12 @@ public class ProductDbContext : DbContext
     private static Money ParseMoney(string s)
     {
         var parts = s.Split(':');
-        if (parts.Length != 2) throw new FormatException("Invalid money format");
-        if (!decimal.TryParse(parts[0], out var amount)) throw new FormatException("Invalid amount");
+        if (parts.Length != 2)
+            throw new FormatException("Invalid money format");
+
+        if (!decimal.TryParse(parts[0], out var amount))
+            throw new FormatException("Invalid amount format");
+
         return new Money(amount, parts[1]);
     }
 
@@ -37,7 +41,10 @@ public class ProductRepository
 {
     private readonly ProductDbContext _context;
 
-    public ProductRepository(ProductDbContext context) => _context = context;
+    public ProductRepository(ProductDbContext context)
+    {
+        _context = context;
+    }
 
     public async Task<Product> SaveAsync(Product product)
     {

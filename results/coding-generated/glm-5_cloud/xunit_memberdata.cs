@@ -5,22 +5,19 @@ public static class MathValidator
     public static bool IsPrime(int n)
     {
         if (n < 2) return false;
-        if (n == 2) return true;
-        if (n % 2 == 0) return false;
-
-        for (int i = 3; i * i <= n; i += 2)
+        for (int i = 2; i * i <= n; i++)
         {
             if (n % i == 0) return false;
         }
         return true;
     }
 
-    public static string Classify(int n) => n switch
+    public static string Classify(int n)
     {
-        < 0 => "negative",
-        0 => "zero",
-        > 0 => "positive"
-    };
+        if (n < 0) return "negative";
+        if (n == 0) return "zero";
+        return "positive";
+    }
 }
 
 public class MathValidatorTests

@@ -22,149 +22,205 @@ public class TodoService : ITodoService
     private static int _nextId = 1;
     private readonly List<TodoItem> _todos = new();
 
-    public async Task<List<TodoItem>> GetAllAsync() => await Task.FromResult(_todos.ToList());
+    public Task<List<TodoItem>> GetAllAsync() => Task.FromResult(_todos.AsReadOnly());
 
-    public async Task<TodoItem> AddAsync(string title)
+    public Task<TodoItem> AddAsync(string title)
     {
         var item = new TodoItem(_nextId++, title, false);
         _todos.Add(item);
-        return item;
+        return Task.FromResult(item);
     }
 
-    public async Task DeleteAsync(int id) => _todos.RemoveAll(t => t.Id == id);
-
-    public async Task ToggleAsync(int id)
+    public Task DeleteAsync(int id)
     {
-        var todo = _todos.FirstOrDefault(t => t.Id == id);
-        if (todo != null)
-            todo.IsCompleted = !todo.IsCompleted;
+        var index = _todos.FindIndex(t => t.Id == id);
+        if (index != -1)
+        {
+            _todos.RemoveAt(index);
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task ToggleAsync(int id)
+    {
+        var index = _todos.FindIndex(t => t.Id == id);
+        if (index != -1)
+        {
+            _todos[index] = _todos[index].WithIsCompleted(!(_todos[index].IsCompleted));
+        }
+        return Task.CompletedTask;
     }
 }
 
 public class TodoListBase : ComponentBase
 {
     [Inject]
-    public ITodoService TodoService { get; set; } = default!;
+    public ITodoService TodoService { get; set; } = null!;
 
     public List<TodoItem> Todos { get; set; } = new();
+
+    public string NewTitle { get; set; } = "";
 
     protected override async Task OnInitializedAsync()
     {
         Todos = await TodoService.GetAllAsync();
     }
 
-    public async Task AddTodo() => 
+    public async Task AddTodo()
+    {
         Todos.Add(await TodoService.AddAsync(NewTitle));
+        NewTitle = "";
+        await InvokeAsync(StateHasChanged);
+    }
 
-    public async Task DeleteTodo(int id) => 
-        Todos.RemoveAll(t => t.Id == id), await ReloadPage();
+    public async Task DeleteTodo(int id)
+    {
+        await TodoService.DeleteAsync(id);
+        Todos = await TodoService.GetAllAsync();
+    }
 
-    public async Task ToggleTodo(int id) => 
-        await TodoService.ToggleAsync(id), await ReloadPage();
+    public async Task ToggleTodo(int id)
+    {
+        await TodoService.ToggleAsync(id);
+        Todos = await TodoService.GetAllAsync();
+    }
 }
 
 public class TodoListBaseTests
 {
     [Fact]
-    public void AddAsync_CreatesNewItemWithCorrectTitle()
+    public async Task AddTodo_AddsNewItem()
     {
-        var service = Substitute.For<ITodoService>();
-        var component = RenderComponent<TodoListBase>(builder =>
-            builder.Add(c => c.TodoService, service));
+        // Arrange
+        var ctx = new TestContext();
+        var cut = ctx.RenderComponent<TodoListBase>();
 
-        component.InvokeAsync(() => component.AddTodo());
+        // Act
+        cut.Find("input").SetValue("Buy groceries");
+        cut.Find("button").Click();
+        var todos = await cut.Instance.GetAllTodosAsync();
 
-        service.Received().AddAsync(Arg.Any<string>());
+        // Assert
+        Assert.Equal(1, todos.Count);
+        Assert.Equal("Buy groceries", todos[0].Title);
+        Assert.False(todos[0].IsCompleted);
     }
 
     [Fact]
-    public void DeleteAsync_RemovesItem()
+    public async Task DeleteTodo_RemovesItem()
     {
-        var service = Substitute.For<ITodoService>();
-        var component = RenderComponent<TodoListBase>(builder =>
-            builder.Add(c => c.TodoService, service));
+        // Arrange
+        var ctx = new TestContext();
+        var cut = ctx.RenderComponent<TodoListBase>();
+        var item = await cut.Instance.AddTodoAsync("Test item");
+        var todos = await cut.Instance.GetAllTodosAsync();
 
-        var todo = new TodoItem(1, "Test", false);
-        service.GetAllAsync().Returns(new List<TodoItem> { todo });
+        // Act
+        cut.Find($"[data-id='{item.Id}'].delete").Click();
+        var updatedTodos = await cut.Instance.GetAllTodosAsync();
 
-        component.InvokeAsync(() => component.DeleteTodo(1));
-        service.Received().DeleteAsync(1);
-
-        Assert.Empty(component.FindComponent<TodoListBase>().Todos);
+        // Assert
+        Assert.Equal(todos.Count - 1, updatedTodos.Count);
+        Assert.DoesNotContain(updatedTodos, t => t.Id == item.Id);
     }
 
     [Fact]
-    public void ToggleAsync_FlipsIsCompleted()
+    public async Task ToggleTodo_TogglesCompleted()
     {
-        var service = Substitute.For<ITodoService>();
-        var component = RenderComponent<TodoListBase>(builder =>
-            builder.Add(c => c.TodoService, service));
+        // Arrange
+        var ctx = new TestContext();
+        var cut = ctx.RenderComponent<TodoListBase>();
+        var item = await cut.Instance.AddTodoAsync("Test item");
+        var todos = await cut.Instance.GetAllTodosAsync();
 
-        var todo = new TodoItem(1, "Test", false);
-        service.GetAllAsync().Returns(new List<TodoItem> { todo });
+        // Act
+        cut.Find($"[data-id='{item.Id}'].toggle").Click();
+        var updatedTodos = await cut.Instance.GetAllTodosAsync();
 
-        component.InvokeAsync(() => component.ToggleTodo(1));
-        Assert.True(component.FindComponent<TodoListBase>().Todos.First().IsCompleted);
+        // Assert
+        Assert.NotEqual(todos[0].IsCompleted, updatedTodos[0].IsCompleted);
     }
 }
 
 public class TodoServiceTests
 {
     [Fact]
-    public async Task GetAllAsync_ReturnsCopyOfTodos()
+    public async Task GetAllAsync_ReturnsTodos()
     {
+        // Arrange
         var service = Substitute.For<ITodoService>();
-        var todos = new List<TodoItem> { new(1, "Test", false) };
-        service.GetAllAsync().Returns(todos);
+        var ctx = new TestContext();
+        var cut = ctx.RenderComponent<TodoListBase>();
+        cut.Instance.TodoService = service;
 
-        var component = RenderComponent<TodoListBase>(builder =>
-            builder.Add(c => c.TodoService, service));
+        // Act
+        service.GetAllAsync().Returns(new List<TodoItem>
+        {
+            new(1, "Buy groceries", false),
+            new(2, "Read book", false)
+        });
 
-        Assert.Equal(todos, await component.InvokeAsync(() => component.Todos));
+        // Assert
+        var todos = await cut.Instance.GetAllTodosAsync();
+        Assert.Equal(2, todos.Count);
+        Assert.Equal("Buy groceries", todos[0].Title);
+        Assert.Equal("Read book", todos[1].Title);
     }
 
     [Fact]
-    public async Task AddAsync_CreatesNewItemWithCorrectId()
+    public async Task AddAsync_AddsNewItem()
     {
+        // Arrange
         var service = Substitute.For<ITodoService>();
-        service.GetAllAsync().Returns(new List<TodoItem>());
-        service.AddAsync("Test").Returns(new TodoItem(1, "Test", false));
+        var ctx = new TestContext();
+        var cut = ctx.RenderComponent<TodoListBase>();
+        cut.Instance.TodoService = service;
 
-        var component = RenderComponent<TodoListBase>(builder =>
-            builder.Add(c => c.TodoService, service));
+        // Act
+        service.AddAsync("Test item").Returns(new TodoItem(1, "Test item", false));
 
-        await component.InvokeAsync(() => component.AddTodo());
-
-        Assert.Equal(1, component.FindComponent<TodoListBase>().Todos.First().Id);
+        // Assert
+        var todos = await cut.Instance.GetAllTodosAsync();
+        Assert.Equal(1, todos.Count);
+        Assert.Equal("Test item", todos[0].Title);
     }
 
     [Fact]
     public async Task DeleteAsync_RemovesItem()
     {
+        // Arrange
         var service = Substitute.For<ITodoService>();
-        var todos = new List<TodoItem> { new(1, "Test", false) };
-        service.GetAllAsync().Returns(todos);
-        service.DeleteAsync(1).Returns(Task.CompletedTask);
+        var ctx = new TestContext();
+        var cut = ctx.RenderComponent<TodoListBase>();
+        cut.Instance.TodoService = service;
+        var item = await cut.Instance.AddTodoAsync("Test item");
+        var todos = await cut.Instance.GetAllTodosAsync();
 
-        var component = RenderComponent<TodoListBase>(builder =>
-            builder.Add(c => c.TodoService, service));
+        // Act
+        service.DeleteAsync(item.Id).WithoutException();
+        var updatedTodos = await cut.Instance.GetAllTodosAsync();
 
-        await component.InvokeAsync(() => component.DeleteTodo(1));
-        Assert.Empty(component.FindComponent<TodoListBase>().Todos);
+        // Assert
+        Assert.Equal(todos.Count - 1, updatedTodos.Count);
+        Assert.DoesNotContain(updatedTodos, t => t.Id == item.Id);
     }
 
     [Fact]
-    public async Task ToggleAsync_FlipsIsCompleted()
+    public async Task ToggleAsync_TogglesCompleted()
     {
+        // Arrange
         var service = Substitute.For<ITodoService>();
-        var todos = new List<TodoItem> { new(1, "Test", false) };
-        service.GetAllAsync().Returns(todos);
-        service.ToggleAsync(1).Returns(Task.CompletedTask);
+        var ctx = new TestContext();
+        var cut = ctx.RenderComponent<TodoListBase>();
+        cut.Instance.TodoService = service;
+        var item = await cut.Instance.AddTodoAsync("Test item");
+        var todos = await cut.Instance.GetAllTodosAsync();
 
-        var component = RenderComponent<TodoListBase>(builder =>
-            builder.Add(c => c.TodoService, service));
+        // Act
+        service.ToggleAsync(item.Id).WithoutException();
+        var updatedTodos = await cut.Instance.GetAllTodosAsync();
 
-        await component.InvokeAsync(() => component.ToggleTodo(1));
-        Assert.True(component.FindComponent<TodoListBase>().Todos.First().IsCompleted);
+        // Assert
+        Assert.NotEqual(todos[0].IsCompleted, updatedTodos[0].IsCompleted);
     }
 }

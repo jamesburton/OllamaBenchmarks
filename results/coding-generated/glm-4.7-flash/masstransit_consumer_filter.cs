@@ -3,8 +3,8 @@ using MassTransit;
 
 namespace Contracts;
 
-record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
-record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
+public record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
+public record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
 
 public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
 {
@@ -26,7 +26,10 @@ public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymen
         ConcurrentMessageLimit = 2;
     }
 
-    protected override void ConfigureConsumer(IReceiveEndpointConfigurator ep, IConsumerConfigurator<ProcessPaymentConsumer> consumer, IRegistrationContext ctx)
+    protected override void ConfigureConsumer(
+        IReceiveEndpointConfigurator ep,
+        IConsumerConfigurator<ProcessPaymentConsumer> consumer,
+        IRegistrationContext ctx)
     {
         ep.UseMessageRetry(r => r.Interval(2, 500));
     }

@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+
+public record NotFound;
+public record ValidationError(string Message);
+
 public class User
 {
     public int Id { get; set; }
@@ -5,15 +11,13 @@ public class User
     public string Email { get; set; }
 }
 
-public record NotFound;
-
-public record ValidationError(string Message);
-
 public interface IUserService
 {
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
+[ApiController]
+[Route("api/users")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -23,13 +27,14 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
+    [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
         var result = await _userService.GetByIdAsync(id);
-        return result.Match(
+        return result.Match<IActionResult>(
             user => Ok(user),
             _ => NotFound(),
-            error => BadRequest(error.Message)
+            err => BadRequest(err.Message)
         );
     }
 }

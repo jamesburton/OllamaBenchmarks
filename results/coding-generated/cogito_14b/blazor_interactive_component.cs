@@ -1,28 +1,25 @@
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorApp.Components
+public class CounterBase : ComponentBase
 {
-    public class CounterBase : ComponentBase
+    [Parameter]
+    public int InitialCount { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnCountChanged { get; set; }
+
+    private int currentCount;
+
+    protected override void OnInitialized()
     {
-        [Parameter]
-        public int InitialCount { get; set; }
-
-        [Parameter]
-        public EventCallback<int> OnCountChanged { get; set; }
-
-        private int currentCount;
-
-        protected override void OnInitialized()
-        {
-            currentCount = InitialCount;
-        }
-
-        public void IncrementCount()
-        {
-            currentCount++;
-            OnCountChanged.InvokeAsync(currentCount);
-        }
-
-        public int CurrentCount => currentCount;
+        currentCount = InitialCount;
     }
+
+    public async Task IncrementCount()
+    {
+        currentCount++;
+        await OnCountChanged.InvokeAsync(currentCount);
+    }
+
+    public int CurrentCount => currentCount;
 }

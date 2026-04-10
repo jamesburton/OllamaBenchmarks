@@ -18,19 +18,15 @@ public class DataProcessor
             {
                 yield break;
             }
-
             var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
-
-            if (batch.Count == 0)
+            if (!batch.Any())
             {
                 break;
             }
-
             foreach (var item in batch)
             {
                 yield return item;
             }
-
             batchNumber++;
         }
     }

@@ -58,6 +58,7 @@ public class OrderService
 
         var order = new Order
         {
+            Id = 0,
             CustomerName = request.CustomerName,
             Items = request.Items,
             Total = total,
@@ -73,79 +74,90 @@ public class OrderService
 public class OrderServiceTests
 {
     [Fact]
-    public void CreateOrder_ValidRequest_ReturnsOrderAndSaves()
+    public void CreateOrder_Should_ReturnValidationError_WhenCustomerNameIsEmpty()
     {
         // Arrange
         var repository = Substitute.For<IOrderRepository>();
         var service = new OrderService(repository);
-        var request = new CreateOrderRequest
-        {
-            CustomerName = "Test Customer",
-            Items = new List<OrderItem>
-            {
-                new OrderItem { ProductName = "Item 1", Quantity = 2, UnitPrice = 10.5m },
-                new OrderItem { ProductName = "Item 2", Quantity = 1, UnitPrice = 5.0m }
-            }
+        var request = new CreateOrderRequest 
+        { 
+            CustomerName = "", 
+            Items = new List<OrderItem> { new OrderItem() } 
         };
 
         // Act
         var result = service.CreateOrder(request);
 
         // Assert
-        result.IsT0.Should().BeTrue("Result should be an Order");
-        var order = result.AsT0;
+        var error = result.Match<ValidationError>(
+            order => null,
+            err => err
+        );
 
-        order.Should().NotBeNull();
-        order.CustomerName.Should().Be("Test Customer");
-        order.Total.Should().Be(26.0m); // (2 * 10.5) + (1 * 5.0)
-        order.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-
-        repository.Received().Save(order);
-    }
-
-    [Fact]
-    public void CreateOrder_MissingCustomerName_ReturnsValidationError()
-    {
-        // Arrange
-        var repository = Substitute.For<IOrderRepository>();
-        var service = new OrderService(repository);
-        var request = new CreateOrderRequest
-        {
-            CustomerName = "",
-            Items = new List<OrderItem> { new OrderItem { ProductName = "P1", Quantity = 1, UnitPrice = 1 } }
-        };
-
-        // Act
-        var result = service.CreateOrder(request);
-
-        // Assert
-        result.IsT1.Should().BeTrue("Result should be a ValidationError");
-        var error = result.AsT1;
-
+        error.Should().NotBeNull();
         error.Message.Should().Be("Customer name is required");
         repository.DidNotReceive().Save(Arg.Any<Order>());
     }
 
     [Fact]
-    public void CreateOrder_EmptyItems_ReturnsValidationError()
+    public void CreateOrder_Should_ReturnValidationError_WhenItemsAreEmpty()
     {
         // Arrange
         var repository = Substitute.For<IOrderRepository>();
         var service = new OrderService(repository);
-        var request = new CreateOrderRequest
-        {
-            CustomerName = "Valid Name",
-            Items = new List<OrderItem>()
+        var request = new CreateOrderRequest 
+        { 
+            CustomerName = "Test Customer", 
+            Items = new List<OrderItem>() 
         };
 
         // Act
         var result = service.CreateOrder(request);
 
         // Assert
-        result.IsT1.Should().BeTrue("Result should be a ValidationError");
-        var error = result.AsT1;
+        var error = result.Match<ValidationError>(
+            order => null,
+            err => err
+        );
 
+        error.Should().NotBeNull();
         error.Message.Should().Be("At least one item is required");
-        repository.DidNotReceive().Save(Arg.Any<Order>());
+    }
+
+    [Fact]
+    public void CreateOrder_Should_CreateOrderAndSave_WhenRequestIsValid()
+    {
+        // Arrange
+        var repository = Substitute.For<IOrderRepository>();
+        var service = new OrderService(repository);
+        var items = new List<OrderItem>
+        {
+            new OrderItem { ProductName = "Item 1", Quantity = 2, UnitPrice = 10.0m },
+            new OrderItem { ProductName = "Item 2", Quantity = 1, UnitPrice = 5.0m }
+        };
+        var request = new CreateOrderRequest 
+        { 
+            CustomerName = "John Doe", 
+            Items = items 
+        };
+
+        // Act
+        var result = service.CreateOrder(request);
+
+        // Assert
+        var order = result.Match<Order>(
+            o => o,
+            err => null
+        );
+
+        order.Should().NotBeNull();
+        order.CustomerName.Should().Be("John Doe");
+        order.Total.Should().Be(25.0m); // (2 * 10) + (1 * 5)
+        order.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+
+        repository.Received(1).Save(Arg.Is<Order>(o => 
+            o.CustomerName == "John Doe" && 
+            o.Total == 25.0m
+        ));
     }
 }

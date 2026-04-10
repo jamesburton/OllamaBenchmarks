@@ -12,26 +12,51 @@ public record CustomerNotified(Guid OrderId, string NotificationMessage);
 
 public class PlaceOrderConsumer : IConsumer<PlaceOrder>
 {
-    public Task Consume(ConsumeContext<PlaceOrder> context)
+    public async Task Consume(ConsumeContext<PlaceOrder> context)
     {
-        return context.Publish(new OrderPlaced(context.Message.OrderId, context.Message.CustomerName));
+        var message = context.Message;
+        await context.Publish(new OrderPlaced(message.OrderId, message.CustomerName));
     }
 }
 
 public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
 {
-    public Task Consume(ConsumeContext<OrderPlaced> context)
+    public async Task Consume(ConsumeContext<OrderPlaced> context)
     {
         var message = context.Message;
-        return context.Publish(new CustomerNotified(message.OrderId, $"Order {message.OrderId} confirmed for {message.CustomerName}"));
+        await context.Publish(new CustomerNotified(
+            message.OrderId,
+            $"Order {message.OrderId} confirmed for {message.CustomerName}"
+        ));
     }
 }
 
-public class ConsumerTests : IAsyncLifetime
+public class ConsumerPipelineTests
 {
-    private ITestHarness _harness;
+    [Fact]
+    public async Task PlaceOrderConsumer_PublishesOrderPlaced()
+    {
+        var services = new ServiceCollection();
+        services.AddMassTransitTestHarness(cfg =>
+        {
+            cfg.AddConsumer<PlaceOrderConsumer>();
+        });
 
-    public async ValueTask InitializeAsync()
+        var harness = services.BuildServiceProvider().GetRequiredService<ITestHarness>();
+        await harness.Start();
+
+        var orderId = Guid.NewGuid();
+        var customerName = "John Doe";
+        await harness.Bus.Publish(new PlaceOrder(orderId, customerName));
+
+        Assert.True(await harness.Consumed.Any<OrderPlaced>());
+        Assert.True(await harness.Published.Any<OrderPlaced>());
+
+        await harness.Stop();
+    }
+
+    [Fact]
+    public async Task FullPipeline_PublishesOrderPlacedAndCustomerNotified()
     {
         var services = new ServiceCollection();
         services.AddMassTransitTestHarness(cfg =>
@@ -40,33 +65,18 @@ public class ConsumerTests : IAsyncLifetime
             cfg.AddConsumer<NotifyCustomerConsumer>();
         });
 
-        _harness = services.BuildServiceProvider().GetRequiredService<ITestHarness>();
-        await _harness.Start();
-    }
+        var harness = services.BuildServiceProvider().GetRequiredService<ITestHarness>();
+        await harness.Start();
 
-    public async ValueTask DisposeAsync()
-    {
-        await _harness.Stop();
-    }
+        var orderId = Guid.NewGuid();
+        var customerName = "Jane Smith";
+        await harness.Bus.Publish(new PlaceOrder(orderId, customerName));
 
-    [Fact]
-    public async Task PlaceOrderConsumer_PublishesOrderPlaced()
-    {
-        var order = new PlaceOrder(Guid.NewGuid(), "John Doe");
-        await _harness.Bus.Publish(order);
+        Assert.True(await harness.Consumed.Any<OrderPlaced>());
+        Assert.True(await harness.Consumed.Any<CustomerNotified>());
+        Assert.True(await harness.Published.Any<OrderPlaced>());
+        Assert.True(await harness.Published.Any<CustomerNotified>());
 
-        await _harness.Consumed.Any<PlaceOrder>();
-        await _harness.Published.Any<OrderPlaced>();
-    }
-
-    [Fact]
-    public async Task FullPipeline_PublishesCustomerNotified()
-    {
-        var order = new PlaceOrder(Guid.NewGuid(), "Jane Smith");
-        await _harness.Bus.Publish(order);
-
-        await _harness.Consumed.Any<PlaceOrder>();
-        await _harness.Published.Any<OrderPlaced>();
-        await _harness.Published.Any<CustomerNotified>();
+        await harness.Stop();
     }
 }

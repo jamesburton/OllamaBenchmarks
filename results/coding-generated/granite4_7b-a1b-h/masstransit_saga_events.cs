@@ -1,11 +1,6 @@
 global using Contracts;
 using MassTransit;
-
 namespace Contracts;
-
-public record InvoiceCreated(Guid InvoiceId, decimal Amount);
-public record InvoiceApproved(Guid InvoiceId);
-public record InvoicePaid(Guid InvoiceId);
 
 public class InvoiceSaga : SagaStateMachineInstance
 {
@@ -14,16 +9,15 @@ public class InvoiceSaga : SagaStateMachineInstance
     public decimal Amount { get; set; }
 }
 
+public record InvoiceCreated(Guid InvoiceId, decimal Amount);
+public record InvoiceApproved(Guid InvoiceId);
+public record InvoicePaid(Guid InvoiceId);
+
 public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 {
-    public State Pending { get; private set; }
-    public State Approved { get; private set; }
-    public State Paid { get; private set; }
-
     public InvoiceStateMachine()
     {
         InstanceState(x => x.CurrentState);
-
         Event(() => InvoiceCreated, x => x.CorrelateById(m => m.InvoiceId));
         Event(() => InvoiceApproved, x => x.CorrelateById(m => m.InvoiceId));
         Event(() => InvoicePaid, x => x.CorrelateById(m => m.InvoiceId));

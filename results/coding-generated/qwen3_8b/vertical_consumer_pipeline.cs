@@ -1,9 +1,7 @@
 global using Contracts;
-
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace Contracts
 {
@@ -23,7 +21,10 @@ namespace Contracts
     {
         public async Task Consume(ConsumeContext<OrderPlaced> context)
         {
-            await context.Publish(new CustomerNotified(context.Message.OrderId, $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}"));
+            await context.Publish(new CustomerNotified(
+                context.Message.OrderId,
+                $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}"
+            ));
         }
     }
 }
@@ -49,18 +50,17 @@ public class OrderTests : IAsyncLifetime
     [Fact]
     public async Task PlaceOrder_ConsumedAndOrderPlacedPublished()
     {
-        await _harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "Alice"));
-
-        await _harness.Consumed.Any<PlaceOrder>();
-        await _harness.Published.Any<OrderPlaced>();
+        await _harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "John Doe"));
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
     }
 
     [Fact]
     public async Task FullPipeline_OrderPlacedAndCustomerNotifiedPublished()
     {
-        await _harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "Bob"));
-
-        await _harness.Published.Any<OrderPlaced>();
-        await _harness.Published.Any<CustomerNotified>();
+        await _harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "Jane Smith"));
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
+        Assert.True(await _harness.Published.Any<CustomerNotified>());
     }
 }

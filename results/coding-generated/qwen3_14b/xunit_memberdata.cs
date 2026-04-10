@@ -7,22 +7,45 @@ public static class MathValidator
 
     public static bool IsPrime(int n)
     {
-        if (n < 2) return false;
-        if (n == 2) return true;
-        if (n % 2 == 0) return false;
+        if (n < 2)
+        {
+            return false;
+        }
+
+        if (n == 2)
+        {
+            return true;
+        }
+
+        if (n % 2 == 0)
+        {
+            return false;
+        }
+
         int sqrtN = (int)Math.Sqrt(n);
         for (int i = 3; i <= sqrtN; i += 2)
         {
             if (n % i == 0)
+            {
                 return false;
+            }
         }
+
         return true;
     }
 
     public static string Classify(int n)
     {
-        if (n < 0) return "negative";
-        if (n == 0) return "zero";
+        if (n < 0)
+        {
+            return "negative";
+        }
+
+        if (n == 0)
+        {
+            return "zero";
+        }
+
         return "positive";
     }
 }

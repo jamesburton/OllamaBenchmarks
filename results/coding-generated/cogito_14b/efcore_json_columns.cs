@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
-[ComplexType]
 public class Address
 {
     public string Street { get; set; }
@@ -17,27 +14,23 @@ public class Company
 
 public class CompanyDbContext : DbContext
 {
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) 
-        : base(options) { }
-
     public DbSet<Company> Companies { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.Entity<Company>()
-            .Property(c => c.HeadquartersAddress)
-            .HasJsonConversion();
+        builder.Entity<Company>()
+            .OwnsOne(c => c.HeadquartersAddress, b => b.ToJson());
     }
 }
 
 public static class CompanyQueries
 {
-    public static async Task<List<Company>> FindCompaniesByCity(
-        CompanyDbContext db, 
-        string city)
+    public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        return await db.Companies
+        return db.Companies
             .Where(c => c.HeadquartersAddress.City == city)
-            .ToListAsync();
+            .ToList();
     }
 }

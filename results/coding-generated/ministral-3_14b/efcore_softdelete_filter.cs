@@ -37,8 +37,7 @@ public class ArticleRepository
 
     public async Task SoftDeleteAsync(int id)
     {
-        var article = await _context.Articles
-            .IgnoreQueryFilters()
+        var article = await _context.Articles.IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (article != null)
@@ -55,8 +54,6 @@ public class ArticleRepository
 
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        return await _context.Articles
-            .IgnoreQueryFilters()
-            .ToListAsync();
+        return await _context.Articles.IgnoreQueryFilters().ToListAsync();
     }
 }

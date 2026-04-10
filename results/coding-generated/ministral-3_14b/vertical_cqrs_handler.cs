@@ -102,8 +102,7 @@ public class CreateProductCommandHandlerTests
         // Assert
         result.Should().BeOfType<OneOf<Product, ValidationError, DuplicateError>>();
         result.IsT2.Should().BeTrue();
-        result.AsT2.Should().BeOfType<DuplicateError>();
-        result.AsT2.ExistingName.Should().Be("Duplicate");
+        result.AsT2.Should().Be("Duplicate");
     }
 
     [Fact]

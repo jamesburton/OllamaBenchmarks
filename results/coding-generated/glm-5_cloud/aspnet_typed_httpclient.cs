@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 
 public record GitHubUser(
-    [JsonPropertyName("login")] string Login,
-    [JsonPropertyName("name")] string Name,
-    [JsonPropertyName("public_repos")] int PublicRepos
+    [property: JsonPropertyName("login")] string Login,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("public_repos")] int PublicRepos
 );
 
 public interface IGitHubClient
@@ -22,9 +22,9 @@ public class GitHubClient : IGitHubClient
         _httpClient = httpClient;
     }
 
-    public Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
+    public async Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
     {
-        return _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
+        return await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
     }
 }
 

@@ -71,6 +71,23 @@ def load_task(yaml_path: str, references_dir: str) -> dict:
     return task
 
 
+def _get_think_setting(model: str):
+    """Return think parameter for the model.
+
+    - False for models where thinking mode tanks throughput (gemma4)
+    - None (omit) for models that crash with think=false (qwen3-coder-next)
+    - Config override if set in prompt_configs
+    """
+    config = _load_prompt_config(model)
+    if config and "think" in config:
+        return config["think"]
+    # Gemma4 models: thinking mode makes them 10-100x slower
+    if model.startswith("gemma4"):
+        return False
+    # Default: omit (let Ollama decide) — safest for unknown models
+    return None
+
+
 def _load_prompt_config(model: str) -> dict | None:
     """Load prompt optimizer config for a model, if it exists."""
     config_dir = os.path.join(os.path.dirname(__file__), "..", "prompt_configs")
@@ -106,6 +123,11 @@ def call_ollama(
         options.update(config["sampling"])
     messages.append({"role": "user", "content": prompt})
 
+    # Disable thinking for models where it tanks throughput without helping code quality.
+    # Some models (qwen3-coder-next on Ollama 0.20.2) crash with 500 when think=false,
+    # so only disable for known-safe models. Others fall back to message.thinking below.
+    think_setting = _get_think_setting(model)
+
     payload = {
         "model": model,
         "messages": messages,
@@ -119,6 +141,8 @@ def call_ollama(
             "seed": seed,
         },
     }
+    if think_setting is not None:
+        payload["think"] = think_setting
     data = json.dumps(payload).encode("utf-8")
     max_retries = 5
     for attempt in range(max_retries):

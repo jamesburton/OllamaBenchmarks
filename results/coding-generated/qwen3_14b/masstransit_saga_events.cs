@@ -5,7 +5,7 @@ namespace Contracts;
 public class InvoiceSaga : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; }
+    public string CurrentState { get; set; } = string.Empty;
     public decimal Amount { get; set; }
 }
 

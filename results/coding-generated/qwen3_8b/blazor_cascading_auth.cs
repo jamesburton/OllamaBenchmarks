@@ -1,11 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
-public interface IUserService
-{
-    Task<string> GetDisplayNameAsync(string userId);
-}
-
 public class UserDashboard : ComponentBase
 {
     [CascadingParameter]
@@ -32,4 +27,9 @@ public class UserDashboard : ComponentBase
             DisplayName = "Guest";
         }
     }
+}
+
+public interface IUserService
+{
+    Task<string> GetDisplayNameAsync(string userId);
 }

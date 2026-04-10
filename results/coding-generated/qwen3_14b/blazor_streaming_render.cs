@@ -11,7 +11,7 @@ public interface IWeatherService
 public class WeatherPageBase : ComponentBase
 {
     [Inject]
-    public IWeatherService WeatherService { get; set; } = default!;
+    public IWeatherService WeatherService { get; set; }
 
     public WeatherForecast[]? Forecasts { get; set; } = null;
 

@@ -28,11 +28,11 @@ public interface ITodoService
 
 public class TodoService : ITodoService
 {
-    private readonly TodoDbContext _db;
+    private readonly TodoDbContext db;
 
     public TodoService(TodoDbContext db)
     {
-        _db = db;
+        this.db = db;
     }
 
     public async Task<TodoItem> CreateAsync(string title)
@@ -44,44 +44,40 @@ public class TodoService : ITodoService
             CreatedAt = DateTime.UtcNow
         };
 
-        _db.TodoItems.Add(item);
-        await _db.SaveChangesAsync();
+        db.TodoItems.Add(item);
+        await db.SaveChangesAsync();
         return item;
     }
 
     public async Task<List<TodoItem>> GetAllAsync()
     {
-        return await _db.TodoItems.ToListAsync();
+        return await db.TodoItems.ToListAsync();
     }
 
     public async Task<TodoItem?> GetByIdAsync(int id)
     {
-        return await _db.TodoItems.FindAsync(id);
+        return await db.TodoItems.FindAsync(id);
     }
 
     public async Task<bool> CompleteAsync(int id)
     {
-        var item = await _db.TodoItems.FindAsync(id);
+        var item = await db.TodoItems.FindAsync(id);
         if (item == null)
-        {
             return false;
-        }
 
         item.IsComplete = true;
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var item = await _db.TodoItems.FindAsync(id);
+        var item = await db.TodoItems.FindAsync(id);
         if (item == null)
-        {
             return false;
-        }
 
-        _db.TodoItems.Remove(item);
-        await _db.SaveChangesAsync();
+        db.TodoItems.Remove(item);
+        await db.SaveChangesAsync();
         return true;
     }
 }

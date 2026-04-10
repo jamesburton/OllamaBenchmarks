@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
         var result = await _userService.GetByIdAsync(id);
         return result.Match<IActionResult>(
             user => Ok(user),
-            _ => NotFound(),
+            notFound => NotFound(),
             error => BadRequest(error.Message)
         );
     }

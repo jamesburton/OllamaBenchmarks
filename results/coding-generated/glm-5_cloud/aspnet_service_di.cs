@@ -35,7 +35,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddTransient<IEmailNotifier, EmailNotifier>();
-
         services.Configure<OrderSettings>(config.GetSection("Orders"));
 
         return services;

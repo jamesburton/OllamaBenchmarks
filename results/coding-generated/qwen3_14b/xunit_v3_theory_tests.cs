@@ -41,7 +41,7 @@ public class StringProcessorTests
     [InlineData("hello", 1)]
     [InlineData("   hello   ", 1)]
     [InlineData("hello world", 2)]
-    [InlineData("   multiple   spaces   ", 3)]
+    [InlineData("   hello   world   ", 2)]
     public void TestCountWords(string input, int expected)
     {
         var processor = new StringProcessor();
@@ -53,8 +53,8 @@ public class StringProcessorTests
     [InlineData(null, false)]
     [InlineData("", false)]
     [InlineData("a", true)]
-    [InlineData("abba", true)]
-    [InlineData("abc", false)]
+    [InlineData("madam", true)]
+    [InlineData("hello", false)]
     [InlineData("Racecar", true)]
     [InlineData("A man a plan a canal Panama", true)]
     public void TestIsPalindrome(string input, bool expected)

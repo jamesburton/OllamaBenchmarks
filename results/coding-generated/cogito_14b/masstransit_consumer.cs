@@ -1,47 +1,33 @@
 using MassTransit;
-using System;
 
-namespace OrderProcessing
+global using Contracts;
+
+namespace Contracts;
+
+public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
+
+public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
+
+public class SubmitOrderConsumer : IConsumer<SubmitOrder>
 {
-    public record SubmitOrder
+    public async Task Consume(ConsumeContext<SubmitOrder> context)
     {
-        public Guid OrderId { get; init; }
-        public string CustomerName { get; init; }
-        public decimal Amount { get; init; }
+        await context.Publish(new OrderSubmitted(context.Message.OrderId, DateTime.UtcNow));
+    }
+}
+
+public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
+{
+    public SubmitOrderConsumerDefinition()
+    {
+        ConcurrentMessageLimit = 4;
     }
 
-    public record OrderSubmitted
+    protected override void ConfigureConsumer(
+        IReceiveEndpointConfigurator ep,
+        IConsumerConfigurator<SubmitOrderConsumer> consumer,
+        IRegistrationContext ctx)
     {
-        public Guid OrderId { get; init; }
-        public DateTime SubmittedAt { get; init; }
-    }
-
-    public class SubmitOrderConsumer : IConsumer<SubmitOrder>
-    {
-        public async Task Consume(ConsumeContext<SubmitOrder> context)
-        {
-            var order = context.Message;
-            await context.Publish(new OrderSubmitted
-            {
-                OrderId = order.OrderId,
-                SubmittedAt = DateTime.UtcNow
-            });
-        }
-    }
-
-    public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
-    {
-        public SubmitOrderConsumerDefinition()
-        {
-            ConcurrentMessageLimit = 4;
-        }
-
-        protected override void ConfigureConsumer(
-            IReceiveEndpointConfigurator ep,
-            IConsumerConfigurator<SubmitOrderConsumer> consumer,
-            IRegistrationContext ctx)
-        {
-            ep.UseMessageRetry(r => r.Interval(3, 1000));
-        }
+        ep.UseMessageRetry(r => r.Interval(3, 1000));
     }
 }

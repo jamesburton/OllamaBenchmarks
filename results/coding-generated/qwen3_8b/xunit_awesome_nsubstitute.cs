@@ -26,41 +26,31 @@ public class NotificationService(IUserRepository repo, IEmailService email)
     }
 }
 
-public class NotificationServiceTests
+[Fact]
+public async Task TestHappyPath()
 {
-    [Fact]
-    public async Task NotifyUserAsync_HappyPath_UserFoundAndEmailSent()
-    {
-        // Arrange
-        var repo = Substitute.For<IUserRepository>();
-        var email = Substitute.For<IEmailService>();
-        var service = new NotificationService(repo, email);
+    var repo = Substitute.For<IUserRepository>();
+    var email = Substitute.For<IEmailService>();
+    var service = new NotificationService(repo, email);
 
-        var user = new User { Id = 1, Email = "test@example.com" };
-        repo.GetByIdAsync(1).Returns(user);
+    var user = new User { Id = 1, Name = "John", Email = "john@example.com" };
+    repo.GetByIdAsync(1).Returns(user);
 
-        // Act
-        await service.NotifyUserAsync(1);
+    await service.NotifyUserAsync(1);
 
-        // Assert
-        await email.Received().SendWelcomeAsync("test@example.com");
-        await repo.Received().GetByIdAsync(1);
-    }
+    email.Received().SendWelcomeAsync(user.Email);
+    repo.Received().GetByIdAsync(1);
+}
 
-    [Fact]
-    public async Task NotifyUserAsync_UserNotFound_ThrowsException()
-    {
-        // Arrange
-        var repo = Substitute.For<IUserRepository>();
-        var email = Substitute.For<IEmailService>();
-        var service = new NotificationService(repo, email);
+[Fact]
+public async Task TestUserNotFound()
+{
+    var repo = Substitute.For<IUserRepository>();
+    var email = Substitute.For<IEmailService>();
+    var service = new NotificationService(repo, email);
 
-        repo.GetByIdAsync(2).Returns((User?)null);
+    repo.GetByIdAsync(1).Returns((User?)null);
 
-        // Act
-        var act = async () => await service.NotifyUserAsync(2);
-
-        // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>();
-    }
+    var act = () => service.NotifyUserAsync(1);
+    await act.Should().ThrowAsync<InvalidOperationException>();
 }

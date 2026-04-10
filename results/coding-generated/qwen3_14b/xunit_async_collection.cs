@@ -34,23 +34,25 @@ public class CounterFixture : IAsyncLifetime
     }
 }
 
+[Collection("Counter")]
 public class CounterFirstTests(CounterFixture fixture)
 {
     [Fact]
     public void Increment_ShouldIncreaseCount()
     {
         fixture.Counter.Increment();
-        fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
+        fixture.Counter.Count.Should().BeGreaterOrEqual(1);
     }
 }
 
+[Collection("Counter")]
 public class CounterSecondTests(CounterFixture fixture)
 {
     [Fact]
-    public void IncrementTwice_ShouldIncreaseCountToAtLeastTwo()
+    public void IncrementTwice_ShouldIncreaseCountToTwo()
     {
         fixture.Counter.Increment();
         fixture.Counter.Increment();
-        fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
+        fixture.Counter.Count.Should().BeGreaterOrEqual(2);
     }
 }

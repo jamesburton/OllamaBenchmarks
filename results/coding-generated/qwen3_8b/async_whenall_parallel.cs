@@ -18,12 +18,14 @@ public class ParallelDataService
 
     public async Task<List<string>> LoadAllAsync(CancellationToken ct)
     {
-        var taskA = loaderA.LoadAsync("sourceA", ct);
-        var taskB = loaderB.LoadAsync("sourceB", ct);
-        var taskC = loaderC.LoadAsync("sourceC", ct);
+        var tasks = new[]
+        {
+            loaderA.LoadAsync("sourceA", ct),
+            loaderB.LoadAsync("sourceB", ct),
+            loaderC.LoadAsync("sourceC", ct)
+        };
 
-        var results = await Task.WhenAll(taskA, taskB, taskC);
-
-        return new List<string> { results[0], results[1], results[2] };
+        var results = await Task.WhenAll(tasks);
+        return results.ToList();
     }
 }

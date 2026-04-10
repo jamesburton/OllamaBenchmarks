@@ -1,32 +1,23 @@
-using System.Threading;
-
 public class SharedCounter : IAsyncLifetime
 {
     private int counter;
 
-    public ValueTask InitializeAsync()
+    public ValueTask InitializeAsync() 
     {
         counter = 0;
-        return ValueTask.CompletedTask;
+        return default;
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask DisposeAsync() => default;
 
-    public int IncrementAndGet()
-    {
-        Interlocked.Increment(ref counter);
-        return counter;
-    }
+    public int IncrementAndGet() => Interlocked.Increment(ref counter);
 }
 
 public class FirstCounterTests
 {
     private readonly SharedCounter _counter;
 
-    public FirstCounterTests(SharedCounter counter)
-    {
-        _counter = counter;
-    }
+    public FirstCounterTests(SharedCounter counter) => _counter = counter;
 
     [Fact]
     public void TestIncrement()

@@ -11,7 +11,12 @@ public class Customer
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public Address HomeAddress { get; set; } = new Address();
+    public Address HomeAddress { get; set; }
+
+    public Customer()
+    {
+        HomeAddress = new Address();
+    }
 }
 
 public class CustomerDbContext : DbContext
@@ -37,7 +42,7 @@ public class CustomerRepository
 
     public async Task<Customer> CreateAsync(Customer customer)
     {
-        await _context.Customers.AddAsync(customer);
+        _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
         return customer;
     }

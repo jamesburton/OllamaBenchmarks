@@ -1,6 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
-
-public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
 public class Customer
 {
@@ -23,12 +24,9 @@ public class AppDbContext : DbContext
 
     public DbSet<Order> Orders { get; set; }
     public DbSet<Customer> Customers { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-    }
 }
+
+public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
 public static class OrderQueries
 {
@@ -39,12 +37,11 @@ public static class OrderQueries
                 db.Customers,
                 order => order.CustomerId,
                 customer => customer.Id,
-                (order, customer) => new OrderDto
-                {
-                    OrderId = order.Id,
-                    Total = order.Total,
-                    CustomerName = customer == null ? "Unknown" : customer.Name
-                }
+                (order, customer) => new OrderDto(
+                    order.Id,
+                    order.Total,
+                    customer == null ? "Unknown" : customer.Name
+                )
             )
             .ToList();
     }

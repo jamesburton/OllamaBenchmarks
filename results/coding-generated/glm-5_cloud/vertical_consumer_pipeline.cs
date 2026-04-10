@@ -1,4 +1,5 @@
 global using Contracts;
+
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +25,7 @@ public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
     public async Task Consume(ConsumeContext<OrderPlaced> context)
     {
         var msg = context.Message;
-        await context.Publish(new CustomerNotified(
-            msg.OrderId, 
-            $"Order {msg.OrderId} confirmed for {msg.CustomerName}"));
+        await context.Publish(new CustomerNotified(msg.OrderId, $"Order {msg.OrderId} confirmed for {msg.CustomerName}"));
     }
 }
 
@@ -39,24 +38,21 @@ public class OrderPipelineTests
         services.AddMassTransitTestHarness(cfg =>
         {
             cfg.AddConsumer<PlaceOrderConsumer>();
+            cfg.AddConsumer<NotifyCustomerConsumer>();
         });
 
         var provider = services.BuildServiceProvider();
         var harness = provider.GetRequiredService<ITestHarness>();
-
         await harness.Start();
 
-        var orderId = Guid.NewGuid();
-        await harness.Bus.Publish(new PlaceOrder(orderId, "John Doe"));
+        await harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "Test Customer"));
 
         Assert.True(await harness.Consumed.Any<PlaceOrder>());
         Assert.True(await harness.Published.Any<OrderPlaced>());
-
-        await harness.Stop();
     }
 
     [Fact]
-    public async Task FullPipeline_ShouldConsumeAllMessagesAndPublishNotifications()
+    public async Task FullPipeline_ShouldConsumePlaceOrderAndPublishAllEvents()
     {
         var services = new ServiceCollection();
         services.AddMassTransitTestHarness(cfg =>
@@ -67,17 +63,13 @@ public class OrderPipelineTests
 
         var provider = services.BuildServiceProvider();
         var harness = provider.GetRequiredService<ITestHarness>();
-
         await harness.Start();
 
-        var orderId = Guid.NewGuid();
-        await harness.Bus.Publish(new PlaceOrder(orderId, "Jane Doe"));
+        await harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "Test Customer"));
 
         Assert.True(await harness.Consumed.Any<PlaceOrder>());
         Assert.True(await harness.Published.Any<OrderPlaced>());
         Assert.True(await harness.Consumed.Any<OrderPlaced>());
         Assert.True(await harness.Published.Any<CustomerNotified>());
-
-        await harness.Stop();
     }
 }

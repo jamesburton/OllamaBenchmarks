@@ -1,4 +1,4 @@
 public interface IExpensiveService
-    {
-        Task<string> ComputeAsync(string key);
-    }
+        {
+            Task<string> ComputeAsync(string key);
+        }

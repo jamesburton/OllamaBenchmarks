@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -25,11 +24,11 @@ public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        var productsToUpdate = await db.Products
+        var products = await db.Products
             .Where(p => p.Category == category)
             .ToListAsync();
 
-        foreach (var product in productsToUpdate)
+        foreach (var product in products)
         {
             product.Price = product.Price * (1 - discountPct);
             product.LastModified = DateTime.UtcNow;
