@@ -19,15 +19,13 @@ public class Order
     public int CustomerId { get; set; }
     public decimal Total { get; set; }
     public DateTime OrderDate { get; set; }
-
-    // Navigation property (optional but good practice)
-    public Customer Customer { get; set; }
+    public Customer Customer { get; set; } // Navigation property
 }
 
-// 4. OrderDto record
+// 4. DTO record
 public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
-// 3. AppDbContext class
+// 3. DbContext class
 public class AppDbContext : DbContext
 {
     public DbSet<Order> Orders { get; set; }
@@ -46,28 +44,22 @@ public static class OrderQueries
     /// <returns>A list of OrderDto containing order details and customer name.</returns>
     public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
     {
-        // Use LeftJoin as per the API reference
+        // Use LeftJoin as per EF Core 10 reference
         var query = db.Orders
             .LeftJoin(
                 db.Customers,
                 order => order.CustomerId,
                 customer => customer.Id,
-                (order, customer) => new 
-                { 
-                    order.Id, 
-                    Total = order.Total, 
-                    OrderDate = order.OrderDate,
-                    // Handle null customer case, projecting the name to "Unknown"
-                    CustomerName = customer == null ? "Unknown" : customer.Name 
-                }
+                (order, customer) => new OrderDto(
+                    order.Id,
+                    order.Total,
+                    // Handle the null case for the customer name
+                    customer == null ? "Unknown" : customer.Name
+                )
             );
 
-        // Project the anonymous type result into the desired DTO
-        var results = await query
-            .Select(x => new OrderDto(x.Id, x.Total, x.CustomerName))
-            .ToListAsync();
-
-        return results;
+        // Execute the query and return the list
+        return await query.ToListAsync();
     }
 }
 

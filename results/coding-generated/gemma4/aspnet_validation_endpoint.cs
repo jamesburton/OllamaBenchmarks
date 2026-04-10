@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System;
 
 // 1. CreateOrderRequest class
 public class CreateOrderRequest
@@ -19,27 +20,27 @@ public class CreateOrderRequest
 public class OrderService
 {
     /// <summary>
-    /// Validates the incoming request and returns the order if valid.
+    /// Validates the incoming request and returns it if valid.
     /// </summary>
     /// <param name="request">The order request data.</param>
-    /// <returns>The validated request object.</returns>
+    /// <returns>The validated request.</returns>
     /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
         var validationContext = new ValidationContext(request);
         var validationResults = new List<ValidationResult>();
 
-        // Validate the object using the specified method
+        // Validate the object
         bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
 
         if (!isValid)
         {
-            // If validation fails, throw ArgumentException with details of the first error
+            // Throw ArgumentException with details of the first validation error
             var firstError = validationResults[0].ErrorMessage;
             throw new ArgumentException($"Validation failed: {firstError}");
         }
 
-        // If validation passes, return the request as a confirmed order
+        // Validation passed
         return request;
     }
 }

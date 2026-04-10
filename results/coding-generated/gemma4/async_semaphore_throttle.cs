@@ -9,11 +9,11 @@ public class ThrottledProcessor
 
     public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
-        var executionTasks = new List<Task<T>>();
+        var taskList = new List<Task<T>>();
 
         foreach (var taskFactory in tasks)
         {
-            // Create a task that handles the throttling logic (acquire/release)
+            // Create a task that handles the throttling logic
             var throttledTask = async () =>
             {
                 await _semaphore.WaitAsync(ct);
@@ -24,19 +24,19 @@ public class ThrottledProcessor
                 }
                 finally
                 {
-                    // Ensure release happens regardless of success or failure
+                    // Ensure release happens even if the task fails
                     _semaphore.Release();
                 }
             };
 
             // Start the task and add it to the list
-            executionTasks.Add(throttledTask());
+            taskList.Add(throttledTask());
         }
 
-        // Run all wrapped tasks concurrently
-        var results = await Task.WhenAll(executionTasks);
+        // Wait for all tasks to complete concurrently
+        var resultsArray = await Task.WhenAll(taskList);
 
-        // Return the results as a List<T>
-        return results.ToList();
+        // Convert the array of results to a List<T>
+        return new List<T>(resultsArray);
     }
 }

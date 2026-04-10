@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +18,7 @@ public class Company
 
 public class CompanyDbContext : DbContext
 {
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
-        : base(options)
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
     {
     }
 

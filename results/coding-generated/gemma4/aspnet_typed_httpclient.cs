@@ -29,8 +29,7 @@ public class GitHubClient : IGitHubClient
     {
         // The API reference suggests using the typed client pattern, 
         // which typically involves calling GetFromJsonAsync on the base client.
-        var response = await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
-        return response;
+        return await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
     }
 }
 
@@ -39,8 +38,12 @@ public static class GitHubClientExtensions
 {
     public static IServiceCollection AddGitHubClient(this IServiceCollection services)
     {
-        // Calls services.AddHttpClient<IGitHubClient, GitHubClient>()
-        services.AddHttpClient<IGitHubClient, GitHubClient>();
+        // This mimics the usage shown in the API reference:
+        // services.AddHttpClient<IGitHubClient, GitHubClient>(c => c.BaseAddress = new Uri("https://api.github.com/"));
+        services.AddHttpClient<IGitHubClient, GitHubClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.github.com/");
+        });
         return services;
     }
 }

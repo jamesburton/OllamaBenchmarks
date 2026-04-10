@@ -36,7 +36,7 @@ public class NotificationServiceTests
         var mockEmail = Substitute.For<IEmailService>();
         var testUser = new User(Id: 1, Name: "Alice", Email: "alice@example.com");
 
-        // Setup mocks for the happy path
+        // Setup successful retrieval
         mockRepo.GetByIdAsync(1).Returns(Task.FromResult(testUser));
 
         var service = new NotificationService(mockRepo, mockEmail);
@@ -44,12 +44,9 @@ public class NotificationServiceTests
         // Act
         await service.NotifyUserAsync(1);
 
-        // Assert
-        // 1. Verify the repository was called correctly
-        await mockRepo.Received(1).GetByIdAsync(1);
-
-        // 2. Verify the email service was called with the correct data
-        await mockEmail.Received(1).SendWelcomeAsync("alice@example.com");
+        // Assert (Verify side effects on mocks)
+        await mockRepo.Received().GetByIdAsync(1);
+        await mockEmail.Received().SendWelcomeAsync("alice@example.com");
     }
 
     [Fact]
@@ -59,18 +56,18 @@ public class NotificationServiceTests
         var mockRepo = Substitute.For<IUserRepository>();
         var mockEmail = Substitute.For<IEmailService>();
 
-        // Setup mock to return null (user not found)
+        // Setup failure: User not found
         mockRepo.GetByIdAsync(99).Returns(Task.FromResult<User?>(null));
 
         var service = new NotificationService(mockRepo, mockEmail);
 
         // Act & Assert
-        // Use AwesomeAssertions for exception testing
-        await () => service.NotifyUserAsync(99)
-            .Should().ThrowAsync<InvalidOperationException>()
+        var act = () => service.NotifyUserAsync(99);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("User not found");
 
-        // Ensure no side effects occurred
+        // Verify that the email service was never called
         await mockEmail.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 }

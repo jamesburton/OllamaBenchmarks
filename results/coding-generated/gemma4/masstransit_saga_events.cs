@@ -16,7 +16,7 @@ public record InvoiceCreated(Guid InvoiceId, decimal Amount);
 public record InvoiceApproved(Guid InvoiceId);
 public record InvoicePaid(Guid InvoiceId);
 
-// 3. State Machine Definition
+// 3. State Machine
 public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 {
     // States
@@ -31,37 +31,31 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 
     public InvoiceStateMachine()
     {
-        // Required setup
         InstanceState(x => x.CurrentState);
-        SetCompletedWhenFinalized();
 
-        // Event Correlation Setup
+        // Configure Event Correlation
         Event(InvoiceCreated, x => x.CorrelateById(m => m.Message.InvoiceId));
         Event(InvoiceApproved, x => x.CorrelateById(m => m.Message.InvoiceId));
         Event(InvoicePaid, x => x.CorrelateById(m => m.Message.InvoiceId));
 
-        // Initial State Transition
+        // Define State Machine Flow
         Initially(
             When(InvoiceCreated)
-                .Then(ctx =>
-                {
-                    // Mutate saga property using Then
-                    ctx.Saga.Amount = ctx.Message.Amount;
-                })
+                .Then(ctx => { ctx.Saga.Amount = ctx.Message.Amount; })
                 .TransitionTo(Pending)
         );
 
-        // During Pending
         During(Pending,
             When(InvoiceApproved)
                 .TransitionTo(Approved)
         );
 
-        // During Approved
         During(Approved,
             When(InvoicePaid)
                 .TransitionTo(Paid)
                 .Finalize()
         );
+
+        SetCompletedWhenFinalized();
     }
 }

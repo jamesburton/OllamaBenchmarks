@@ -3,7 +3,7 @@ using OneOf;
 using System;
 using System.Threading.Tasks;
 
-// --- Model Definitions ---
+// --- Domain Models ---
 
 // User must be a class with public get/set properties
 public class User
@@ -27,7 +27,8 @@ public interface IUserService
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
-// --- Controller Implementation ---
+
+// --- Controller ---
 
 [ApiController]
 [Route("api/users")]
@@ -52,19 +53,19 @@ public class UsersController : ControllerBase
             // Case 1: User found (200 OK)
             user => Ok(user),
 
-            // Case 2: Not Found (404 Not Found)
+            // Case 2: Not found (404 Not Found)
             // Note: We use the default record instance here
             _ => NotFound(), 
 
-            // Case 3: Validation Error (400 Bad Request)
-            // The 'err' parameter is the ValidationError record
+            // Case 3: Validation error (400 Bad Request)
+            // The 'err' parameter captures the ValidationError instance
             err => BadRequest(new { Error = err.Message })
         );
     }
 }
 
-// --- Mock Service Implementation (for completeness/testing) ---
-
+// --- Mock Implementation for Demonstration ---
+// In a real application, this would be registered via services.AddScoped
 public class MockUserService : IUserService
 {
     public Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id)
@@ -77,12 +78,12 @@ public class MockUserService : IUserService
         }
         else if (id == 99)
         {
-            // Validation Error case
+            // Validation error case
             return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new ValidationError("The provided ID format is invalid.")));
         }
         else if (id == 0)
         {
-            // Not Found case
+            // Not found case
             return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
         }
         else
@@ -93,18 +94,14 @@ public class MockUserService : IUserService
     }
 }
 
-// --- Program Setup (Simulating Dependency Injection) ---
+// Example of how DI would register the mock service (optional, but good practice)
 /*
-// In a real ASP.NET Core 10 setup, you would register these services:
-var builder = WebApplication.CreateBuilder(args);
-
-// Register services
-builder.Services.AddSingleton<IUserService, MockUserService>();
-
-// Add controllers
-builder.Services.AddControllers();
-
-var app = builder.Build();
-app.MapControllers();
-app.Run();
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddMockServices(this IServiceCollection services)
+    {
+        services.AddScoped<IUserService, MockUserService>();
+        return services;
+    }
+}
 */

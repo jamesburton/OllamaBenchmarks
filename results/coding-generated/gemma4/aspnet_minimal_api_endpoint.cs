@@ -15,7 +15,7 @@ public static class ProductEndpoints
     private static int _idCounter = 0;
 
     /// <summary>
-    /// Creates a new product, performing validation checks.
+    /// Creates a new product, performing manual validation checks.
     /// </summary>
     /// <param name="request">The product creation request.</param>
     /// <returns>An IResult representing the HTTP response.</returns>

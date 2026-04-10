@@ -1,0 +1,94 @@
+using OneOf;
+
+    public record CreateProductCommand(string Name, decimal Price);
+    public record Product(int Id, string Name, decimal Price);
+    public record ValidationError(string Message);
+    public record DuplicateError(string ExistingName);
+
+    public interface IProductRepository
+    {
+        Task<bool> ExistsAsync(string name);
+        Task<Product> AddAsync(Product product);
+    }
+
+    public interface ICommandHandler<TCommand, TResult>
+    -------------------------------------------------------
+    public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, OneOf<Product, ValidationError, DuplicateError>>
+    {
+        private readonly IProductRepository _repository;
+        public CreateProductCommandHandler(IProductRepository repository) => _repository = repository;
+
+        public async Task<OneOf<Product, ValidationError, DuplicateError>> HandleAsync(CreateProductCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(command.Name))
+                return new ValidationError("Name is required");
+
+            if (command.Price <= 0)
+                return new ValidationError("Price must be positive");
+
+            if (await _repository.ExistsAsync(command.Name))
+                return new DuplicateError(command.Name);
+
+            return await _repository.AddAsync(new Product(0, command.Name, command.Price));
+        }
+    }
+
+    public class CreateProductCommandHandlerTests
+    {
+        [Fact]
+        public async Task HandleAsync_WhenNameIsEmpty_ReturnsValidationError()
+        {
+            var repo = Substitute.For<IProductRepository>();
+            var handler = new CreateProductCommandHandler(repo);
+            var command = new CreateProductCommand("", 10m);
+
+            var result = await handler.HandleAsync(command);
+
+            result.IsT1.Should().BeTrue();
+            result.AsT1.Message.Should().Be("Name is required");
+        }
+
+        [Fact]
+        public async Task HandleAsync_WhenPriceIsZero_ReturnsValidationError()
+        {
+            var repo = Substitute.For<IProductRepository>();
+            var handler = new CreateProductCommandHandler(repo);
+            var command = new CreateProductCommand("Test", 0m);
+
+            var result = await handler.HandleAsync(command);
+
+            result.IsT1.Should().BeTrue();
+            result.AsT1.Message.Should().Be("Price must be positive");
+        }
+
+        [Fact]
+        public async Task HandleAsync_WhenProductExists_ReturnsDuplicateError()
+        {
+            var repo = Substitute.For<IProductRepository>();
+            repo.ExistsAsync("Existing").Returns(true);
+            var handler = new CreateProductCommandHandler(repo);
+            var command = new CreateProductCommand("Existing", 10m);
+
+            var result = await handler.HandleHandleAsync(command); // typo check: HandleAsync
+
+            result.IsT2.Should().BeTrue();
+            result.AsT2.ExistingName.Should().Be("Existing");
+        }
+
+        [Fact]
+        public async Task HandleAsync_WhenValid_ReturnsProduct()
+        {
+            var repo = Substitute.For<IProductRepository>();
+            var expectedProduct = new Product(1, "New", 10m);
+            repo.ExistsAsync("New").Returns(false);
+            repo.AddAsync(Arg.Any<Product>()).Returns(expectedProduct);
+            var handler = new CreateProductCommandHandler(repo);
+            var command = new CreateProductCommand("New", 10m);
+
+            var result = await handler.HandleAsync(command);
+
+            result.IsT0.Should().BeTrue();
+            result.AsT0.Name.Should().Be("New");
+            result.AsT0.Price.Should().Be(10m);
+        }
+    }

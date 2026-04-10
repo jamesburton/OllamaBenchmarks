@@ -2,7 +2,6 @@ using MassTransit;
 using System;
 using System.Threading.Tasks;
 
-// Global using statement to make types accessible without explicit using directives
 global using Contracts;
 
 namespace Contracts;
@@ -28,18 +27,15 @@ public class SubmitOrderConsumer : IConsumer<SubmitOrder>
 // 4. Consumer Definition
 public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
 {
-    public SubmitOrderConsumerDefinition()
-    {
-        // Set ConcurrentMessageLimit = 4
-        this.ConcurrentMessageLimit = 4;
-    }
-
     protected override void ConfigureConsumer(
         IReceiveEndpointConfigurator ep,
         IConsumerConfigurator<SubmitOrderConsumer> consumer,
         IRegistrationContext ctx)
     {
-        // Set retry policy: Interval(3, 1000)
+        // Set ConcurrentMessageLimit = 4
+        consumer.UseMessageLimit(4);
+
+        // Configure retry: Interval(3, 1000)
         ep.UseMessageRetry(r => r.Interval(3, 1000));
     }
 }

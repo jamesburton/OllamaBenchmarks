@@ -17,6 +17,7 @@ public class UserDashboard : ComponentBase
     public IUserService UserService { get; set; }
 
     public string? DisplayName { get; set; }
+
     public bool IsAuthenticated { get; set; }
 
     protected override async Task OnInitializedAsync()

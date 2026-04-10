@@ -1,11 +1,10 @@
 using Xunit;
 using Xunit.Abstractions;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using AwesomeAssertions;
+using System.Collections.Generic;
 
-// 1. CounterService
+// --- 1. CounterService ---
 public class CounterService
 {
     public int Count { get; private set; } = 0;
@@ -21,7 +20,7 @@ public class CounterService
     }
 }
 
-// 2. CounterFixture
+// --- 2. CounterFixture ---
 public class CounterFixture : IAsyncLifetime
 {
     public CounterService Counter { get; private set; } = null!;
@@ -29,25 +28,24 @@ public class CounterFixture : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         Counter = new CounterService();
-        // Simulate async setup
-        await Task.Delay(1); 
+        await Task.CompletedTask; // Placeholder for async initialization
     }
 
     public async ValueTask DisposeAsync()
     {
-        // Cleanup logic
-        await Task.Delay(1);
+        // Cleanup logic if needed
+        await Task.CompletedTask;
     }
 }
 
-// 3. Marker class for the collection
+// --- 3. CounterCollection ---
 [CollectionDefinition("Counter")]
 public class CounterCollection : ICollectionFixture<CounterFixture>
 {
-    // This class serves only as a marker for the collection definition.
+    // This class serves only as a collection definition marker.
 }
 
-// 4. First Test Class
+// --- 4. CounterFirstTests ---
 [Collection("Counter")]
 public class CounterFirstTests
 {
@@ -59,20 +57,19 @@ public class CounterFirstTests
     }
 
     [Fact]
-    public void Test_IncrementsCounterOnce()
+    public void FirstTest_IncrementsCounter()
     {
-        // Arrange: Ensure a clean start for this test run (though the fixture handles setup)
-        _fixture.Counter.Reset();
+        // Arrange: Initial state is 0 (set by fixture)
 
         // Act
         _fixture.Counter.Increment();
 
-        // Assert
-        _fixture.Counter.Count.Should().Be(1);
+        // Assert: Check if the count is at least 1
+        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(1);
     }
 }
 
-// 5. Second Test Class
+// --- 5. CounterSecondTests ---
 [Collection("Counter")]
 public class CounterSecondTests
 {
@@ -84,19 +81,15 @@ public class CounterSecondTests
     }
 
     [Fact]
-    public void Test_IncrementsCounterTwice()
+    public void SecondTest_IncrementsCounterTwice()
     {
-        // Arrange: The counter state is shared. We must reset it manually 
-        // if we want this test to be isolated from the previous test run.
-        _fixture.Counter.Reset();
+        // Arrange: The counter state is shared and should be 1 from CounterFirstTests
 
         // Act
         _fixture.Counter.Increment();
         _fixture.Counter.Increment();
 
-        // Assert
-        // Because the fixture is shared, this test relies on the state being reset 
-        // before the test method runs, ensuring the count is 2.
-        _fixture.Counter.Count.Should().Be(2);
+        // Assert: Check if the count is at least 3 (1 initial + 2 increments)
+        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(3);
     }
 }

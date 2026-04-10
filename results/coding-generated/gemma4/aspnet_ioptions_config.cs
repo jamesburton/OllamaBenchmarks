@@ -22,7 +22,7 @@ public class SmtpEmailSender : IEmailSender
 {
     private readonly IOptions<SmtpOptions> _options;
 
-    // Constructor takes IOptions<SmtpOptions>
+    // Constructor taking IOptions<SmtpOptions>
     public SmtpEmailSender(IOptions<SmtpOptions> options)
     {
         _options = options;

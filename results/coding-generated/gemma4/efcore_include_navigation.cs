@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Threading.Tasks;
 
 // 1. Comment Class
@@ -11,7 +9,7 @@ public class Comment
     public string Text { get; set; }
     public int PostId { get; set; }
 
-    // Navigation property
+    // Navigation property (must be nullable)
     public Post? Post { get; set; }
 }
 
@@ -22,8 +20,10 @@ public class Post
     public string Content { get; set; }
     public int BlogId { get; set; }
 
-    // Navigation properties
+    // Navigation property (must be nullable)
     public Blog? Blog { get; set; }
+
+    // Collection property
     public List<Comment> Comments { get; set; } = new List<Comment>();
 }
 
@@ -32,6 +32,8 @@ public class Blog
 {
     public int Id { get; set; }
     public string Title { get; set; }
+
+    // Collection property
     public List<Post> Posts { get; set; } = new List<Post>();
 }
 
@@ -46,13 +48,13 @@ public class BlogDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure Blog to have many Posts
+        // Configure Blog -> Post relationship
         modelBuilder.Entity<Post>()
             .HasOne(p => p.Blog)
             .WithMany(b => b.Posts)
             .HasForeignKey(p => p.BlogId);
 
-        // Configure Post to have many Comments
+        // Configure Post -> Comment relationship
         modelBuilder.Entity<Comment>()
             .HasOne(c => c.Post)
             .WithMany(p => p.Comments)

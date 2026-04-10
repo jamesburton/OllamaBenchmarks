@@ -11,9 +11,9 @@ public static class OrderProcessor
     {
         return order.Total switch
         {
-            var t when t > 1000m => "Premium",
-            var t when t > 100m  => "Standard",
-            _                    => "Budget"
+            > 1000m => "Premium",
+            > 100m  => "Standard",
+            _       => "Budget"
         };
     }
 }

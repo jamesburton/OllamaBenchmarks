@@ -19,12 +19,10 @@ public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
 
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
-    {
-    }
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
 }
 
-// 3. ProductOperations static class
+// 3. Static class for operations
 public static class ProductOperations
 {
     /// <summary>
@@ -44,7 +42,7 @@ public static class ProductOperations
 
         int updatedCount = 0;
 
-        // 2. Iterate and update manually (required due to InMemory provider limitation)
+        // 2. Iterate and update manually (required for InMemory compatibility)
         foreach (var product in productsToUpdate)
         {
             // Calculate new price: Price * (1 - discountPct)
@@ -53,6 +51,11 @@ public static class ProductOperations
             // Update properties
             product.Price = newPrice;
             product.LastModified = DateTime.UtcNow;
+
+            // Attach the updated entity and mark it as modified
+            // Note: Since we loaded the entities into memory (productsToUpdate), 
+            // we must explicitly tell the context to track the changes.
+            db.Entry(product).State = EntityState.Modified;
 
             updatedCount++;
         }

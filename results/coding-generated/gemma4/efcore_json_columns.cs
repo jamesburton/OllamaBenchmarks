@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,25 +30,22 @@ public class CompanyDbContext : DbContext
     {
         // Configure HeadquartersAddress as an owned JSON column
         modelBuilder.Entity<Company>()
-            .OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
+            .OwnsOne(c => c.HeadquartersAddress, b => { 
+                b.ToJson(); 
+            });
     }
 }
 
 // 4. CompanyQueries static class
 public static class CompanyQueries
 {
-    /// <summary>
-    /// Queries companies where the HeadquartersAddress.City matches the given city parameter.
-    /// </summary>
-    /// <param name="db">The database context.</param>
-    /// <param name="city">The city name to filter by.</param>
-    /// <returns>A list of matching companies.</returns>
     public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        // This query leverages EF Core's ability to query nested JSON properties
-        // configured via OwnsOne().ToJson().
-        return db.Companies
-            .Where(c => c.HeadquartersAddress.City == city)
+        // Querying the JSON owned property
+        var companies = db.Companies
+            .Where(c => c.HeadquartersAddress != null && c.HeadquartersAddress.City == city)
             .ToList();
+
+        return companies;
     }
 }

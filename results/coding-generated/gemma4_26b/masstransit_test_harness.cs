@@ -1,58 +1,41 @@
+using MassTransit;
+using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
+
 public class ProcessPaymentConsumerTests
-        {
-            [Fact]
-            public async Task Consume_ShouldPublishPaymentProcessed()
+{
+    [Fact]
+    public async Task Consume_Should_ProcessPayment_And_Publish_PaymentProcessed()
+    {
+        // Arrange
+        var provider = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg =>
             {
-                var provider = new ServiceCollection()
-                    .AddMassTransitTestHarness(cfg =>
-                    {
-                        cfg.AddConsumer<ProcessPaymentConsumer>();
-                    })
-                    .BuildServiceProvider(true);
+                cfg.AddConsumer<ProcessPaymentConsumer>();
+            })
+            .BuildServiceProvider(true);
 
-                var harness = provider.GetRequiredService<ITestHarness>();
-                await harness.Start();
+        var harness = provider.GetRequiredService<ITestHarness>();
+        await harness.Start();
 
-                var orderId = Guid.NewGuid();
-                var amount = 100m;
+        var orderId = Guid.NewGuid();
+        var amount = 99.99m;
+        var message = new ProcessPayment(orderId, amount);
 
-                await harness.Bus.Publish(new ProcessPayment(orderId, amount));
+        // Act
+        await harness.Bus.Publish(message);
 
-                // 1. The consumer receives and processes the ProcessPayment message
-                bool consumed = await harness.Consumed.Any<ProcessPayment>();
+        // Assert - Await results individually before Assert.Multiple as it does not support async lambdas
+        bool wasConsumed = await harness.Consumed.Any<ProcessPayment>();
+        bool wasPublished = await harness.Published.Any<PaymentProcessed>();
 
-                // 2. A PaymentProcessed event is published
-                bool published = await harness.Published.Any<PaymentProcessed>();
+        var publishedContext = harness.Published.Select<PaymentProcessed>().FirstOrDefault();
+        bool orderIdMatches = publishedContext != null && publishedContext.Context.Message.OrderId == orderId;
 
-                // 2. (continued) with the correct OrderId
-                bool correctOrderId = await harness.Published.Select<PaymentProcessed>()
-                    .Any(x => x.Context.Message.OrderId == orderId);
-
-                // 3. Use Assert.Multiple to check both assertions
-                Assert.Multiple(
-                    () => Assert.True(consumed, "Message was not consumed"),
-                    () => Assert.True(published, "Message was not published"),
-                    () => Assert.True(correctOrderId, "Published message had incorrect OrderId")
-                );
-            }
-        }
-
-bool wasConsumed = await harness.Consumed.Any<ProcessPayment>();
-    bool wasPublishedWithCorrectId = await harness.Published.Select<PaymentProcessed>()
-        .Any(x => x.Context.Message.OrderId == orderId);
-
-    Assert.Multiple(
-        () => Assert.True(wasConsumed, "The ProcessPayment message was not consumed."),
-        () => Assert.True(wasPublishedWithCorrectId, "The PaymentProcessed event was not published with the correct OrderId.")
-    );
-
-bool wasConsumed = await harness.Consumed.Any<ProcessPayment>();
-    bool wasPublished = await harness.Published.Any<PaymentProcessed>();
-    bool wasPublishedWithCorrectId = await harness.Published.Select<PaymentProcessed>()
-        .Any(x => x.Context.Message.OrderId == orderId);
-
-    Assert.Multiple(
-        () => Assert.True(wasConsumed),
-        () => Assert.True(wasPublished),
-        () => Assert.True(wasPublishedWithCorrectId)
-    );
+        Assert.Multiple(
+            () => Assert.True(wasConsumed, "The consumer did not receive the ProcessPayment message."),
+            () => Assert.True(wasPublished, "The PaymentProcessed event was not published."),
+            () => Assert.True(orderIdMatches, "The published PaymentProcessed event does not contain the correct OrderId.")
+        );
+    }
+}

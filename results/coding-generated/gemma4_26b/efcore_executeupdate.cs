@@ -25,13 +25,13 @@ public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        // Note: Using manual update loop to ensure compatibility with InMemory provider 
-        // as requested, since InMemory does not support ExecuteUpdateAsync.
+        // Since InMemory provider does not support ExecuteUpdateAsync, 
+        // we implement the logic via manual retrieval and update to ensure testability.
         var products = await db.Products
             .Where(p => p.Category == category)
             .ToListAsync();
 
-        int affectedRows = products.Count;
+        int count = products.Count;
 
         foreach (var product in products)
         {
@@ -41,6 +41,6 @@ public static class ProductOperations
 
         await db.SaveChangesAsync();
 
-        return affectedRows;
+        return count;
     }
 }

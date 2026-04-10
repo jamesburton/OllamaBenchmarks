@@ -1,28 +1,21 @@
-using Xunit;
-using AwesomeAssertions;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-// 1. InMemoryStore implementation
 public class InMemoryStore : IAsyncLifetime
 {
     public Dictionary<string, string> Data { get; private set; } = new();
 
-    public async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync()
     {
         Data.Add("key1", "value1");
         Data.Add("key2", "value2");
-        await default; // Explicitly return default ValueTask
+        return default;
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         Data.Clear();
-        await default; // Explicitly return default ValueTask
+        return default;
     }
 }
 
-// 2. StoreService implementation
 public class StoreService
 {
     private readonly InMemoryStore _store;
@@ -47,7 +40,6 @@ public class StoreService
     }
 }
 
-// 3. Test Class
 public class StoreServiceTests : IClassFixture<InMemoryStore>
 {
     private readonly StoreService _service;

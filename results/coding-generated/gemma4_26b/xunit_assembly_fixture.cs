@@ -6,7 +6,7 @@ public class SharedCounter : IAsyncLifetime
 
     public ValueTask InitializeAsync()
     {
-        _counter = 0;
+        _            counter = 0;
         return default;
     }
 
@@ -24,7 +24,7 @@ public class SharedCounter : IAsyncLifetime
 public class FirstCounterTests(SharedCounter counter)
 {
     [Fact]
-    public void TestIncrement()
+    public void Test()
     {
         Assert.True(counter.IncrementAndGet() > 0);
     }
@@ -33,7 +33,7 @@ public class FirstCounterTests(SharedCounter counter)
 public class SecondCounterTests
 {
     [Fact]
-    public void TestIncrementWithContext()
+    public void Test()
     {
         var counter = TestContext.Current.GetFixture<SharedCounter>();
         Assert.True(counter.IncrementAndGet() > 0);

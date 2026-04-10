@@ -38,7 +38,7 @@ public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymen
     public ProcessPaymentConsumerDefinition()
     {
         // Set ConcurrentMessageLimit
-        ConcurrentMessageLimit = 2;
+        this.ConcurrentMessageLimit = 2;
     }
 
     protected override void ConfigureConsumer(

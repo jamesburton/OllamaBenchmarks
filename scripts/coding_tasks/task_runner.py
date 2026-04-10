@@ -125,7 +125,7 @@ def call_ollama(
     max_retries = 5
     for attempt in range(max_retries):
         req = urllib.request.Request(
-            "http://127.0.0.1:11434/api/chat",
+            os.environ.get("OLLAMA_HOST_URL", "http://127.0.0.1:11434") + "/api/chat",
             data=data,
             headers={"Content-Type": "application/json"},
             method="POST",

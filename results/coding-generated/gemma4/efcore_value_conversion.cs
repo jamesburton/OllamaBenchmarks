@@ -32,13 +32,12 @@ public class ProductDbContext : DbContext
         var parts = s.Split(':');
         if (parts.Length != 2)
         {
-            // Handle malformed string gracefully
-            return new Money(0, "USD");
+            throw new FormatException("Money string must be in 'amount:currency' format.");
         }
 
         if (!decimal.TryParse(parts[0], out var amount))
         {
-            return new Money(0, "USD");
+            throw new FormatException("Invalid amount format.");
         }
 
         return new Money(amount, parts[1]);
@@ -48,13 +47,13 @@ public class ProductDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure the value conversion for Product.Price
+        // Configure value conversion for Product.Price
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
             .HasConversion(
-                // Converter to database type (string)
+                // Convert to database value (string)
                 m => $"{m.Amount}:{m.Currency}", 
-                // Converter from database type (string)
+                // Convert from database value (string)
                 s => ParseMoney(s)
             );
     }
@@ -85,8 +84,8 @@ public class ProductRepository
     /// </summary>
     public async Task<Product?> GetByIdAsync(int id)
     {
-        // Using AsNoTracking() ensures EF Core re-applies the conversion logic 
-        // when loading the object from the database.
+        // Using AsNoTracking() ensures EF Core reads the raw data, 
+        // but the conversion logic (HasConversion) is still applied upon materialization.
         return await _context.Products
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id);

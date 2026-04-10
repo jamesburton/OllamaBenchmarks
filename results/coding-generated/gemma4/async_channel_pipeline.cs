@@ -9,7 +9,7 @@ public class DataPipeline
         _channel = Channel.CreateBounded<string>(capacity);
     }
 
-    public ChannelWriter<string> Writer => _channel.Writer;
+    public ChannelWriter<string> Writer { get; } = _channel.Writer;
 
     public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
     {

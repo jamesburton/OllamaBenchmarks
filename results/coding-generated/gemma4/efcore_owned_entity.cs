@@ -15,7 +15,7 @@ public class Customer
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    // Initialize HomeAddress to prevent null reference issues
+    // Initialize HomeAddress to avoid null reference issues
     public Address HomeAddress { get; set; } = new Address();
 }
 

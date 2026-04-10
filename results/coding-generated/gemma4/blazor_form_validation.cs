@@ -5,13 +5,14 @@ using System.ComponentModel.DataAnnotations;
 // 1. ContactModel class
 public class ContactModel
 {
-    [Required]
+    [Required(ErrorMessage = "Name is required.")]
     public string Name { get; set; } = "";
 
-    [EmailAddress]
+    [Required(ErrorMessage = "Email is required.")]
+    [EmailAddress(ErrorMessage = "Invalid email format.")]
     public string Email { get; set; } = "";
 
-    [Range(1, 120)]
+    [Range(1, 120, ErrorMessage = "Age must be between 1 and 120.")]
     public int Age { get; set; }
 }
 
@@ -32,5 +33,6 @@ public class ContactFormBase : ComponentBase
     {
         // Logic executed upon successful form submission
         IsSubmitted = true;
+        // In a real application, you would typically call StateHasChanged() here
     }
 }

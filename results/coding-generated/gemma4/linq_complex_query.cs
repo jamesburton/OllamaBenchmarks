@@ -12,53 +12,52 @@ public record CategorySummary(string Category, decimal TotalAmount, decimal Aver
 public static class SalesAnalyzer
 {
     /// <summary>
-    /// Groups sales by category, calculates summary statistics, and orders the results.
+    /// Groups sales by category and computes summary statistics.
     /// </summary>
     /// <param name="sales">The collection of sales records.</param>
     /// <returns>A list of CategorySummary, ordered by TotalAmount descending.</returns>
     public static List<CategorySummary> SummarizeByCategory(IEnumerable<Sale> sales)
     {
         // Use LINQ method syntax: GroupBy -> Select -> OrderByDescending
-        var summary = sales
+        return sales
             .GroupBy(sale => sale.Category) // Group by Category
             .Select(group => new CategorySummary(
                 Category: group.Key,
-                TotalAmount: group.Sum(s => s.Amount), // Sum
-                AverageAmount: group.Average(s => s.Amount), // Average
+                TotalAmount: group.Sum(sale => sale.Amount), // Sum
+                AverageAmount: group.Average(sale => sale.Amount), // Average
                 Count: group.Count() // Count
             ))
             .OrderByDescending(summary => summary.TotalAmount) // Order by TotalAmount descending
             .ToList();
-
-        return summary;
     }
 }
 
-// Example usage (optional, but useful for testing the code structure)
 public class Program
 {
     public static void Main()
     {
+        // Example Usage
         var salesData = new List<Sale>
         {
-            new Sale("Laptop", "Electronics", 1200.00m, new DateOnly(2023, 1, 15)),
-            new Sale("T-Shirt", "Apparel", 25.00m, new DateOnly(2023, 1, 16)),
-            new Sale("Monitor", "Electronics", 300.00m, new DateOnly(2023, 1, 17)),
-            new Sale("Jeans", "Apparel", 75.00m, new DateOnly(2023, 1, 18)),
-            new Sale("Mouse", "Electronics", 25.00m, new DateOnly(2023, 1, 19)),
-            new Sale("Sweater", "Apparel", 50.00m, new DateOnly(2023, 1, 20))
+            new Sale("Laptop X", "Electronics", 1200.00m, new DateOnly(2023, 10, 1)),
+            new Sale("T-Shirt", "Apparel", 25.00m, new DateOnly(2023, 10, 2)),
+            new Sale("Monitor Y", "Electronics", 300.00m, new DateOnly(2023, 10, 3)),
+            new Sale("Jeans", "Apparel", 75.00m, new DateOnly(2023, 10, 4)),
+            new Sale("Mouse Pad", "Accessories", 10.00m, new DateOnly(2023, 10, 5)),
+            new Sale("Keyboard Z", "Electronics", 150.00m, new DateOnly(2023, 10, 6)),
+            new Sale("Sweater", "Apparel", 50.00m, new DateOnly(2023, 10, 7))
         };
+
+        Console.WriteLine("--- Running Sales Analysis ---");
 
         var summary = SalesAnalyzer.SummarizeByCategory(salesData);
 
-        Console.WriteLine("--- Sales Summary by Category ---");
         foreach (var item in summary)
         {
-            Console.WriteLine($"Category: {item.Category}");
-            Console.WriteLine($"  Total Amount: {item.TotalAmount:C}");
-            Console.WriteLine($"  Average Amount: {item.AverageAmount:C}");
-            Console.WriteLine($"  Count: {item.Count}");
-            Console.WriteLine("---------------------------------");
+            Console.WriteLine($"\nCategory: {item.Category}");
+            Console.WriteLine($"  Total Sales: {item.TotalAmount:C}");
+            Console.WriteLine($"  Average Sale: {item.AverageAmount:C}");
+            Console.WriteLine($"  Number of Transactions: {item.Count}");
         }
     }
 }

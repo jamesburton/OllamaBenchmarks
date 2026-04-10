@@ -28,7 +28,7 @@ public class ArticleDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Apply the query filter: only retrieve articles where IsDeleted is false by default
+        // Apply the query filter: only retrieve articles where IsDeleted is false
         modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
     }
 }
@@ -45,11 +45,11 @@ public class ArticleRepository
 
     /// <summary>
     /// Soft deletes an article by setting IsDeleted = true.
-    /// Uses IgnoreQueryFilters() to find the record even if it was already deleted.
+    /// Uses IgnoreQueryFilters to find the record even if it was already deleted.
     /// </summary>
     public async Task SoftDeleteAsync(int id)
     {
-        // Use IgnoreQueryFilters() to find the record regardless of the active query filter
+        // Use IgnoreQueryFilters() to bypass the global filter and find the record regardless of its IsDeleted status.
         var article = await _context.Articles
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
@@ -59,15 +59,14 @@ public class ArticleRepository
             article.IsDeleted = true;
             await _context.SaveChangesAsync();
         }
-        // If article is null or already deleted, do nothing.
     }
 
     /// <summary>
-    /// Retrieves all active articles (respects the query filter).
+    /// Retrieves all active articles (respects the global query filter).
     /// </summary>
     public async Task<List<Article>> GetAllAsync()
     {
-        // The query filter handles the IsDeleted == false condition automatically.
+        // The query filter (a => !a.IsDeleted) handles filtering automatically.
         return await _context.Articles.ToListAsync();
     }
 
@@ -76,7 +75,7 @@ public class ArticleRepository
     /// </summary>
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        // Use IgnoreQueryFilters() to bypass the default filtering logic.
+        // Use IgnoreQueryFilters() to bypass the global filter.
         return await _context.Articles
             .IgnoreQueryFilters()
             .ToListAsync();

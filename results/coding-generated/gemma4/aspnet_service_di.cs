@@ -10,10 +10,7 @@ public interface IOrderRepository
 // 2. OrderRepository class
 public class OrderRepository : IOrderRepository
 {
-    // Must have a parameterless constructor
-    public OrderRepository()
-    {
-    }
+    // Parameterless constructor required
 }
 
 // 3. IOrderService interface
@@ -24,10 +21,7 @@ public interface IOrderService
 // 4. OrderService class
 public class OrderService : IOrderService
 {
-    // Must have a parameterless constructor
-    public OrderService()
-    {
-    }
+    // Parameterless constructor required
 }
 
 // 5. IEmailNotifier interface
@@ -38,10 +32,7 @@ public interface IEmailNotifier
 // 6. EmailNotifier class
 public class EmailNotifier : IEmailNotifier
 {
-    // Must have a parameterless constructor
-    public EmailNotifier()
-    {
-    }
+    // Parameterless constructor required
 }
 
 // 7. OrderSettings class

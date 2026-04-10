@@ -12,14 +12,15 @@ public class CounterBase : ComponentBase
     [Parameter]
     public EventCallback<int> OnCountChanged { get; set; }
 
-    // 4. Private state field
+    // 4. Private field
     private int currentCount;
 
-    // 6. Lifecycle method
+    // 6. Lifecycle method initialization
     protected override void OnInitialized()
     {
-        // Initialize currentCount with the provided InitialCount
+        // Initialize currentCount using the parameter
         currentCount = InitialCount;
+        base.OnInitialized();
     }
 
     // 6. Public read-only property for testing
@@ -29,7 +30,7 @@ public class CounterBase : ComponentBase
     public async Task IncrementCount()
     {
         currentCount++;
-        // Invoke the event callback with the new value
+        // Invoke the event callback
         await OnCountChanged.InvokeAsync(currentCount);
     }
 }

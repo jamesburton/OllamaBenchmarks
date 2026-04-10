@@ -25,42 +25,43 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     public State Completed { get; private set; }
 
     // Events
-    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
-    public Event<OrderAccepted> OrderAccepted { get; private set; }
-    public Event<OrderCompleted> OrderCompleted { get; private set; }
+    public Event<OrderSubmitted> OrderSubmittedEvent { get; private set; }
+    public Event<OrderAccepted> OrderAcceptedEvent { get; private set; }
+    public Event<OrderCompleted> OrderCompletedEvent { get; private set; }
 
     public OrderStateMachine()
     {
         InstanceState(x => x.CurrentState);
 
-        // Configure Correlation for all events
-        OrderSubmitted = Event<OrderSubmitted>(
+        // Configure Correlation
+        OrderSubmittedEvent = Event<OrderSubmitted>(
             cfg => cfg.CorrelateById(m => m.Message.OrderId));
 
-        OrderAccepted = Event<OrderAccepted>(
+        OrderAcceptedEvent = Event<OrderAccepted>(
             cfg => cfg.CorrelateById(m => m.Message.OrderId));
 
-        OrderCompleted = Event<OrderCompleted>(
+        OrderCompletedEvent = Event<OrderCompleted>(
             cfg => cfg.CorrelateById(m => m.Message.OrderId));
 
-        // Initial State Flow
+        // Initial State: OrderSubmitted -> Submitted
         Initially(
-            When(OrderSubmitted)
+            When(OrderSubmittedEvent)
                 .Then(context =>
                 {
                     context.Saga.OrderDate = context.Message.OrderDate;
                 })
                 .TransitionTo(Submitted)
+                .Send(context => new OrderAccepted(context.Message.OrderId, DateTime.UtcNow)) // Example action
+                .Publish(context => new OrderAccepted(context.Message.OrderId, DateTime.UtcNow))
                 .OnEnter(context =>
                 {
-                    // Set initial state property
                     context.Saga.CurrentState = "Submitted";
                 })
         );
 
-        // Submitted State Flow
+        // Transition: Submitted -> Accepted
         During(Submitted,
-            When(OrderAccepted)
+            When(OrderAcceptedEvent)
                 .Then(context =>
                 {
                     context.Saga.AcceptedAt = context.Message.AcceptedAt;
@@ -72,20 +73,19 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 })
         );
 
-        // Accepted State Flow
+        // Transition: Accepted -> Completed (Finalize)
         During(Accepted,
-            When(OrderCompleted)
+            When(OrderCompletedEvent)
                 .Then(context =>
                 {
-                    // No specific property update required for this transition, just finalizing
+                    // No specific property update needed here, but we must use the required syntax
                 })
+                .TransitionTo(Completed)
                 .Finalize()
                 .OnEnter(context =>
                 {
                     context.Saga.CurrentState = "Completed";
                 })
         );
-
-        SetCompletedWhenFinalized();
     }
 }

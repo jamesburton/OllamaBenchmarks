@@ -20,8 +20,9 @@ public class PlaceOrderConsumer : IConsumer<PlaceOrder>
 {
     public async Task Consume(ConsumeContext<PlaceOrder> context)
     {
+        var msg = context.Message;
         // Publish OrderPlaced event
-        await context.Publish(new OrderPlaced(context.Message.OrderId, context.Message.CustomerName));
+        await context.Publish(new OrderPlaced(msg.OrderId, msg.CustomerName));
     }
 }
 
@@ -30,39 +31,39 @@ public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
 {
     public async Task Consume(ConsumeContext<OrderPlaced> context)
     {
-        // Construct the notification message
-        var message = $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}";
+        var msg = context.Message;
+        var notificationMessage = $"Order {msg.OrderId} confirmed for {msg.CustomerName}";
 
         // Publish CustomerNotified event
-        await context.Publish(new CustomerNotified(context.Message.OrderId, message));
+        await context.Publish(new CustomerNotified(msg.OrderId, notificationMessage));
     }
 }
 
-// --- Test Class (Outside Contracts Namespace) ---
+// --- Test Class (No Namespace) ---
 
 public class ConsumerPipelineTests
 {
-    private ITestHarness SetupHarness()
+    private IServiceCollection SetupServices()
     {
         var services = new ServiceCollection();
-
-        // Register the consumers for the test harness
-        services.AddMassTransitTestHarness(cfg =>
+        services.AddMassTransit(x =>
         {
-            cfg.AddConsumer<PlaceOrderConsumer>();
-            cfg.AddConsumer<NotifyCustomerConsumer>();
+            x.AddConsumer<PlaceOrderConsumer>();
+            x.AddConsumer<NotifyCustomerConsumer>();
+            // Use in-memory bus for testing
+            x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
         });
-
-        var provider = services.BuildServiceProvider();
-        var harness = provider.GetRequiredService<ITestHarness>();
-        return harness;
+        return services;
     }
 
     [Fact]
     public async Task PlaceOrder_ShouldPublishOrderPlaced()
     {
         // Arrange
-        var harness = SetupHarness();
+        var services = SetupServices();
+        var provider = services.BuildServiceProvider();
+
+        var harness = provider.GetRequiredService<ITestHarness>();
         await harness.Start();
 
         var orderId = Guid.NewGuid();
@@ -73,48 +74,52 @@ public class ConsumerPipelineTests
 
         // Assert
         // 1. Verify the initial message was consumed
-        Assert.True(await harness.Consumed.Any<PlaceOrder>());
+        await Assert.True(harness.Consumed.Any<PlaceOrder>());
 
-        // 2. Verify the first event was published
-        var orderPlacedMessages = await harness.Published.OfType<OrderPlaced>().ToListAsync();
-        Assert.Single(orderPlacedMessages);
-        Assert.Equal(orderId, orderPlacedMessages.First().OrderId);
+        // 2. Verify the subsequent event was published
+        await Assert.True(harness.Published.Any<OrderPlaced>());
+
+        // Clean up
+        await harness.Stop();
     }
 
     [Fact]
-    public async Task FullPipeline_ShouldProcessPlaceOrderToCustomerNotified()
+    public async Task FullPipeline_ShouldProcessAndPublishCustomerNotified()
     {
         // Arrange
-        var harness = SetupHarness();
+        var services = SetupServices();
+        var provider = services.BuildServiceProvider();
+
+        var harness = provider.GetRequiredService<ITestHarness>();
         await harness.Start();
 
         var orderId = Guid.NewGuid();
         var initialMessage = new PlaceOrder(orderId, "Bob");
 
         // Act
-        // Publish the initial message
         await harness.Bus.Publish(initialMessage);
 
-        // Wait for the asynchronous pipeline to complete (PlaceOrder -> OrderPlaced -> CustomerNotified)
-        // We wait for the final expected message type to ensure the chain completes.
+        // Wait for the asynchronous pipeline to complete
+        // We wait until the final expected message (CustomerNotified) is published.
         await Task.Delay(100); 
 
         // Assert
-
         // 1. Verify the initial message was consumed
-        Assert.True(await harness.Consumed.Any<PlaceOrder>());
+        await Assert.True(harness.Consumed.Any<PlaceOrder>());
 
-        // 2. Verify the intermediate event was published
-        var orderPlacedMessages = await harness.Published.OfType<OrderPlaced>().ToListAsync();
-        Assert.Single(orderPlacedMessages);
-        Assert.Equal(orderId, orderPlacedMessages.First().OrderId);
+        // 2. Verify the intermediate event was consumed
+        await Assert.True(harness.Consumed.Any<OrderPlaced>());
 
         // 3. Verify the final event was published
-        var notifiedMessages = await harness.Published.OfType<CustomerNotified>().ToListAsync();
-        Assert.Single(notifiedMessages);
+        await Assert.True(harness.Published.Any<CustomerNotified>());
 
-        var finalMessage = notifiedMessages.First();
-        Assert.Equal(orderId, finalMessage.OrderId);
-        Assert.Contains("confirmed for Bob", finalMessage.NotificationMessage);
+        // Optional: Verify the content of the final message
+        var publishedCustomerNotified = await harness.Published.OfType<CustomerNotified>().FirstOrDefaultAsync();
+        Assert.NotNull(publishedCustomerNotified);
+        Assert.Equal(orderId, publishedCustomerNotified.OrderId);
+        Assert.Contains("confirmed for Bob", publishedCustomerNotified.NotificationMessage);
+
+        // Clean up
+        await harness.Stop();
     }
 }
