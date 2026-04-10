@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 public class Address
@@ -16,14 +17,14 @@ public class Company
 
 public class CompanyDbContext : DbContext
 {
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
-
     public DbSet<Company> Companies { get; set; }
+
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
+        modelBuilder.Entity<Company>()
+            .OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
     }
 }
 

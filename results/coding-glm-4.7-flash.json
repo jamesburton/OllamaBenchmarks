@@ -1,8 +1,8 @@
 {
   "model": "glm-4.7-flash",
   "benchmark": "coding",
-  "run_started_at": "2026-04-09T22:48:38.519699+00:00",
-  "run_finished_at": "2026-04-10T05:27:20.726585+00:00",
+  "run_started_at": "2026-04-10T09:27:45.866556+00:00",
+  "run_finished_at": "2026-04-10T09:27:46.661186+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
@@ -13,7 +13,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.09,
+      "generation_time_s": 0.09,
       "generated_code_path": null
     },
     {
@@ -25,20 +25,20 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.0,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
       "task": "aspnet_service_di",
       "category": "aspnet",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 492.06,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\aspnet_service_di.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.01,
+      "generated_code_path": null
     },
     {
       "task": "efcore_leftjoin",
@@ -49,7 +49,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -61,7 +61,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.01,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -73,7 +73,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.0,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -85,7 +85,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -97,7 +97,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.0,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -109,44 +109,44 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.01,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
       "task": "blazor_interactive_component",
       "category": "blazor",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 332.53,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\blazor_interactive_component.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "blazor_streaming_render",
       "category": "blazor",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 357.36,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\blazor_streaming_render.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "blazor_cascading_auth",
       "category": "blazor",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 343.22,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\blazor_cascading_auth.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "xunit_v3_theory_tests",
@@ -157,7 +157,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.0,
       "generated_code_path": null
     },
     {
@@ -169,7 +169,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.03,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -181,7 +181,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -189,12 +189,12 @@
       "category": "linq",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 373.56,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\linq_complex_query.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "async_cancellation",
@@ -205,7 +205,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -217,7 +217,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.0,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -229,7 +229,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -241,56 +241,56 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.01,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
       "task": "linq_selectmany_flatten",
       "category": "linq",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 159.64,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\linq_selectmany_flatten.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "linq_set_operations",
       "category": "linq",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 206.89,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\linq_set_operations.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.01,
+      "generated_code_path": null
     },
     {
       "task": "linq_aggregate_stats",
       "category": "linq",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 474.76,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\linq_aggregate_stats.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "linq_todictionary_tolookup",
       "category": "linq",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 272.8,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\linq_todictionary_tolookup.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "async_whenall_parallel",
@@ -301,7 +301,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.01,
+      "generation_time_s": 0.0,
       "generated_code_path": null
     },
     {
@@ -313,7 +313,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -325,7 +325,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.01,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -333,60 +333,60 @@
       "category": "async",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 282.84,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\async_valuetask_cache.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "aspnet_minimal_api_endpoint",
       "category": "aspnet",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 1,
-      "tests_total": 3,
-      "generation_time_s": 411.42,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\aspnet_minimal_api_endpoint.cs"
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.01,
+      "generated_code_path": null
     },
     {
       "task": "aspnet_typed_httpclient",
       "category": "aspnet",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 409.69,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\aspnet_typed_httpclient.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "aspnet_ioptions_config",
       "category": "aspnet",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 378.53,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\aspnet_ioptions_config.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.01,
+      "generated_code_path": null
     },
     {
       "task": "aspnet_problemdetails_handler",
       "category": "aspnet",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 463.28,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\aspnet_problemdetails_handler.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "efcore_include_navigation",
@@ -397,7 +397,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
@@ -409,44 +409,44 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
       "task": "efcore_owned_entity",
       "category": "efcore",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 433.41,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\efcore_owned_entity.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "efcore_value_conversion",
       "category": "efcore",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 529.33,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\efcore_value_conversion.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "masstransit_request_response",
       "category": "masstransit",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 474.52,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\masstransit_request_response.cs"
+      "generation_time_s": 0.01,
+      "generated_code_path": null
     },
     {
       "task": "masstransit_saga_events",
@@ -457,44 +457,44 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.02,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
       "task": "masstransit_consumer_filter",
       "category": "masstransit",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 394.94,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\masstransit_consumer_filter.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "xunit_memberdata",
       "category": "xunit",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 25,
-      "tests_total": 25,
-      "generation_time_s": 569.23,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\xunit_memberdata.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "xunit_class_fixture",
       "category": "xunit",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 9,
-      "tests_total": 9,
-      "generation_time_s": 497.86,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\xunit_class_fixture.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "xunit_async_collection",
@@ -505,44 +505,44 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.0,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
       "task": "blazor_form_validation",
       "category": "blazor",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 7,
-      "tests_total": 7,
-      "generation_time_s": 263.19,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\blazor_form_validation.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.01,
+      "generated_code_path": null
     },
     {
       "task": "blazor_navigation_redirect",
       "category": "blazor",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 262.53,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\blazor_navigation_redirect.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "blazor_parameter_lifecycle",
       "category": "blazor",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 282.97,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\blazor_parameter_lifecycle.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "vertical_cqrs_handler",
@@ -553,7 +553,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.01,
+      "generation_time_s": 0.01,
       "generated_code_path": null
     },
     {
@@ -565,45 +565,45 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 600.03,
+      "generation_time_s": 0.02,
       "generated_code_path": null
     },
     {
       "task": "patterns_record_with",
       "category": "patterns",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 6,
-      "tests_total": 6,
-      "generation_time_s": 156.12,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\patterns_record_with.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.01,
+      "generated_code_path": null
     },
     {
       "task": "patterns_json_serialization",
       "category": "patterns",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 183.53,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\patterns_json_serialization.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "patterns_timeprovider",
       "category": "patterns",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 4,
-      "tests_total": 4,
-      "generation_time_s": 199.55,
-      "generated_code_path": "results\\coding-generated\\glm-4.7-flash\\patterns_timeprovider.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     }
   ],
-  "layer3_weighted_score": 0.36363636363636365
+  "layer3_weighted_score": 0.0
 }
