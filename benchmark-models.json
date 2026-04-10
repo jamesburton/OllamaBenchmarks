@@ -47,7 +47,10 @@
     "deepseek-v3.2:cloud",
     "glm-5.1:cloud",
     "hf.co/bartowski/stepfun-ai_Step-3.5-Flash-GGUF:IQ2_XXS",
-    "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K"
+    "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K",
+    "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_XXS",
+    "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_M",
+    "hf.co/TeichAI/gemma-4-31B-it-Claude-Opus-Distill-GGUF:Q4_K_M"
   ],
   "local_installed": [
     "cogito:8b",
@@ -180,6 +183,9 @@
     "nemotron-3-super": "Strix: Coding L3 36/50 (0.727) — #4. 86GB model, 28%/72% CPU/GPU split (93GB loaded). 120B MoE 12B active. Strong finish — last 20 tasks 19/20 PASS. Uses temperature=1.0. Failed early tasks (aspnet_oneof, efcore_leftjoin, masstransit_statemachine/test_harness, xunit tasks) but swept EF Core 33-36, MassTransit 37-39, all Blazor, vertical, and patterns tasks.",
     "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K": "Strix: 85GB model, 24%/76% CPU/GPU split. Qwen3 235B MoE (22B active), i1-Q2_K quant. Very slow (~7 min/task). L3 benchmark in progress. Q2_K quality significantly degrades code generation — 50% pass rate at task 13. The abliterated (uncensored) variant is not optimal for coding benchmarks.",
     "hf.co/bartowski/stepfun-ai_Step-3.5-Flash-GGUF:IQ2_XXS": "BLOCKED: Ollama 0.20.2 does not support Step-3.5-Flash architecture (GitHub issue #14043, llama.cpp PRs merged but not in Ollama yet). 48GB IQ2_XXS downloaded, 500 error on load. 197B MoE (11B active), Apache 2.0. StepFun official Q4_K_S (111GB) explicitly targets 128GB unified memory (AMD Ryzen AI Max+ 395). REAP pruned variant (149B/11B) available at Q4_K_S 85GB. Needs llama-server or Ollama update.",
-    "deepseek-v3.2:cloud": "Ollama cloud (provider: DeepSeek). 685B MoE, ~37B active. Coding L3 (20-task): 16/20 (0.826). NOT runnable locally — smallest GGUF is 161GB (unsloth UD-TQ1_0), exceeds 128GB. Cloud-only on Ollama."
+    "deepseek-v3.2:cloud": "Ollama cloud (provider: DeepSeek). 685B MoE, ~37B active. Coding L3 (20-task): 16/20 (0.826). NOT runnable locally — smallest GGUF is 161GB (unsloth UD-TQ1_0), exceeds 128GB. Cloud-only on Ollama.",
+    "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_XXS": "Framework candidate. 31B dense, Unsloth Dynamic IQ2_XXS = 8.5GB. Fits fully in 12GB GPU. Testing if IQ2 quality holds for code generation.",
+    "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_M": "Framework candidate. 31B dense, Unsloth Dynamic IQ2_M = 10.8GB. Tight fit in 12GB GPU. Better quality than IQ2_XXS.",
+    "hf.co/TeichAI/gemma-4-31B-it-Claude-Opus-Distill-GGUF:Q4_K_M": "Strix candidate. 31B dense fine-tuned with Claude Opus reasoning data. Q4_K_M = ~18GB. Too large for Framework GPU but fits Strix 128GB easily. May outperform base gemma4:31b on coding tasks."
   }
 }
