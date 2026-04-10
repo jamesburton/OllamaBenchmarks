@@ -1,8 +1,8 @@
 {
     "benchmark":  "throughput_resource",
     "run_started_at":  "2026-04-10T17:21:20.0500241+01:00",
-    "run_finished_at":  "2026-04-10T17:24:30.2991772+01:00",
-    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-gemma4.json",
+    "run_finished_at":  "2026-04-10T17:24:30.4584577+01:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260410-172120.json",
     "host":  "FRAMEWORK",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
@@ -11,6 +11,15 @@
     "models":  [
                    "gemma4"
                ],
+    "completed_models":  [
+                             "gemma4"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,
