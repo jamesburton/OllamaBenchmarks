@@ -35,24 +35,38 @@ public class CounterCollection : ICollectionFixture<CounterFixture>
 }
 
 [Collection("Counter")]
-public class CounterFirstTests(CounterFixture fixture)
+public class CounterFirstTests
 {
+    private readonly CounterFixture _fixture;
+
+    public CounterFirstTests(CounterFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     [Fact]
     public void Increment_IncreasesCount()
     {
-        fixture.Counter.Increment();
-        fixture.Counter.Count.Should().BeGreaterOrEqualTo(1);
+        _fixture.Counter.Increment();
+        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(1);
     }
 }
 
 [Collection("Counter")]
-public class CounterSecondTests(CounterFixture fixture)
+public class CounterSecondTests
 {
+    private readonly CounterFixture _fixture;
+
+    public CounterSecondTests(CounterFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     [Fact]
     public void IncrementTwice_IncreasesCountFurther()
     {
-        fixture.Counter.Increment();
-        fixture.Counter.Increment();
-        fixture.Counter.Count.Should().BeGreaterOrEqualTo(2);
+        _fixture.Counter.Increment();
+        _fixture.Counter.Increment();
+        _fixture.Counter.Count.Should().BeGreaterOrEqualTo(2);
     }
 }

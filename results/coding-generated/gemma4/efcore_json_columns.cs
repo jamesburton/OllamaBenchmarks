@@ -25,10 +25,7 @@ public class CompanyDbContext : DbContext
 {
     public DbSet<Company> Companies { get; set; }
 
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
-        : base(options)
-    {
-    }
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,7 +40,8 @@ public static class CompanyQueries
 {
     public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        // Querying the JSON owned property (HeadquartersAddress.City)
+        // EF Core handles accessing the JSON property via navigation/property access
+        // when using OwnsOne().ToJson() configuration.
         var companies = db.Companies
             .Where(c => c.HeadquartersAddress != null && c.HeadquartersAddress.City == city)
             .ToList();

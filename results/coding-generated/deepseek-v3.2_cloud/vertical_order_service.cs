@@ -2,7 +2,7 @@ using OneOf;
 
 public class OrderItem
 {
-    public string ProductName { get; set; }
+    public string ProductName { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
 }
@@ -10,21 +10,21 @@ public class OrderItem
 public class Order
 {
     public int Id { get; set; }
-    public string CustomerName { get; set; }
-    public List<OrderItem> Items { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public List<OrderItem> Items { get; set; } = new();
     public decimal Total { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 
 public class CreateOrderRequest
 {
-    public string CustomerName { get; set; }
-    public List<OrderItem> Items { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public List<OrderItem> Items { get; set; } = new();
 }
 
 public class ValidationError
 {
-    public string Message { get; set; }
+    public string Message { get; set; } = string.Empty;
 }
 
 public interface IOrderRepository
@@ -44,7 +44,7 @@ public class OrderService
 
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
-        if (string.IsNullOrEmpty(request.CustomerName))
+        if (string.IsNullOrWhiteSpace(request.CustomerName))
         {
             return new ValidationError { Message = "Customer name is required" };
         }

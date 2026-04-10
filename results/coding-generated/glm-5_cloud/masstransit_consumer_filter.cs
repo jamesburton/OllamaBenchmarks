@@ -1,10 +1,10 @@
 global using Contracts;
+
 using MassTransit;
 
 namespace Contracts;
 
 public record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
-
 public record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
 
 public class ProcessPaymentConsumer : IConsumer<ProcessPayment>

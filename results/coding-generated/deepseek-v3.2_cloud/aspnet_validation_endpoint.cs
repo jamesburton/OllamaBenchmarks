@@ -19,12 +19,7 @@ public class OrderService
         var validationContext = new ValidationContext(request);
         var validationResults = new List<ValidationResult>();
 
-        bool isValid = Validator.TryValidateObject(
-            request, 
-            validationContext, 
-            validationResults, 
-            validateAllProperties: true
-        );
+        bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
 
         if (!isValid && validationResults.Count > 0)
         {

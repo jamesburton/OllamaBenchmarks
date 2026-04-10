@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-// 1. Customer Entity
+// 1. Customer entity class
 public class Customer
 {
     public int Id { get; set; }
@@ -12,7 +12,7 @@ public class Customer
     public string Email { get; set; }
 }
 
-// 2. Order Entity
+// 2. Order entity class
 public class Order
 {
     public int Id { get; set; }
@@ -21,10 +21,7 @@ public class Order
     public DateTime OrderDate { get; set; }
 }
 
-// 4. Order DTO
-public record OrderDto(int OrderId, decimal Total, string CustomerName);
-
-// 3. AppDbContext
+// 3. AppDbContext class
 public class AppDbContext : DbContext
 {
     public DbSet<Order> Orders { get; set; }
@@ -36,75 +33,70 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Ensure relationships are defined if necessary (optional for this specific query)
-        modelBuilder.Entity<Order>()
-            .HasOne(o => o.Customer)
-            .WithMany() // Assuming Customer doesn't reference Order directly for simplicity
-            .HasForeignKey(o => o.CustomerId);
+        // Seed data for demonstration purposes (optional, but helpful for testing)
+        modelBuilder.Entity<Customer>().HasData(
+            new Customer { Id = 1, Name = "Alice", Email = "alice@example.com" },
+            new Customer { Id = 2, Name = "Bob", Email = "bob@example.com" }
+        );
+        modelBuilder.Entity<Order>().HasData(
+            new Order { Id = 101, CustomerId = 1, Total = 50.00m, OrderDate = DateTime.Now.AddDays(-5) },
+            new Order { Id = 102, CustomerId = 99, Total = 150.50m, OrderDate = DateTime.Now.AddDays(-3) } // Order with non-existent customer
+        );
     }
 }
 
-// 5. Static Class with Query Logic
+// 4. OrderDto record
+public record OrderDto(int OrderId, decimal Total, string CustomerName);
+
+// 5. Static class with the query method
 public static class OrderQueries
 {
     /// <summary>
     /// Retrieves orders joined with customer names using EF Core 10's LeftJoin.
     /// </summary>
+    /// <param name="db">The DbContext to query against.</param>
+    /// <returns>A list of OrderDto containing order details and customer names.</returns>
     public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
     {
-        var result = await db.Orders
+        var results = await db.Orders
             .LeftJoin(
                 db.Customers,
                 order => order.CustomerId,
                 customer => customer.Id,
-                (order, customer) => new { order, customer } // Define the join result structure
+                (order, customer) => new { order.Id, CustomerName = customer == null ? "Unknown" : customer.Name }
             )
             .Select(joined => new OrderDto(
                 OrderId: joined.order.Id,
                 Total: joined.order.Total,
-                // Handle the null case for the left join
-                CustomerName: joined.customer != null ? joined.customer.Name : "Unknown"
+                CustomerName: joined.CustomerName
             ))
             .ToListAsync();
 
-        return result;
+        return results;
     }
 }
 
-// Example Usage (Demonstration purposes only, requires setup of a DbContext)
+// Example usage (optional, for completeness, not strictly required by prompt)
 /*
 public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Setup In-Memory Database for demonstration
+        // Setup In-Memory Database for testing
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(databaseName: "TestDb")
             .Options;
 
         using (var context = new AppDbContext(options))
         {
-            // Seed Data
-            context.Customers.AddRange(new List<Customer>
-            {
-                new Customer { Id = 1, Name = "Alice", Email = "alice@example.com" },
-                new Customer { Id = 2, Name = "Bob", Email = "bob@example.com" }
-            });
+            // Ensure database is created and seeded (if not using seed data in OnModelCreating)
+            // context.Database.EnsureCreated(); 
 
-            context.Orders.AddRange(new List<Order>
-            {
-                new Order { CustomerId = 1, Total = 100.50m, OrderDate = DateTime.Now.AddDays(-5) },
-                new Order { CustomerId = 99, Total = 50.00m, OrderDate = DateTime.Now.AddDays(-3) } // Order with unknown customer
-            });
+            Console.WriteLine("Executing LeftJoin query...");
+            var orderDtos = await OrderQueries.GetOrdersWithCustomers(context);
 
-            await context.SaveChangesAsync();
-
-            // Execute the query
-            var dtos = await OrderQueries.GetOrdersWithCustomers(context);
-
-            // Output Results
-            Console.WriteLine("--- Orders with Customer Names ---");
-            foreach (var dto in dtos)
+            Console.WriteLine("\n--- Results ---");
+            foreach (var dto in orderDtos)
             {
                 Console.WriteLine($"Order ID: {dto.OrderId}, Total: {dto.Total:C}, Customer: {dto.CustomerName}");
             }

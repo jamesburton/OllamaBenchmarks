@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using System;
-using System.Threading.Tasks;
 
 public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
 
@@ -14,16 +12,16 @@ public class WeatherPageBase : ComponentBase
     [Inject]
     public IWeatherService Orders { get; set; }
 
-    [StreamRendering]
     public WeatherForecast[]? Forecasts { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        if (Orders == null)
-        {
-            throw new InvalidOperationException("IWeatherService must be injected.");
-        }
+        await LoadForecasts();
+    }
 
-        Forecasts = await Orders.GetForecastsAsync();
+    private async Task LoadForecasts()
+    {
+        var forecasts = await Orders.GetForecastsAsync();
+        Forecasts = forecasts;
     }
 }

@@ -3,7 +3,7 @@ using OneOf;
 using System;
 using System.Threading.Tasks;
 
-// --- Model Definitions ---
+// --- Domain Models ---
 
 // User must be a class with public get/set properties
 public class User
@@ -13,20 +13,21 @@ public class User
     public string Email { get; set; } = string.Empty;
 }
 
-// NotFound record type (parameterless constructor)
+// NotFound must be a record with a parameterless constructor
 public record NotFound;
 
-// ValidationError record type (accepts Message)
+// ValidationError must be a record accepting a single string Message parameter
 public record ValidationError(string Message);
 
 // --- Service Interface ---
 
 public interface IUserService
 {
+    // The service returns the OneOf discriminated union
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
-// --- Controller Implementation ---
+// --- Controller ---
 
 [ApiController]
 [Route("api/users")]
@@ -39,74 +40,44 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
-    // GET /api/users/{id}
+    // Action method must be named 'Get'
+    [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        // 1. Call the service layer
+        // Call the service which returns the OneOf union
         var result = await _userService.GetByIdAsync(id);
 
-        // 2. Use Match to handle the discriminated union and map to IActionResult
+        // Use the Match pattern to handle the discriminated union result
         return result.Match<IActionResult>(
-            // Case 1: Success (User) -> 200 OK
-            user => Ok(user),
-
-            // Case 2: Not Found (NotFound) -> 404 Not Found
-            // Note: We use the default record instance here.
-            _ => NotFound(), 
-
-            // Case 3: Validation Error (ValidationError) -> 400 Bad Request
-            // We must cast the remainder to ValidationError to access the message.
-            err => BadRequest(err.Message)
+            user => Ok(user), // T0: User -> 200 OK
+            _ => NotFound(),  // T1: NotFound -> 404 Not Found
+            err => BadRequest(err.Message) // T2: ValidationError -> 400 Bad Request
         );
     }
 }
 
-// --- Mock Service Implementation (for completeness/testing) ---
-
+// --- Mock Implementation for Compilation/Testing ---
+// In a real application, this would be registered via Program.cs/Startup.cs
 public class MockUserService : IUserService
 {
     public Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id)
     {
         if (id == 1)
         {
-            // Success case
             var user = new User { Id = 1, Name = "Alice", Email = "alice@example.com" };
             return Task.FromResult(new OneOf<User, NotFound, ValidationError>(user));
         }
         else if (id == 99)
         {
-            // Validation Error case
+            // Simulate validation error
             return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new ValidationError("User ID must be positive.")));
-        }
-        else if (id == 0)
-        {
-            // Not Found case
-            return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
         }
         else
         {
-            // Default fallback (e.g., if the service logic changes)
+            // Simulate not found
             return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
         }
     }
 }
 
-// --- Program Setup (Simulating Dependency Injection) ---
-// This section is not required for the final output but shows how the components fit together.
-/*
-public class Program
-{
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-
-        // Register services
-        builder.Services.AddSingleton<IUserService, MockUserService>();
-        builder.Services.AddControllers();
-
-        var app = builder.Build();
-        app.MapControllers();
-        app.Run();
-    }
-}
-*/
+// Note: For this code to run, the project must have the OneOf NuGet package installed.

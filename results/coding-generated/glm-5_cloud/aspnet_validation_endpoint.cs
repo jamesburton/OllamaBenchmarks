@@ -19,20 +19,12 @@ public class OrderService
         var validationContext = new ValidationContext(request);
         var validationResults = new List<ValidationResult>();
 
-        bool isValid = Validator.TryValidateObject(
-            request,
-            validationContext,
-            validationResults,
-            validateAllProperties: true);
+        bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
 
         if (!isValid)
         {
             var firstError = validationResults[0];
-            var memberName = firstError.MemberNames.FirstOrDefault();
-            var errorMessage = memberName != null
-                ? $"{memberName}: {firstError.ErrorMessage}"
-                : firstError.ErrorMessage;
-            throw new ArgumentException(errorMessage);
+            throw new ArgumentException(firstError.ErrorMessage);
         }
 
         return request;

@@ -13,17 +13,17 @@ public static class ProductEndpoints
     {
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            return Results.ValidationProblem(new Dictionary<string, string[]> 
-            { 
-                ["Name"] = ["Name is required."] 
+            return Results.ValidationProblem(new Dictionary<string, string[]>
+            {
+                ["Name"] = ["Name is required."]
             });
         }
 
         if (request.Price <= 0)
         {
-            return Results.ValidationProblem(new Dictionary<string, string[]> 
-            { 
-                ["Price"] = ["Price must be greater than 0."] 
+            return Results.ValidationProblem(new Dictionary<string, string[]>
+            {
+                ["Price"] = ["Price must be greater than 0."]
             });
         }
 

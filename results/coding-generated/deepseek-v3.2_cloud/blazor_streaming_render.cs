@@ -1,12 +1,5 @@
 using Microsoft.AspNetCore.Components;
 
-public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
-
-public interface IWeatherService
-{
-    Task<WeatherForecast[]> GetForecastsAsync();
-}
-
 [StreamRendering]
 public class WeatherPageBase : ComponentBase
 {
@@ -19,4 +12,11 @@ public class WeatherPageBase : ComponentBase
     {
         Forecasts = await WeatherService.GetForecastsAsync();
     }
+}
+
+public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
+
+public interface IWeatherService
+{
+    Task<WeatherForecast[]> GetForecastsAsync();
 }

@@ -53,6 +53,11 @@ public class TodoListBase : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadTodos();
+    }
+
+    private async Task LoadTodos()
+    {
         Todos = await TodoService.GetAllAsync();
     }
 
@@ -62,20 +67,20 @@ public class TodoListBase : ComponentBase
         {
             await TodoService.AddAsync(NewTitle);
             NewTitle = "";
-            Todos = await TodoService.GetAllAsync();
+            await LoadTodos();
         }
     }
 
     public async Task DeleteTodo(int id)
     {
         await TodoService.DeleteAsync(id);
-        Todos = await TodoService.GetAllAsync();
+        await LoadTodos();
     }
 
     public async Task ToggleTodo(int id)
     {
         await TodoService.ToggleAsync(id);
-        Todos = await TodoService.GetAllAsync();
+        await LoadTodos();
     }
 }
 
@@ -119,10 +124,10 @@ public class TodoListBaseTests
         var ctx = new Bunit.TestContext();
         var mockService = Substitute.For<ITodoService>();
 
-        ctx.Services.AddSingleton<ITodoService>(mockService);
+        ctx.Services.AddSingleton(mockService);
 
         ctx.RenderComponent<TodoListBase>();
 
-        mockService.Received(1).GetAllAsync();
+        mockService.Received().GetAllAsync();
     }
 }

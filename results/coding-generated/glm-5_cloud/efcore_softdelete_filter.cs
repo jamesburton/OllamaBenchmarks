@@ -48,14 +48,14 @@ public class ArticleRepository
         }
     }
 
-    public async Task<List<Article>> GetAllAsync()
+    public Task<List<Article>> GetAllAsync()
     {
-        return await _context.Articles.ToListAsync();
+        return _context.Articles.ToListAsync();
     }
 
-    public async Task<List<Article>> GetAllIncludingDeletedAsync()
+    public Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        return await _context.Articles
+        return _context.Articles
             .IgnoreQueryFilters()
             .ToListAsync();
     }

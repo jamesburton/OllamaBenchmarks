@@ -9,42 +9,50 @@ public class ProcessPaymentConsumerTests
     {
         // Arrange
         var services = new ServiceCollection();
-        services.AddMassTransit(x =>
+        services.AddMassTransitTestHarness(cfg =>
         {
-            // Register the consumer we are testing
-            x.AddConsumer<ProcessPaymentConsumer>();
+            cfg.AddConsumer<ProcessPaymentConsumer>();
         });
 
-        // Build the service provider and the test harness
         var provider = services.BuildServiceProvider(true);
         var harness = provider.GetRequiredService<ITestHarness>();
 
+        var orderId = Guid.NewGuid();
+        var amount = 100.50m;
+        var paymentMessage = new ProcessPayment(orderId, amount);
+
         // Act
         await harness.Start();
-
-        var testOrderId = Guid.NewGuid();
-        var testAmount = 100.50m;
-        var message = new ProcessPayment(testOrderId, testAmount);
-
-        await harness.Bus.Publish(message);
+        await harness.Bus.Publish(paymentMessage);
 
         // Assert
-        // 1. Verify that the consumer received the input message (implicitly checked by the harness setup)
-        // 2. Verify that the consumer published the output event
+        var consumed = await harness.Consumed.Any<PaymentProcessed>();
+        var published = await harness.Published.Any<PaymentProcessed>();
 
-        var consumedResult = await harness.Consumed.Any<PaymentProcessed>();
-        var publishedResult = await harness.Published.Any<PaymentProcessed>();
+        // Check if the event was consumed
+        var consumedResult = await consumed;
+        Assert.True(consumedResult, "PaymentProcessed event should have been consumed.");
 
-        // Use Assert.Multiple to check both results
+        // Check if the event was published
+        var publishedResult = await published;
+        Assert.True(publishedResult, "PaymentProcessed event should have been published.");
+
+        // Verify the content of the published event
+        var publishedEvent = await published.First();
+        Assert.Equal(orderId, publishedEvent.OrderId);
+
+        // Since the consumer generates a new Guid for TransactionId, we only check the OrderId match.
+        // We don't assert the exact TransactionId as it's generated inside the consumer.
+
+        // Use Assert.Multiple to group the checks
         Assert.Multiple(
             () =>
             {
-                // Check 1: Ensure the PaymentProcessed event was published
-                Assert.True(publishedResult, "PaymentProcessed event should have been published.");
+                // 1. Check consumption
+                Assert.True(consumedResult, "The PaymentProcessed event must be consumed.");
 
-                // Check 2: Ensure the published event contains the correct OrderId
-                var publishedEvent = await harness.Published.FirstAsync<PaymentProcessed>();
-                Assert.Equal(testOrderId, publishedEvent.OrderId);
+                // 2. Check publication
+                Assert.True(publishedResult, "The PaymentProcessed event must be published.");
             });
     }
 }

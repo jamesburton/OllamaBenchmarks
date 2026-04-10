@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 public class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task Consume_ProcessPayment_PublishesPaymentProcessed()
+    public async Task Should_ProcessPayment_And_Publish_PaymentProcessed()
     {
         // Arrange
         var services = new ServiceCollection();
@@ -16,6 +16,7 @@ public class ProcessPaymentConsumerTests
 
         var provider = services.BuildServiceProvider(true);
         var harness = provider.GetRequiredService<ITestHarness>();
+
         await harness.Start();
 
         var orderId = Guid.NewGuid();
@@ -28,11 +29,11 @@ public class ProcessPaymentConsumerTests
         bool consumed = await harness.Consumed.Any<ProcessPayment>();
         bool published = await harness.Published.Any<PaymentProcessed>();
 
-        var publishedMessage = harness.Published.Select<PaymentProcessed>().FirstOrDefault();
+        var publishedMessage = harness.Published.SelectFirst(typeof(PaymentProcessed)).Message as PaymentProcessed;
 
         Assert.Multiple(
-            () => Assert.True(consumed, "The ProcessPayment message should have been consumed."),
-            () => Assert.True(published, "A PaymentProcessed event should have been published."),
+            () => Assert.True(consumed, "The ProcessPayment message should be consumed."),
+            () => Assert.True(published, "A PaymentProcessed event should be published."),
             () => Assert.Equal(orderId, publishedMessage?.OrderId)
         );
     }

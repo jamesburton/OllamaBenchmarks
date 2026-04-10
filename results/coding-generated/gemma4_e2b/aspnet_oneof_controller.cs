@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using OneOf;
 
-// --- 1. Define Custom Types using OneOf pattern ---
+// --- Data Structures ---
 
-// User Class (supports object initializer)
+// User class (must support object-initializer syntax)
 public class User
 {
     public int Id { get; set; }
@@ -11,41 +11,43 @@ public class User
     public string Email { get; set; }
 }
 
-// NotFound Record
+// NotFound record
 public record NotFound;
 
-// ValidationError Record
+// ValidationError record
 public record ValidationError(string Message);
 
-// --- 2. Define Service Interface ---
+// --- Service Interface ---
 
 public interface IUserService
 {
-    // The service returns the discriminated union
     OneOf<User, NotFound, ValidationError> GetByIdAsync(int id);
 }
 
-// --- 3. Mock Implementation of the Service (for context) ---
-
+// --- Example Service Implementation (for context, not strictly required by prompt) ---
+// In a real application, this would be injected.
 public class UserService : IUserService
 {
     public OneOf<User, NotFound, ValidationError> GetByIdAsync(int id)
     {
         if (id == 1)
         {
-            var user = new User { Id = 1, Name = "Alice", Email = "a@b.com" };
-            return user;
+            return new User { Id = 1, Name = "Alice", Email = "a@b.com" };
         }
-        if (id == 99)
+        if (id == 404)
         {
             return new NotFound();
         }
-        // Simulate a validation error for other IDs
-        return new ValidationError("User not found or invalid ID.");
+        if (id == 400)
+        {
+            return new ValidationError("User not found for ID: " + id);
+        }
+        // Default case if needed
+        return new NotFound();
     }
 }
 
-// --- 4. Define the Controller ---
+// --- Controller ---
 
 [ApiController]
 [Route("api/[controller]")]
@@ -59,25 +61,25 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a user by ID, handling NotFound or ValidationError outcomes.
+    /// Retrieves a user by ID, handling success, not found, and validation errors.
     /// </summary>
     /// <param name="id">The ID of the user to retrieve.</param>
-    /// <returns>The appropriate HTTP status code and response body.</returns>
+    /// <returns>The appropriate HTTP result (200, 404, or 400).</returns>
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        // Call the service which returns the OneOf union
+        // Call the service which returns the OneOf union type
         OneOf<User, NotFound, ValidationError> result = await _userService.GetByIdAsync(id);
 
-        // Use the Match method to map the union result to the appropriate IActionResult
+        // Use the Match method to map the union type to the appropriate IActionResult
         return result.Match<IActionResult>(
-            user   => Ok(user),             // Maps User to 200 OK
+            user    => Ok(user),             // Maps User to 200 OK
             notFound => NotFound(),           // Maps NotFound to 404 Not Found
-            err    => BadRequest(new
-            {
-                Message = err.Message,
-                ErrorType = "Validation"
-            }) // Maps ValidationError to 400 Bad Request
+            err     => BadRequest(new
+                {
+                    Message = err.Message,
+                    Status = 400
+                }) // Maps ValidationError to 400 Bad Request
         );
     }
 }

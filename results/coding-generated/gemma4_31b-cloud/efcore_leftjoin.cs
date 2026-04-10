@@ -33,7 +33,7 @@ public static class OrderQueries
 {
     public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
     {
-        var query = db.Orders
+        return db.Orders
             .LeftJoin(
                 db.Customers,
                 order => order.CustomerId,
@@ -43,8 +43,7 @@ public static class OrderQueries
                     order.Total, 
                     customer == null ? "Unknown" : customer.Name
                 )
-            );
-
-        return query.ToList();
+            )
+            .ToList();
     }
 }

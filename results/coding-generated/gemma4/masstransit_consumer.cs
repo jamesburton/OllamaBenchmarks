@@ -1,37 +1,36 @@
 using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
-// Global using statement to make types accessible without explicit using directives
+// Global using for file-scoped namespace access
 global using Contracts;
 
 namespace Contracts;
 
-// 1. Message Record
+// 1. SubmitOrder message record
 public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
 
-// 2. Event Record
+// 2. OrderSubmitted event record
 public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
 
-// 3. Consumer Implementation
+// 3. SubmitOrderConsumer class
 public class SubmitOrderConsumer : IConsumer<SubmitOrder>
 {
     public async Task Consume(ConsumeContext<SubmitOrder> context)
     {
         var message = context.Message;
-
-        // Publish the OrderSubmitted event
         await context.Publish(new OrderSubmitted(message.OrderId, DateTime.UtcNow));
     }
 }
 
-// 4. Consumer Definition
+// 4. SubmitOrderConsumerDefinition class
 public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
 {
     public SubmitOrderConsumerDefinition()
     {
         // Set ConcurrentMessageLimit = 4
-        this.ConcurrentMessageLimit = 4;
+        this.SetConcurrentMessageLimit(4);
     }
 
     protected override void ConfigureConsumer(
@@ -39,7 +38,25 @@ public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsu
         IConsumerConfigurator<SubmitOrderConsumer> consumer,
         IRegistrationContext ctx)
     {
-        // UseMessageRetry(r => r.Interval(3, 1000))
+        // Call ep.UseMessageRetry(r => r.Interval(3, 1000))
         ep.UseMessageRetry(r => r.Interval(3, 1000));
     }
 }
+
+// Example usage structure (not required for the output, but useful for context)
+/*
+public static class Program
+{
+    public static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMassTransit(x =>
+        {
+            x.AddConsumer<SubmitOrderConsumer>();
+            x.UsingInMemory((context, cfg) =>
+            {
+                cfg.ConfigureEndpoints(context);
+            });
+        });
+    }
+}
+*/

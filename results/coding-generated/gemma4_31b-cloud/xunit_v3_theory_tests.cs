@@ -39,9 +39,9 @@ public class StringProcessorTests
     [Theory]
     [InlineData(null, 0)]
     [InlineData("", 0)]
-    [InlineData("Hello", 1)]
-    [InlineData("Hello world test", 3)]
-    [InlineData("  Hello   world  ", 2)]
+    [InlineData("Word", 1)]
+    [InlineData("Two words", 2)]
+    [InlineData("  Extra   spaces  ", 2)]
     public void CountWords_ShouldReturnExpectedCount(string input, int expected)
     {
         var result = _sut.CountWords(input);

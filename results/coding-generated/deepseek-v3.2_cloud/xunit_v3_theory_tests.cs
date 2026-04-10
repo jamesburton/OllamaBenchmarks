@@ -22,7 +22,7 @@ public class StringProcessor
 
 public class StringProcessorTests
 {
-    private readonly StringProcessor _processor = new();
+    private readonly StringProcessor _sut = new();
 
     [Theory]
     [InlineData(null, 5, "")]
@@ -33,7 +33,7 @@ public class StringProcessorTests
     [InlineData("hello world", 7, "hello w...")]
     public void Truncate_ReturnsExpectedResult(string input, int maxLength, string expected)
     {
-        var result = _processor.Truncate(input, maxLength);
+        var result = _sut.Truncate(input, maxLength);
         result.Should().Be(expected);
     }
 
@@ -42,11 +42,11 @@ public class StringProcessorTests
     [InlineData("", 0)]
     [InlineData("hello", 1)]
     [InlineData("hello world", 2)]
-    [InlineData("hello   world   test", 3)]
     [InlineData("  hello  world  ", 2)]
+    [InlineData("one two three four", 4)]
     public void CountWords_ReturnsExpectedCount(string input, int expected)
     {
-        var result = _processor.CountWords(input);
+        var result = _sut.CountWords(input);
         result.Should().Be(expected);
     }
 
@@ -58,9 +58,10 @@ public class StringProcessorTests
     [InlineData("hello", false)]
     [InlineData("RaceCar", true)]
     [InlineData("A man a plan a canal Panama", true)]
+    [InlineData("not a palindrome", false)]
     public void IsPalindrome_ReturnsExpectedResult(string input, bool expected)
     {
-        var result = _processor.IsPalindrome(input);
+        var result = _sut.IsPalindrome(input);
         result.Should().Be(expected);
     }
 }

@@ -18,7 +18,7 @@ public static class SalesAnalyzer
                 AverageAmount: g.Average(s => s.Amount),
                 Count: g.Count()
             ))
-            .OrderByDescending(cs => cs.TotalAmount)
+            .OrderByDescending(summary => summary.TotalAmount)
             .ToList();
     }
 }

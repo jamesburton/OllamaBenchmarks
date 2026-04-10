@@ -81,9 +81,20 @@ public class CreateProductCommandHandlerTests
     }
 
     [Fact]
-    public async Task HandleAsync_ShouldReturnValidationError_WhenPriceIsZeroOrNegative()
+    public async Task HandleAsync_ShouldReturnValidationError_WhenPriceIsZero()
     {
-        var command = new CreateProductCommand("Valid", 0m);
+        var command = new CreateProductCommand("ValidName", 0m);
+
+        var result = await _sut.HandleAsync(command);
+
+        result.IsT1.Should().BeTrue();
+        result.AsT1.Message.Should().Be("Price must be positive");
+    }
+
+    [Fact]
+    public async Task HandleAsync_ShouldReturnValidationError_WhenPriceIsNegative()
+    {
+        var command = new CreateProductCommand("ValidName", -10m);
 
         var result = await _sut.HandleAsync(command);
 
@@ -94,22 +105,21 @@ public class CreateProductCommandHandlerTests
     [Fact]
     public async Task HandleAsync_ShouldReturnDuplicateError_WhenProductExists()
     {
-        var command = new CreateProductCommand("Existing", 10m);
-        _repository.ExistsAsync("Existing").Returns(true);
+        var command = new CreateProductCommand("ExistingProduct", 100m);
+        _repository.ExistsAsync("ExistingProduct").Returns(true);
 
         var result = await _sut.HandleAsync(command);
 
         result.IsT2.Should().BeTrue();
-        result.AsT2.ExistingName.Should().Be("Existing");
+        result.AsT2.ExistingName.Should().Be("ExistingProduct");
     }
 
     [Fact]
-    public async Task HandleAsync_ShouldReturnProduct_WhenValid()
+    public async Task HandleAsync_ShouldReturnProduct_WhenValidCommand()
     {
-        var command = new CreateProductCommand("New", 10m);
-        var expectedProduct = new Product(1, "New", 10m);
-
-        _repository.ExistsAsync("New").Returns(false);
+        var command = new CreateProductCommand("NewProduct", 100m);
+        var expectedProduct = new Product(1, "NewProduct", 100m);
+        _repository.ExistsAsync("NewProduct").Returns(false);
         _repository.AddAsync(Arg.Any<Product>()).Returns(expectedProduct);
 
         var result = await _sut.HandleAsync(command);

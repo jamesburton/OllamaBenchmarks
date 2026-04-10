@@ -31,40 +31,79 @@ public class NotificationServiceTests
     [Fact]
     public async Task NotifyUserAsync_UserFound_SendsEmailWithCorrectAddress()
     {
-        var userId = 1;
-        var userEmail = "test@example.com";
-        var user = new User { Id = userId, Email = userEmail };
+        var userRepository = Substitute.For<IUserRepository>();
+        var emailService = Substitute.For<IEmailService>();
+        var sut = new NotificationService(userRepository, emailService);
 
-        var mockRepo = Substitute.For<IUserRepository>();
-        var mockEmail = Substitute.For<IEmailService>();
+        var testUser = new User { Id = 1, Name = "Test User", Email = "test@example.com" };
+        userRepository.GetByIdAsync(1).Returns(testUser);
 
-        mockRepo.GetByIdAsync(userId).Returns(user);
+        await sut.NotifyUserAsync(1);
 
-        var sut = new NotificationService(mockRepo, mockEmail);
-
-        await sut.NotifyUserAsync(userId);
-
-        await mockRepo.Received(1).GetByIdAsync(userId);
-        await mockEmail.Received(1).SendWelcomeAsync(userEmail);
+        await emailService.Received(1).SendWelcomeAsync("test@example.com");
     }
 
     [Fact]
     public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
     {
-        var userId = 999;
+        var userRepository = Substitute.For<IUserRepository>();
+        var emailService = Substitute.For<IEmailService>();
+        var sut = new NotificationService(userRepository, emailService);
 
-        var mockRepo = Substitute.For<IUserRepository>();
-        var mockEmail = Substitute.For<IEmailService>();
+        userRepository.GetByIdAsync(1).Returns((User?)null);
 
-        mockRepo.GetByIdAsync(userId).Returns((User?)null);
-
-        var sut = new NotificationService(mockRepo, mockEmail);
-
-        Func<Task> act = () => sut.NotifyUserAsync(userId);
+        Func<Task> act = () => sut.NotifyUserAsync(1);
 
         await act.Should().ThrowAsync<InvalidOperationException>();
+        await emailService.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+    }
 
-        await mockRepo.Received(1).GetByIdAsync(userId);
-        await mockEmail.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+    [Theory]
+    [InlineData(1, "user1@test.com")]
+    [InlineData(2, "user2@test.com")]
+    [InlineData(3, "user3@test.com")]
+    public async Task NotifyUserAsync_WithDifferentUsers_SendsToCorrectEmail(int userId, string expectedEmail)
+    {
+        var userRepository = Substitute.For<IUserRepository>();
+        var emailService = Substitute.For<IEmailService>();
+        var sut = new NotificationService(userRepository, emailService);
+
+        var testUser = new User { Id = userId, Name = $"User {userId}", Email = expectedEmail };
+        userRepository.GetByIdAsync(userId).Returns(testUser);
+
+        await sut.NotifyUserAsync(userId);
+
+        await emailService.Received(1).SendWelcomeAsync(expectedEmail);
+    }
+
+    [Fact]
+    public async Task NotifyUserAsync_EmailServiceCalledExactlyOnce()
+    {
+        var userRepository = Substitute.For<IUserRepository>();
+        var emailService = Substitute.For<IEmailService>();
+        var sut = new NotificationService(userRepository, emailService);
+
+        var testUser = new User { Id = 5, Name = "Single Call User", Email = "single@test.com" };
+        userRepository.GetByIdAsync(5).Returns(testUser);
+
+        await sut.NotifyUserAsync(5);
+
+        await emailService.Received(1).SendWelcomeAsync(Arg.Any<string>());
+        await emailService.DidNotReceiveWithAnyArgs().SendWelcomeAsync(default);
+    }
+
+    [Fact]
+    public async Task NotifyUserAsync_RepositoryCalledWithCorrectId()
+    {
+        var userRepository = Substitute.For<IUserRepository>();
+        var emailService = Substitute.For<IEmailService>();
+        var sut = new NotificationService(userRepository, emailService);
+
+        var testUser = new User { Id = 42, Name = "Repository Test", Email = "repo@test.com" };
+        userRepository.GetByIdAsync(42).Returns(testUser);
+
+        await sut.NotifyUserAsync(42);
+
+        await userRepository.Received(1).GetByIdAsync(42);
     }
 }

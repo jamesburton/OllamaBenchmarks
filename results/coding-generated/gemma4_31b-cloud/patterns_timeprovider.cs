@@ -7,10 +7,7 @@ public class FakeTimeProvider : TimeProvider
         _fixedUtcNow = fixedUtcNow;
     }
 
-    public override DateTimeOffset GetUtcNow()
-    {
-        return _fixedUtcNow;
-    }
+    public override DateTimeOffset GetUtcNow() => _fixedUtcNow;
 }
 
 public class ExpiryChecker

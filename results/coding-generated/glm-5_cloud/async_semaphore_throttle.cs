@@ -7,29 +7,35 @@ public class ThrottledProcessor
         _semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
     }
 
-    public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
+    public async System.Threading.Tasks.Task<System.Collections.Generic.List<T>> ProcessAllAsync<T>(
+        System.Collections.Generic.IEnumerable<System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>>> tasks,
+        System.Threading.CancellationToken ct)
     {
-        var taskList = new List<Task<T>>();
+        var taskFactories = new System.Collections.Generic.List<System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<T>>>(tasks);
+        var results = new T[taskFactories.Count];
+        var processingTasks = new System.Threading.Tasks.Task[taskFactories.Count];
 
-        foreach (var factory in tasks)
+        for (int i = 0; i < taskFactories.Count; i++)
         {
-            taskList.Add(ProcessItemAsync(factory, ct));
+            int index = i;
+            var factory = taskFactories[i];
+
+            processingTasks[i] = System.Threading.Tasks.Task.Run(async () =>
+            {
+                await _semaphore.WaitAsync(ct).ConfigureAwait(false);
+                try
+                {
+                    results[index] = await factory(ct).ConfigureAwait(false);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }, ct);
         }
 
-        T[] results = await Task.WhenAll(taskList);
-        return new List<T>(results);
-    }
+        await System.Threading.Tasks.Task.WhenAll(processingTasks).ConfigureAwait(false);
 
-    private async Task<T> ProcessItemAsync<T>(Func<CancellationToken, Task<T>> factory, CancellationToken ct)
-    {
-        await _semaphore.WaitAsync(ct);
-        try
-        {
-            return await factory(ct);
-        }
-        finally
-        {
-            _semaphore.Release();
-        }
+        return new System.Collections.Generic.List<T>(results);
     }
 }

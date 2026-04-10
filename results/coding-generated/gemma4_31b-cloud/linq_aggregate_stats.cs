@@ -15,13 +15,13 @@ public static class SurveyAnalyzer
         int count = sortedValues.Count;
         double median;
 
-        if (count % 2 == 0)
+        if (count % 2 != 0)
         {
-            median = (sortedValues[count / 2 - 1] + sortedValues[count / 2]) / 2.0;
+            median = sortedValues[count / 2];
         }
         else
         {
-            median = sortedValues[count / 2];
+            median = (sortedValues[(count / 2) - 1] + sortedValues[count / 2]) / 2.0;
         }
 
         return (mean, median, min, max);

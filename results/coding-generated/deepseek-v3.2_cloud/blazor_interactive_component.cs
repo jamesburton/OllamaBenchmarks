@@ -2,13 +2,15 @@ using Microsoft.AspNetCore.Components;
 
 public class CounterBase : ComponentBase
 {
+    private int currentCount;
+
     [Parameter]
     public int InitialCount { get; set; }
 
     [Parameter]
     public EventCallback<int> OnCountChanged { get; set; }
 
-    private int currentCount;
+    public int CurrentCount => currentCount;
 
     protected override void OnInitialized()
     {
@@ -20,6 +22,4 @@ public class CounterBase : ComponentBase
         currentCount++;
         await OnCountChanged.InvokeAsync(currentCount);
     }
-
-    public int CurrentCount => currentCount;
 }

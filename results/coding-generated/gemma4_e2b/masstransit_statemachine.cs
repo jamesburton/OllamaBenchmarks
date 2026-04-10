@@ -1,69 +1,71 @@
-global using Contracts;
+using System;
+using MassTransit;
 
-namespace Contracts
+namespace Contracts;
+
+public class OrderState : SagaStateMachineInstance
 {
-    using MassTransit;
-    using System;
+    public Guid CorrelationId { get; set; }
+    public string CurrentState { get; set; }
+    public DateTime OrderDate { get; set; }
+    public DateTime? AcceptedAt { get; set; }
+}
 
-    // 1. Event Records
-    public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
-    public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
-    public record OrderCompleted(Guid OrderId);
+public class OrderStateMachine : MassTransitStateMachine<OrderState>
+{
+    public State Submitted { get; }
+    public State Accepted { get; }
+    public State Completed { get; }
 
-    // 2. Saga State Machine Instance
-    public class OrderState : SagaStateMachineInstance
+    public Event<OrderSubmitted> OrderSubmitted { get; }
+    public Event<OrderAccepted> OrderAccepted { get; }
+    public Event<OrderCompleted> OrderCompleted { get; }
+
+    public OrderStateMachine()
     {
-        public Guid CorrelationId { get; set; }
-        public string CurrentState { get; set; }
-        public DateTime OrderDate { get; set; }
-        public DateTime? AcceptedAt { get; set; }
-    }
+        Submitted = new State("Submitted");
+        Accepted = new State("Accepted");
+        Completed = new State("Completed");
 
-    // 3. Saga State Machine
-    public class OrderStateMachine : MassTransitStateMachine<OrderState>
-    {
-        // States
-        public State Submitted { get; private set; }
-        public State Accepted { get; private set; }
-        public State Completed { get; private set; }
+        OrderSubmitted = new Event<OrderSubmitted>();
+        OrderAccepted = new Event<OrderAccepted>();
+        OrderCompleted = new Event<OrderCompleted>();
 
-        // Events
-        public Event<OrderSubmitted> OrderSubmitted { get; private set; }
-        public Event<OrderAccepted> OrderAccepted { get; private set; }
-        public Event<OrderCompleted> OrderCompleted { get; private set; }
+        InstanceState(x => x.CurrentState);
 
-        public OrderStateMachine()
-        {
-            // Initialize states
-            Initially(
-                When(OrderSubmitted)
-                    .Then(context =>
-                    {
-                        // Set saga properties
-                        context.Saga.OrderDate = context.Message.OrderDate;
-                        context.Saga.CurrentState = nameof(Submitted);
-                    })
-                    .TransitionTo(Submitted)
-            );
+        // Initial state setup
+        Initially(
+            When(OrderSubmitted)
+                .TransitionTo(Submitted)
+                .Then(context =>
+                {
+                    var msg = context.Message;
+                    context.Saga.OrderDate = msg.OrderDate;
+                })
+        );
 
-            During(Submitted,
-                When(OrderAccepted)
-                    .Then(context =>
-                    {
-                        // Set saga properties
-                        context.Saga.AcceptedAt = context.Message.AcceptedAt;
-                        context.Saga.CurrentState = nameof(Accepted);
-                    })
-                    .TransitionTo(Accepted)
-            );
+        // Transitions during Submitted state
+        During(Submitted,
+            When(OrderAccepted)
+                .TransitionTo(Accepted)
+                .Then(context =>
+                {
+                    var msg = context.Message;
+                    context.Saga.AcceptedAt = msg.AcceptedAt;
+                })
+        );
 
-            During(Accepted,
-                When(OrderCompleted)
-                    .Finalize()
-            );
-
-            // Finalization step
-            SetCompletedWhenFinalized();
-        }
+        // Finalization
+        During(Accepted,
+            When(OrderCompleted)
+                .TransitionTo(Completed)
+                .Finalize()
+        );
     }
 }
+
+// --- Event Records ---
+
+public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+public record OrderCompleted(Guid OrderId);

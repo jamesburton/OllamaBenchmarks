@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 public class Customer
@@ -18,15 +15,17 @@ public class Order
     public DateTime OrderDate { get; set; }
 }
 
-public record OrderDto(int OrderId, decimal Total, string CustomerName);
-
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
     public DbSet<Order> Orders { get; set; }
     public DbSet<Customer> Customers { get; set; }
+
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
 }
+
+public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
 public static class OrderQueries
 {
@@ -41,7 +40,8 @@ public static class OrderQueries
                     order.Id,
                     order.Total,
                     customer == null ? "Unknown" : customer.Name
-                ))
+                )
+            )
             .ToList();
     }
 }

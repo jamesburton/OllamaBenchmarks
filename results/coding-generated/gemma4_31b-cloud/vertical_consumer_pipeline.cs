@@ -34,14 +34,13 @@ public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
 public class OrderPipelineTests
 {
     [Fact]
-    public async Task PlaceOrder_ShouldPublishOrderPlaced()
+    public async Task PlaceOrderConsumer_ShouldPublishOrderPlaced()
     {
         // Arrange
         var services = new ServiceCollection();
-        services.AddMassTransitTestHarness(cfg =>
+        services.AddMassTransitTestHarness(cfg => 
         {
             cfg.AddConsumer<PlaceOrderConsumer>();
-            cfg.AddConsumer<NotifyCustomerConsumer>();
         });
 
         var provider = services.BuildServiceProvider();
@@ -49,10 +48,10 @@ public class OrderPipelineTests
         await harness.Start();
 
         var orderId = Guid.NewGuid();
-        var placeOrder = new PlaceOrder(orderId, "Alice");
+        var message = new PlaceOrder(orderId, "John Doe");
 
         // Act
-        await harness.Bus.Publish(placeOrder);
+        await harness.Bus.Publish(message);
 
         // Assert
         Assert.True(await harness.Consumed.Any<PlaceOrder>());
@@ -60,11 +59,11 @@ public class OrderPipelineTests
     }
 
     [Fact]
-    public async Task FullPipeline_ShouldReachCustomerNotified()
+    public async Task FullPipeline_ShouldProcessFromPlaceOrderToCustomerNotified()
     {
         // Arrange
         var services = new ServiceCollection();
-        services.AddMassTransitTestHarness(cfg =>
+        services.AddMassTransitTestHarness(cfg => 
         {
             cfg.AddConsumer<PlaceOrderConsumer>();
             cfg.AddConsumer<NotifyCustomerConsumer>();
@@ -75,16 +74,16 @@ public class OrderPipelineTests
         await harness.Start();
 
         var orderId = Guid.NewGuid();
-        var placeOrder = new PlaceOrder(orderId, "Bob");
+        var message = new PlaceOrder(orderId, "Jane Doe");
 
         // Act
-        await harness.Bus.Publish(placeOrder);
+        await harness.Bus.Publish(message);
 
         // Assert
         Assert.Multiple(
             () => Assert.True(await harness.Consumed.Any<PlaceOrder>()),
             () => Assert.True(await harness.Consumed.Any<OrderPlaced>()),
-            () => Assert.True(await harness.Published.Any<CustomerNotified>())
+            () => Assert.True(await harness.Consumed.Any<CustomerNotified>())
         );
     }
 }

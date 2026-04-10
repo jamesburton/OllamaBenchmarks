@@ -1,26 +1,14 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
 public interface IOrderRepository { }
 
-public class OrderRepository : IOrderRepository
-{
-    public OrderRepository() { }
-}
+public class OrderRepository : IOrderRepository { }
 
 public interface IOrderService { }
 
-public class OrderService : IOrderService
-{
-    public OrderService() { }
-}
+public class OrderService : IOrderService { }
 
 public interface IEmailNotifier { }
 
-public class EmailNotifier : IEmailNotifier
-{
-    public EmailNotifier() { }
-}
+public class EmailNotifier : IEmailNotifier { }
 
 public class OrderSettings
 {
@@ -35,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddTransient<IEmailNotifier, EmailNotifier>();
+
         services.Configure<OrderSettings>(config.GetSection("Orders"));
 
         return services;

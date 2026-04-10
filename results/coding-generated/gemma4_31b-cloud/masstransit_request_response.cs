@@ -11,7 +11,7 @@ public record ProductNotFound();
 
 public class GetProductConsumer : IConsumer<GetProduct>
 {
-    public static readonly Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+    public static Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
     public async Task Consume(ConsumeContext<GetProduct> context)
     {

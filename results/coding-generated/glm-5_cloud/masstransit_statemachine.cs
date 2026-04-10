@@ -1,11 +1,9 @@
 global using Contracts;
-using MassTransit;
 
 namespace Contracts;
 
-public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
-public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
-public record OrderCompleted(Guid OrderId);
+using MassTransit;
+using System;
 
 public class OrderState : SagaStateMachineInstance
 {
@@ -14,6 +12,10 @@ public class OrderState : SagaStateMachineInstance
     public DateTime OrderDate { get; set; }
     public DateTime? AcceptedAt { get; set; }
 }
+
+public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+public record OrderCompleted(Guid OrderId);
 
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
@@ -39,8 +41,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     context.Saga.OrderDate = context.Message.OrderDate;
                 })
-                .TransitionTo(Submitted)
-        );
+                .TransitionTo(Submitted));
 
         During(Submitted,
             When(OrderAccepted)
@@ -48,13 +49,11 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 {
                     context.Saga.AcceptedAt = context.Message.AcceptedAt;
                 })
-                .TransitionTo(Accepted)
-        );
+                .TransitionTo(Accepted));
 
         During(Accepted,
             When(OrderCompleted)
-                .Finalize()
-        );
+                .Finalize());
 
         SetCompletedWhenFinalized();
     }

@@ -1,7 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-
 public class Address
 {
     public string Street { get; set; }
@@ -16,27 +12,27 @@ public class Company
     public Address HeadquartersAddress { get; set; }
 }
 
-public class CompanyDbContext : DbContext
+public class CompanyDbContext : Microsoft.EntityFrameworkCore.DbContext
 {
-    public DbSet<Company> Companies { get; set; }
-
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
+    public CompanyDbContext(Microsoft.EntityFrameworkCore.DbContextOptions<CompanyDbContext> options)
+        : base(options)
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public Microsoft.EntityFrameworkCore.DbSet<Company> Companies { get; set; }
+
+    protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder builder)
     {
-        modelBuilder.Entity<Company>()
-            .OwnsOne(c => c.HeadquartersAddress, b =>
-            {
-                b.ToJson();
-            });
+        builder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b =>
+        {
+            b.ToJson();
+        });
     }
 }
 
 public static class CompanyQueries
 {
-    public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
+    public static System.Collections.Generic.List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
         return db.Companies
             .Where(c => c.HeadquartersAddress.City == city)

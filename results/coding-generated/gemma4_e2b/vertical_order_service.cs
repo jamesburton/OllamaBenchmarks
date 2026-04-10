@@ -44,27 +44,23 @@ public class OrderService
 
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
-        // 1. Validate CustomerName
         if (string.IsNullOrWhiteSpace(request.CustomerName))
         {
             return OneOf<Order, ValidationError>.FromT1(new ValidationError { Message = "Customer name is required" });
         }
 
-        // 2. Validate Items
         if (request.Items == null || !request.Items.Any())
         {
             return OneOf<Order, ValidationError>.FromT1(new ValidationError { Message = "At least one item is required" });
         }
 
-        // 3. Calculate Total
         decimal total = 0;
         foreach (var item in request.Items)
         {
             total += item.Quantity * item.UnitPrice;
         }
 
-        // 4. Create Order
-        var newOrder = new Order
+        var order = new Order
         {
             CustomerName = request.CustomerName,
             Items = request.Items,
@@ -72,10 +68,8 @@ public class OrderService
             CreatedAt = DateTime.UtcNow
         };
 
-        // 5. Save
-        _repository.Save(newOrder);
+        _repository.Save(order);
 
-        // 6. Return success
-        return OneOf<Order, ValidationError>.FromT0(newOrder);
+        return OneOf<Order, ValidationError>.FromT0(order);
     }
 }

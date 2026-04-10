@@ -10,6 +10,7 @@ public class User
 }
 
 public record NotFound;
+
 public record ValidationError(string Message);
 
 public interface IUserService

@@ -27,9 +27,9 @@ public class CompanyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b =>
-        {
-            b.ToJson();
+        builder.Entity<Company>().OwnsOne(c => c.HeadquartersAddress, b => 
+        { 
+            b.ToJson(); 
         });
     }
 }

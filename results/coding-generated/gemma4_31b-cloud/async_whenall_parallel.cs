@@ -16,14 +16,35 @@ public class ParallelDataService
         _loaderC = loaderC;
     }
 
-    public async System.Threading.Tasks.Task<System.Collections.Generic.List<string>> LoadAllAsync(System.Threading.CancellationToken ct)
+    public System.Threading.Tasks.Task<System.Collections.Generic.List<string>> LoadAllAsync(System.Threading.CancellationToken ct)
     {
         var taskA = _loaderA.LoadAsync("sourceA", ct);
         var taskB = _loaderB.LoadAsync("sourceB", ct);
         var taskC = _loaderC.LoadAsync("sourceC", ct);
 
-        string[] results = await System.Threading.Tasks.Task.WhenAll(taskA, taskB, taskC);
+        return System.Threading.Tasks.Task.WhenAll(taskA, taskB, taskC)
+            .ContinueWith(t => new System.Collections.Generic.List<string> 
+            { 
+                taskA.Result, 
+                taskB.Result, 
+                taskC.Result 
+            }, ct).AsTask();
+    }
 
-        return new System.Collections.Generic.List<string>(results);
+    // Alternative implementation of LoadAllAsync using async/await for clarity
+    public async System.Threading.Tasks.Task<System.Collections.Generic.List<string>> LoadAllAsyncAsync(System.Threading.CancellationToken ct)
+    {
+        var taskA = _loaderA.LoadAsync("sourceA", ct);
+        var taskB = _loaderB.LoadAsync("sourceB", ct);
+        var taskC = _loaderC.LoadAsync("sourceC", ct);
+
+        await System.Threading.Tasks.Task.WhenAll(taskA, taskB, taskC);
+
+        return new System.Collections.Generic.List<string> 
+        { 
+            await taskA, 
+            await taskB, 
+            await taskC 
+        };
     }
 }

@@ -87,7 +87,7 @@ public class CreateProductCommandHandlerTests
         // Arrange
         var repo = Substitute.For<IProductRepository>();
         var command = new CreateProductCommand("Existing", 10m);
-        repo.ExistsAsync("Existing").Returns(true);
+        repo.ExistsAsync(command.Name).Returns(true);
         var sut = new CreateProductCommandHandler(repo);
 
         // Act
@@ -103,10 +103,10 @@ public class CreateProductCommandHandlerTests
     {
         // Arrange
         var repo = Substitute.For<IProductRepository>();
-        var command = new CreateProductCommand("New", 10m);
-        var expectedProduct = new Product(1, "New", 10m);
+        var command = new CreateProductCommand("New Product", 10m);
+        var expectedProduct = new Product(1, "New Product", 10m);
 
-        repo.ExistsAsync("New").Returns(false);
+        repo.ExistsAsync(command.Name).Returns(false);
         repo.AddAsync(Arg.Any<Product>()).Returns(expectedProduct);
 
         var sut = new CreateProductCommandHandler(repo);
@@ -117,6 +117,6 @@ public class CreateProductCommandHandlerTests
         // Assert
         result.IsT0.Should().BeTrue();
         result.AsT0.Id.Should().Be(1);
-        result.AsT0.Name.Should().Be("New");
+        result.AsT0.Name.Should().Be("New Product");
     }
 }

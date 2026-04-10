@@ -18,7 +18,8 @@ public class CustomerDbContext : DbContext
 {
     public DbSet<Customer> Customers { get; set; }
 
-    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options)
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options)
+        : base(options)
     {
     }
 
@@ -39,7 +40,7 @@ public class CustomerRepository
 
     public async Task<Customer> CreateAsync(Customer customer)
     {
-        await _context.Customers.AddAsync(customer);
+        _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
         return customer;
     }

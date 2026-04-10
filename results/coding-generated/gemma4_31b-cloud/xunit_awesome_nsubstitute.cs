@@ -37,7 +37,7 @@ public class NotificationServiceTests
         var sut = new NotificationService(repo, emailService);
 
         var userId = 1;
-        var user = new User { Id = userId, Email = "test@example.com", Name = "Test User" };
+        var user = new User { Id = userId, Name = "Test User", Email = "test@example.com" };
 
         repo.GetByIdAsync(userId).Returns(user);
 
@@ -45,7 +45,6 @@ public class NotificationServiceTests
         await sut.NotifyUserAsync(userId);
 
         // Assert
-        await repo.Received(1).GetByIdAsync(userId);
         await emailService.Received(1).SendWelcomeAsync(user.Email);
     }
 
@@ -57,7 +56,7 @@ public class NotificationServiceTests
         var emailService = Substitute.For<IEmailService>();
         var sut = new NotificationService(repo, emailService);
 
-        int userId = 99;
+        var userId = 99;
         repo.GetByIdAsync(userId).Returns((User?)null);
 
         // Act
