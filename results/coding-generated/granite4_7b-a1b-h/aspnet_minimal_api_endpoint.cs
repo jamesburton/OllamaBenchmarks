@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -12,12 +13,12 @@ public static class ProductEndpoints
     {
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            return Results.ValidationProblem(new Dictionary<string, string[]> { ["Name"] = new[] {"Name is required."} });
+            return Results.ValidationProblem(new Dictionary<string, string[]> { ["Name"] = new[] { "Name is required." } });
         }
 
         if (request.Price <= 0)
         {
-            return Results.ValidationProblem(new Dictionary<string, string[]> { ["Price"] = new[] {"Price must be greater than zero."} });
+            return Results.ValidationProblem(new Dictionary<string, string[]> { ["Price"] = new[] { "Price must be greater than zero." } });
         }
 
         _idCounter++;

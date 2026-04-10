@@ -1,20 +1,27 @@
-[Required]
-public string Name { get; set; }
+using System.ComponentModel.DataAnnotations;
 
-[Range(0.01m, 10000)]
-public decimal Price { get; set; }
+public class CreateOrderRequest
+{
+    [Required]
+    public string Name { get; set; }
 
-[Range(1, 999)]
-public int Quantity { get; set; }
+    [Range(0.01m, 10000)]
+    public decimal Price { get; set; }
+
+    [Range(1, 999)]
+    public int Quantity { get; set; }
 }
 
 public class OrderService
 {
-    public Order CreateOrder(CreateOrderRequest request)
+    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        if (!Validator.TryValidateObject(request, new ValidationContext(request), true))
+        var validationContext = new ValidationContext(request, serviceProvider: null, items: null);
+        var validationResults = new List<ValidationResult>();
+
+        if (!Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true))
         {
-            throw new ArgumentException(Validator.Message);
+            throw new ArgumentException(validationResults[0].ErrorMessage);
         }
 
         return request;

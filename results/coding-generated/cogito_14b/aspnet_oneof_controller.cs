@@ -1,22 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
 
-// Records for error types
-public record NotFound(int Id);
+public record NotFound;
+
 public record ValidationError(string Message);
 
-// User record
-public record User(int Id, string Name, string Email);
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = default!;
+    public string Email { get; set; } = default!;
+}
 
-// Service interface
 public interface IUserService
 {
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
-// Controller
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -27,7 +29,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetUser(int id)
+    public async Task<IActionResult> Get(int id)
     {
         var result = await _userService.GetByIdAsync(id);
         return result.Match<IActionResult>(

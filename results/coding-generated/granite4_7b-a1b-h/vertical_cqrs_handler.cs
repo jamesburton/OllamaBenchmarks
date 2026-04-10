@@ -1,7 +1,5 @@
-using System;
-using System.Threading.Tasks;
 using OneOf;
-using NSubstitute;
+using Xunit;
 
 public record CreateProductCommand(string Name, decimal Price);
 public record Product(int Id, string Name, decimal Price);
@@ -26,13 +24,19 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
     public async Task<OneOf<Product, ValidationError, DuplicateError>> HandleAsync(CreateProductCommand command)
     {
         if (string.IsNullOrWhiteSpace(command.Name))
+        {
             return new ValidationError("Name is required");
+        }
 
         if (command.Price <= 0)
+        {
             return new ValidationError("Price must be positive");
+        }
 
         if (await _repository.ExistsAsync(command.Name))
+        {
             return new DuplicateError(command.Name);
+        }
 
         var product = new Product(0, command.Name, command.Price);
         await _repository.AddAsync(product);

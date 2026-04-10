@@ -20,16 +20,11 @@ public class UserDashboard : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthState;
-        var user = authState.User;
-
-        if (user.Identity?.IsAuthenticated == true)
+        if (authState.User.Identity?.IsAuthenticated == true)
         {
             IsAuthenticated = true;
-            var userName = user.Identity.Name;
-            if (userName != null)
-            {
-                DisplayName = await UserService.GetDisplayNameAsync(userName);
-            }
+            var name = authState.User.Identity.Name;
+            DisplayName = await UserService.GetDisplayNameAsync(name);
         }
         else
         {

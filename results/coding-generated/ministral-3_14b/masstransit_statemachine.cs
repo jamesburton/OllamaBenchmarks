@@ -29,15 +29,15 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
         InstanceState(x => x.CurrentState);
 
         Event(() => OrderSubmitted,
-            x => x.CorrelateById(m => m.OrderId)
+            x => x.CorrelateById(m => m.Message.OrderId)
                 .Then(context => { context.Saga.OrderDate = context.Message.OrderDate; }));
 
         Event(() => OrderAccepted,
-            x => x.CorrelateById(m => m.OrderId)
+            x => x.CorrelateById(m => m.Message.OrderId)
                 .Then(context => { context.Saga.AcceptedAt = context.Message.AcceptedAt; }));
 
         Event(() => OrderCompleted,
-            x => x.CorrelateById(m => m.OrderId));
+            x => x.CorrelateById(m => m.Message.OrderId));
 
         Initially(
             When(OrderSubmitted)

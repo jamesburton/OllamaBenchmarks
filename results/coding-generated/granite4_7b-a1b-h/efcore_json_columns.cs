@@ -1,6 +1,8 @@
 using System.Collections.Generic;
-using System.Data.Common;
+using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 public class Address
 {
@@ -18,9 +20,7 @@ public class Company
 
 public class CompanyDbContext : DbContext
 {
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
-    {
-    }
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
 
     public DbSet<Company> Companies { get; set; }
 
@@ -38,6 +38,8 @@ public static class CompanyQueries
 {
     public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        return db.Companies.Where(c => c.HeadquartersAddress?.City == city).ToList();
+        return db.Companies
+            .Where(c => c.HeadquartersAddress?.City == city)
+            .ToList();
     }
 }

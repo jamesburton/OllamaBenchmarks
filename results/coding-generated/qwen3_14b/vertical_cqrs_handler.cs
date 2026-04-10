@@ -51,7 +51,7 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
 public class CreateProductCommandHandlerTests
 {
     [Fact]
-    public async Task HandleAsync_WhenNameIsEmpty_ReturnsValidationError()
+    public async Task HandleAsync_WhenNameIsNullOrEmpty_ReturnsValidationError()
     {
         var repository = Substitute.For<IProductRepository>();
         var handler = new CreateProductCommandHandler(repository);
@@ -69,7 +69,7 @@ public class CreateProductCommandHandlerTests
     {
         var repository = Substitute.For<IProductRepository>();
         var handler = new CreateProductCommandHandler(repository);
-        var command = new CreateProductCommand("Test", 0);
+        var command = new CreateProductCommand("Test", 0.0m);
 
         var result = await handler.HandleAsync(command);
 
@@ -106,7 +106,6 @@ public class CreateProductCommandHandlerTests
 
         result.IsT0.Should().BeTrue();
         var product = result.AsT0;
-        product.Id.Should().Be(1);
         product.Name.Should().Be("New");
         product.Price.Should().Be(10.0m);
     }

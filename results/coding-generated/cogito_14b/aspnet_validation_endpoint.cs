@@ -1,46 +1,33 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ModelExpressionProvider;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.ViewEngine.Abstractions.Internal.ViewEngines.Abstractions.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal.Internal
+using System.ComponentModel.DataAnnotations;
+
+public class CreateOrderRequest
+{
+    [Required]
+    public string Name { get; set; } = default!;
+
+    [Range(0.01m, 10000m)]
+    public decimal Price { get; set; }
+
+    [Range(1, 999)]
+    public int Quantity { get; set; }
+}
+
+public class OrderService
+{
+    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
+    {
+        var validationContext = new ValidationContext(request);
+        var validationResults = new List<ValidationResult>();
+
+        if (!Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true))
+        {
+            var firstError = validationResults.FirstOrDefault();
+            if (firstError != null)
+            {
+                throw new ArgumentException(firstError.ErrorMessage, firstError.MemberNames.FirstOrDefault());
+            }
+        }
+
+        return request;
+    }
+}

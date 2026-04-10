@@ -2,79 +2,35 @@ using System;
 using System.Threading.Tasks;
 using MassTransit;
 using MassTransit.Testing;
-using MassTransit.DependencyInjection.Extensions;
+using MassTransit.Testing.Xunit;
+using Xunit;
 
 public class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task Test_ProcessPayment_ConsumerProcessesMessage()
+    public async Task ProcessPaymentConsumer_ProcessesMessageAndPublishesEvent()
     {
         var serviceCollection = new ServiceCollection();
-        var serviceProvider = serviceCollection.AddMassTransitTestHarness(cfg =>
-        {
-            cfg.AddConsumer<ProcessPaymentConsumer>();
-        })
-        .BuildServiceProvider(true);
+        var serviceProvider = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>())
+            .BuildServiceProvider(true);
 
         var harness = serviceProvider.GetRequiredService<ITestHarness>();
 
         await harness.Start();
 
-        var orderGuid = Guid.NewGuid();
-        var amount = 100.00m;
-        harness.Bus.Publish(new ProcessPayment(orderGuid, amount));
+        var orderPayment = new ProcessPayment(Guid.NewGuid(), 100.00m);
+        harness.Bus.Publish(orderPayment);
+
+        await Task.Delay(100); // Ensure message processing completes
 
         Assert.True(await harness.Consumed.Any<ProcessPayment>());
-        Assert.True(await harness.Published.Any<PaymentProcessed>(msg => msg.OrderId == orderGuid));
+        Assert.True(await harness.Published.Any<PaymentProcessed>());
 
-        await harness.Stop();
-    }
+        var consumed = await harness.Consumed.Take<ProcessPayment>();
+        var published = await harness.Published.Take<PaymentProcessed>();
 
-    [Fact]
-    public async Task Test_ProcessPayment_PublishesCorrectTransactionId()
-    {
-        var serviceCollection = new ServiceCollection();
-        var serviceProvider = serviceCollection.AddMassTransitTestHarness(cfg =>
-        {
-            cfg.AddConsumer<ProcessPaymentConsumer>();
-        })
-        .BuildServiceProvider(true);
-
-        var harness = serviceProvider.GetRequiredService<ITestHarness>();
-
-        await harness.Start();
-
-        var orderGuid = Guid.NewGuid();
-        var amount = 100.00m;
-        harness.Bus.Publish(new ProcessPayment(orderGuid, amount));
-
-        Assert.True(await harness.Consumed.Any<ProcessPayment>());
-        Assert.True(await harness.Published.Any<PaymentProcessed>(msg => msg.OrderId == orderGuid));
-
-        await harness.Stop();
-    }
-
-    [Fact]
-    public async Task Test_ProcessPayment_ConsumerPublishesCorrectTransactionId()
-    {
-        var serviceCollection = new ServiceCollection();
-        var serviceProvider = serviceCollection.AddMassTransitTestHarness(cfg =>
-        {
-            cfg.AddConsumer<ProcessPaymentConsumer>();
-        })
-        .BuildServiceProvider(true);
-
-        var harness = serviceProvider.GetRequiredService<ITestHarness>();
-
-        await harness.Start();
-
-        var orderGuid = Guid.NewGuid();
-        var amount = 100.00m;
-        harness.Bus.Publish(new ProcessPayment(orderGuid, amount));
-
-        Assert.True(await harness.Consumed.Any<ProcessPayment>());
-        Assert.True(await harness.Published.Any<PaymentProcessed>(msg => msg.OrderId == orderGuid));
-
-        await harness.Stop();
+        Assert.Equal(consumed.Message.OrderId, published.Message.OrderId);
+        Assert.NotEqual(published.Message.TransactionId, Guid.Empty.ToString());
     }
 }

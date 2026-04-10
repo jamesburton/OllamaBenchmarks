@@ -11,8 +11,7 @@ public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
 
-    public ProductDbContext(DbContextOptions<ProductDbContext> options)
-        : base(options)
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
     {
     }
 }
@@ -23,18 +22,13 @@ public static class ProductOperations
     {
         if (db.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
         {
-            var products = await db.Products
-                .Where(p => p.Category == category)
-                .ToListAsync();
-
+            var products = await db.Products.Where(p => p.Category == category).ToListAsync();
             foreach (var product in products)
             {
                 product.Price *= (1 - discountPct);
                 product.LastModified = DateTime.UtcNow;
             }
-
-            await db.SaveChangesAsync();
-            return products.Count;
+            return await db.SaveChangesAsync();
         }
         else
         {

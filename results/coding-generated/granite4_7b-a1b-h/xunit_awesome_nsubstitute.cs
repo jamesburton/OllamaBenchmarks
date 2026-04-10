@@ -28,32 +28,34 @@ public class NotificationServiceTests
     {
         // Arrange
         var userRepository = Substitute.For<IUserRepository>();
-        var emailService = Substitute.For<IEmailService>();
-
         userRepository.GetByIdAsync(2).Returns(null);
 
-        var notificationService = new NotificationService(userRepository, emailService);
-        Action act = () => notificationService.NotifyUserAsync(2);
+        var emailService = Substitute.For<IEmailService>();
 
-        // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>()
-                 .WithMessage("*not found*");
+        var notificationService = new NotificationService(userRepository, emailService);
+
+        // Act & Assert
+        await notificationService.NotifyUserAsync(2).Should().ThrowAsync<InvalidOperationException>();
+        userRepository.Received().GetByIdAsync(2);
+        emailService.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 
     [Fact]
-    public void NotifyUserAsync_ReceivedCalls()
+    public async Task NotifyUserAsync_ThrowsCorrectException()
     {
         // Arrange
         var userRepository = Substitute.For<IUserRepository>();
+        userRepository.GetByIdAsync(3).Returns(null);
+
         var emailService = Substitute.For<IEmailService>();
 
         var notificationService = new NotificationService(userRepository, emailService);
 
         // Act
-        notificationService.NotifyUserAsync(3);
+        var act = notificationService.NotifyUserAsync(3);
 
         // Assert
-        userRepository.Received().GetByIdAsync(3);
-        emailService.Received().SendWelcomeAsync(Arg.Any<string>());
+        await act.Should().ThrowAsync<InvalidOperationException>()
+                 .WithMessage("*not found*");
     }
 }

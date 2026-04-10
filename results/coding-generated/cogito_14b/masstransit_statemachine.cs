@@ -1,5 +1,10 @@
-using MassTransit;
-using System;
+global using Contracts;
+
+namespace Contracts;
+
+public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+public record OrderCompleted(Guid OrderId);
 
 public class OrderState : SagaStateMachineInstance
 {
@@ -9,23 +14,32 @@ public class OrderState : SagaStateMachineInstance
     public DateTime? AcceptedAt { get; set; }
 }
 
-public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
-public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
-public record OrderCompleted(Guid OrderId);
-
 public class OrderStateMachine : MassTransitStateMachine<OrderState>
 {
+    public State Submitted { get; private set; }
+    public State Accepted { get; private set; }
+    public State Completed { get; private set; }
+    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
+    public Event<OrderAccepted> OrderAccepted { get; private set; }
+    public Event<OrderCompleted> OrderCompleted { get; private set; }
+
     public OrderStateMachine()
     {
+        InstanceState(x => x.CurrentState);
+
+        Event(() => OrderSubmitted, x => x.CorrelateById(m => m.OrderId));
+        Event(() => OrderAccepted, x => x.CorrelateById(m => m.OrderId));
+        Event(() => OrderCompleted, x => x.CorrelateById(m => m.OrderId));
+
         Initially(
             When(OrderSubmitted)
-                .SetSaga(s => s.OrderDate = context.Message.OrderDate)
+                .Then(context => context.Saga.OrderDate = context.Data.OrderDate)
                 .TransitionTo(Submitted));
 
         During(Submitted,
             When(OrderAccepted)
-                .SetSaga(s => s.AcceptedAt = context.Message.AcceptedAt)
-                .TransitionTo(Accepted));
+                .Then(context => context.Saga.AcceptedAt = context.Data.AcceptedAt)
+                .TransitionTo(Accepted)));
 
         During(Accepted,
             When(OrderCompleted)
@@ -33,12 +47,4 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
         SetCompletedWhenFinalized();
     }
-
-    public State Submitted { get; private set; }
-    public State Accepted { get; private set; }
-    public State Completed { get; private set; }
-
-    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
-    public Event<OrderAccepted> OrderAccepted { get; private set; }
-    public Event<OrderCompleted> OrderCompleted { get; private set; }
 }

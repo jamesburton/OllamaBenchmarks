@@ -9,7 +9,7 @@ class ThrottledProcessor
 
     public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
-        var results = new List<T>();
+        var results = new List<T>(tasks.Count());
         var tasksToRun = new List<Task>();
 
         foreach (var taskFactory in tasks)
@@ -19,7 +19,7 @@ class ThrottledProcessor
             {
                 try
                 {
-                    results.Add(await taskFactory(ct));
+                    return await taskFactory(ct);
                 }
                 finally
                 {
@@ -29,6 +29,10 @@ class ThrottledProcessor
         }
 
         await Task.WhenAll(tasksToRun);
+        for (int i = 0; i < tasks.Count(); i++)
+        {
+            results.Add(await tasksToRun[i]);
+        }
 
         return results;
     }

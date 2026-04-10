@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -12,21 +13,17 @@ public class Product
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
-public static class ProductDbContextExtensions
-{
-    private static Money ParseMoney(string s)
-    {
-        var parts = s.Split(':');
-        if (parts.Length != 2) throw new ArgumentException("Invalid format for money value.");
-        return new Money(decimal.Parse(parts[0]), parts[1]);
-    }
-}
-
 public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
+
+    private static Money ParseMoney(string s)
+    {
+        var parts = s.Split(':');
+        return new Money(decimal.Parse(parts[0]), parts[1]);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,7 +31,7 @@ public class ProductDbContext : DbContext
             .Property(p => p.Price)
             .HasConversion(
                 m => $"{m.Amount}:{m.Currency}",
-                s => ProductDbContextExtensions.ParseMoney(s));
+                s => ParseMoney(s));
     }
 }
 

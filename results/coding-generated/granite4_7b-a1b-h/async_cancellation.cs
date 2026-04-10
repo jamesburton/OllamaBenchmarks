@@ -8,32 +8,22 @@ public interface IDataSource
 public class DataProcessor
 {
     public async IAsyncEnumerable<string> ProcessAllBatchesAsync(IDataSource source,
-        [EnumeratorCancellation]CancellationToken ct = default)
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
         int batchNumber = 0;
         while (!ct.IsCancellationRequested)
         {
-            try
-            {
-                var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
-                if (batch == null || !batch.Any())
-                {
-                    yield break;
-                }
+            ct.ThrowIfCancellationRequested();
 
-                foreach (var item in batch)
-                {
-                    yield return item;
-                }
-            }
-            catch (OperationCanceledException)
+            var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
+            if (batch == null || batch.Count == 0)
             {
-                // This block is technically unnecessary due to the cancellation check before fetching
-                // but included for completeness as per your instructions.
+                yield break;
             }
-            finally
+
+            foreach (var item in batch)
             {
-                ct.ThrowIfCancellationRequested();
+                yield return item;
             }
 
             batchNumber++;

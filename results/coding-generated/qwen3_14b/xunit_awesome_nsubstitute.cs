@@ -26,42 +26,40 @@ public class NotificationService(IUserRepository repo, IEmailService email)
     }
 }
 
-public class NotificationServiceTests
+[Fact]
+public async Task NotifyUserAsync_ShouldSendWelcomeEmail_WhenUserIsFound()
 {
-    [Fact]
-    public async Task TestNotifyUserAsync_HappyPath()
-    {
-        // Arrange
-        var user = new User { Id = 123, Name = "John Doe", Email = "test@example.com" };
-        var repo = Substitute.For<IUserRepository>();
-        repo.GetByIdAsync(123).Returns(Task.FromResult(user));
-        var email = Substitute.For<IEmailService>();
+    // Arrange
+    var user = new User { Id = 1, Email = "test@example.com" };
+    var repoMock = Substitute.For<IUserRepository>();
+    repoMock.GetByIdAsync(1).ReturnsAsync(user);
+    var emailMock = Substitute.For<IEmailService>();
+    emailMock.SendWelcomeAsync("test@example.com").Returns(Task.CompletedTask);
 
-        var service = new NotificationService(repo, email);
+    var service = new NotificationService(repoMock, emailMock);
 
-        // Act
-        await service.NotifyUserAsync(123);
+    // Act
+    await service.NotifyUserAsync(1);
 
-        // Assert
-        await email.Received().SendWelcomeAsync("test@example.com");
-        repo.Received().GetByIdAsync(123);
-    }
+    // Assert
+    await repoMock.Received().GetByIdAsync(1);
+    await emailMock.Received().SendWelcomeAsync("test@example.com");
+}
 
-    [Fact]
-    public async Task TestNotifyUserAsync_UserNotFound()
-    {
-        // Arrange
-        var repo = Substitute.For<IUserRepository>();
-        repo.GetByIdAsync(456).Returns(Task.FromResult<User?>(null));
-        var email = Substitute.For<IEmailService>();
+[Fact]
+public async Task NotifyUserAsync_ShouldThrowException_WhenUserIsNotFound()
+{
+    // Arrange
+    var repoMock = Substitute.For<IUserRepository>();
+    repoMock.GetByIdAsync(2).ReturnsAsync((User?)null);
+    var emailMock = Substitute.For<IEmailService>();
+    var service = new NotificationService(repoMock, emailMock);
 
-        var service = new NotificationService(repo, email);
+    // Act & Assert
+    var act = async () => await service.NotifyUserAsync(2);
+    await act.Should().ThrowAsync<InvalidOperationException>();
 
-        // Act & Assert
-        var asyncAct = () => service.NotifyUserAsync(456);
-        await asyncAct.Should().ThrowAsync<InvalidOperationException>();
-
-        repo.Received().GetByIdAsync(456);
-        email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
-    }
+    // Verify that GetById was called, but SendWelcome was not
+    await repoMock.Received().GetByIdAsync(2);
+    emailMock.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
 }

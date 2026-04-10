@@ -17,9 +17,7 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
             return;
         }
 
-        await context.Publish(new PaymentProcessed(
-            context.Message.OrderId,
-            DateTime.UtcNow));
+        await context.Publish(new PaymentProcessed(context.Message.OrderId, DateTime.UtcNow));
     }
 }
 

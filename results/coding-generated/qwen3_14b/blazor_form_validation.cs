@@ -17,9 +17,7 @@ public class ContactModel
 public class ContactFormBase : ComponentBase
 {
     public ContactModel Model { get; set; } = new();
-
     public EditContext EditCtx { get; set; } = null!;
-
     public bool IsSubmitted { get; set; }
 
     protected override void OnInitialized()

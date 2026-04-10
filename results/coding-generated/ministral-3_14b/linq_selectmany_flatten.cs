@@ -5,7 +5,7 @@ public static class StaffDirectory
     public static List<string> GetAllEmployees(IEnumerable<Department> departments)
     {
         return departments
-            .SelectMany(department => department.Employees)
+            .SelectMany(dept => dept.Employees)
             .OrderBy(name => name)
             .ToList();
     }

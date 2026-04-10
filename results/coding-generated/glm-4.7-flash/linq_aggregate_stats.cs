@@ -11,17 +11,18 @@ public static class SurveyAnalyzer
         double min = values.Min();
         double max = values.Max();
 
-        var sortedValues = values.OrderBy(x => x).ToList();
+        var sortedValues = values.OrderBy(v => v).ToList();
         int count = sortedValues.Count;
-        double median;
+        int mid = count / 2;
 
+        double median;
         if (count % 2 == 1)
         {
-            median = sortedValues[count / 2];
+            median = sortedValues[mid];
         }
         else
         {
-            median = (sortedValues[count / 2 - 1] + sortedValues[count / 2]) / 2.0;
+            median = (sortedValues[mid - 1] + sortedValues[mid]) / 2.0;
         }
 
         return (mean, median, min, max);

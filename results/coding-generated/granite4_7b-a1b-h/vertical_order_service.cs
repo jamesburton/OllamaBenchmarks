@@ -11,7 +11,7 @@ public class Order
 {
     public int Id { get; set; }
     public string CustomerName { get; set; }
-    public List<OrderItem> Items { get; set; } = new();
+    public List<OrderItem> Items { get; set; }
     public decimal Total { get; set; }
     public DateTime CreatedAt { get; set; }
 }
@@ -19,7 +19,7 @@ public class Order
 public class CreateOrderRequest
 {
     public string CustomerName { get; set; }
-    public List<OrderItem> Items { get; set; } = new();
+    public List<OrderItem> Items { get; set; }
 }
 
 public class ValidationError
@@ -33,7 +33,7 @@ public interface IOrderRepository
     Order? GetById(int id);
 }
 
-public partial class OrderService : IOrderService
+public class OrderService
 {
     private readonly IOrderRepository _repository;
 
@@ -45,41 +45,25 @@ public partial class OrderService : IOrderService
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.CustomerName))
-            return new ValidationError { Message = "Customer name is required" };
+        {
+            return OneOf<Order, ValidationError>.FromT1(new ValidationError { Message = "Customer name is required" });
+        }
 
-        if (!request.Items.Any())
-            return new ValidationError { Message = "At least one item is required" };
+        if (request.Items == null || request.Items.Count == 0)
+        {
+            return OneOf<Order, ValidationError>.FromT1(new ValidationError { Message = "At least one item is required" });
+        }
 
         var order = new Order
         {
+            Id = _repository.GetById(1) != null ? _repository.GetById(1).Id + 1 : 1,
             CustomerName = request.CustomerName,
             Items = request.Items,
+            Total = request.Items.Sum(item => item.Quantity * item.UnitPrice),
             CreatedAt = DateTime.UtcNow
         };
 
         _repository.Save(order);
-        return order;
-    }
-}
-
-public partial class OrderService : IOrderService
-{
-    public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
-    {
-        if (string.IsNullOrWhiteSpace(request.CustomerName))
-            return new ValidationError { Message = "Customer name is required" };
-
-        if (!request.Items.Any())
-            return new ValidationError { Message = "At least one item is required" };
-
-        var order = new Order
-        {
-            CustomerName = request.CustomerName,
-            Items = request.Items,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _repository.Save(order);
-        return order;
+        return OneOf<Order, ValidationError>.FromT0(order);
     }
 }

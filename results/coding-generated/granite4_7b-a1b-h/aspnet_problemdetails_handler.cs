@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 public class NotFoundException : Exception
@@ -23,25 +24,25 @@ public class ConflictException : Exception
     }
 }
 
-static class ApiExceptionMapper
+public static class ApiExceptionMapper
 {
     public static ProblemDetails MapException(Exception ex)
     {
         switch (ex)
         {
-            case NotFoundException notFound:
+            case NotFoundException notFoundException:
                 return new ProblemDetails
                 {
                     Status = (int)HttpStatusCode.NotFound,
                     Title = "Not Found",
-                    Detail = notFound.ResourceName
+                    Detail = notFoundException.ResourceName
                 };
-            case ConflictException conflict:
+            case ConflictException conflictException:
                 return new ProblemDetails
                 {
                     Status = (int)HttpStatusCode.Conflict,
                     Title = "Conflict",
-                    Detail = conflict.ConflictReason
+                    Detail = conflictException.ConflictReason
                 };
             default:
                 return new ProblemDetails

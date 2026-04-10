@@ -1,30 +1,22 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-
 public interface IOrderRepository { }
 
-public class OrderRepository : IOrderRepository { }
+public class OrderRepository : IOrderRepository
+{
+    public OrderRepository() { }
+}
 
 public interface IOrderService { }
 
 public class OrderService : IOrderService
 {
-    private readonly IOrderRepository _repository;
-    private readonly IEmailNotifier _emailNotifier;
-
-    public OrderService(IOrderRepository repository, IEmailNotifier emailNotifier)
-    {
-        _repository = repository;
-        _emailNotifier = emailNotifier;
-    }
+    public OrderService() { }
 }
 
 public interface IEmailNotifier { }
 
 public class EmailNotifier : IEmailNotifier
 {
-    public void Notify(string message) { }
+    public EmailNotifier() { }
 }
 
 public class OrderSettings

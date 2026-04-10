@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 
 public interface IDataSource
@@ -20,7 +16,7 @@ public class DataProcessor
         {
             if (ct.IsCancellationRequested)
             {
-                throw new OperationCanceledException(ct);
+                yield break;
             }
 
             var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
