@@ -1,0 +1,94 @@
+name: hard_efcore_020
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with transaction management and unit of work:
+  Entities: Account(int Id, string Name, decimal Balance, string Currency),
+  Transfer(int Id, int FromAccountId, int ToAccountId, decimal Amount, string Currency,
+    DateTime ExecutedAt, string Status).
+  DbContext: FinanceDbContext.
+  Class TransferService(FinanceDbContext db):
+    Task<Transfer> ExecuteTransferAsync(int fromId, int toId, decimal amount, string currency, CancellationToken ct) —
+      uses database transaction. Validates: accounts exist and same currency, sufficient funds.
+      Creates Transfer record with Status="Completed". On any failure: Status="Failed", rolls back balance changes.
+      Throws InvalidOperationException with appropriate message for validation failures.
+    Task<IReadOnlyList<Transfer>> GetTransferHistoryAsync(int accountId, CancellationToken ct)
+    Task<Account> CreateAccountAsync(string name, decimal initialBalance, string currency, CancellationToken ct)
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TransferServiceTests : IDisposable
+  {
+      private readonly FinanceDbContext _db;
+      private readonly TransferService _svc;
+
+      public TransferServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<FinanceDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new FinanceDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new TransferService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task ExecuteTransfer_Success_UpdatesBalances()
+      {
+          var from = await _svc.CreateAccountAsync("Alice", 1000m, "GBP", CancellationToken.None);
+          var to   = await _svc.CreateAccountAsync("Bob",   500m,  "GBP", CancellationToken.None);
+          await _svc.ExecuteTransferAsync(from.Id, to.Id, 250m, "GBP", CancellationToken.None);
+          _db.Entry(from).Reload();
+          _db.Entry(to).Reload();
+          from.Balance.Should().Be(750m);
+          to.Balance.Should().Be(750m);
+      }
+
+      [Fact]
+      public async Task ExecuteTransfer_InsufficientFunds_ThrowsInvalidOperationException()
+      {
+          var from = await _svc.CreateAccountAsync("Alice", 100m, "GBP", CancellationToken.None);
+          var to   = await _svc.CreateAccountAsync("Bob",   500m, "GBP", CancellationToken.None);
+          var act = async () => await _svc.ExecuteTransferAsync(from.Id, to.Id, 500m, "GBP", CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+          _db.Entry(from).Reload();
+          from.Balance.Should().Be(100m);
+      }
+
+      [Fact]
+      public async Task ExecuteTransfer_CurrencyMismatch_ThrowsInvalidOperationException()
+      {
+          var from = await _svc.CreateAccountAsync("Alice", 1000m, "GBP", CancellationToken.None);
+          var to   = await _svc.CreateAccountAsync("Bob",   500m,  "USD", CancellationToken.None);
+          var act = async () => await _svc.ExecuteTransferAsync(from.Id, to.Id, 100m, "GBP", CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task GetTransferHistory_ReturnsCorrectTransfers()
+      {
+          var from = await _svc.CreateAccountAsync("Alice", 1000m, "GBP", CancellationToken.None);
+          var to   = await _svc.CreateAccountAsync("Bob",    500m, "GBP", CancellationToken.None);
+          await _svc.ExecuteTransferAsync(from.Id, to.Id, 100m, "GBP", CancellationToken.None);
+          await _svc.ExecuteTransferAsync(from.Id, to.Id, 50m,  "GBP", CancellationToken.None);
+          var history = await _svc.GetTransferHistoryAsync(from.Id, CancellationToken.None);
+          history.Should().HaveCount(2);
+          history.Should().AllSatisfy(t => t.Status.Should().Be("Completed"));
+      }
+
+      [Fact]
+      public async Task ExecuteTransfer_UnknownFromAccount_ThrowsInvalidOperationException()
+      {
+          var to = await _svc.CreateAccountAsync("Bob", 100m, "GBP", CancellationToken.None);
+          var act = async () => await _svc.ExecuteTransferAsync(9999, to.Id, 10m, "GBP", CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+  }

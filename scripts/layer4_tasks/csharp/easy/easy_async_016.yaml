@@ -1,0 +1,34 @@
+name: easy_async_016
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncFilter with a static method:
+    async Task<List<T>> WhereAsync<T>(IEnumerable<T> items, Func<T, Task<bool>> predicate)
+  that filters items asynchronously, returning only those for which predicate returns true.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncFilterTests
+  {
+      [Fact]
+      public async Task WhereAsync_FiltersByPredicate()
+      {
+          var result = await AsyncFilter.WhereAsync(new[]{1,2,3,4,5},
+              x => Task.FromResult(x % 2 == 0));
+          result.Should().BeEquivalentTo(new[]{2,4});
+      }
+      [Fact]
+      public async Task WhereAsync_AllMatch_ReturnsAll()
+      {
+          var result = await AsyncFilter.WhereAsync(new[]{1,2,3},
+              x => Task.FromResult(true));
+          result.Should().HaveCount(3);
+      }
+  }

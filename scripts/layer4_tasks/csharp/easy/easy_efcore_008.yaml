@@ -1,0 +1,39 @@
+name: easy_efcore_008
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Employee with properties: int Id, string Name, string Department, decimal Salary
+  A DbContext class HrContext with:
+    DbSet<Employee> Employees { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class EmployeeRepository with:
+    Dictionary<string, decimal> GetAverageSalaryByDepartment(HrContext context)
+  that returns average salary grouped by department.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EmployeeRepositoryTests
+  {
+      [Fact]
+      public void GetAverageSalaryByDepartment_BasicCase()
+      {
+          using var context = new HrContext();
+          context.Database.EnsureCreated();
+          context.Employees.AddRange(
+              new Employee { Name = "Alice", Department = "Engineering", Salary = 100000m },
+              new Employee { Name = "Bob", Department = "Engineering", Salary = 80000m },
+              new Employee { Name = "Carol", Department = "Sales", Salary = 60000m });
+          context.SaveChanges();
+          var result = EmployeeRepository.GetAverageSalaryByDepartment(context);
+          result["Engineering"].Should().Be(90000m);
+          result["Sales"].Should().Be(60000m);
+      }
+  }

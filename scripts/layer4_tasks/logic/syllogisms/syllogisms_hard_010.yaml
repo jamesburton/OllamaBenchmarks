@@ -1,0 +1,15 @@
+name: syllogisms_hard_010
+category: logic
+subcategory: syllogisms
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. If a set is infinite and well-ordered, it has a least element.
+  2. The natural numbers are infinite and well-ordered.
+  3. Zero is the least natural number.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "The natural numbers have a least element, which is zero."
+validator_config: {}

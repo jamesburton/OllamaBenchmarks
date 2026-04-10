@@ -1,0 +1,18 @@
+name: summarisation_medium_054
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The mental health challenges faced by elite athletes are receiving unprecedented attention following high-profile disclosures by Olympic champions. Sports organisations are now embedding psychologists within support teams and developing programmes to destigmatise seeking help. Research suggests that the pressure of elite competition significantly increases the risk of anxiety and depression.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "mental health"
+    - "athletes"
+    - "anxiety"
+    - "psychologists"
+  max_words: 25

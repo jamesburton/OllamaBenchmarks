@@ -1,0 +1,33 @@
+name: easy_xunit_004
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class NumberUtils with a static method:
+    bool IsEven(int n) returns true if n is even
+  Return only valid C# code in a single file.
+test_code: |
+  public class NumberUtilsTests
+  {
+      [Theory]
+      [InlineData(2, true)]
+      [InlineData(3, false)]
+      [InlineData(0, true)]
+      [InlineData(-4, true)]
+      public void IsEven_ReturnsCorrectResult(int n, bool expected)
+      {
+          NumberUtils.IsEven(n).Should().Be(expected);
+      }
+      [Fact]
+      public void IsEven_LargeEvenNumber()
+      {
+          NumberUtils.IsEven(1000000).Should().BeTrue();
+      }
+  }

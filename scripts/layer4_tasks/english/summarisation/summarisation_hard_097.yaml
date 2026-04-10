@@ -1,0 +1,18 @@
+name: summarisation_hard_097
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Homomorphic encryption enables computation on encrypted data without decryption, offering the prospect of privacy-preserving cloud processing. Despite decades of theoretical development, practical homomorphic encryption remains orders of magnitude slower than plaintext computation, limiting deployment to high-value applications such as medical genomics. Hardware acceleration using FPGAs and custom ASICs is the current frontier of performance research.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "homomorphic"
+    - "encryption"
+    - "privacy"
+    - "computation"
+  max_words: 25

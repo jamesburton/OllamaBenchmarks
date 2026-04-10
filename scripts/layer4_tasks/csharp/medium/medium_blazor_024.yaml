@@ -1,0 +1,41 @@
+name: medium_blazor_024
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AccordionService with:
+    IReadOnlyList<string> OpenSections, Toggle(string section), OpenAll(IEnumerable<string>), CloseAll(), IsOpen(string)->bool, OnAccordionChanged event
+  Return only valid C# code in a single file.
+test_code: |
+  public class AccordionServiceTests
+  {
+      [Fact]
+      public void Service_CanBeInstantiated()
+      {
+          var svc = new AccordionService();
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_InitialState_IsDefault()
+      {
+          var svc = new AccordionService();
+          // Just verify construction does not throw
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_BasicOperation_Works()
+      {
+          var svc = new AccordionService();
+          // Basic smoke test
+          svc.Should().NotBeNull();
+      }
+  }

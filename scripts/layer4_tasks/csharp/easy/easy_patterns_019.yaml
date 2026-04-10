@@ -1,0 +1,44 @@
+name: easy_patterns_019
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ListPattern with a static method:
+    string DescribeList(int[] numbers)
+  that uses list patterns (C# 11) to return:
+    "empty" if the array is empty []
+    "single: {x}" if the array has one element [x]
+    "pair: {a}, {b}" if the array has exactly two elements [a, b]
+    "many" otherwise
+  Return only valid C# code in a single file.
+test_code: |
+  public class ListPatternTests
+  {
+      [Fact]
+      public void DescribeList_Empty()
+      {
+          ListPattern.DescribeList(Array.Empty<int>()).Should().Be("empty");
+      }
+      [Fact]
+      public void DescribeList_Single()
+      {
+          ListPattern.DescribeList(new[]{42}).Should().Be("single: 42");
+      }
+      [Fact]
+      public void DescribeList_Pair()
+      {
+          ListPattern.DescribeList(new[]{1,2}).Should().Be("pair: 1, 2");
+      }
+      [Fact]
+      public void DescribeList_Many()
+      {
+          ListPattern.DescribeList(new[]{1,2,3}).Should().Be("many");
+      }
+  }

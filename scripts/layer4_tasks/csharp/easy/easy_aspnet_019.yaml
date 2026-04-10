@@ -1,0 +1,32 @@
+name: easy_aspnet_019
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ApiResponseHelper with a static method:
+    IResult ToResult<T>(T? value) where T : class
+  that returns Results.NotFound() if value is null, otherwise Results.Ok(value).
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApiResponseHelperTests
+  {
+      [Fact]
+      public void ToResult_NonNull_ReturnsOk()
+      {
+          var result = ApiResponseHelper.ToResult("hello");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<string>>();
+      }
+      [Fact]
+      public void ToResult_Null_ReturnsNotFound()
+      {
+          var result = ApiResponseHelper.ToResult<string>(null);
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.NotFound>();
+      }
+  }

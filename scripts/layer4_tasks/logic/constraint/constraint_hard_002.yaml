@@ -1,0 +1,17 @@
+name: constraint_hard_002
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Six people sit around a circular table: A, B, C, D, E, F.
+  Clues:
+  1. A sits directly opposite D.
+  2. B sits next to A.
+  3. C sits directly opposite B.
+  4. E sits between D and F.
+  Who sits directly opposite E? Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

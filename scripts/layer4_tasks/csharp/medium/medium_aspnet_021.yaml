@@ -1,0 +1,61 @@
+name: medium_aspnet_021
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record HealthStatus(bool IsHealthy, string Message, DateTime CheckedAt).
+  A static class HealthEndpoints with:
+    void MapHealthEndpoints(WebApplication app)
+  Register GET /health — returns HealthStatus with IsHealthy=true, Message="OK".
+  Register GET /health/ready — returns HealthStatus with IsHealthy=true if all services are reachable (simulate with always true).
+  Return only valid C# code in a single file.
+test_code: |
+  public class HealthEndpointTests
+  {
+      private async Task<WebApplication> BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          HealthEndpoints.MapHealthEndpoints(app);
+          await app.StartAsync();
+          return app;
+      }
+
+      [Fact]
+      public async Task Health_ReturnsOk()
+      {
+          var client = (await BuildApp()).GetTestClient();
+          var response = await client.GetAsync("/health");
+          response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          var status = await response.Content.ReadFromJsonAsync<HealthStatus>();
+          status!.IsHealthy.Should().BeTrue();
+          status.Message.Should().Be("OK");
+      }
+
+      [Fact]
+      public async Task Health_ReturnsCheckedAt()
+      {
+          var before = DateTime.UtcNow.AddSeconds(-1);
+          var client = (await BuildApp()).GetTestClient();
+          var status = await (await client.GetAsync("/health")).Content.ReadFromJsonAsync<HealthStatus>();
+          status!.CheckedAt.Should().BeAfter(before);
+      }
+
+      [Fact]
+      public async Task HealthReady_ReturnsHealthy()
+      {
+          var client = (await BuildApp()).GetTestClient();
+          var response = await client.GetAsync("/health/ready");
+          response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          var status = await response.Content.ReadFromJsonAsync<HealthStatus>();
+          status!.IsHealthy.Should().BeTrue();
+      }
+  }

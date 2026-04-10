@@ -1,0 +1,20 @@
+name: rewriting_medium_069
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Split this compound sentence into two shorter sentences:
+  'The legislation passed easily in the lower house, but it faces significant opposition in the senate.'
+  Write only the two rewritten sentences.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "passed"
+    - "senate"
+    - "opposition"
+    - "house"
+  min_words: 7
+  max_words: 30

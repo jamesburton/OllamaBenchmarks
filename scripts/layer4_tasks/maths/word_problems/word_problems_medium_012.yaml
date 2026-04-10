@@ -1,0 +1,14 @@
+name: word_problems_medium_012
+category: maths
+subcategory: word_problems
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  A 50-liter solution is 40% alcohol. How many liters of water must be added to reduce it to 25% alcohol?
+  Reply with only the number.
+expected_answer: "30"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

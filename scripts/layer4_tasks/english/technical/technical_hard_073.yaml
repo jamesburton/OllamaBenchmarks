@@ -1,0 +1,24 @@
+name: technical_hard_073
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a GDPR-compliant data deletion confirmation notice to a user who submitted a right-to-erasure request.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "deleted"
+    - "data"
+    - "request"
+    - "GDPR"
+    - "erasure"
+    - "processed"
+    - "retain"
+    - "legal"
+    - "confirmation"
+  min_words: 10
+  max_words: 80

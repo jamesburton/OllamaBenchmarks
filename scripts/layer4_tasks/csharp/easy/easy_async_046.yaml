@@ -1,0 +1,36 @@
+name: easy_async_046
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class CancellableLoop with a static method:
+    async Task<int> CountUntilCancelledAsync(CancellationToken token, int maxCount)
+  that counts from 0 upwards, checking token.IsCancellationRequested each iteration.
+  Stops and returns the current count when cancelled or when maxCount is reached.
+  Each iteration uses await Task.Yield().
+  Return only valid C# code in a single file.
+test_code: |
+  public class CancellableLoopTests
+  {
+      [Fact]
+      public async Task CountUntilCancelledAsync_ReachesMaxCount()
+      {
+          var result = await CancellableLoop.CountUntilCancelledAsync(CancellationToken.None, 5);
+          result.Should().Be(5);
+      }
+      [Fact]
+      public async Task CountUntilCancelledAsync_CancelledEarly_ReturnsBelowMax()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var result = await CancellableLoop.CountUntilCancelledAsync(cts.Token, 100);
+          result.Should().BeLessThan(100);
+      }
+  }

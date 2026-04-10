@@ -1,0 +1,21 @@
+name: rewriting_medium_090
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'Climate change is accelerating. Governments must act urgently. Time is running out.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "climate"
+    - "urgently"
+    - "running out"
+    - "time"
+    - "governments"
+  min_words: 8
+  max_words: 30

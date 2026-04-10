@@ -1,0 +1,43 @@
+name: easy_efcore_023
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  Entity classes:
+    class Category with properties: int Id, string Name, ICollection<Product> Products
+    class Product with properties: int Id, string Name, decimal Price, int CategoryId, Category Category
+  A DbContext class StoreContext with:
+    DbSet<Category> Categories { get; set; }
+    DbSet<Product> Products { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class StoreRepository with:
+    List<Category> GetCategoriesWithProducts(StoreContext context)
+  that returns all categories with their products included.
+  Return only valid C# code in a single file.
+test_code: |
+  public class StoreRepositoryTests
+  {
+      [Fact]
+      public void GetCategoriesWithProducts_IncludesProducts()
+      {
+          using var context = new StoreContext();
+          context.Database.EnsureCreated();
+          var cat = new Category { Name = "Electronics" };
+          context.Categories.Add(cat);
+          context.SaveChanges();
+          context.Products.AddRange(
+              new Product { Name = "Phone", Price = 500m, CategoryId = cat.Id },
+              new Product { Name = "Tablet", Price = 300m, CategoryId = cat.Id });
+          context.SaveChanges();
+          var result = StoreRepository.GetCategoriesWithProducts(context);
+          result.Should().HaveCount(1);
+          result[0].Products.Should().HaveCount(2);
+      }
+  }

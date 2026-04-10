@@ -1,0 +1,15 @@
+name: grammar_easy_083
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The team practiced hard and will win the match.
+  B) The team practiced hard and won the match.
+  C) The team practices hard and won the match.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

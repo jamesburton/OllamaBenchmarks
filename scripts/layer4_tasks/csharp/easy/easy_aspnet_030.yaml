@@ -1,0 +1,33 @@
+name: easy_aspnet_030
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ProblemDetailsFactory with a static method:
+    ProblemDetails CreateConflict(string resource, string detail)
+  that creates a ProblemDetails with:
+    Status = 409
+    Title = "Conflict"
+    Detail = detail
+    Extensions["resource"] = resource
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProblemDetailsFactoryTests
+  {
+      [Fact]
+      public void CreateConflict_SetsAllProperties()
+      {
+          var result = ProblemDetailsFactory.CreateConflict("User", "User already exists");
+          result.Status.Should().Be(409);
+          result.Title.Should().Be("Conflict");
+          result.Detail.Should().Be("User already exists");
+          result.Extensions["resource"].Should().Be("User");
+      }
+  }

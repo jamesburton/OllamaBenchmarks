@@ -1,0 +1,76 @@
+name: hard_xunit_003
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit [Theory] with complex MemberData:
+  Records:
+    PricingInput(decimal BasePrice, decimal DiscountPercent, string CustomerTier, bool IsFirstOrder)
+    PricingExpectation(decimal ExpectedFinalPrice, string ExpectedTierLabel, bool ExpectedFreeShipping)
+
+  Class PricingEngine:
+    (decimal FinalPrice, string TierLabel, bool FreeShipping) Calculate(PricingInput input):
+      Apply discount: BasePrice * (1 - DiscountPercent/100).
+      CustomerTier "Gold": additional 5% off, label "Gold Member", free shipping if > $50.
+      CustomerTier "Silver": additional 2% off, label "Silver Member", free shipping if > $100.
+      CustomerTier "Bronze" or other: no additional discount, label "Standard".
+      First order: additional 10% off.
+      FreeShipping also true if final price > $200.
+
+  Provide static IEnumerable<object[]> TestCases for [MemberData]:
+    At least 6 cases covering different tiers, first order, free shipping thresholds.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PricingEngineTests
+  {
+      private readonly PricingEngine _engine = new();
+
+      public static IEnumerable<object[]> TestCases => PricingEngineTestData.Cases;
+
+      [Theory]
+      [MemberData(nameof(TestCases))]
+      public void Calculate_ReturnsCorrectResults(PricingInput input, PricingExpectation expected)
+      {
+          var (finalPrice, tierLabel, freeShipping) = _engine.Calculate(input);
+          finalPrice.Should().BeApproximately(expected.ExpectedFinalPrice, 0.01m);
+          tierLabel.Should().Be(expected.ExpectedTierLabel);
+          freeShipping.Should().Be(expected.ExpectedFreeShipping);
+      }
+
+      [Fact]
+      public void GoldMember_Gets5PercentAdditionalDiscount()
+      {
+          var (price, label, _) = _engine.Calculate(new PricingInput(100m, 0, "Gold", false));
+          price.Should().Be(95m);
+          label.Should().Be("Gold Member");
+      }
+
+      [Fact]
+      public void FirstOrder_Gets10PercentDiscount()
+      {
+          var (price, _, _) = _engine.Calculate(new PricingInput(100m, 0, "Bronze", true));
+          price.Should().Be(90m);
+      }
+
+      [Fact]
+      public void HighValue_GetsFreeShipping()
+      {
+          var (_, _, freeShipping) = _engine.Calculate(new PricingInput(300m, 0, "Standard", false));
+          freeShipping.Should().BeTrue();
+      }
+
+      [Fact]
+      public void StandardTier_NoAdditionalDiscount()
+      {
+          var (price, label, _) = _engine.Calculate(new PricingInput(100m, 10, "Standard", false));
+          price.Should().Be(90m);
+          label.Should().Be("Standard");
+      }
+  }

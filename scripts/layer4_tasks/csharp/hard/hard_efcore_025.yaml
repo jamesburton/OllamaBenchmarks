@@ -1,0 +1,101 @@
+name: hard_efcore_025
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with CQRS repository split (read model vs write model):
+  Write entities: WorkItem(int Id, string Title, string Type, string AssigneeId, int Priority,
+    List<WorkItemComment> Comments), WorkItemComment(int Id, int WorkItemId, string AuthorId, string Body, DateTime PostedAt).
+  Read-optimized view: WorkItemSummary(not an entity — a DTO from projection).
+  DbContext: WorkItemDbContext.
+  Interface IWorkItemWriteRepository:
+    Task<WorkItem> CreateAsync(WorkItem item, CancellationToken ct)
+    Task AddCommentAsync(int workItemId, string authorId, string body, CancellationToken ct)
+    Task<bool> AssignAsync(int workItemId, string assigneeId, CancellationToken ct)
+    Task<bool> CloseAsync(int workItemId, CancellationToken ct) — sets Type to "Closed".
+  Interface IWorkItemReadRepository:
+    Task<IReadOnlyList<WorkItemSummary>> GetSummariesAsync(string? assigneeId, CancellationToken ct)
+    Task<WorkItemSummary?> GetSummaryAsync(int id, CancellationToken ct)
+  Record: WorkItemSummary(int Id, string Title, string Type, string AssigneeId, int CommentCount, DateTime? LastCommentAt).
+  Use SQLite in-memory. NSubstitute not required.
+  Return only valid C# code in a single file.
+test_code: |
+  public class WorkItemCqrsTests : IDisposable
+  {
+      private readonly WorkItemDbContext _db;
+      private readonly IWorkItemWriteRepository _write;
+      private readonly IWorkItemReadRepository _read;
+
+      public WorkItemCqrsTests()
+      {
+          var opts = new DbContextOptionsBuilder<WorkItemDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new WorkItemDbContext(opts);
+          _db.Database.EnsureCreated();
+          _write = new EfWorkItemWriteRepository(_db);
+          _read  = new EfWorkItemReadRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task Create_And_GetSummary()
+      {
+          var item = await _write.CreateAsync(new WorkItem { Title = "Fix bug", Type = "Bug", AssigneeId = "alice", Priority = 1 }, CancellationToken.None);
+          var summary = await _read.GetSummaryAsync(item.Id, CancellationToken.None);
+          summary.Should().NotBeNull();
+          summary!.Title.Should().Be("Fix bug");
+          summary.CommentCount.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task AddComment_ReflectsInSummary()
+      {
+          var item = await _write.CreateAsync(new WorkItem { Title = "T", Type = "Task", AssigneeId = "bob", Priority = 2 }, CancellationToken.None);
+          await _write.AddCommentAsync(item.Id, "alice", "Looks good!", CancellationToken.None);
+          var summary = await _read.GetSummaryAsync(item.Id, CancellationToken.None);
+          summary!.CommentCount.Should().Be(1);
+          summary.LastCommentAt.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task Assign_ChangesAssignee()
+      {
+          var item = await _write.CreateAsync(new WorkItem { Title = "T", Type = "Task", AssigneeId = "alice", Priority = 1 }, CancellationToken.None);
+          await _write.AssignAsync(item.Id, "bob", CancellationToken.None);
+          var summary = await _read.GetSummaryAsync(item.Id, CancellationToken.None);
+          summary!.AssigneeId.Should().Be("bob");
+      }
+
+      [Fact]
+      public async Task Close_SetsTypeToClosed()
+      {
+          var item = await _write.CreateAsync(new WorkItem { Title = "T", Type = "Task", AssigneeId = "alice", Priority = 1 }, CancellationToken.None);
+          await _write.CloseAsync(item.Id, CancellationToken.None);
+          var summary = await _read.GetSummaryAsync(item.Id, CancellationToken.None);
+          summary!.Type.Should().Be("Closed");
+      }
+
+      [Fact]
+      public async Task GetSummaries_FiltersByAssignee()
+      {
+          await _write.CreateAsync(new WorkItem { Title = "A", Type = "Bug",  AssigneeId = "alice", Priority = 1 }, CancellationToken.None);
+          await _write.CreateAsync(new WorkItem { Title = "B", Type = "Task", AssigneeId = "bob",   Priority = 2 }, CancellationToken.None);
+          var alice = await _read.GetSummariesAsync("alice", CancellationToken.None);
+          alice.Should().ContainSingle(s => s.Title == "A");
+          alice.Should().NotContain(s => s.Title == "B");
+      }
+
+      [Fact]
+      public async Task Assign_UnknownId_ReturnsFalse()
+      {
+          var result = await _write.AssignAsync(9999, "alice", CancellationToken.None);
+          result.Should().BeFalse();
+      }
+  }

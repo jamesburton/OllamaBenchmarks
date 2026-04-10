@@ -1,0 +1,21 @@
+name: rewriting_hard_120
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'There exists a strong body of evidence to suggest that the introduction of mandatory paid parental leave policies has a positive and measurable effect on gender equality outcomes in the workplace.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "paid parental leave"
+    - "gender equality"
+    - "evidence"
+    - "workplace"
+    - "improves"
+  min_words: 5
+  max_words: 22

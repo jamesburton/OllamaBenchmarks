@@ -1,0 +1,64 @@
+name: medium_blazor_009
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class LoadingService with:
+    bool IsLoading { get; private set; }
+    int ActiveOperations { get; private set; }
+    event Action? OnStateChanged
+    IDisposable BeginLoading()
+  BeginLoading increments ActiveOperations, sets IsLoading=true, fires event.
+  Disposing the returned IDisposable decrements ActiveOperations; sets IsLoading=false when 0, fires event.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LoadingServiceTests
+  {
+      [Fact]
+      public void BeginLoading_SetsIsLoading()
+      {
+          var svc = new LoadingService();
+          using var op = svc.BeginLoading();
+          svc.IsLoading.Should().BeTrue();
+      }
+
+      [Fact]
+      public void Dispose_ClearsIsLoading()
+      {
+          var svc = new LoadingService();
+          var op = svc.BeginLoading();
+          op.Dispose();
+          svc.IsLoading.Should().BeFalse();
+      }
+
+      [Fact]
+      public void MultipleOperations_CountsCorrectly()
+      {
+          var svc = new LoadingService();
+          var op1 = svc.BeginLoading();
+          var op2 = svc.BeginLoading();
+          svc.ActiveOperations.Should().Be(2);
+          op1.Dispose();
+          svc.IsLoading.Should().BeTrue();
+          svc.ActiveOperations.Should().Be(1);
+          op2.Dispose();
+          svc.IsLoading.Should().BeFalse();
+      }
+
+      [Fact]
+      public void BeginLoading_FiresEvent()
+      {
+          var svc = new LoadingService();
+          var fired = false;
+          svc.OnStateChanged += () => fired = true;
+          using var op = svc.BeginLoading();
+          fired.Should().BeTrue();
+      }
+  }

@@ -1,0 +1,61 @@
+name: medium_aspnet_022
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record BulkCreateRequest<T>(IEnumerable<T> Items).
+  A record BulkResult(int Created, int Failed, IEnumerable<string> Errors).
+  An interface IBulkService<T> with:
+    Task<BulkResult> CreateManyAsync(IEnumerable<T> items)
+  A class BulkController<T> : ControllerBase with [ApiController] and [Route("api/bulk")] attributes.
+  Constructor accepts IBulkService<T>.
+  Action: POST api/bulk — calls CreateManyAsync and returns 200 with BulkResult.
+  Return only valid C# code in a single file.
+test_code: |
+  public record Widget(string Name, decimal Price);
+
+  public class BulkControllerTests
+  {
+      [Fact]
+      public async Task Post_CallsService_ReturnsResult()
+      {
+          var svc = Substitute.For<IBulkService<Widget>>();
+          svc.CreateManyAsync(Arg.Any<IEnumerable<Widget>>())
+              .Returns(new BulkResult(3, 0, Enumerable.Empty<string>()));
+          var ctrl = new BulkController<Widget>(svc);
+          var req = new BulkCreateRequest<Widget>(new[] { new Widget("A", 1m), new Widget("B", 2m), new Widget("C", 3m) });
+          var result = await ctrl.Post(req) as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+          (result.Value as BulkResult)!.Created.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task Post_WithErrors_ReturnsPartialResult()
+      {
+          var svc = Substitute.For<IBulkService<Widget>>();
+          svc.CreateManyAsync(Arg.Any<IEnumerable<Widget>>())
+              .Returns(new BulkResult(1, 2, new[] { "err1", "err2" }));
+          var ctrl = new BulkController<Widget>(svc);
+          var req = new BulkCreateRequest<Widget>(new[] { new Widget("A", 1m) });
+          var result = await ctrl.Post(req) as OkObjectResult;
+          (result!.Value as BulkResult)!.Failed.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task Post_DelegatesToService()
+      {
+          var svc = Substitute.For<IBulkService<Widget>>();
+          svc.CreateManyAsync(Arg.Any<IEnumerable<Widget>>())
+              .Returns(new BulkResult(0, 0, Enumerable.Empty<string>()));
+          var ctrl = new BulkController<Widget>(svc);
+          await ctrl.Post(new BulkCreateRequest<Widget>(Array.Empty<Widget>()));
+          await svc.Received(1).CreateManyAsync(Arg.Any<IEnumerable<Widget>>());
+      }
+  }

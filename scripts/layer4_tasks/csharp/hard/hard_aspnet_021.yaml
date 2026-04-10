@@ -1,0 +1,95 @@
+name: hard_aspnet_021
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A multi-tenant API with tenant resolution middleware:
+  Record: TenantInfo(string TenantId, string Name, string Plan, bool IsActive).
+  Interface ITenantResolver: Task<TenantInfo?> ResolveAsync(HttpContext ctx, CancellationToken ct)
+  Class HeaderTenantResolver : ITenantResolver — reads X-Tenant-Id header.
+  Interface ITenantStore:
+    Task<TenantInfo?> GetAsync(string tenantId, CancellationToken ct)
+    Task RegisterAsync(TenantInfo tenant, CancellationToken ct)
+  Class InMemoryTenantStore : ITenantStore.
+  Class TenantMiddleware:
+    Resolves tenant using ITenantResolver. If not found or inactive: returns 403.
+    Stores resolved TenantInfo in HttpContext.Items["Tenant"].
+  Static: AddMultiTenancy(this IServiceCollection svc)
+         UseMultiTenancy(this IApplicationBuilder app)
+  Return only valid C# code in a single file.
+test_code: |
+  public class MultiTenancyTests
+  {
+      private static async Task<WebApplication> BuildAppWithTenant(TenantInfo? tenant = null)
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddMultiTenancy();
+          var store = new InMemoryTenantStore();
+          if (tenant != null) await store.RegisterAsync(tenant, CancellationToken.None);
+          builder.Services.AddSingleton<ITenantStore>(store);
+          var app = builder.Build();
+          app.UseMultiTenancy();
+          app.MapGet("/", (HttpContext ctx) =>
+              ctx.Items["Tenant"] is TenantInfo t ? t.Name : "unknown");
+          return app;
+      }
+
+      [Fact]
+      public async Task ValidActiveTenant_Returns200WithName()
+      {
+          var tenant = new TenantInfo("t1", "Acme Corp", "Pro", true);
+          await using var app = await BuildAppWithTenant(tenant);
+          var req = new HttpRequestMessage(HttpMethod.Get, "/");
+          req.Headers.Add("X-Tenant-Id", "t1");
+          var resp = await app.GetTestClient().SendAsync(req);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          (await resp.Content.ReadAsStringAsync()).Should().Contain("Acme Corp");
+      }
+
+      [Fact]
+      public async Task UnknownTenant_Returns403()
+      {
+          await using var app = await BuildAppWithTenant();
+          var req = new HttpRequestMessage(HttpMethod.Get, "/");
+          req.Headers.Add("X-Tenant-Id", "unknown-tenant");
+          var resp = await app.GetTestClient().SendAsync(req);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Forbidden);
+      }
+
+      [Fact]
+      public async Task InactiveTenant_Returns403()
+      {
+          var tenant = new TenantInfo("t2", "Inactive Corp", "Free", false);
+          await using var app = await BuildAppWithTenant(tenant);
+          var req = new HttpRequestMessage(HttpMethod.Get, "/");
+          req.Headers.Add("X-Tenant-Id", "t2");
+          var resp = await app.GetTestClient().SendAsync(req);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Forbidden);
+      }
+
+      [Fact]
+      public async Task NoTenantHeader_Returns403()
+      {
+          await using var app = await BuildAppWithTenant();
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Forbidden);
+      }
+
+      [Fact]
+      public async Task InMemoryStore_RegisterAndGet()
+      {
+          var store = new InMemoryTenantStore();
+          var tenant = new TenantInfo("xyz", "XYZ Corp", "Basic", true);
+          await store.RegisterAsync(tenant, CancellationToken.None);
+          var result = await store.GetAsync("xyz", CancellationToken.None);
+          result.Should().NotBeNull();
+          result!.Name.Should().Be("XYZ Corp");
+      }
+  }

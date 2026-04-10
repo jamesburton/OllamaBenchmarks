@@ -1,0 +1,128 @@
+name: hard_masstransit_020
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit multi-step notification pipeline:
+  Messages:
+    record SendNotification(Guid NotificationId, string UserId, string Channel, string Subject, string Body);
+    record NotificationQueued(Guid NotificationId, string Channel);
+    record NotificationDelivered(Guid NotificationId, string Channel, DateTime DeliveredAt);
+    record NotificationFailed(Guid NotificationId, string Channel, string Reason);
+
+  Interface INotificationSender:
+    Task<bool> SendAsync(string channel, string subject, string body, CancellationToken ct)
+
+  Class EmailNotificationConsumer : IConsumer<SendNotification>:
+    Only handles Channel == "email".
+    Uses INotificationSender to send.
+    First publishes NotificationQueued, then NotificationDelivered or NotificationFailed.
+
+  Class SmsNotificationConsumer : IConsumer<SendNotification>:
+    Only handles Channel == "sms".
+    Uses INotificationSender to send.
+    First publishes NotificationQueued, then NotificationDelivered or NotificationFailed.
+
+  Each consumer skips messages not meant for its channel.
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationConsumerTests
+  {
+      [Fact]
+      public async Task EmailConsumer_HandlesEmailChannel()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          sender.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new EmailNotificationConsumer(sender));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SendNotification(Guid.NewGuid(), "u1", "email", "Hi", "Body"));
+              await Task.Delay(200);
+              (await harness.Published.Any<NotificationDelivered>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EmailConsumer_SkipsSmsChannel()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new EmailNotificationConsumer(sender));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SendNotification(Guid.NewGuid(), "u2", "sms", "Hi", "Body"));
+              await Task.Delay(200);
+              await sender.DidNotReceive().SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SmsConsumer_HandlesSmsChannel()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          sender.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new SmsNotificationConsumer(sender));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SendNotification(Guid.NewGuid(), "u3", "sms", "Alert", "Text"));
+              await Task.Delay(200);
+              (await harness.Published.Any<NotificationDelivered>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EmailConsumer_OnFailure_PublishesNotificationFailed()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          sender.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(false);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new EmailNotificationConsumer(sender));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SendNotification(Guid.NewGuid(), "u4", "email", "Sub", "Body"));
+              await Task.Delay(200);
+              (await harness.Published.Any<NotificationFailed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EmailConsumer_PublishesQueuedFirst()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          sender.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new EmailNotificationConsumer(sender));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SendNotification(Guid.NewGuid(), "u5", "email", "S", "B"));
+              await Task.Delay(200);
+              (await harness.Published.Any<NotificationQueued>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+  }

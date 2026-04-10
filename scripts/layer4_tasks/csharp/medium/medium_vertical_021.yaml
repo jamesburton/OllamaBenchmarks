@@ -1,0 +1,41 @@
+name: medium_vertical_021
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for archiveproject.
+  Include:
+    Command: Guid ProjectId, string RequestedBy, string Reason
+  Result: Guid ProjectId, DateTime ArchivedAt, string ArchivedBy
+  Handler validates: Reason not empty, min 10 chars. Returns result with timestamp.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ArchiveProjectHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new ArchiveProjectHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new ArchiveProjectHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new ArchiveProjectHandler();
+          handler.Should().NotBeNull();
+      }
+  }

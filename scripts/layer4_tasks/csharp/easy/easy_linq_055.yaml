@@ -1,0 +1,31 @@
+name: easy_linq_055
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Reverser with a static method:
+    List<T> Reverse<T>(IEnumerable<T> items)
+  that returns elements in reversed order using LINQ Reverse + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReverserTests
+  {
+      [Fact]
+      public void Reverse_BasicCase()
+      {
+          var result = Reverser.Reverse(new[]{1,2,3,4,5});
+          result.Should().BeEquivalentTo(new[]{5,4,3,2,1}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void Reverse_SingleElement_ReturnsSame()
+      {
+          Reverser.Reverse(new[]{"hello"}).Should().BeEquivalentTo(new[]{"hello"}, cfg => cfg.WithStrictOrdering());
+      }
+  }

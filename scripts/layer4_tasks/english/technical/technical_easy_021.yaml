@@ -1,0 +1,21 @@
+name: technical_easy_021
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a JSDoc comment for a JavaScript function that adds two numbers and returns the sum.
+  Include @param and @returns tags.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "@param"
+    - "@returns"
+    - "number"
+    - "sum"
+    - "add"
+    - "function"
+  min_words: 8
+  max_words: 60

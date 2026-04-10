@@ -1,0 +1,99 @@
+name: hard_linq_001
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A record Product(int Id, string Category, string Name, decimal Price, int Stock).
+  A class ProductPipeline with constructor accepting IEnumerable<Product> products.
+  Methods:
+    IEnumerable<CategoryReport> BuildCategoryReport() — groups by Category, computes
+      Count, TotalValue (Price*Stock sum), AveragePrice, and TopProduct (highest Price).
+      Orders by TotalValue descending.
+    IEnumerable<Product> FilterAndRank(string category, decimal minPrice, int topN) —
+      filters by category and minPrice, orders by Price descending, takes topN.
+    Dictionary<string, List<Product>> GroupByPriceRange(decimal low, decimal high) —
+      returns three buckets keyed "Low"(<low), "Mid"(low..high inclusive), "High"(>high).
+  Records: CategoryReport(string Category, int Count, decimal TotalValue, decimal AveragePrice, Product TopProduct).
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductPipelineTests
+  {
+      private static readonly List<Product> Products = new()
+      {
+          new(1, "Books",       "C# in Depth",    45.00m, 10),
+          new(2, "Books",       "CLR via C#",     55.00m, 5),
+          new(3, "Electronics", "Keyboard",      120.00m, 3),
+          new(4, "Electronics", "Mouse",          40.00m, 15),
+          new(5, "Electronics", "Monitor",       350.00m, 2),
+          new(6, "Clothing",    "T-Shirt",        20.00m, 50),
+      };
+
+      [Fact]
+      public void BuildCategoryReport_ReturnsThreeCategories()
+      {
+          var result = new ProductPipeline(Products).BuildCategoryReport().ToList();
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void BuildCategoryReport_ElectronicsHasCorrectTotalValue()
+      {
+          var result = new ProductPipeline(Products).BuildCategoryReport().ToList();
+          var elec = result.First();
+          elec.Category.Should().Be("Electronics");
+          elec.TotalValue.Should().Be(120m*3 + 40m*15 + 350m*2);
+      }
+
+      [Fact]
+      public void BuildCategoryReport_TopProductIsHighestPrice()
+      {
+          var result = new ProductPipeline(Products).BuildCategoryReport().ToList();
+          var elec = result.First(r => r.Category == "Electronics");
+          elec.TopProduct.Name.Should().Be("Monitor");
+      }
+
+      [Fact]
+      public void FilterAndRank_ReturnsCorrectTopN()
+      {
+          var result = new ProductPipeline(Products).FilterAndRank("Electronics", 50m, 2).ToList();
+          result.Should().HaveCount(2);
+          result[0].Name.Should().Be("Monitor");
+          result[1].Name.Should().Be("Keyboard");
+      }
+
+      [Fact]
+      public void FilterAndRank_NoMatchReturnsEmpty()
+      {
+          var result = new ProductPipeline(Products).FilterAndRank("Electronics", 9999m, 5).ToList();
+          result.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void GroupByPriceRange_BucketsCorrectly()
+      {
+          var result = new ProductPipeline(Products).GroupByPriceRange(30m, 100m);
+          result["Low"].Should().ContainSingle(p => p.Name == "T-Shirt");
+          result["Mid"].Count.Should().Be(3);
+          result["High"].Should().ContainSingle(p => p.Name == "Monitor");
+      }
+
+      [Fact]
+      public void GroupByPriceRange_AllBucketsPresent()
+      {
+          var result = new ProductPipeline(Products).GroupByPriceRange(30m, 100m);
+          result.Keys.Should().BeEquivalentTo(new[] { "Low", "Mid", "High" });
+      }
+
+      [Fact]
+      public void BuildCategoryReport_EmptyInput_ReturnsEmpty()
+      {
+          new ProductPipeline(Array.Empty<Product>()).BuildCategoryReport().Should().BeEmpty();
+      }
+  }

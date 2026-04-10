@@ -1,0 +1,28 @@
+name: easy_aspnet_004
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ProblemDetailsFactory with a static method:
+    ProblemDetails CreateNotFound(string detail)
+  that creates a ProblemDetails with Status=404, Title="Not Found", Detail=detail.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProblemDetailsFactoryTests
+  {
+      [Fact]
+      public void CreateNotFound_ReturnsCorrectProblemDetails()
+      {
+          var result = ProblemDetailsFactory.CreateNotFound("Item not found");
+          result.Status.Should().Be(404);
+          result.Title.Should().Be("Not Found");
+          result.Detail.Should().Be("Item not found");
+      }
+  }

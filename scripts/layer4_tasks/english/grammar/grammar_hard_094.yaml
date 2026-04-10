@@ -1,0 +1,15 @@
+name: grammar_hard_094
+category: english
+subcategory: grammar
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) She asked to whom the letter was addressed.
+  B) She asked whom the letter was addressed to.
+  C) Both A and B are correct.
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

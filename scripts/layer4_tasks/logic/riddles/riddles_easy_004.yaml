@@ -1,0 +1,16 @@
+name: riddles_easy_004
+category: logic
+subcategory: riddles
+difficulty: easy
+weight: 1
+validator_type: logic
+max_tokens: 64
+prompt: |
+  I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?
+  Reply with only the answer.
+expected_answer: "An echo"
+validator_config:
+  accepted_answers:
+  - "An echo"
+  - "echo"
+  - "an echo"

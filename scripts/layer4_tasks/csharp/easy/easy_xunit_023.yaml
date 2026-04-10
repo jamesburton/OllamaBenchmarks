@@ -1,0 +1,39 @@
+name: easy_xunit_023
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IFileReader with method:
+    Task<string> ReadAllTextAsync(string path)
+  A class FileProcessor with constructor taking IFileReader, and async method:
+    Task<int> CountLinesAsync(string path) reads file content and returns line count (split by '\n')
+  Return only valid C# code in a single file.
+test_code: |
+  public class FileProcessorTests
+  {
+      [Fact]
+      public async Task CountLinesAsync_ReturnsLineCount()
+      {
+          var reader = Substitute.For<IFileReader>();
+          reader.ReadAllTextAsync("test.txt").Returns("line1\nline2\nline3");
+          var processor = new FileProcessor(reader);
+          var count = await processor.CountLinesAsync("test.txt");
+          count.Should().Be(3);
+      }
+      [Fact]
+      public async Task CountLinesAsync_EmptyFile_ReturnsOne()
+      {
+          var reader = Substitute.For<IFileReader>();
+          reader.ReadAllTextAsync("empty.txt").Returns("");
+          var processor = new FileProcessor(reader);
+          var count = await processor.CountLinesAsync("empty.txt");
+          count.Should().Be(1);
+      }
+  }

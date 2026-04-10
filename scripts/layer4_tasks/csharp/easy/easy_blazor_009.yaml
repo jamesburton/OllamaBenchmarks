@@ -1,0 +1,44 @@
+name: easy_blazor_009
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class TodoListComponent that extends ComponentBase with:
+    List<string> Items { get; private set; } = new()
+    void AddItem(string item) — adds item if non-empty
+    void RemoveItem(string item) — removes first occurrence of item
+    int Count => Items.Count
+  Return only valid C# code in a single file.
+test_code: |
+  public class TodoListComponentTests
+  {
+      [Fact]
+      public void AddItem_AddsToList()
+      {
+          var c = new TodoListComponent();
+          c.AddItem("Buy milk");
+          c.Count.Should().Be(1);
+      }
+      [Fact]
+      public void AddItem_EmptyItem_DoesNotAdd()
+      {
+          var c = new TodoListComponent();
+          c.AddItem("");
+          c.Count.Should().Be(0);
+      }
+      [Fact]
+      public void RemoveItem_RemovesFromList()
+      {
+          var c = new TodoListComponent();
+          c.AddItem("Task 1");
+          c.RemoveItem("Task 1");
+          c.Count.Should().Be(0);
+      }
+  }

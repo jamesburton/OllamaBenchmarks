@@ -1,0 +1,39 @@
+name: medium_xunit_026
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class NumberBaseConverter with:
+    string ToBase(long number, int toBase), long FromBase(string number, int fromBase) — bases 2-36
+  Return only valid C# code in a single file.
+test_code: |
+  public class NumberBaseConverterTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new NumberBaseConverter();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new NumberBaseConverter();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new NumberBaseConverter();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

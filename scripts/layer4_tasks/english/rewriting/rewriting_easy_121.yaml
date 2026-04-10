@@ -1,0 +1,22 @@
+name: rewriting_easy_121
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity (remove ambiguity):
+  'I saw the man with binoculars.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "binoculars"
+    - "saw"
+    - "man"
+    - "using"
+    - "through"
+    - "watched"
+  min_words: 5
+  max_words: 20

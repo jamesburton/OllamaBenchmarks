@@ -1,0 +1,18 @@
+name: summarisation_medium_074
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The politicisation of central bank independence has intensified as governments seek to use monetary policy tools to address structural economic problems beyond the traditional mandate of price stability. Politically motivated appointments to central bank boards undermine credibility and can amplify market volatility. Most economists regard central bank independence as essential for anchoring inflation expectations.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "central bank"
+    - "independence"
+    - "inflation"
+    - "monetary"
+  max_words: 25

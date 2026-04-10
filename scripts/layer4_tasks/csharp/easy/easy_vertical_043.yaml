@@ -1,0 +1,38 @@
+name: easy_vertical_043
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record GiftCard(string Code, decimal Balance, bool IsActive)
+  A class GiftCardWallet with:
+    void Add(GiftCard card)
+    decimal? GetBalance(string code) returns balance or null if not found or inactive
+    bool Redeem(string code, decimal amount) deducts amount if card exists, is active, and has sufficient balance; returns false otherwise
+  Return only valid C# code in a single file.
+test_code: |
+  public class GiftCardWalletTests
+  {
+      [Fact]
+      public void Redeem_SuccessfulRedemption()
+      {
+          var wallet = new GiftCardWallet();
+          wallet.Add(new GiftCard("GC001", 50m, true));
+          wallet.Redeem("GC001", 20m).Should().BeTrue();
+          wallet.GetBalance("GC001").Should().Be(30m);
+      }
+      [Fact]
+      public void Redeem_InsufficientBalance_ReturnsFalse()
+      {
+          var wallet = new GiftCardWallet();
+          wallet.Add(new GiftCard("GC002", 10m, true));
+          wallet.Redeem("GC002", 50m).Should().BeFalse();
+          wallet.GetBalance("GC002").Should().Be(10m);
+      }
+  }

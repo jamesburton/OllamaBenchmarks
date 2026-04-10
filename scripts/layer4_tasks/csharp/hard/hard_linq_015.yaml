@@ -1,0 +1,93 @@
+name: hard_linq_015
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Asset(int Id, string AssetClass, string Ticker, decimal Quantity, decimal PurchasePrice),
+  PriceQuote(string Ticker, decimal CurrentPrice).
+  A class PortfolioAnalyser with constructor accepting IEnumerable<Asset> assets and
+  IEnumerable<PriceQuote> quotes.
+  Methods:
+    IEnumerable<PositionSummary> Positions() — joins assets to quotes by Ticker,
+      computes MarketValue (Qty*CurrentPrice), UnrealisedPnL (MarketValue - Qty*PurchasePrice),
+      PnLPercent. Orders by MarketValue descending.
+    IEnumerable<AllocationSummary> AssetClassAllocation() — groups by AssetClass,
+      computes TotalMarketValue and WeightPercent (of total portfolio). Orders by Weight descending.
+    decimal TotalPortfolioValue() — sum of all market values.
+    IEnumerable<Asset> UnpricedAssets() — assets with no matching quote.
+  Records: PositionSummary(string Ticker, decimal MarketValue, decimal UnrealisedPnL, decimal PnLPercent),
+           AllocationSummary(string AssetClass, decimal TotalMarketValue, decimal WeightPercent).
+  Return only valid C# code in a single file.
+test_code: |
+  public class PortfolioAnalyserTests
+  {
+      private static readonly List<Asset> Assets = new()
+      {
+          new(1, "Equity", "AAPL", 10m, 150m),
+          new(2, "Equity", "MSFT",  5m, 300m),
+          new(3, "Bond",   "TBND", 20m,  98m),
+          new(4, "Equity", "NOQUOTE", 3m, 50m),
+      };
+      private static readonly List<PriceQuote> Quotes = new()
+      {
+          new("AAPL", 180m),
+          new("MSFT", 320m),
+          new("TBND", 100m),
+      };
+
+      [Fact]
+      public void Positions_AAPLMarketValueCorrect()
+      {
+          var result = new PortfolioAnalyser(Assets, Quotes).Positions().ToList();
+          result.First(p => p.Ticker == "AAPL").MarketValue.Should().Be(1800m);
+      }
+
+      [Fact]
+      public void Positions_MSFTPnLIsCorrect()
+      {
+          var result = new PortfolioAnalyser(Assets, Quotes).Positions().ToList();
+          result.First(p => p.Ticker == "MSFT").UnrealisedPnL.Should().Be(100m);
+      }
+
+      [Fact]
+      public void TotalPortfolioValue_IsCorrect()
+      {
+          new PortfolioAnalyser(Assets, Quotes).TotalPortfolioValue()
+              .Should().Be(1800m + 1600m + 2000m);
+      }
+
+      [Fact]
+      public void AssetClassAllocation_EquityWeightIsCorrect()
+      {
+          var result = new PortfolioAnalyser(Assets, Quotes).AssetClassAllocation().ToList();
+          var equity = result.First(a => a.AssetClass == "Equity");
+          equity.TotalMarketValue.Should().Be(3400m);
+      }
+
+      [Fact]
+      public void UnpricedAssets_ReturnsAssetsWithNoQuote()
+      {
+          var result = new PortfolioAnalyser(Assets, Quotes).UnpricedAssets().ToList();
+          result.Should().ContainSingle(a => a.Ticker == "NOQUOTE");
+      }
+
+      [Fact]
+      public void Positions_OrderedByMarketValueDescending()
+      {
+          var result = new PortfolioAnalyser(Assets, Quotes).Positions().ToList();
+          result.Select(p => p.MarketValue).Should().BeInDescendingOrder();
+      }
+
+      [Fact]
+      public void Positions_EmptyQuotes_ReturnsEmpty()
+      {
+          new PortfolioAnalyser(Assets, Array.Empty<PriceQuote>()).Positions().Should().BeEmpty();
+      }
+  }

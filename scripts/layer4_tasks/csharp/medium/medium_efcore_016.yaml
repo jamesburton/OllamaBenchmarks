@@ -1,0 +1,75 @@
+name: medium_efcore_016
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity SupportTicket with: int Id, string Subject, string Description, string Status, int Priority, string AssignedTo, DateTime CreatedAt.
+  A class SupportDbContext : DbContext with DbSet<SupportTicket> Tickets.
+  A class TicketRepository with constructor accepting SupportDbContext.
+  Methods:
+    Task<IEnumerable<SupportTicket>> GetOpenByPriorityAsync()
+    Task<IEnumerable<SupportTicket>> GetAssignedToAsync(string assignee)
+    Task AssignAsync(int ticketId, string assignee)
+    Task CloseAsync(int ticketId)
+  GetOpenByPriorityAsync returns open tickets ordered by Priority descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TicketRepositoryTests : IAsyncLifetime
+  {
+      private SupportDbContext _db = null!;
+      private TicketRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<SupportDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new SupportDbContext(opts);
+          _repo = new TicketRepository(_db);
+          _db.Tickets.AddRange(
+              new SupportTicket { Subject = "A", Description = "d", Status = "Open", Priority = 2, AssignedTo = "agent1", CreatedAt = DateTime.UtcNow },
+              new SupportTicket { Subject = "B", Description = "d", Status = "Open", Priority = 5, AssignedTo = "agent2", CreatedAt = DateTime.UtcNow },
+              new SupportTicket { Subject = "C", Description = "d", Status = "Closed", Priority = 3, AssignedTo = "agent1", CreatedAt = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetOpenByPriority_OnlyOpen_Ordered()
+      {
+          var tickets = (await _repo.GetOpenByPriorityAsync()).ToList();
+          tickets.Should().HaveCount(2);
+          tickets[0].Priority.Should().BeGreaterThan(tickets[1].Priority);
+      }
+
+      [Fact]
+      public async Task GetAssignedTo_ReturnsCorrect()
+      {
+          (await _repo.GetAssignedToAsync("agent1")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task Assign_UpdatesAssignee()
+      {
+          var id = _db.Tickets.First(t => t.AssignedTo == "agent2").Id;
+          await _repo.AssignAsync(id, "agent1");
+          _db.ChangeTracker.Clear();
+          (await _db.Tickets.FindAsync(id))!.AssignedTo.Should().Be("agent1");
+      }
+
+      [Fact]
+      public async Task Close_SetsStatusClosed()
+      {
+          var id = _db.Tickets.First(t => t.Status == "Open").Id;
+          await _repo.CloseAsync(id);
+          _db.ChangeTracker.Clear();
+          (await _db.Tickets.FindAsync(id))!.Status.Should().Be("Closed");
+      }
+  }

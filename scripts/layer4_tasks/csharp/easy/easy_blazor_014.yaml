@@ -1,0 +1,40 @@
+name: easy_blazor_014
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class CounterComponent that extends ComponentBase with:
+    [Parameter] int InitialCount { get; set; } = 0
+    int Count { get; set; }
+    void Increment() increments Count by 1
+    void Decrement() decrements Count by 1
+    public void OnInitializedPublic() calls OnInitialized() and sets Count = InitialCount
+  Override protected void OnInitialized() to set Count = InitialCount.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CounterComponentTests
+  {
+      [Fact]
+      public void Increment_IncreasesCount()
+      {
+          var c = new CounterComponent { InitialCount = 5 };
+          c.OnInitializedPublic();
+          c.Increment();
+          c.Count.Should().Be(6);
+      }
+      [Fact]
+      public void Decrement_DecreasesCount()
+      {
+          var c = new CounterComponent { InitialCount = 3 };
+          c.OnInitializedPublic();
+          c.Decrement();
+          c.Count.Should().Be(2);
+      }
+  }

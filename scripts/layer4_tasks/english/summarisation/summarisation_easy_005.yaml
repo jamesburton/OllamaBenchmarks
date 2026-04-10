@@ -1,0 +1,18 @@
+name: summarisation_easy_005
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The startup secured ten million dollars in Series A funding to expand its delivery platform. Investors were attracted by the company's rapid growth and loyal customer base. The funds will be used to hire engineers and enter three new cities.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "funding"
+    - "startup"
+    - "delivery"
+    - "expansion"
+  max_words: 25

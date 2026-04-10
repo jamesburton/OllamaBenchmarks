@@ -1,0 +1,37 @@
+name: easy_async_038
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class TaskGuard with a static method:
+    async Task RunWithCancellationAsync(Func<Task> action, CancellationToken token)
+  that throws OperationCanceledException if token is already cancelled before running action,
+  otherwise runs the action.
+  Use token.ThrowIfCancellationRequested().
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaskGuardTests
+  {
+      [Fact]
+      public async Task RunWithCancellationAsync_NotCancelled_Runs()
+      {
+          bool ran = false;
+          await TaskGuard.RunWithCancellationAsync(() => { ran = true; return Task.CompletedTask; }, CancellationToken.None);
+          ran.Should().BeTrue();
+      }
+      [Fact]
+      public async Task RunWithCancellationAsync_Cancelled_Throws()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(
+              () => TaskGuard.RunWithCancellationAsync(() => Task.CompletedTask, cts.Token));
+      }
+  }

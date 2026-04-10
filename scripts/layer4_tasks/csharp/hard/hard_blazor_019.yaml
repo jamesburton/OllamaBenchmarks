@@ -1,0 +1,102 @@
+name: hard_blazor_019
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor offline/sync service:
+  Enum SyncStatus { Pending, Syncing, Synced, Failed }
+  Records:
+    PendingChange(Guid Id, string EntityType, string EntityId, string Operation, string JsonData, DateTime CreatedAt, SyncStatus Status, int RetryCount)
+    SyncResult(int Succeeded, int Failed, IReadOnlyList<Guid> FailedIds)
+
+  Interface IRemoteSync:
+    Task<bool> SyncChangeAsync(PendingChange change, CancellationToken ct)
+
+  Class OfflineSyncService(IRemoteSync remote):
+    void QueueChange(string entityType, string entityId, string operation, string jsonData): adds PendingChange.
+    Task<SyncResult> SyncAllAsync(CancellationToken ct): processes all pending changes.
+      On success: mark Synced.
+      On failure: mark Failed, increment RetryCount.
+    IReadOnlyList<PendingChange> GetPendingChanges()
+    IReadOnlyList<PendingChange> GetFailedChanges()
+    int GetPendingCount()
+  Return only valid C# code in a single file.
+test_code: |
+  public class OfflineSyncServiceTests
+  {
+      [Fact]
+      public void QueueChange_AddsToPending()
+      {
+          var remote = Substitute.For<IRemoteSync>();
+          var svc = new OfflineSyncService(remote);
+          svc.QueueChange("Order", "1", "create", "{}");
+          svc.GetPendingCount().Should().Be(1);
+      }
+
+      [Fact]
+      public async Task SyncAll_AllSucceed_ReturnsCorrectCount()
+      {
+          var remote = Substitute.For<IRemoteSync>();
+          remote.SyncChangeAsync(Arg.Any<PendingChange>(), Arg.Any<CancellationToken>()).Returns(true);
+          var svc = new OfflineSyncService(remote);
+          svc.QueueChange("Order", "1", "create", "{}");
+          svc.QueueChange("Order", "2", "update", "{}");
+          var result = await svc.SyncAllAsync(CancellationToken.None);
+          result.Succeeded.Should().Be(2);
+          result.Failed.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task SyncAll_SomeFail_TracksFailedIds()
+      {
+          var call = 0;
+          var remote = Substitute.For<IRemoteSync>();
+          remote.SyncChangeAsync(Arg.Any<PendingChange>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult(Interlocked.Increment(ref call) % 2 == 0));
+          var svc = new OfflineSyncService(remote);
+          svc.QueueChange("A", "1", "create", "{}");
+          svc.QueueChange("B", "2", "create", "{}");
+          var result = await svc.SyncAllAsync(CancellationToken.None);
+          result.FailedIds.Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task SyncAll_Success_ClearsFromPending()
+      {
+          var remote = Substitute.For<IRemoteSync>();
+          remote.SyncChangeAsync(Arg.Any<PendingChange>(), Arg.Any<CancellationToken>()).Returns(true);
+          var svc = new OfflineSyncService(remote);
+          svc.QueueChange("X", "1", "create", "{}");
+          await svc.SyncAllAsync(CancellationToken.None);
+          svc.GetPendingChanges().Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task SyncAll_Failure_AppearsInFailedChanges()
+      {
+          var remote = Substitute.For<IRemoteSync>();
+          remote.SyncChangeAsync(Arg.Any<PendingChange>(), Arg.Any<CancellationToken>()).Returns(false);
+          var svc = new OfflineSyncService(remote);
+          svc.QueueChange("Y", "1", "delete", "{}");
+          await svc.SyncAllAsync(CancellationToken.None);
+          svc.GetFailedChanges().Should().ContainSingle();
+      }
+
+      [Fact]
+      public async Task SyncAll_Failure_IncrementsRetryCount()
+      {
+          var remote = Substitute.For<IRemoteSync>();
+          remote.SyncChangeAsync(Arg.Any<PendingChange>(), Arg.Any<CancellationToken>()).Returns(false);
+          var svc = new OfflineSyncService(remote);
+          svc.QueueChange("Z", "1", "update", "{}");
+          await svc.SyncAllAsync(CancellationToken.None);
+          svc.GetFailedChanges().First().RetryCount.Should().Be(1);
+      }
+  }

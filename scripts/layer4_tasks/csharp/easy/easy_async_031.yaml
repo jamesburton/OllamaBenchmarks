@@ -1,0 +1,35 @@
+name: easy_async_031
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncEventCounter with:
+    - A private int _count field
+    - async Task FireEventAsync() — increments _count using await Task.Yield() before incrementing
+    - int Count { get; } — returns _count
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncEventCounterTests
+  {
+      [Fact]
+      public async Task FireEventAsync_IncrementsCount()
+      {
+          var counter = new AsyncEventCounter();
+          await counter.FireEventAsync();
+          counter.Count.Should().Be(1);
+      }
+      [Fact]
+      public async Task FireEventAsync_MultipleEvents()
+      {
+          var counter = new AsyncEventCounter();
+          for (int i = 0; i < 5; i++) await counter.FireEventAsync();
+          counter.Count.Should().Be(5);
+      }
+  }

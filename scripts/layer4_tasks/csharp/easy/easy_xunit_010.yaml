@@ -1,0 +1,37 @@
+name: easy_xunit_010
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IEmailSender with method:
+    Task SendAsync(string to, string subject, string body)
+  A class NotificationService with constructor taking IEmailSender, and async method:
+    Task NotifyAsync(string email, string message) calls sender.SendAsync(email, "Notification", message)
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationServiceTests
+  {
+      [Fact]
+      public async Task NotifyAsync_CallsSendAsyncWithCorrectArgs()
+      {
+          var sender = Substitute.For<IEmailSender>();
+          var service = new NotificationService(sender);
+          await service.NotifyAsync("user@test.com", "hello");
+          await sender.Received(1).SendAsync("user@test.com", "Notification", "hello");
+      }
+      [Fact]
+      public async Task NotifyAsync_DoesNotThrow()
+      {
+          var sender = Substitute.For<IEmailSender>();
+          var service = new NotificationService(sender);
+          var act = async () => await service.NotifyAsync("a@b.com", "msg");
+          await act.Should().NotThrowAsync();
+      }
+  }

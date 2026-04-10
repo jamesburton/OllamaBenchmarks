@@ -1,0 +1,14 @@
+name: number_theory_hard_005
+category: maths
+subcategory: number_theory
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  How many integers from 1 to 100 are divisible by neither 2 nor 3?
+  Reply with only the number.
+expected_answer: "34"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

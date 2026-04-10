@@ -1,0 +1,118 @@
+name: hard_masstransit_001
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit messages:
+    record SubmitOrder(Guid OrderId, string CustomerId, decimal Amount, DateTime SubmittedAt);
+    record OrderSubmitted(Guid OrderId, string CustomerId, decimal Amount);
+    record OrderConfirmed(Guid OrderId, DateTime ConfirmedAt);
+    record OrderRejected(Guid OrderId, string Reason);
+
+  A saga state machine for order processing with 4+ states:
+  Enum OrderState { Initial=0, Submitted=1, Confirmed=2, Rejected=3, Completed=4 }
+  Class OrderStateMachine : MassTransitStateMachine<OrderSagaState>:
+    States: Submitted, Confirmed, Rejected, Completed.
+    Events: OrderSubmitted, OrderConfirmed, OrderRejected.
+    Transitions:
+      Initially + SubmitOrder -> Submitted (publish OrderSubmitted)
+      Submitted + OrderConfirmed -> Confirmed
+      Submitted + OrderRejected -> Rejected
+      Confirmed + CompleteOrder -> Completed
+  Class OrderSagaState : SagaStateMachineInstance: Guid CorrelationId, string CurrentState,
+    string CustomerId, decimal Amount, DateTime? ConfirmedAt, string? RejectionReason.
+  Use InMemorySagaRepository. Harness test setup.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderStateMachineTests
+  {
+      [Fact]
+      public async Task SubmitOrder_TransitionsToSubmitted()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OrderSagaState, OrderStateMachine>(new OrderStateMachine());
+          await harness.Start();
+          try
+          {
+              var orderId = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitOrder(orderId, "CUST-1", 100m, DateTime.UtcNow));
+              var instance = sagaHarness.Created.ContainsInState(orderId, sagaHarness.Machine, sagaHarness.Machine.Submitted);
+              instance.Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SubmitOrder_PublishesOrderSubmitted()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.StateMachineSaga<OrderSagaState, OrderStateMachine>(new OrderStateMachine());
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SubmitOrder(NewId.NextGuid(), "C1", 200m, DateTime.UtcNow));
+              (await harness.Published.Any<OrderSubmitted>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task OrderConfirmed_TransitionsToConfirmed()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OrderSagaState, OrderStateMachine>(new OrderStateMachine());
+          await harness.Start();
+          try
+          {
+              var orderId = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitOrder(orderId, "C1", 50m, DateTime.UtcNow));
+              await harness.InputQueueSendEndpoint.Send(new OrderConfirmed(orderId, DateTime.UtcNow));
+              var instance = sagaHarness.Created.ContainsInState(orderId, sagaHarness.Machine, sagaHarness.Machine.Confirmed);
+              instance.Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task OrderRejected_TransitionsToRejected()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OrderSagaState, OrderStateMachine>(new OrderStateMachine());
+          await harness.Start();
+          try
+          {
+              var orderId = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitOrder(orderId, "C2", 999m, DateTime.UtcNow));
+              await harness.InputQueueSendEndpoint.Send(new OrderRejected(orderId, "Fraud detected"));
+              var instance = sagaHarness.Created.ContainsInState(orderId, sagaHarness.Machine, sagaHarness.Machine.Rejected);
+              instance.Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SagaState_StoresCustomerId()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OrderSagaState, OrderStateMachine>(new OrderStateMachine());
+          await harness.Start();
+          try
+          {
+              var orderId = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitOrder(orderId, "CUST-42", 150m, DateTime.UtcNow));
+              var state = sagaHarness.Sagas.ContainsInState(orderId, sagaHarness.Machine, sagaHarness.Machine.Submitted);
+              state!.CustomerId.Should().Be("CUST-42");
+          }
+          finally { await harness.Stop(); }
+      }
+  }

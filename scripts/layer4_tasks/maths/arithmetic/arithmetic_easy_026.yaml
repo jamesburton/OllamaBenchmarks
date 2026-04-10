@@ -1,0 +1,14 @@
+name: arithmetic_easy_026
+category: maths
+subcategory: arithmetic
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Calculate: 3600 / 60
+  Reply with only the number.
+expected_answer: "60"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

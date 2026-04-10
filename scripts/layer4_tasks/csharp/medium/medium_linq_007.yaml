@@ -1,0 +1,65 @@
+name: medium_linq_007
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record SalesRecord with: string Region, string Product, int Quantity, decimal UnitPrice.
+  A class SalesAggregator with a constructor accepting IEnumerable<SalesRecord> records.
+  Expose:
+    IEnumerable<RegionStats> Aggregate()
+  returning RegionStats with: string Region, decimal Revenue, int TotalUnits, string BestProduct.
+  Revenue = sum(Quantity * UnitPrice).
+  BestProduct = product name with highest revenue in that region.
+  Ordered by Revenue descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SalesAggregatorTests
+  {
+      private readonly SalesRecord[] _data = {
+          new("North", "Widget", 10, 5.00m),
+          new("North", "Gadget", 5,  20.00m),
+          new("South", "Widget", 20, 5.00m),
+          new("South", "Gadget", 2,  20.00m),
+      };
+
+      [Fact]
+      public void Aggregate_ReturnsTwoRegions()
+      {
+          new SalesAggregator(_data).Aggregate().Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Aggregate_NorthRevenueCorrect()
+      {
+          var north = new SalesAggregator(_data).Aggregate().First(r => r.Region == "North");
+          north.Revenue.Should().Be(150m);
+      }
+
+      [Fact]
+      public void Aggregate_NorthBestProductIsGadget()
+      {
+          var north = new SalesAggregator(_data).Aggregate().First(r => r.Region == "North");
+          north.BestProduct.Should().Be("Gadget");
+      }
+
+      [Fact]
+      public void Aggregate_OrderedByRevenueDescending()
+      {
+          var result = new SalesAggregator(_data).Aggregate().ToList();
+          result.Select(r => r.Revenue).Should().BeInDescendingOrder();
+      }
+
+      [Fact]
+      public void Aggregate_TotalUnitsCorrect()
+      {
+          var south = new SalesAggregator(_data).Aggregate().First(r => r.Region == "South");
+          south.TotalUnits.Should().Be(22);
+      }
+  }

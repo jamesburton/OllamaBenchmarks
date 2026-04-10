@@ -1,0 +1,18 @@
+name: summarisation_hard_099
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Generative AI systems trained on copyrighted material raise novel questions about the boundaries of fair use doctrine and the originality requirement for copyright protection. Courts are grappling with whether training constitutes a transformative use and whether AI-generated outputs are substantially similar to protected works. The outcome will have profound implications for the economics of creative industries and the incentives to produce original content.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "copyright"
+    - "AI"
+    - "fair use"
+    - "creative"
+  max_words: 25

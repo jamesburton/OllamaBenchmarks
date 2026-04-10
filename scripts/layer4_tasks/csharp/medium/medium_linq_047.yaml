@@ -1,0 +1,55 @@
+name: medium_linq_047
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class GraphHelper with static methods operating on adjacency lists (Dictionary<string, List<string>>):
+    IEnumerable<string> BreadthFirstSearch(Dictionary<string, List<string>> graph, string start)
+      — BFS traversal order starting from 'start'
+    bool HasPath(Dictionary<string, List<string>> graph, string from, string to)
+      — returns true if a path exists from 'from' to 'to'
+  Return only valid C# code in a single file.
+test_code: |
+  public class GraphHelperTests
+  {
+      private static Dictionary<string, List<string>> MakeGraph() => new()
+      {
+          ["A"] = new[]{"B","C"}.ToList(),
+          ["B"] = new[]{"D"}.ToList(),
+          ["C"] = new[]{"D"}.ToList(),
+          ["D"] = new List<string>(),
+      };
+
+      [Fact]
+      public void BFS_StartsAtA_VisitsAll()
+      {
+          var result = GraphHelper.BreadthFirstSearch(MakeGraph(), "A").ToList();
+          result.Should().BeEquivalentTo(new[]{"A","B","C","D"});
+          result[0].Should().Be("A");
+      }
+
+      [Fact]
+      public void BFS_StartAtD_OnlyD()
+      {
+          GraphHelper.BreadthFirstSearch(MakeGraph(), "D").Should().ContainSingle("D");
+      }
+
+      [Fact]
+      public void HasPath_A_to_D_True()
+      {
+          GraphHelper.HasPath(MakeGraph(), "A", "D").Should().BeTrue();
+      }
+
+      [Fact]
+      public void HasPath_D_to_A_False()
+      {
+          GraphHelper.HasPath(MakeGraph(), "D", "A").Should().BeFalse();
+      }
+  }

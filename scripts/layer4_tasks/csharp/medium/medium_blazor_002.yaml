@@ -1,0 +1,72 @@
+name: medium_blazor_002
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ThemeService with:
+    string CurrentTheme { get; private set; } (default: "light")
+    event Action? OnThemeChanged
+    void SetTheme(string theme)
+    void ToggleTheme()
+    bool IsDarkMode => CurrentTheme == "dark"
+  ToggleTheme switches between "light" and "dark".
+  Return only valid C# code in a single file.
+test_code: |
+  public class ThemeServiceTests
+  {
+      [Fact]
+      public void DefaultTheme_IsLight()
+      {
+          new ThemeService().CurrentTheme.Should().Be("light");
+      }
+
+      [Fact]
+      public void SetTheme_ChangesTheme()
+      {
+          var svc = new ThemeService();
+          svc.SetTheme("dark");
+          svc.CurrentTheme.Should().Be("dark");
+      }
+
+      [Fact]
+      public void ToggleTheme_SwitchesToDark()
+      {
+          var svc = new ThemeService();
+          svc.ToggleTheme();
+          svc.CurrentTheme.Should().Be("dark");
+      }
+
+      [Fact]
+      public void ToggleTheme_SwitchesBackToLight()
+      {
+          var svc = new ThemeService();
+          svc.ToggleTheme();
+          svc.ToggleTheme();
+          svc.CurrentTheme.Should().Be("light");
+      }
+
+      [Fact]
+      public void IsDarkMode_ReturnsTrueWhenDark()
+      {
+          var svc = new ThemeService();
+          svc.SetTheme("dark");
+          svc.IsDarkMode.Should().BeTrue();
+      }
+
+      [Fact]
+      public void SetTheme_FiresEvent()
+      {
+          var svc = new ThemeService();
+          var fired = false;
+          svc.OnThemeChanged += () => fired = true;
+          svc.SetTheme("dark");
+          fired.Should().BeTrue();
+      }
+  }

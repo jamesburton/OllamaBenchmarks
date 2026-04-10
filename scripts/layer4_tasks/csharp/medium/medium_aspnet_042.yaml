@@ -1,0 +1,56 @@
+name: medium_aspnet_042
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ShippingRate(string Carrier, decimal BaseRate, decimal PerKgRate, IEnumerable<string> SupportedCountries).
+  A class ShippingController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<ShippingRate> (for testability).
+  Actions:
+    GET api/shipping/rates?country=US — all rates for that country
+    POST api/shipping/calculate — accepts {carrier, weightKg, country}: returns calculated cost or 404 if carrier/country combo not available
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShippingControllerTests
+  {
+      private ShippingController MakeController() => new(new List<ShippingRate>
+      {
+          new("FedEx", 5m, 2m, new[] { "US", "CA" }),
+          new("DHL", 8m, 1.5m, new[] { "US", "UK", "DE" }),
+          new("UPS", 6m, 1.8m, new[] { "US" })
+      });
+
+      [Fact]
+      public void GetRates_ForUS_ReturnsAll()
+      {
+          var result = MakeController().GetRates("US") as OkObjectResult;
+          (result!.Value as IEnumerable<ShippingRate>).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetRates_ForUK_ReturnsFiltered()
+      {
+          var result = MakeController().GetRates("UK") as OkObjectResult;
+          (result!.Value as IEnumerable<ShippingRate>).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void Calculate_ReturnsCorrectCost()
+      {
+          var result = MakeController().Calculate("FedEx", 2.0m, "US") as OkObjectResult;
+          ((decimal)result!.Value!).Should().Be(9m); // 5 + 2*2
+      }
+
+      [Fact]
+      public void Calculate_CarrierNotInCountry_Returns404()
+      {
+          MakeController().Calculate("UPS", 1.0m, "UK").Should().BeOfType<NotFoundResult>();
+      }
+  }

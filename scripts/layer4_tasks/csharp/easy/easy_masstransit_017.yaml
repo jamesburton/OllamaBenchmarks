@@ -1,0 +1,42 @@
+name: easy_masstransit_017
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record DeploymentStarted(Guid DeploymentId, string Environment, string Version)
+  A consumer class DeploymentStartedConsumer that implements IConsumer<DeploymentStarted>:
+    Has a public List<string> ActiveEnvironments = new()
+    Consume method adds Environment to ActiveEnvironments if not already present
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class DeploymentStartedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_AddsNewEnvironment()
+      {
+          var consumer = new DeploymentStartedConsumer();
+          var context = Substitute.For<ConsumeContext<DeploymentStarted>>();
+          context.Message.Returns(new DeploymentStarted(Guid.NewGuid(), "production", "1.0.0"));
+          await consumer.Consume(context);
+          consumer.ActiveEnvironments.Should().Contain("production");
+      }
+      [Fact]
+      public async Task Consume_DuplicateEnvironment_NotAdded()
+      {
+          var consumer = new DeploymentStartedConsumer();
+          var context = Substitute.For<ConsumeContext<DeploymentStarted>>();
+          context.Message.Returns(new DeploymentStarted(Guid.NewGuid(), "staging", "1.0.0"));
+          await consumer.Consume(context);
+          await consumer.Consume(context);
+          consumer.ActiveEnvironments.Should().HaveCount(1);
+      }
+  }

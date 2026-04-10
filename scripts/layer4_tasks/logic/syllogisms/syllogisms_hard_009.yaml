@@ -1,0 +1,16 @@
+name: syllogisms_hard_009
+category: logic
+subcategory: syllogisms
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All P imply Q.
+  2. All Q imply R.
+  3. Some R are S.
+  4. No S are T.
+  Can any P be T? Reply with only: Yes, No, or Cannot be determined.
+expected_answer: "Cannot be determined."
+validator_config: {}

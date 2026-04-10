@@ -1,0 +1,14 @@
+name: algebra_medium_015
+category: maths
+subcategory: algebra
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Solve: x^2 - x - 6 = 0. Reply with only the two roots separated by a comma (smaller first).
+expected_answer: "-2,3"
+multi_value: true
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

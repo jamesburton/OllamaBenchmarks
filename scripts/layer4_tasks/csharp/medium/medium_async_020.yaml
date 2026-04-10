@@ -1,0 +1,58 @@
+name: medium_async_020
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class RateLimiter that limits calls to a delegate to at most N calls per second.
+  Constructor accepts int callsPerSecond.
+  Expose:
+    Task<T> ExecuteAsync<T>(Func<Task<T>> operation, CancellationToken ct = default)
+  Uses SemaphoreSlim to throttle. Releases the semaphore slot after 1/callsPerSecond seconds.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RateLimiterTests
+  {
+      [Fact]
+      public async Task ExecuteAsync_ReturnsResult()
+      {
+          var limiter = new RateLimiter(10);
+          var result = await limiter.ExecuteAsync(async () => { await Task.Yield(); return 42; });
+          result.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_MultipleCallsComplete()
+      {
+          var limiter = new RateLimiter(100);
+          var tasks = Enumerable.Range(1,5).Select(i => limiter.ExecuteAsync(async () => { await Task.Yield(); return i; }));
+          var results = await Task.WhenAll(tasks);
+          results.Should().HaveCount(5);
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_OperationThrows_PropagatesException()
+      {
+          var limiter = new RateLimiter(10);
+          await Assert.ThrowsAsync<InvalidOperationException>(() =>
+              limiter.ExecuteAsync<int>(() => Task.FromException<int>(new InvalidOperationException("err"))));
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_CancelledToken_Throws()
+      {
+          var limiter = new RateLimiter(1);
+          // exhaust the slot
+          _ = limiter.ExecuteAsync(async () => { await Task.Delay(500); return 0; });
+          await Task.Delay(10);
+          var cts = new CancellationTokenSource(50);
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+              limiter.ExecuteAsync(async () => { await Task.Yield(); return 0; }, cts.Token));
+      }
+  }

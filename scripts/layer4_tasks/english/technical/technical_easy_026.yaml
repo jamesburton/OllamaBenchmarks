@@ -1,0 +1,21 @@
+name: technical_easy_026
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for a function that returns the maximum value in a list.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Returns:"
+    - "list"
+    - "maximum"
+    - "max"
+    - "value"
+    - "number"
+  min_words: 8
+  max_words: 60

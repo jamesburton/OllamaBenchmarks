@@ -1,0 +1,31 @@
+name: easy_linq_002
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Mapper with a static method:
+    List<int> SelectLengths(IEnumerable<string> items)
+  that returns the length of each string using LINQ Select + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MapperTests
+  {
+      [Fact]
+      public void SelectLengths_BasicCase()
+      {
+          var result = Mapper.SelectLengths(new[]{"hi","hello","yo"});
+          result.Should().BeEquivalentTo(new[]{2,5,2}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void SelectLengths_EmptySource_ReturnsEmpty()
+      {
+          Mapper.SelectLengths(Array.Empty<string>()).Should().BeEmpty();
+      }
+  }

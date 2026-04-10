@@ -1,0 +1,83 @@
+name: hard_async_009
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncBatchProcessor<TInput, TOutput> that processes items in batches:
+    Constructor: AsyncBatchProcessor(int batchSize, Func<IReadOnlyList<TInput>, CancellationToken, Task<IReadOnlyList<TOutput>>> batchHandler)
+    Task<IReadOnlyList<TOutput>> ProcessAsync(IEnumerable<TInput> items, CancellationToken ct) —
+      splits items into batches of batchSize, processes each batch using batchHandler,
+      runs batches sequentially, flattens results.
+    Task<IReadOnlyList<TOutput>> ProcessParallelAsync(IEnumerable<TInput> items,
+      int maxDegreeOfParallelism, CancellationToken ct) — processes multiple batches
+      concurrently up to maxDegreeOfParallelism. Maintains original order in output.
+  Throws ArgumentOutOfRangeException if batchSize < 1.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncBatchProcessorTests
+  {
+      [Fact]
+      public async Task ProcessAsync_AllItemsProcessed()
+      {
+          var processor = new AsyncBatchProcessor<int, int>(5,
+              (batch, _) => Task.FromResult<IReadOnlyList<int>>(batch.Select(x => x * 2).ToList()));
+          var result = await processor.ProcessAsync(Enumerable.Range(1, 12), CancellationToken.None);
+          result.Should().HaveCount(12);
+          result[0].Should().Be(2);
+          result[11].Should().Be(24);
+      }
+
+      [Fact]
+      public async Task ProcessAsync_EmptyInput_ReturnsEmpty()
+      {
+          var processor = new AsyncBatchProcessor<int, int>(5,
+              (b, _) => Task.FromResult<IReadOnlyList<int>>(b.ToList()));
+          var result = await processor.ProcessAsync(Array.Empty<int>(), CancellationToken.None);
+          result.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void Constructor_InvalidBatchSize_ThrowsArgumentOutOfRangeException()
+      {
+          var act = () => new AsyncBatchProcessor<int, int>(0,
+              (b, _) => Task.FromResult<IReadOnlyList<int>>(b.ToList()));
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public async Task ProcessParallelAsync_AllItemsProcessed()
+      {
+          var processor = new AsyncBatchProcessor<int, string>(3,
+              (b, _) => Task.FromResult<IReadOnlyList<string>>(b.Select(x => x.ToString()).ToList()));
+          var result = await processor.ProcessParallelAsync(Enumerable.Range(1, 9), 3, CancellationToken.None);
+          result.Should().HaveCount(9);
+      }
+
+      [Fact]
+      public async Task ProcessParallelAsync_MaintainsOrder()
+      {
+          var processor = new AsyncBatchProcessor<int, int>(2,
+              (b, _) => Task.FromResult<IReadOnlyList<int>>(b.ToList()));
+          var input = Enumerable.Range(1, 6).ToList();
+          var result = await processor.ProcessParallelAsync(input, 3, CancellationToken.None);
+          result.Should().ContainInOrder(1, 2, 3, 4, 5, 6);
+      }
+
+      [Fact]
+      public async Task ProcessAsync_CancellationToken_Propagated()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var processor = new AsyncBatchProcessor<int, int>(2,
+              async (b, ct) => { await Task.Delay(100, ct); return b.ToList(); });
+          var act = async () => await processor.ProcessAsync(Enumerable.Range(1, 4), cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+  }

@@ -1,0 +1,65 @@
+name: medium_blazor_008
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class SearchService with:
+    string SearchTerm { get; private set; } (default: "")
+    IReadOnlyList<string> RecentSearches { get; } (max 10)
+    event Action? OnSearchChanged
+    void SetSearchTerm(string term)
+    void ClearSearch()
+  SetSearchTerm fires event and adds non-empty terms to RecentSearches (avoid duplicates, latest first).
+  Return only valid C# code in a single file.
+test_code: |
+  public class SearchServiceTests
+  {
+      [Fact]
+      public void SetSearchTerm_UpdatesTerm()
+      {
+          var svc = new SearchService();
+          svc.SetSearchTerm("csharp");
+          svc.SearchTerm.Should().Be("csharp");
+      }
+
+      [Fact]
+      public void SetSearchTerm_AddsToRecent()
+      {
+          var svc = new SearchService();
+          svc.SetSearchTerm("dotnet");
+          svc.RecentSearches.Should().Contain("dotnet");
+      }
+
+      [Fact]
+      public void SetSearchTerm_NoDuplicatesInRecent()
+      {
+          var svc = new SearchService();
+          svc.SetSearchTerm("test");
+          svc.SetSearchTerm("test");
+          svc.RecentSearches.Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void ClearSearch_EmptiesTerm()
+      {
+          var svc = new SearchService();
+          svc.SetSearchTerm("hello");
+          svc.ClearSearch();
+          svc.SearchTerm.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void RecentSearches_MaxTen()
+      {
+          var svc = new SearchService();
+          for (int i = 0; i < 15; i++) svc.SetSearchTerm($"term{i}");
+          svc.RecentSearches.Should().HaveCount(10);
+      }
+  }

@@ -1,0 +1,31 @@
+name: easy_linq_037
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Finder with a static method:
+    int IndexOf(IEnumerable<string> items, string target)
+  that returns the zero-based index of the first occurrence of target, or -1 if not found.
+  Use LINQ Select with index overload then FirstOrDefault.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FinderTests
+  {
+      [Fact]
+      public void IndexOf_Found()
+      {
+          Finder.IndexOf(new[]{"a","b","c","b"}, "b").Should().Be(1);
+      }
+      [Fact]
+      public void IndexOf_NotFound_ReturnsNegativeOne()
+      {
+          Finder.IndexOf(new[]{"a","b","c"}, "z").Should().Be(-1);
+      }
+  }

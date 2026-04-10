@@ -1,0 +1,21 @@
+name: rewriting_hard_149
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity, removing the double negative and passive voice:
+  'It cannot be denied that the results were not unimpressive.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "impressive"
+    - "results"
+    - "were"
+    - "clearly"
+    - "notably"
+  min_words: 3
+  max_words: 12

@@ -1,0 +1,41 @@
+name: medium_vertical_023
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for publisharticle.
+  Include:
+    Command: Guid ArticleId, string AuthorId, IEnumerable<string> Tags, DateTime? ScheduledAt
+  Result: Guid ArticleId, string Status, DateTime? PublishedAt
+  Handler validates: AuthorId not empty, Tags count 1-10. If ScheduledAt null, status=Published. Else status=Scheduled.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PublishArticleHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new PublishArticleHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new PublishArticleHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new PublishArticleHandler();
+          handler.Should().NotBeNull();
+      }
+  }

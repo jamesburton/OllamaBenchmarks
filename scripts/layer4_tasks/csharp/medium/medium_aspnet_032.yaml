@@ -1,0 +1,58 @@
+name: medium_aspnet_032
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record SubscriptionPlan(string Id, string Name, decimal MonthlyPrice, IEnumerable<string> Features).
+  A class SubscriptionsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<SubscriptionPlan> (for testability).
+  Actions:
+    GET api/subscriptions/plans — all plans
+    GET api/subscriptions/plans/{id} — plan by id or 404
+    GET api/subscriptions/plans/compare?ids=id1,id2 — returns specified plans for comparison
+  Return only valid C# code in a single file.
+test_code: |
+  public class SubscriptionsControllerTests
+  {
+      private SubscriptionsController MakeController() => new(new List<SubscriptionPlan>
+      {
+          new("basic", "Basic", 9.99m, new[] { "feature1", "feature2" }),
+          new("pro", "Pro", 29.99m, new[] { "feature1", "feature2", "feature3" }),
+          new("enterprise", "Enterprise", 99.99m, new[] { "all" })
+      });
+
+      [Fact]
+      public void GetPlans_ReturnsAll()
+      {
+          (MakeController().GetPlans() as OkObjectResult)!
+              .Value.Should().BeAssignableTo<IEnumerable<SubscriptionPlan>>()
+              .Which.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetPlan_Found()
+      {
+          var result = MakeController().GetPlan("pro") as OkObjectResult;
+          (result!.Value as SubscriptionPlan)!.MonthlyPrice.Should().Be(29.99m);
+      }
+
+      [Fact]
+      public void GetPlan_NotFound_Returns404()
+      {
+          MakeController().GetPlan("gold").Should().BeOfType<NotFoundResult>();
+      }
+
+      [Fact]
+      public void Compare_ReturnsSpecifiedPlans()
+      {
+          var result = MakeController().Compare("basic,pro") as OkObjectResult;
+          (result!.Value as IEnumerable<SubscriptionPlan>).Should().HaveCount(2);
+      }
+  }

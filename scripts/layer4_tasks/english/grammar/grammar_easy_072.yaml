@@ -1,0 +1,15 @@
+name: grammar_easy_072
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The sun set quickly darkness fell over the valley.
+  B) The sun set quickly, and darkness fell over the valley.
+  C) The sun set quickly darkness fell over the valley suddenly.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

@@ -1,0 +1,66 @@
+name: medium_blazor_010
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class UserPreferencesService with:
+    IDictionary<string, string> Preferences { get; }
+    event Action? OnPreferencesChanged
+    void Set(string key, string value)
+    string? Get(string key)
+    void Remove(string key)
+    void Reset()
+  Return only valid C# code in a single file.
+test_code: |
+  public class UserPreferencesServiceTests
+  {
+      [Fact]
+      public void Set_StoresPreference()
+      {
+          var svc = new UserPreferencesService();
+          svc.Set("language", "fr");
+          svc.Get("language").Should().Be("fr");
+      }
+
+      [Fact]
+      public void Get_MissingKey_ReturnsNull()
+      {
+          new UserPreferencesService().Get("missing").Should().BeNull();
+      }
+
+      [Fact]
+      public void Remove_DeletesKey()
+      {
+          var svc = new UserPreferencesService();
+          svc.Set("k", "v");
+          svc.Remove("k");
+          svc.Get("k").Should().BeNull();
+      }
+
+      [Fact]
+      public void Reset_ClearsAll()
+      {
+          var svc = new UserPreferencesService();
+          svc.Set("a", "1");
+          svc.Set("b", "2");
+          svc.Reset();
+          svc.Preferences.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void Set_FiresEvent()
+      {
+          var svc = new UserPreferencesService();
+          var fired = false;
+          svc.OnPreferencesChanged += () => fired = true;
+          svc.Set("x", "y");
+          fired.Should().BeTrue();
+      }
+  }

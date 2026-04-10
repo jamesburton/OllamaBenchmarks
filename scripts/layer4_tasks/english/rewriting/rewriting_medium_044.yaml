@@ -1,0 +1,21 @@
+name: rewriting_medium_044
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'In the event that you require further assistance, please do not hesitate to contact us.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "need"
+    - "help"
+    - "give us a ring"
+    - "get in touch"
+    - "if"
+  min_words: 5
+  max_words: 20

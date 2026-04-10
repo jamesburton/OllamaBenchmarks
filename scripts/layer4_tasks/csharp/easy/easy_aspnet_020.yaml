@@ -1,0 +1,36 @@
+name: easy_aspnet_020
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class RateLimitOptions with:
+    int PermitLimit { get; set; } = 100
+    int WindowSeconds { get; set; } = 60
+    int QueueLimit { get; set; } = 10
+  and a static class RateLimitHelper with:
+    double GetRequestsPerSecond(RateLimitOptions options)
+  that returns (double)PermitLimit / WindowSeconds.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RateLimitHelperTests
+  {
+      [Fact]
+      public void GetRequestsPerSecond_Default_ReturnsCorrect()
+      {
+          var opts = new RateLimitOptions();
+          RateLimitHelper.GetRequestsPerSecond(opts).Should().BeApproximately(100.0 / 60, 0.001);
+      }
+      [Fact]
+      public void GetRequestsPerSecond_Custom_ReturnsCorrect()
+      {
+          var opts = new RateLimitOptions { PermitLimit = 10, WindowSeconds = 5 };
+          RateLimitHelper.GetRequestsPerSecond(opts).Should().BeApproximately(2.0, 0.001);
+      }
+  }

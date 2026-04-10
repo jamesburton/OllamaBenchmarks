@@ -1,0 +1,30 @@
+name: easy_xunit_018
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ArrayUtils with static methods:
+    int[] Reverse(int[] arr) returns a new array with elements in reverse order
+    int[] Unique(int[] arr) returns a new array with duplicate elements removed, preserving order
+  Return only valid C# code in a single file.
+test_code: |
+  public class ArrayUtilsTests
+  {
+      [Fact]
+      public void Reverse_ReversesArray()
+      {
+          ArrayUtils.Reverse(new[] { 1, 2, 3 }).Should().Equal(3, 2, 1);
+      }
+      [Fact]
+      public void Unique_RemovesDuplicates()
+      {
+          ArrayUtils.Unique(new[] { 1, 2, 2, 3, 1 }).Should().Equal(1, 2, 3);
+      }
+  }

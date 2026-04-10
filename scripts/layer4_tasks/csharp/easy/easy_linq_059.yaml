@@ -1,0 +1,35 @@
+name: easy_linq_059
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Checker with a static method:
+    bool SequenceEqual(IEnumerable<int> first, IEnumerable<int> second)
+  that returns true if both sequences have the same elements in the same order using LINQ SequenceEqual.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CheckerTests
+  {
+      [Fact]
+      public void SequenceEqual_EqualSequences_ReturnsTrue()
+      {
+          Checker.SequenceEqual(new[]{1,2,3}, new[]{1,2,3}).Should().BeTrue();
+      }
+      [Fact]
+      public void SequenceEqual_DifferentOrder_ReturnsFalse()
+      {
+          Checker.SequenceEqual(new[]{1,2,3}, new[]{3,2,1}).Should().BeFalse();
+      }
+      [Fact]
+      public void SequenceEqual_DifferentLength_ReturnsFalse()
+      {
+          Checker.SequenceEqual(new[]{1,2,3}, new[]{1,2}).Should().BeFalse();
+      }
+  }

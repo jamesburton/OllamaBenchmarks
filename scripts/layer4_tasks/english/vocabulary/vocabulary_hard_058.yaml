@@ -1,0 +1,16 @@
+name: vocabulary_hard_058
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word about an argument has a NEGATIVE connotation suggesting bad faith?
+  A) Debate
+  B) Discussion
+  C) Quibble
+  D) Dialogue
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

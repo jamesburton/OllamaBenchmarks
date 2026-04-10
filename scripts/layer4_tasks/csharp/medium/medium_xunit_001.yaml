@@ -1,0 +1,67 @@
+name: medium_xunit_001
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class StringCalculator with:
+    int Add(string numbers)
+  The Add method:
+    Returns 0 for empty string.
+    Returns the number itself for a single number.
+    Returns sum of comma-separated numbers.
+    Supports newline as delimiter.
+    Supports custom delimiters in format //[delimiter]\n[numbers].
+    Throws ArgumentException for negative numbers, listing them in the message.
+  Return only valid C# code in a single file.
+test_code: |
+  public class StringCalculatorTests
+  {
+      private readonly StringCalculator _calc = new();
+
+      [Fact]
+      public void Add_Empty_ReturnsZero()
+      {
+          _calc.Add("").Should().Be(0);
+      }
+
+      [Fact]
+      public void Add_SingleNumber_ReturnsThatNumber()
+      {
+          _calc.Add("5").Should().Be(5);
+      }
+
+      [Fact]
+      public void Add_TwoNumbers_ReturnsSum()
+      {
+          _calc.Add("1,2").Should().Be(3);
+      }
+
+      [Fact]
+      public void Add_NewlineDelimiter_Works()
+      {
+          _calc.Add("1
+  2,3").Should().Be(6);
+      }
+
+      [Fact]
+      public void Add_CustomDelimiter_Works()
+      {
+          _calc.Add("//;
+  1;2;3").Should().Be(6);
+      }
+
+      [Fact]
+      public void Add_NegativeNumber_ThrowsWithMessage()
+      {
+          _calc.Invoking(c => c.Add("-1,2,-3"))
+              .Should().Throw<ArgumentException>()
+              .WithMessage("*-1*-3*");
+      }
+  }

@@ -1,0 +1,41 @@
+name: easy_masstransit_024
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record FraudDetected(Guid TransactionId, string AccountId, decimal Amount, string RiskLevel)
+  A consumer class FraudDetectedConsumer that implements IConsumer<FraudDetected>:
+    Has a public List<FraudDetected> HighRiskEvents = new()
+    Consume method adds message to HighRiskEvents only if RiskLevel is "high" or "critical" (case-insensitive)
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class FraudDetectedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_HighRisk_Added()
+      {
+          var consumer = new FraudDetectedConsumer();
+          var context = Substitute.For<ConsumeContext<FraudDetected>>();
+          context.Message.Returns(new FraudDetected(Guid.NewGuid(), "acc1", 10000m, "HIGH"));
+          await consumer.Consume(context);
+          consumer.HighRiskEvents.Should().HaveCount(1);
+      }
+      [Fact]
+      public async Task Consume_LowRisk_NotAdded()
+      {
+          var consumer = new FraudDetectedConsumer();
+          var context = Substitute.For<ConsumeContext<FraudDetected>>();
+          context.Message.Returns(new FraudDetected(Guid.NewGuid(), "acc2", 50m, "low"));
+          await consumer.Consume(context);
+          consumer.HighRiskEvents.Should().BeEmpty();
+      }
+  }

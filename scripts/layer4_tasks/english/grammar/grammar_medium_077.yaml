@@ -1,0 +1,15 @@
+name: grammar_medium_077
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which sentence is a run-on?
+  A) The stock market fell sharply investors panicked.
+  B) The stock market fell sharply, causing investors to panic.
+  C) When the stock market fell sharply, investors panicked.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

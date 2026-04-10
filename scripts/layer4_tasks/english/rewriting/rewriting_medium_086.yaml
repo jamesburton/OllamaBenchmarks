@@ -1,0 +1,21 @@
+name: rewriting_medium_086
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'The report was submitted on time. The manager was pleased. The team celebrated.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "submitted"
+    - "manager"
+    - "pleased"
+    - "team"
+    - "celebrated"
+  min_words: 8
+  max_words: 30

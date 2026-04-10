@@ -1,0 +1,95 @@
+name: hard_efcore_004
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core optimistic concurrency with RowVersion:
+  Entity: BankAccount(int Id, string Owner, decimal Balance, byte[] RowVersion [Timestamp]).
+  DbContext: BankDbContext — configure RowVersion as concurrency token.
+  Class AccountService(BankDbContext db):
+    Task<BankAccount> CreateAsync(string owner, decimal initialBalance, CancellationToken ct)
+    Task<BankAccount?> GetAsync(int id, CancellationToken ct)
+    Task<bool> TransferAsync(int fromId, int toId, decimal amount, CancellationToken ct) —
+      performs atomic transfer. Returns false if insufficient funds.
+      Throws DbUpdateConcurrencyException if concurrent modification detected.
+    Task<bool> UpdateBalanceAsync(int id, decimal newBalance, byte[] expectedRowVersion, CancellationToken ct) —
+      uses optimistic concurrency; throws DbUpdateConcurrencyException on conflict.
+  Use SQLite in-memory (note: SQLite doesn't support RowVersion natively; use uint RowVersion manually).
+  Return only valid C# code in a single file.
+test_code: |
+  public class BankAccountConcurrencyTests : IDisposable
+  {
+      private readonly BankDbContext _db;
+      private readonly AccountService _svc;
+
+      public BankAccountConcurrencyTests()
+      {
+          var opts = new DbContextOptionsBuilder<BankDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new BankDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new AccountService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task Create_And_Get_Works()
+      {
+          var acc = await _svc.CreateAsync("Alice", 1000m, CancellationToken.None);
+          var found = await _svc.GetAsync(acc.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.Balance.Should().Be(1000m);
+      }
+
+      [Fact]
+      public async Task Transfer_ReducesFromAndIncreesTo()
+      {
+          var from = await _svc.CreateAsync("Alice", 500m, CancellationToken.None);
+          var to   = await _svc.CreateAsync("Bob",   100m, CancellationToken.None);
+          var result = await _svc.TransferAsync(from.Id, to.Id, 200m, CancellationToken.None);
+          result.Should().BeTrue();
+          (await _svc.GetAsync(from.Id, CancellationToken.None))!.Balance.Should().Be(300m);
+          (await _svc.GetAsync(to.Id,   CancellationToken.None))!.Balance.Should().Be(300m);
+      }
+
+      [Fact]
+      public async Task Transfer_InsufficientFunds_ReturnsFalse()
+      {
+          var from = await _svc.CreateAsync("Alice", 50m,  CancellationToken.None);
+          var to   = await _svc.CreateAsync("Bob",   100m, CancellationToken.None);
+          var result = await _svc.TransferAsync(from.Id, to.Id, 200m, CancellationToken.None);
+          result.Should().BeFalse();
+          (await _svc.GetAsync(from.Id, CancellationToken.None))!.Balance.Should().Be(50m);
+      }
+
+      [Fact]
+      public async Task Transfer_NonExistentAccount_ReturnsFalse()
+      {
+          var to = await _svc.CreateAsync("Bob", 100m, CancellationToken.None);
+          var result = await _svc.TransferAsync(9999, to.Id, 10m, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task Get_UnknownId_ReturnsNull()
+      {
+          var result = await _svc.GetAsync(9999, CancellationToken.None);
+          result.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task Transfer_ZeroAmount_ReturnsFalse()
+      {
+          var from = await _svc.CreateAsync("Alice", 100m, CancellationToken.None);
+          var to = await _svc.CreateAsync("Bob", 100m, CancellationToken.None);
+          var result = await _svc.TransferAsync(from.Id, to.Id, 0m, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+  }

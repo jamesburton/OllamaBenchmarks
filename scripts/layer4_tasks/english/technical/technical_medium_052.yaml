@@ -1,0 +1,23 @@
+name: technical_medium_052
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a user-facing error message for when a file format is not supported.
+  List acceptable formats and keep it under 30 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "format"
+    - "not supported"
+    - "accepted"
+    - "upload"
+    - "PDF"
+    - "PNG"
+    - "JPG"
+    - "file"
+  min_words: 8
+  max_words: 30

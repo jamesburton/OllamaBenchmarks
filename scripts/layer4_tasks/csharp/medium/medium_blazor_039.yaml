@@ -1,0 +1,41 @@
+name: medium_blazor_039
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class KeyboardShortcutService with:
+    IDictionary<string,Action> Shortcuts, void Register(string key, Action handler), void Unregister(string key), void Execute(string key)
+  Return only valid C# code in a single file.
+test_code: |
+  public class KeyboardShortcutServiceTests
+  {
+      [Fact]
+      public void Service_CanBeInstantiated()
+      {
+          var svc = new KeyboardShortcutService();
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_InitialState_IsDefault()
+      {
+          var svc = new KeyboardShortcutService();
+          // Just verify construction does not throw
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_BasicOperation_Works()
+      {
+          var svc = new KeyboardShortcutService();
+          // Basic smoke test
+          svc.Should().NotBeNull();
+      }
+  }

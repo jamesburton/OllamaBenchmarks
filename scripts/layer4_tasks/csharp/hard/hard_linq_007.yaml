@@ -1,0 +1,83 @@
+name: hard_linq_007
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class DynamicSorter<T> that provides:
+    IEnumerable<T> Sort(IEnumerable<T> source, IEnumerable<SortSpec> specs) — applies
+      multi-key dynamic ordering. SortSpec has string PropertyName and bool Descending.
+      Uses reflection to read property values. Throws ArgumentException if a property
+      does not exist on T.
+  Record: SortSpec(string PropertyName, bool Descending).
+  A record Person(string FirstName, string LastName, int Age).
+  Return only valid C# code in a single file.
+test_code: |
+  public class DynamicSorterTests
+  {
+      private static readonly List<Person> People = new()
+      {
+          new("Charlie", "Brown",  30),
+          new("Alice",   "Brown",  25),
+          new("Alice",   "Smith",  28),
+          new("Bob",     "Jones",  30),
+      };
+      private readonly DynamicSorter<Person> _sorter = new();
+
+      [Fact]
+      public void Sort_SingleAscending_ByFirstName()
+      {
+          var result = _sorter.Sort(People, new[]{ new SortSpec("FirstName", false) }).ToList();
+          result[0].FirstName.Should().Be("Alice");
+      }
+
+      [Fact]
+      public void Sort_SingleDescending_ByAge()
+      {
+          var result = _sorter.Sort(People, new[]{ new SortSpec("Age", true) }).ToList();
+          result[0].Age.Should().Be(30);
+      }
+
+      [Fact]
+      public void Sort_MultiKey_FirstNameThenLastNameDescending()
+      {
+          var specs = new[]{ new SortSpec("FirstName", false), new SortSpec("LastName", true) };
+          var result = _sorter.Sort(People, specs).ToList();
+          result[0].FirstName.Should().Be("Alice");
+          result[0].LastName.Should().Be("Smith");
+      }
+
+      [Fact]
+      public void Sort_EmptySpecs_ReturnsSameOrder()
+      {
+          var result = _sorter.Sort(People, Array.Empty<SortSpec>()).ToList();
+          result.Should().HaveCount(4);
+      }
+
+      [Fact]
+      public void Sort_InvalidProperty_ThrowsArgumentException()
+      {
+          var act = () => _sorter.Sort(People, new[]{ new SortSpec("NonExistent", false) }).ToList();
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Sort_EmptyInput_ReturnsEmpty()
+      {
+          _sorter.Sort(Array.Empty<Person>(), new[]{ new SortSpec("Age", false) })
+                 .Should().BeEmpty();
+      }
+
+      [Fact]
+      public void Sort_ByLastNameAscending_CorrectOrder()
+      {
+          var result = _sorter.Sort(People, new[]{ new SortSpec("LastName", false) }).ToList();
+          result[0].LastName.Should().Be("Brown");
+      }
+  }

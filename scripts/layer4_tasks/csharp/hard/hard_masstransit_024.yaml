@@ -1,0 +1,144 @@
+name: hard_masstransit_024
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit consumer with middleware filter:
+  Messages:
+    record AuditedCommand(Guid CommandId, string UserId, string Action, string Resource, string Payload);
+    record CommandExecuted(Guid CommandId, string UserId, string Action, DateTime ExecutedAt);
+    record CommandDenied(Guid CommandId, string UserId, string Reason);
+
+  Interface IAuthorizationService:
+    Task<bool> IsAuthorizedAsync(string userId, string action, string resource, CancellationToken ct)
+
+  Interface IAuditLogger:
+    Task LogAsync(Guid commandId, string userId, string action, bool allowed, CancellationToken ct)
+
+  Class AuditedCommandConsumer : IConsumer<AuditedCommand>:
+    Constructor takes IAuthorizationService and IAuditLogger.
+    Check authorization; log result.
+    If authorized: publish CommandExecuted.
+    If not authorized: publish CommandDenied.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuditedCommandConsumerTests
+  {
+      [Fact]
+      public async Task AuthorizedCommand_PublishesCommandExecuted()
+      {
+          var auth = Substitute.For<IAuthorizationService>();
+          auth.IsAuthorizedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var logger = Substitute.For<IAuditLogger>();
+          logger.LogAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new AuditedCommandConsumer(auth, logger));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new AuditedCommand(Guid.NewGuid(), "user1", "read", "report", "{}"));
+              await Task.Delay(200);
+              (await harness.Published.Any<CommandExecuted>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task UnauthorizedCommand_PublishesCommandDenied()
+      {
+          var auth = Substitute.For<IAuthorizationService>();
+          auth.IsAuthorizedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(false);
+          var logger = Substitute.For<IAuditLogger>();
+          logger.LogAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new AuditedCommandConsumer(auth, logger));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new AuditedCommand(Guid.NewGuid(), "hacker", "delete", "db", "{}"));
+              await Task.Delay(200);
+              (await harness.Published.Any<CommandDenied>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task AuditLogCalled_Regardless()
+      {
+          var auth = Substitute.For<IAuthorizationService>();
+          auth.IsAuthorizedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var logger = Substitute.For<IAuditLogger>();
+          logger.LogAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new AuditedCommandConsumer(auth, logger));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new AuditedCommand(Guid.NewGuid(), "u", "a", "r", "p"));
+              await Task.Delay(200);
+              await logger.Received(1).LogAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task CommandExecuted_ContainsTimestamp()
+      {
+          var auth = Substitute.For<IAuthorizationService>();
+          auth.IsAuthorizedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var logger = Substitute.For<IAuditLogger>();
+          logger.LogAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new AuditedCommandConsumer(auth, logger));
+          await harness.Start();
+          try
+          {
+              var before = DateTime.UtcNow;
+              await harness.InputQueueSendEndpoint.Send(new AuditedCommand(Guid.NewGuid(), "u2", "write", "doc", "data"));
+              await Task.Delay(200);
+              var msg = harness.Published.Select<CommandExecuted>().First().Context.Message;
+              msg.ExecutedAt.Should().BeOnOrAfter(before);
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task CommandDenied_ContainsUserId()
+      {
+          var auth = Substitute.For<IAuthorizationService>();
+          auth.IsAuthorizedAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(false);
+          var logger = Substitute.For<IAuditLogger>();
+          logger.LogAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new AuditedCommandConsumer(auth, logger));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new AuditedCommand(Guid.NewGuid(), "bad-actor", "drop", "table", ""));
+              await Task.Delay(200);
+              var msg = harness.Published.Select<CommandDenied>().First().Context.Message;
+              msg.UserId.Should().Be("bad-actor");
+          }
+          finally { await harness.Stop(); }
+      }
+  }

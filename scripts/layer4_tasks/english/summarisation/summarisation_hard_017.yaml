@@ -1,0 +1,18 @@
+name: summarisation_hard_017
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The proliferation of private equity ownership in healthcare, housing, and education sectors has sparked debate about whether profit-driven management is compatible with equitable access to essential services. Critics cite evidence of cost-cutting and asset-stripping, while defenders argue private capital enables investment that public funding cannot provide.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "private equity"
+    - "healthcare"
+    - "profit"
+    - "access"
+  max_words: 25

@@ -1,0 +1,70 @@
+name: medium_efcore_036
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Device with: int Id, string Name, string Status, DateTime CreatedAt, string OwnerId.
+  A class DeviceDbContext : DbContext with DbSet<Device> Items.
+  A class DeviceRepository with constructor accepting DeviceDbContext.
+  Methods:
+    Task<IEnumerable<Device>> GetByOwnerAsync(string ownerId)
+    Task<IEnumerable<Device>> GetByStatusAsync(string status)
+    Task<Device?> GetByIdAsync(int id)
+    Task UpdateStatusAsync(int id, string newStatus)
+  Return only valid C# code in a single file.
+test_code: |
+  public class DeviceRepositoryTests : IAsyncLifetime
+  {
+      private DeviceDbContext _db = null!;
+      private DeviceRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<DeviceDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new DeviceDbContext(opts);
+          _repo = new DeviceRepository(_db);
+          _db.Items.AddRange(
+              new Device { Name = "Item1", Status = "Active", CreatedAt = DateTime.UtcNow, OwnerId = "u1" },
+              new Device { Name = "Item2", Status = "Inactive", CreatedAt = DateTime.UtcNow, OwnerId = "u1" },
+              new Device { Name = "Item3", Status = "Active", CreatedAt = DateTime.UtcNow, OwnerId = "u2" });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByOwner_ReturnsCorrect()
+      {
+          (await _repo.GetByOwnerAsync("u1")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetByStatus_FiltersCorrectly()
+      {
+          (await _repo.GetByStatusAsync("Active")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetById_ReturnsItem()
+      {
+          var id = _db.Items.First().Id;
+          (await _repo.GetByIdAsync(id)).Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task UpdateStatus_ChangesStatus()
+      {
+          var id = _db.Items.First().Id;
+          await _repo.UpdateStatusAsync(id, "Archived");
+          _db.ChangeTracker.Clear();
+          (await _repo.GetByIdAsync(id))!.Status.Should().Be("Archived");
+      }
+  }

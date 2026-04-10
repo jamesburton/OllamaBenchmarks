@@ -1,0 +1,97 @@
+name: hard_vertical_008
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + Repository + Unit of Work for banking:
+  Entities:
+    Account(int Id, string AccountNumber, string OwnerId, decimal Balance, string Type, bool IsActive)
+    Transaction(int Id, int FromAccountId, int? ToAccountId, decimal Amount, string Type, DateTime OccurredAt, string? Reference)
+  DbContext: BankDbContext (SQLite in-memory).
+
+  Interface IAccountRepository:
+    Task<Account?> GetByNumberAsync(string number, CancellationToken ct)
+    Task<Account> CreateAsync(string ownerId, decimal initialBalance, string type, CancellationToken ct)
+    Task<IReadOnlyList<Transaction>> GetTransactionsAsync(int accountId, CancellationToken ct)
+
+  Interface IUnitOfWork:
+    IAccountRepository Accounts { get; }
+    Task<int> SaveChangesAsync(CancellationToken ct)
+
+  Class BankingService(IUnitOfWork uow):
+    Task<Transaction> TransferAsync(string fromNumber, string toNumber, decimal amount, string? reference, CancellationToken ct):
+      Throws if either account not found, inactive, insufficient funds.
+      Debits from, credits to, creates Transaction record, saves.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BankingServiceTests : IDisposable
+  {
+      private readonly BankDbContext _db;
+      private readonly BankingService _svc;
+
+      public BankingServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<BankDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new BankDbContext(opts);
+          _db.Database.EnsureCreated();
+          var repo = new AccountRepository(_db);
+          var uow = new UnitOfWork(_db, repo);
+          _svc = new BankingService(uow);
+          SeedAccounts();
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedAccounts()
+      {
+          _db.Accounts.AddRange(
+              new Account { AccountNumber = "ACC-001", OwnerId = "u1", Balance = 1000m, Type = "Checking", IsActive = true },
+              new Account { AccountNumber = "ACC-002", OwnerId = "u2", Balance = 500m, Type = "Savings", IsActive = true },
+              new Account { AccountNumber = "ACC-003", OwnerId = "u3", Balance = 200m, Type = "Checking", IsActive = false }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task Transfer_ValidAccounts_UpdatesBalances()
+      {
+          await _svc.TransferAsync("ACC-001", "ACC-002", 100m, null, CancellationToken.None);
+          _db.Accounts.First(a => a.AccountNumber == "ACC-001").Balance.Should().Be(900m);
+          _db.Accounts.First(a => a.AccountNumber == "ACC-002").Balance.Should().Be(600m);
+      }
+
+      [Fact]
+      public async Task Transfer_InsufficientFunds_Throws()
+      {
+          var act = async () => await _svc.TransferAsync("ACC-001", "ACC-002", 2000m, null, CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task Transfer_InactiveAccount_Throws()
+      {
+          var act = async () => await _svc.TransferAsync("ACC-003", "ACC-001", 50m, null, CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task Transfer_UnknownAccount_Throws()
+      {
+          var act = async () => await _svc.TransferAsync("NOPE", "ACC-001", 50m, null, CancellationToken.None);
+          await act.Should().ThrowAsync<Exception>();
+      }
+
+      [Fact]
+      public async Task Transfer_CreatesTransactionRecord()
+      {
+          await _svc.TransferAsync("ACC-001", "ACC-002", 50m, "REF-X", CancellationToken.None);
+          _db.Transactions.Should().ContainSingle(t => t.Reference == "REF-X");
+      }
+  }

@@ -1,0 +1,14 @@
+name: deduction_medium_006
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. No prime number greater than 2 is even.
+  2. 101 is a prime number greater than 2.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "101 is not even."
+validator_config: {}

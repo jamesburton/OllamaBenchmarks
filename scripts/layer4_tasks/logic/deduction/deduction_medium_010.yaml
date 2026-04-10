@@ -1,0 +1,14 @@
+name: deduction_medium_010
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If an animal is a mammal, it is warm-blooded.
+  2. A crocodile is not warm-blooded.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "A crocodile is not a mammal."
+validator_config: {}

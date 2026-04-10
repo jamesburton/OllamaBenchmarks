@@ -1,0 +1,40 @@
+name: easy_vertical_039
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record JobPosting(string Id, string Title, string Company, string Location, bool IsRemote)
+  A class JobBoard with:
+    void Post(JobPosting job)
+    List<JobPosting> SearchByTitle(string keyword) case-insensitive title search
+    List<JobPosting> GetRemote() returns only remote jobs
+    int TotalPostings => total number of job postings
+  Return only valid C# code in a single file.
+test_code: |
+  public class JobBoardTests
+  {
+      [Fact]
+      public void SearchByTitle_FindsMatchingJobs()
+      {
+          var board = new JobBoard();
+          board.Post(new JobPosting("j1", "Senior Developer", "TechCo", "London", false));
+          board.Post(new JobPosting("j2", "Junior Developer", "StartUp", "Remote", true));
+          board.Post(new JobPosting("j3", "Product Manager", "BigCo", "NYC", false));
+          board.SearchByTitle("developer").Should().HaveCount(2);
+      }
+      [Fact]
+      public void GetRemote_ReturnsOnlyRemoteJobs()
+      {
+          var board = new JobBoard();
+          board.Post(new JobPosting("j1", "Dev", "Co1", "Remote", true));
+          board.Post(new JobPosting("j2", "PM", "Co2", "NYC", false));
+          board.GetRemote().Should().HaveCount(1);
+      }
+  }

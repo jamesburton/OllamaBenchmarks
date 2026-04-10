@@ -1,0 +1,41 @@
+name: easy_xunit_014
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IStockService with method:
+    Task<decimal> GetPriceAsync(string ticker)
+  A class PortfolioCalculator with constructor taking IStockService, and method:
+    async Task<decimal> GetTotalValueAsync(Dictionary<string, int> holdings)
+  that calls GetPriceAsync for each ticker and returns the sum of (price * quantity).
+  Return only valid C# code in a single file.
+test_code: |
+  public class PortfolioCalculatorTests
+  {
+      [Fact]
+      public async Task GetTotalValueAsync_CalculatesTotal()
+      {
+          var stockService = Substitute.For<IStockService>();
+          stockService.GetPriceAsync("AAPL").Returns(150m);
+          stockService.GetPriceAsync("MSFT").Returns(300m);
+          var calc = new PortfolioCalculator(stockService);
+          var holdings = new Dictionary<string, int> { ["AAPL"] = 2, ["MSFT"] = 1 };
+          var total = await calc.GetTotalValueAsync(holdings);
+          total.Should().Be(600m);
+      }
+      [Fact]
+      public async Task GetTotalValueAsync_EmptyHoldings_ReturnsZero()
+      {
+          var stockService = Substitute.For<IStockService>();
+          var calc = new PortfolioCalculator(stockService);
+          var total = await calc.GetTotalValueAsync(new Dictionary<string, int>());
+          total.Should().Be(0m);
+      }
+  }

@@ -1,0 +1,15 @@
+name: grammar_hard_100
+category: english
+subcategory: grammar
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The new law will effect significant changes in housing policy.
+  B) The new law will affect significant changes in housing policy.
+  C) The new law will have an affect on significant changes in housing policy.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

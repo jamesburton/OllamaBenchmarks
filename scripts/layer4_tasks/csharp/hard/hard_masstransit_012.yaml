@@ -1,0 +1,120 @@
+name: hard_masstransit_012
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit saga with activity chaining (Courier):
+  Messages:
+    record StartSubscription(Guid SubscriptionId, string UserId, string Plan);
+    record SubscriptionActivated(Guid SubscriptionId);
+    record SubscriptionSuspended(Guid SubscriptionId, string Reason);
+    record SubscriptionCancelled(Guid SubscriptionId);
+    record BillingCharged(Guid SubscriptionId, decimal Amount);
+    record BillingFailed(Guid SubscriptionId, string Error);
+
+  States: Pending, Active, Suspended, Cancelled.
+  SubscriptionStateMachine : MassTransitStateMachine<SubscriptionState>
+  Transitions:
+    Initially + StartSubscription -> Pending (publish BillingCharged request)
+    Pending + BillingCharged -> Active (publish SubscriptionActivated)
+    Pending + BillingFailed -> Suspended (publish SubscriptionSuspended)
+    Active + SubscriptionSuspended -> Suspended
+    (Pending|Active|Suspended) + SubscriptionCancelled -> Cancelled
+
+  SubscriptionState: Guid CorrelationId, string CurrentState, string UserId, string Plan,
+    decimal? LastChargeAmount, DateTime CreatedAt.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SubscriptionStateMachineTests
+  {
+      [Fact]
+      public async Task StartSubscription_TransitionsToPending()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<SubscriptionState, SubscriptionStateMachine>(new SubscriptionStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartSubscription(id, "user1", "Pro"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Pending).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task BillingCharged_TransitionsToActive()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<SubscriptionState, SubscriptionStateMachine>(new SubscriptionStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartSubscription(id, "user2", "Basic"));
+              await harness.InputQueueSendEndpoint.Send(new BillingCharged(id, 9.99m));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Active).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task BillingFailed_TransitionsToSuspended()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<SubscriptionState, SubscriptionStateMachine>(new SubscriptionStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartSubscription(id, "user3", "Pro"));
+              await harness.InputQueueSendEndpoint.Send(new BillingFailed(id, "Card expired"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Suspended).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task Cancellation_TransitionsToCancelled()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<SubscriptionState, SubscriptionStateMachine>(new SubscriptionStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartSubscription(id, "user4", "Free"));
+              await harness.InputQueueSendEndpoint.Send(new BillingCharged(id, 0m));
+              await harness.InputQueueSendEndpoint.Send(new SubscriptionCancelled(id));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Cancelled).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SagaState_StoresUserIdAndPlan()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<SubscriptionState, SubscriptionStateMachine>(new SubscriptionStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartSubscription(id, "myuser", "Enterprise"));
+              var state = sagaHarness.Sagas.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Pending);
+              state!.UserId.Should().Be("myuser");
+              state.Plan.Should().Be("Enterprise");
+          }
+          finally { await harness.Stop(); }
+      }
+  }

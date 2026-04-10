@@ -1,0 +1,25 @@
+name: comprehension_hard_042
+category: english
+subcategory: comprehension
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  Artificial intelligence is transforming healthcare by enabling faster and more accurate diagnosis of diseases. Machine learning algorithms trained on millions of medical images can now detect conditions such as diabetic retinopathy and certain cancers at an early stage, sometimes outperforming experienced clinicians. AI-powered tools also assist in drug discovery by predicting which molecular compounds are likely to be effective against specific diseases, dramatically reducing development timelines. In administrative roles, AI streamlines tasks such as appointment scheduling, billing, and clinical note transcription. However, critics raise important concerns. Patient data used to train AI models raises privacy issues, and algorithmic bias — the tendency of models to perform worse on populations underrepresented in training data — can exacerbate health inequalities. Clinicians also caution that AI should support, not replace, human medical judgement.
+  
+  Answer in one sentence:
+  Is the following statement a fact or an inference based on the passage: 'AI will eventually replace doctors'?
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "inference"
+    - "not stated"
+    - "caution"
+    - "support not replace"
+    - "opinion"
+    - "beyond"
+  min_words: 8
+  max_words: 40

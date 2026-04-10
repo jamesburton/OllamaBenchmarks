@@ -1,0 +1,39 @@
+name: medium_patterns_040
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class StringExtensions with static extension methods on string:
+    string ToPascalCase(this string s) — converts snake_case or kebab-case to PascalCase
+    string ToCamelCase(this string s) — converts to camelCase
+    string Truncate(this string s, int maxLength, string suffix = "...") — truncates with suffix
+    bool IsEmail(this string s) — simple email format check (contains @ and .)
+  Return only valid C# code in a single file.
+test_code: |
+  public class StringExtensionsTests
+  {
+      [Fact]
+      public void ToPascalCase_SnakeCase() { "hello_world".ToPascalCase().Should().Be("HelloWorld"); }
+
+      [Fact]
+      public void ToPascalCase_KebabCase() { "foo-bar-baz".ToPascalCase().Should().Be("FooBarBaz"); }
+
+      [Fact]
+      public void ToCamelCase_SnakeCase() { "hello_world".ToCamelCase().Should().Be("helloWorld"); }
+
+      [Fact]
+      public void Truncate_LongerThanMax()
+      {
+          "Hello World".Truncate(5).Should().Be("He...");
+      }
+
+      [Fact]
+      public void IsEmail_Valid_True() { "test@example.com".IsEmail().Should().BeTrue(); }
+  }

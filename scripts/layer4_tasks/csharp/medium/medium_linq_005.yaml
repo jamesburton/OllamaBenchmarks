@@ -1,0 +1,68 @@
+name: medium_linq_005
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Transaction with: int Id, DateTime Date, string Type, decimal Amount.
+  A class TransactionLedger with a constructor accepting IEnumerable<Transaction> transactions.
+  Expose:
+    IEnumerable<MonthlyTotal> GetMonthlyTotals()
+  returning MonthlyTotal records with: int Year, int Month, decimal Credits, decimal Debits, decimal Net.
+  Credits = sum of Amount where Type == "Credit".
+  Debits = sum of Amount where Type == "Debit".
+  Net = Credits - Debits.
+  Results ordered by Year then Month ascending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TransactionLedgerTests
+  {
+      private readonly Transaction[] _txns = {
+          new(1, new DateTime(2024,1,5),  "Credit", 500m),
+          new(2, new DateTime(2024,1,10), "Debit",  200m),
+          new(3, new DateTime(2024,2,3),  "Credit", 300m),
+          new(4, new DateTime(2024,2,14), "Debit",  100m),
+          new(5, new DateTime(2024,2,20), "Credit", 150m),
+      };
+
+      [Fact]
+      public void GetMonthlyTotals_ReturnsTwoMonths()
+      {
+          new TransactionLedger(_txns).GetMonthlyTotals().Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetMonthlyTotals_JanuaryNetCorrect()
+      {
+          var jan = new TransactionLedger(_txns).GetMonthlyTotals().First();
+          jan.Month.Should().Be(1);
+          jan.Net.Should().Be(300m);
+      }
+
+      [Fact]
+      public void GetMonthlyTotals_FebruaryCreditsAndDebitsCorrect()
+      {
+          var feb = new TransactionLedger(_txns).GetMonthlyTotals().Last();
+          feb.Credits.Should().Be(450m);
+          feb.Debits.Should().Be(100m);
+      }
+
+      [Fact]
+      public void GetMonthlyTotals_OrderedByYearMonth()
+      {
+          var result = new TransactionLedger(_txns).GetMonthlyTotals().ToList();
+          result[0].Month.Should().BeLessThan(result[1].Month);
+      }
+
+      [Fact]
+      public void GetMonthlyTotals_Empty_ReturnsEmpty()
+      {
+          new TransactionLedger(Array.Empty<Transaction>()).GetMonthlyTotals().Should().BeEmpty();
+      }
+  }

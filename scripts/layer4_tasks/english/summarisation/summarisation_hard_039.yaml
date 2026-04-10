@@ -1,0 +1,18 @@
+name: summarisation_hard_039
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The Fermi paradox — the apparent contradiction between the high probability of extraterrestrial civilisations and the lack of evidence for them — has generated numerous proposed resolutions, including the great filter hypothesis, the rare Earth hypothesis, and the possibility that advanced civilisations self-destruct before achieving interstellar communication. The detection of biosignatures in exoplanet atmospheres may eventually provide empirical constraints on the debate.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Fermi"
+    - "extraterrestrial"
+    - "civilisations"
+    - "biosignatures"
+  max_words: 25

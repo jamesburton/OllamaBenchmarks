@@ -1,0 +1,35 @@
+name: easy_xunit_031
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class DateUtils with static methods:
+    int DaysBetween(DateTime start, DateTime end) returns absolute number of days between two dates
+    bool IsWeekend(DateTime date) returns true if date is Saturday or Sunday
+  Return only valid C# code in a single file.
+test_code: |
+  public class DateUtilsTests
+  {
+      [Fact]
+      public void DaysBetween_ReturnsCorrectCount()
+      {
+          var start = new DateTime(2024, 1, 1);
+          var end = new DateTime(2024, 1, 11);
+          DateUtils.DaysBetween(start, end).Should().Be(10);
+      }
+      [Theory]
+      [InlineData(2024, 1, 6, true)]   // Saturday
+      [InlineData(2024, 1, 7, true)]   // Sunday
+      [InlineData(2024, 1, 8, false)]  // Monday
+      public void IsWeekend_ReturnsCorrectResult(int year, int month, int day, bool expected)
+      {
+          DateUtils.IsWeekend(new DateTime(year, month, day)).Should().Be(expected);
+      }
+  }

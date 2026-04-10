@@ -1,0 +1,22 @@
+name: technical_medium_016
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'API Reference' overview section for a library with three main functions.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "function"
+    - "parameter"
+    - "return"
+    - "API"
+    - "reference"
+    - "method"
+    - "call"
+  min_words: 10
+  max_words: 80

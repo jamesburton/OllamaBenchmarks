@@ -1,0 +1,59 @@
+name: medium_linq_045
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record User with: int Id, string Username, string Email, IReadOnlyList<string> Roles.
+  A class UserDirectory with a constructor accepting IEnumerable<User> users.
+  Expose:
+    User? FindByEmail(string email) — case-insensitive match, null if not found
+    IEnumerable<User> InRole(string role) — users having the specified role
+    Dictionary<string, int> RolePopularity() — count of users per role, ordered by count desc
+    bool HasRole(int userId, string role)
+  Return only valid C# code in a single file.
+test_code: |
+  public class UserDirectoryTests
+  {
+      private readonly User[] _users = {
+          new(1,"alice","alice@example.com", new[]{"Admin","User"}),
+          new(2,"bob",  "bob@example.com",   new[]{"User"}),
+          new(3,"carol","carol@example.com", new[]{"Admin"}),
+      };
+
+      [Fact]
+      public void FindByEmail_CaseInsensitive_ReturnsAlice()
+      {
+          new UserDirectory(_users).FindByEmail("ALICE@EXAMPLE.COM")!.Username.Should().Be("alice");
+      }
+
+      [Fact]
+      public void FindByEmail_NotFound_ReturnsNull()
+      {
+          new UserDirectory(_users).FindByEmail("nope@example.com").Should().BeNull();
+      }
+
+      [Fact]
+      public void InRole_AdminHasTwoUsers()
+      {
+          new UserDirectory(_users).InRole("Admin").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void HasRole_AliceIsAdmin_True()
+      {
+          new UserDirectory(_users).HasRole(1,"Admin").Should().BeTrue();
+      }
+
+      [Fact]
+      public void HasRole_BobNotAdmin_False()
+      {
+          new UserDirectory(_users).HasRole(2,"Admin").Should().BeFalse();
+      }
+  }

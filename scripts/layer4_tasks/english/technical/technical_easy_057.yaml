@@ -1,0 +1,22 @@
+name: technical_easy_057
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a brief notice informing users that their password needs to be reset.
+  Keep it under 30 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "password"
+    - "reset"
+    - "required"
+    - "security"
+    - "click"
+    - "update"
+    - "account"
+  min_words: 6
+  max_words: 30

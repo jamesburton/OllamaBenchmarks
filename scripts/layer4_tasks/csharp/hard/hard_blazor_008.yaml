@@ -1,0 +1,92 @@
+name: hard_blazor_008
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor real-time notification service:
+  Records:
+    Notification(Guid Id, string UserId, string Title, string Message, NotificationSeverity Severity, DateTime CreatedAt, bool IsRead)
+    NotificationFilter(string? UserId, NotificationSeverity? Severity, bool? IsRead)
+  Enum NotificationSeverity { Info, Warning, Error, Critical }
+
+  Class NotificationService:
+    Notification Add(string userId, string title, string message, NotificationSeverity severity):
+      Creates notification with new Guid, IsRead=false.
+    void MarkAsRead(Guid id): throws KeyNotFoundException if not found.
+    void MarkAllAsRead(string userId)
+    void Delete(Guid id)
+    IReadOnlyList<Notification> GetAll(NotificationFilter filter):
+      Filters by UserId if set, Severity if set, IsRead if set.
+    int GetUnreadCount(string userId)
+    event Action<Notification>? OnNotificationAdded
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationServiceTests
+  {
+      private readonly NotificationService _svc = new();
+
+      [Fact]
+      public void Add_CreatesNotification()
+      {
+          var n = _svc.Add("u1", "Hello", "Message", NotificationSeverity.Info);
+          n.Id.Should().NotBe(Guid.Empty);
+          n.IsRead.Should().BeFalse();
+      }
+
+      [Fact]
+      public void MarkAsRead_MarksCorrectNotification()
+      {
+          var n = _svc.Add("u1", "T", "M", NotificationSeverity.Warning);
+          _svc.MarkAsRead(n.Id);
+          _svc.GetAll(new NotificationFilter("u1", null, true)).Should().ContainSingle(x => x.Id == n.Id);
+      }
+
+      [Fact]
+      public void MarkAsRead_UnknownId_ThrowsKeyNotFoundException()
+      {
+          var act = () => _svc.MarkAsRead(Guid.NewGuid());
+          act.Should().Throw<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public void GetAll_FiltersBySeverity()
+      {
+          _svc.Add("u1", "T1", "M1", NotificationSeverity.Error);
+          _svc.Add("u1", "T2", "M2", NotificationSeverity.Info);
+          var errors = _svc.GetAll(new NotificationFilter(null, NotificationSeverity.Error, null));
+          errors.Should().AllSatisfy(n => n.Severity.Should().Be(NotificationSeverity.Error));
+      }
+
+      [Fact]
+      public void GetUnreadCount_ReturnsCorrectCount()
+      {
+          _svc.Add("u2", "T1", "M1", NotificationSeverity.Info);
+          _svc.Add("u2", "T2", "M2", NotificationSeverity.Info);
+          _svc.GetUnreadCount("u2").Should().Be(2);
+      }
+
+      [Fact]
+      public void MarkAllAsRead_MarksForUser()
+      {
+          _svc.Add("u3", "T1", "M1", NotificationSeverity.Info);
+          _svc.Add("u3", "T2", "M2", NotificationSeverity.Warning);
+          _svc.MarkAllAsRead("u3");
+          _svc.GetUnreadCount("u3").Should().Be(0);
+      }
+
+      [Fact]
+      public void Add_FiresOnNotificationAdded()
+      {
+          Notification? captured = null;
+          _svc.OnNotificationAdded += n => captured = n;
+          _svc.Add("u4", "T", "M", NotificationSeverity.Critical);
+          captured.Should().NotBeNull();
+      }
+  }

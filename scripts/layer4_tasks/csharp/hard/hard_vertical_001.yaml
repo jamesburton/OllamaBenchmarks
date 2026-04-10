@@ -1,0 +1,109 @@
+name: hard_vertical_001
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  CQRS vertical slice for product catalog management:
+  Records:
+    CreateProductCommand(string Name, string Category, decimal Price, int Stock)
+    UpdatePriceCommand(int ProductId, decimal NewPrice)
+    GetProductQuery(int ProductId)
+    GetProductsByCategoryQuery(string Category, int Page, int PageSize)
+    ProductDto(int Id, string Name, string Category, decimal Price, int Stock, DateTime CreatedAt)
+    PagedProductsDto(IReadOnlyList<ProductDto> Items, int Total, int Page, int TotalPages)
+    CommandResult<T>(bool Success, T? Data, string? Error)
+
+  Interface IProductRepository:
+    Task<ProductDto?> GetByIdAsync(int id, CancellationToken ct)
+    Task<PagedProductsDto> GetByCategoryAsync(string category, int page, int pageSize, CancellationToken ct)
+    Task<ProductDto> CreateAsync(CreateProductCommand cmd, CancellationToken ct)
+    Task<ProductDto?> UpdatePriceAsync(int id, decimal price, CancellationToken ct)
+
+  Class CreateProductCommandHandler(IProductRepository repo):
+    Task<CommandResult<ProductDto>> HandleAsync(CreateProductCommand cmd, CancellationToken ct):
+      Validates Name not empty, Price > 0, Stock >= 0.
+
+  Class UpdatePriceCommandHandler(IProductRepository repo):
+    Task<CommandResult<ProductDto>> HandleAsync(UpdatePriceCommand cmd, CancellationToken ct):
+      Validates Price > 0; returns error if product not found.
+
+  Use NSubstitute for mocking.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CreateProductCommandHandlerTests
+  {
+      private IProductRepository CreateRepo(ProductDto? result = null)
+      {
+          var repo = Substitute.For<IProductRepository>();
+          result ??= new ProductDto(1, "Widget", "Tools", 9.99m, 10, DateTime.UtcNow);
+          repo.CreateAsync(Arg.Any<CreateProductCommand>(), Arg.Any<CancellationToken>()).Returns(result);
+          return repo;
+      }
+
+      [Fact]
+      public async Task ValidCommand_ReturnsSuccess()
+      {
+          var handler = new CreateProductCommandHandler(CreateRepo());
+          var result = await handler.HandleAsync(new CreateProductCommand("Widget", "Tools", 9.99m, 10), CancellationToken.None);
+          result.Success.Should().BeTrue();
+          result.Data.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task EmptyName_ReturnsError()
+      {
+          var handler = new CreateProductCommandHandler(CreateRepo());
+          var result = await handler.HandleAsync(new CreateProductCommand("", "Tools", 9.99m, 10), CancellationToken.None);
+          result.Success.Should().BeFalse();
+          result.Error.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public async Task NegativePrice_ReturnsError()
+      {
+          var handler = new CreateProductCommandHandler(CreateRepo());
+          var result = await handler.HandleAsync(new CreateProductCommand("X", "Y", -1m, 0), CancellationToken.None);
+          result.Success.Should().BeFalse();
+      }
+  }
+
+  public class UpdatePriceCommandHandlerTests
+  {
+      [Fact]
+      public async Task ValidUpdate_ReturnsSuccess()
+      {
+          var repo = Substitute.For<IProductRepository>();
+          repo.UpdatePriceAsync(1, Arg.Any<decimal>(), Arg.Any<CancellationToken>())
+              .Returns(new ProductDto(1, "W", "T", 19.99m, 5, DateTime.UtcNow));
+          var handler = new UpdatePriceCommandHandler(repo);
+          var result = await handler.HandleAsync(new UpdatePriceCommand(1, 19.99m), CancellationToken.None);
+          result.Success.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task ProductNotFound_ReturnsError()
+      {
+          var repo = Substitute.For<IProductRepository>();
+          repo.UpdatePriceAsync(99, Arg.Any<decimal>(), Arg.Any<CancellationToken>())
+              .Returns((ProductDto?)null);
+          var handler = new UpdatePriceCommandHandler(repo);
+          var result = await handler.HandleAsync(new UpdatePriceCommand(99, 9.99m), CancellationToken.None);
+          result.Success.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task ZeroPrice_ReturnsValidationError()
+      {
+          var repo = Substitute.For<IProductRepository>();
+          var handler = new UpdatePriceCommandHandler(repo);
+          var result = await handler.HandleAsync(new UpdatePriceCommand(1, 0), CancellationToken.None);
+          result.Success.Should().BeFalse();
+      }
+  }

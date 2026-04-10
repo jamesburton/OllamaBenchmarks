@@ -1,0 +1,38 @@
+name: easy_xunit_008
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IRepository<T> with methods:
+    void Add(T item)
+    T? GetById(int id)
+    IEnumerable<T> GetAll()
+  A record Product(int Id, string Name)
+  A class ProductRepository implementing IRepository<Product> using an in-memory List<Product>
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductRepositoryTests
+  {
+      [Fact]
+      public void Add_And_GetById_Works()
+      {
+          var repo = new ProductRepository();
+          repo.Add(new Product(1, "Widget"));
+          repo.GetById(1)!.Name.Should().Be("Widget");
+      }
+      [Fact]
+      public void GetAll_ReturnsAllProducts()
+      {
+          var repo = new ProductRepository();
+          repo.Add(new Product(1, "A"));
+          repo.Add(new Product(2, "B"));
+          repo.GetAll().Should().HaveCount(2);
+      }
+  }

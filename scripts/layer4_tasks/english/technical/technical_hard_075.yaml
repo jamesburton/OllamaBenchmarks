@@ -1,0 +1,23 @@
+name: technical_hard_075
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a notice informing users of a significant change to how their data is used for personalisation, complying with transparency requirements.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "data"
+    - "personalisation"
+    - "change"
+    - "transparency"
+    - "opt out"
+    - "consent"
+    - "uses"
+    - "privacy"
+  min_words: 10
+  max_words: 80

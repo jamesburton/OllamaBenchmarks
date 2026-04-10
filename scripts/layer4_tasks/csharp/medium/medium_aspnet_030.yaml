@@ -1,0 +1,62 @@
+name: medium_aspnet_030
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record TagDto(int Id, string Name, int UsageCount).
+  A class TagsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<TagDto> (for testability).
+  Actions:
+    GET api/tags — all tags ordered by UsageCount descending
+    GET api/tags/popular?top=5 — top N tags by usage
+    GET api/tags/search?q=term — tags where Name contains term (case-insensitive)
+  Return only valid C# code in a single file.
+test_code: |
+  public class TagsControllerTests
+  {
+      private TagsController MakeController() => new(new List<TagDto>
+      {
+          new(1, "csharp", 100),
+          new(2, "dotnet", 80),
+          new(3, "azure", 60),
+          new(4, "asp", 40),
+          new(5, "ef", 20),
+          new(6, "blazor", 10)
+      });
+
+      [Fact]
+      public void GetAll_OrderedByUsageDesc()
+      {
+          var result = MakeController().GetAll() as OkObjectResult;
+          var items = (result!.Value as IEnumerable<TagDto>)!.ToList();
+          items.Should().BeInDescendingOrder(t => t.UsageCount);
+      }
+
+      [Fact]
+      public void GetPopular_ReturnsTopN()
+      {
+          var result = MakeController().GetPopular(3) as OkObjectResult;
+          (result!.Value as IEnumerable<TagDto>).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void Search_FiltersByName()
+      {
+          var result = MakeController().Search("net") as OkObjectResult;
+          (result!.Value as IEnumerable<TagDto>).Should().OnlyContain(t => t.Name.Contains("net", StringComparison.OrdinalIgnoreCase));
+      }
+
+      [Fact]
+      public void Search_CaseInsensitive()
+      {
+          var result = MakeController().Search("SHARP") as OkObjectResult;
+          (result!.Value as IEnumerable<TagDto>).Should().Contain(t => t.Name == "csharp");
+      }
+  }

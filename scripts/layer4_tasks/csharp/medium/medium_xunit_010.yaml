@@ -1,0 +1,55 @@
+name: medium_xunit_010
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TextAnalyzer with:
+    int CountWords(string text)
+    int CountSentences(string text)
+    IDictionary<string, int> WordFrequency(string text) — case-insensitive
+    string MostFrequentWord(string text)
+    double AverageWordLength(string text)
+  Return only valid C# code in a single file.
+test_code: |
+  public class TextAnalyzerTests
+  {
+      private readonly TextAnalyzer _analyzer = new();
+
+      [Fact]
+      public void CountWords_ReturnsCorrectCount()
+      {
+          _analyzer.CountWords("Hello world foo bar").Should().Be(4);
+      }
+
+      [Fact]
+      public void CountWords_EmptyString_ReturnsZero()
+      {
+          _analyzer.CountWords("").Should().Be(0);
+      }
+
+      [Fact]
+      public void WordFrequency_CaseInsensitive()
+      {
+          var freq = _analyzer.WordFrequency("Hello hello HELLO");
+          freq["hello"].Should().Be(3);
+      }
+
+      [Fact]
+      public void MostFrequentWord_ReturnsCorrect()
+      {
+          _analyzer.MostFrequentWord("the cat sat on the mat the").Should().Be("the");
+      }
+
+      [Fact]
+      public void AverageWordLength_CalculatesCorrectly()
+      {
+          _analyzer.AverageWordLength("cat is a").Should().BeApproximately(2.0, 0.1);
+      }
+  }

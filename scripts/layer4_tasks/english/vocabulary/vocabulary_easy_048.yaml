@@ -1,0 +1,16 @@
+name: vocabulary_easy_048
+category: english
+subcategory: vocabulary
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word has a NEGATIVE connotation?
+  A) Slim
+  B) Lean
+  C) Gaunt
+  D) Slender
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

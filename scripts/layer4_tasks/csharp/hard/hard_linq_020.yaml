@@ -1,0 +1,88 @@
+name: hard_linq_020
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: BuildRun(int Id, string Pipeline, string Branch, DateTime StartedAt,
+  DateTime? FinishedAt, string Status).
+  A class CiAnalyser with constructor accepting IEnumerable<BuildRun> runs.
+  Methods:
+    IEnumerable<PipelineStats> PipelineHealth() — per Pipeline: SuccessRate (Status=="Success"),
+      AverageDurationSeconds (completed runs only), FailureCount, TotalRuns.
+      Orders by SuccessRate descending.
+    IEnumerable<BuildRun> RecentFailures(int count) — last N failed builds by StartedAt descending.
+    IEnumerable<BranchActivity> BranchActivity(int topN) — per Branch: RunCount, SuccessCount.
+      Returns top N by RunCount. Orders by RunCount descending.
+    double OverallSuccessRate() — across all completed runs.
+  Records: PipelineStats(string Pipeline, double SuccessRate, double AverageDurationSeconds, int FailureCount, int TotalRuns),
+           BranchActivity(string Branch, int RunCount, int SuccessCount).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CiAnalyserTests
+  {
+      private static readonly DateTime T = new(2024,4,1,10,0,0);
+      private static readonly List<BuildRun> Runs = new()
+      {
+          new(1, "Backend", "main", T,               T.AddSeconds(120), "Success"),
+          new(2, "Backend", "main", T.AddHours(1),   T.AddHours(1).AddSeconds(300), "Failure"),
+          new(3, "Backend", "dev",  T.AddHours(2),   T.AddHours(2).AddSeconds(90),  "Success"),
+          new(4, "Frontend","main", T.AddHours(3),   T.AddHours(3).AddSeconds(60),  "Success"),
+          new(5, "Frontend","main", T.AddHours(4),   null, "Running"),
+      };
+
+      [Fact]
+      public void PipelineHealth_BackendSuccessRateIsCorrect()
+      {
+          var result = new CiAnalyser(Runs).PipelineHealth().ToList();
+          result.First(p => p.Pipeline == "Backend").SuccessRate
+                .Should().BeApproximately(2.0/3.0, 0.01);
+      }
+
+      [Fact]
+      public void PipelineHealth_FrontendExcludesRunning()
+      {
+          var result = new CiAnalyser(Runs).PipelineHealth().ToList();
+          var fe = result.First(p => p.Pipeline == "Frontend");
+          fe.TotalRuns.Should().Be(2);
+          fe.SuccessRate.Should().BeApproximately(0.5, 0.01);
+      }
+
+      [Fact]
+      public void RecentFailures_ReturnsOnlyFailures()
+      {
+          var result = new CiAnalyser(Runs).RecentFailures(5).ToList();
+          result.Should().AllSatisfy(r => r.Status.Should().Be("Failure"));
+      }
+
+      [Fact]
+      public void BranchActivity_MainIsFirst()
+      {
+          var result = new CiAnalyser(Runs).BranchActivity(2).ToList();
+          result[0].Branch.Should().Be("main");
+      }
+
+      [Fact]
+      public void OverallSuccessRate_IsCorrect()
+      {
+          new CiAnalyser(Runs).OverallSuccessRate().Should().BeApproximately(3.0/4.0, 0.01);
+      }
+
+      [Fact]
+      public void PipelineHealth_EmptyInput_ReturnsEmpty()
+      {
+          new CiAnalyser(Array.Empty<BuildRun>()).PipelineHealth().Should().BeEmpty();
+      }
+
+      [Fact]
+      public void OverallSuccessRate_EmptyInput_ReturnsZero()
+      {
+          new CiAnalyser(Array.Empty<BuildRun>()).OverallSuccessRate().Should().Be(0.0);
+      }
+  }

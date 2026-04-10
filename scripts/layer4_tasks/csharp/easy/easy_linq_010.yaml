@@ -1,0 +1,30 @@
+name: easy_linq_010
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Stats with a static method:
+    int Sum(IEnumerable<int> numbers)
+  that returns the sum of all numbers using LINQ Sum.
+  Return only valid C# code in a single file.
+test_code: |
+  public class StatsTests
+  {
+      [Fact]
+      public void Sum_BasicCase()
+      {
+          Stats.Sum(new[]{1,2,3,4,5}).Should().Be(15);
+      }
+      [Fact]
+      public void Sum_EmptySource_ReturnsZero()
+      {
+          Stats.Sum(Array.Empty<int>()).Should().Be(0);
+      }
+  }

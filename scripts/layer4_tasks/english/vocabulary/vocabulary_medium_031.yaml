@@ -1,0 +1,16 @@
+name: vocabulary_medium_031
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The old building had a dilapidated appearance', which word best replaces 'dilapidated'?
+  A) Pristine
+  B) Modern
+  C) Rundown
+  D) Ornate
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

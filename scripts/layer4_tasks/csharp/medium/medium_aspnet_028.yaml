@@ -1,0 +1,57 @@
+name: medium_aspnet_028
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record SluggedContent(string Slug, string Title, string Body, DateTime PublishedAt).
+  A class ContentController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<SluggedContent> (for testability).
+  Actions:
+    GET api/content — returns all content ordered by PublishedAt descending
+    GET api/content/{slug} — returns content by slug (case-insensitive), 404 if not found
+  Return only valid C# code in a single file.
+test_code: |
+  public class ContentControllerTests
+  {
+      private ContentController MakeController() => new(new List<SluggedContent>
+      {
+          new("hello-world", "Hello World", "Body1", DateTime.UtcNow.AddDays(-2)),
+          new("second-post", "Second Post", "Body2", DateTime.UtcNow.AddDays(-1)),
+          new("latest-post", "Latest Post", "Body3", DateTime.UtcNow)
+      });
+
+      [Fact]
+      public void GetAll_ReturnsOrderedByDate()
+      {
+          var result = MakeController().GetAll() as OkObjectResult;
+          var items = (result!.Value as IEnumerable<SluggedContent>)!.ToList();
+          items.Should().BeInDescendingOrder(c => c.PublishedAt);
+      }
+
+      [Fact]
+      public void GetBySlug_Found_ReturnsContent()
+      {
+          var result = MakeController().GetBySlug("hello-world") as OkObjectResult;
+          (result!.Value as SluggedContent)!.Title.Should().Be("Hello World");
+      }
+
+      [Fact]
+      public void GetBySlug_CaseInsensitive()
+      {
+          var result = MakeController().GetBySlug("HELLO-WORLD") as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+      }
+
+      [Fact]
+      public void GetBySlug_NotFound_Returns404()
+      {
+          MakeController().GetBySlug("nonexistent").Should().BeOfType<NotFoundResult>();
+      }
+  }

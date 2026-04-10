@@ -1,0 +1,71 @@
+name: medium_efcore_023
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Subscription with: int Id, string UserId, string PlanId, DateTime StartDate, DateTime? EndDate, bool IsActive, decimal MonthlyPrice.
+  A class SubscriptionDbContext : DbContext with DbSet<Subscription> Subscriptions.
+  A class SubscriptionRepository with constructor accepting SubscriptionDbContext.
+  Methods:
+    Task<Subscription?> GetActiveForUserAsync(string userId)
+    Task<decimal> GetMonthlyRevenueAsync()
+    Task CancelAsync(int subscriptionId)
+    Task<IEnumerable<Subscription>> GetExpiringAsync(int daysAhead)
+  GetMonthlyRevenueAsync sums MonthlyPrice for all active subscriptions.
+  GetExpiringAsync returns active subscriptions with EndDate within daysAhead.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SubscriptionRepositoryTests : IAsyncLifetime
+  {
+      private SubscriptionDbContext _db = null!;
+      private SubscriptionRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<SubscriptionDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new SubscriptionDbContext(opts);
+          _repo = new SubscriptionRepository(_db);
+          _db.Subscriptions.AddRange(
+              new Subscription { UserId = "u1", PlanId = "basic", StartDate = DateTime.UtcNow.AddMonths(-1), EndDate = DateTime.UtcNow.AddDays(5), IsActive = true, MonthlyPrice = 9.99m },
+              new Subscription { UserId = "u2", PlanId = "pro", StartDate = DateTime.UtcNow.AddMonths(-2), EndDate = null, IsActive = true, MonthlyPrice = 29.99m },
+              new Subscription { UserId = "u3", PlanId = "basic", StartDate = DateTime.UtcNow.AddYears(-1), EndDate = DateTime.UtcNow.AddDays(-1), IsActive = false, MonthlyPrice = 9.99m });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetActiveForUser_ReturnsActive()
+      {
+          (await _repo.GetActiveForUserAsync("u1")).Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task GetMonthlyRevenue_SumsActive()
+      {
+          (await _repo.GetMonthlyRevenueAsync()).Should().BeApproximately(39.98m, 0.01m);
+      }
+
+      [Fact]
+      public async Task Cancel_SetsInactive()
+      {
+          var id = _db.Subscriptions.First(s => s.IsActive).Id;
+          await _repo.CancelAsync(id);
+          _db.ChangeTracker.Clear();
+          (await _db.Subscriptions.FindAsync(id))!.IsActive.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task GetExpiring_FiltersWithinWindow()
+      {
+          (await _repo.GetExpiringAsync(10)).Should().HaveCount(1);
+      }
+  }

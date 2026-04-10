@@ -1,0 +1,14 @@
+name: sequences_medium_001
+category: logic
+subcategory: sequences
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  In the arithmetic sequence 3, 7, 11, 15, ..., what is the 20th term?
+  Reply with only the number.
+expected_answer: "79"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

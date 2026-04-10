@@ -1,0 +1,93 @@
+name: hard_aspnet_011
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A scoped service with request-scoped context:
+  Interface IRequestContext: Guid RequestId, string? UserId, DateTime StartedAt.
+  Class HttpRequestContext : IRequestContext — populated from HttpContext in middleware.
+  Class RequestContextMiddleware — creates IRequestContext per request from:
+    X-Request-Id header (generates Guid if absent), X-User-Id header.
+    Registers IRequestContext as scoped in DI.
+  Interface IAuditService:
+    Task LogAsync(string action, string details, CancellationToken ct)
+    Task<IReadOnlyList<AuditEntry>> GetLogsAsync(CancellationToken ct)
+  Class AuditService(IRequestContext context) : IAuditService — logs with requestId and userId.
+  Record: AuditEntry(Guid RequestId, string? UserId, string Action, string Details, DateTime At).
+  Static: AddAuditServices(this IServiceCollection svc)
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuditServiceTests
+  {
+      [Fact]
+      public async Task LogAsync_CreatesEntryWithContext()
+      {
+          var ctx = new HttpRequestContext(Guid.NewGuid(), "user42", DateTime.UtcNow);
+          var svc = new AuditService(ctx, new InMemoryAuditStore());
+          await svc.LogAsync("login", "User logged in", CancellationToken.None);
+          var logs = await svc.GetLogsAsync(CancellationToken.None);
+          logs.Should().ContainSingle();
+          logs[0].UserId.Should().Be("user42");
+          logs[0].Action.Should().Be("login");
+      }
+
+      [Fact]
+      public async Task LogAsync_MultipleEntries_AllStored()
+      {
+          var ctx = new HttpRequestContext(Guid.NewGuid(), null, DateTime.UtcNow);
+          var store = new InMemoryAuditStore();
+          var svc = new AuditService(ctx, store);
+          await svc.LogAsync("action1", "d1", CancellationToken.None);
+          await svc.LogAsync("action2", "d2", CancellationToken.None);
+          var logs = await svc.GetLogsAsync(CancellationToken.None);
+          logs.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task RequestContextMiddleware_PopulatesRequestId()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddAuditServices();
+          var app = builder.Build();
+          app.UseMiddleware<RequestContextMiddleware>();
+          string? capturedId = null;
+          app.MapGet("/", (IRequestContext ctx) => { capturedId = ctx.RequestId.ToString(); return "ok"; });
+          var req = new HttpRequestMessage(HttpMethod.Get, "/");
+          req.Headers.Add("X-Request-Id", "aaa-bbb");
+          await app.GetTestClient().SendAsync(req);
+          capturedId.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public async Task RequestContextMiddleware_GeneratesIdWhenAbsent()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddAuditServices();
+          var app = builder.Build();
+          app.UseMiddleware<RequestContextMiddleware>();
+          Guid captured = Guid.Empty;
+          app.MapGet("/", (IRequestContext ctx) => { captured = ctx.RequestId; return "ok"; });
+          await app.GetTestClient().GetAsync("/");
+          captured.Should().NotBe(Guid.Empty);
+      }
+
+      [Fact]
+      public async Task RequestContext_UserId_NullWhenNoHeader()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddAuditServices();
+          var app = builder.Build();
+          app.UseMiddleware<RequestContextMiddleware>();
+          string? userId = "set";
+          app.MapGet("/", (IRequestContext ctx) => { userId = ctx.UserId; return "ok"; });
+          await app.GetTestClient().GetAsync("/");
+          userId.Should().BeNull();
+      }
+  }

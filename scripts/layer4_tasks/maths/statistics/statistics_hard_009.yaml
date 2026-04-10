@@ -1,0 +1,13 @@
+name: statistics_hard_009
+category: maths
+subcategory: statistics
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  How many ways can a committee of 3 be chosen from 10 people? Reply with only the number.
+expected_answer: "120"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

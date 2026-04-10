@@ -1,0 +1,66 @@
+name: medium_aspnet_017
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record FileUploadResult(string FileName, long Size, string ContentType).
+  A class FileController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Action: POST api/file/upload accepting IFormFile file.
+  Validate: file must not be null, size must be <= 5MB, content type must start with "image/".
+  Return 400 with error message on validation failure, or 200 with FileUploadResult on success.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FileControllerTests
+  {
+      private IFormFile MakeFile(string name, long size, string contentType)
+      {
+          var file = Substitute.For<IFormFile>();
+          file.FileName.Returns(name);
+          file.Length.Returns(size);
+          file.ContentType.Returns(contentType);
+          return file;
+      }
+
+      [Fact]
+      public async Task ValidImage_Returns200()
+      {
+          var ctrl = new FileController();
+          var file = MakeFile("photo.jpg", 1024 * 100, "image/jpeg");
+          var result = await ctrl.Upload(file) as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+          (result.Value as FileUploadResult)!.FileName.Should().Be("photo.jpg");
+      }
+
+      [Fact]
+      public async Task TooLarge_Returns400()
+      {
+          var ctrl = new FileController();
+          var file = MakeFile("big.jpg", 6 * 1024 * 1024L, "image/jpeg");
+          var result = await ctrl.Upload(file);
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public async Task WrongContentType_Returns400()
+      {
+          var ctrl = new FileController();
+          var file = MakeFile("doc.pdf", 1024, "application/pdf");
+          var result = await ctrl.Upload(file);
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public async Task NullFile_Returns400()
+      {
+          var ctrl = new FileController();
+          var result = await ctrl.Upload(null!);
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

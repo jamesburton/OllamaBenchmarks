@@ -1,0 +1,16 @@
+name: syllogisms_hard_001
+category: logic
+subcategory: syllogisms
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All A are B or C.
+  2. No B is D.
+  3. All C are D.
+  4. X is an A that is not C.
+  What can you conclude about X? Reply with only the conclusion.
+expected_answer: "X is B and not D."
+validator_config: {}

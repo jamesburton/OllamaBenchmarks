@@ -1,0 +1,39 @@
+name: easy_patterns_016
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Rectangle(double Width, double Height)
+  with a computed property:
+    double Area => Width * Height
+  and a static class RectangleHelper with:
+    bool IsSquare(Rectangle r)
+  that returns true if Width == Height.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RectangleHelperTests
+  {
+      [Fact]
+      public void IsSquare_EqualSides_ReturnsTrue()
+      {
+          RectangleHelper.IsSquare(new Rectangle(5, 5)).Should().BeTrue();
+      }
+      [Fact]
+      public void IsSquare_UnequalSides_ReturnsFalse()
+      {
+          RectangleHelper.IsSquare(new Rectangle(3, 4)).Should().BeFalse();
+      }
+      [Fact]
+      public void Area_ComputedCorrectly()
+      {
+          new Rectangle(3, 4).Area.Should().Be(12);
+      }
+  }

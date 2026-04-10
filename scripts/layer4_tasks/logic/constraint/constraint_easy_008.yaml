@@ -1,0 +1,16 @@
+name: constraint_easy_008
+category: logic
+subcategory: constraint
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three siblings - Oldest, Middle, Youngest - are named Dana, Evan, Fran.
+  Clues:
+  1. Dana is not the oldest.
+  2. Evan is the middle child.
+  3. Fran is not the youngest.
+  Who is the oldest? Reply with only the name.
+expected_answer: "Fran"
+validator_config: {}

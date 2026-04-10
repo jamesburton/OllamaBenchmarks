@@ -1,0 +1,15 @@
+name: grammar_easy_061
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct version:
+  A) She studied all night; she passed the exam.
+  B) She studied all night, she passed the exam.
+  C) She studied all night she passed the exam.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

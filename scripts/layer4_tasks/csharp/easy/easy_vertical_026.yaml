@@ -1,0 +1,41 @@
+name: easy_vertical_026
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Ingredient(string Name, int Quantity, string Unit)
+  A record Recipe(string Name, List<Ingredient> Ingredients, int Servings)
+  A class RecipeScaler with static method:
+    Recipe Scale(Recipe recipe, int targetServings) returns new Recipe with all ingredient quantities scaled proportionally
+  Return only valid C# code in a single file.
+test_code: |
+  public class RecipeScalerTests
+  {
+      [Fact]
+      public void Scale_DoublesIngredients()
+      {
+          var recipe = new Recipe("Cake", new List<Ingredient>
+          {
+              new("Flour", 200, "g"),
+              new("Sugar", 100, "g")
+          }, 4);
+          var scaled = RecipeScaler.Scale(recipe, 8);
+          scaled.Ingredients[0].Quantity.Should().Be(400);
+          scaled.Ingredients[1].Quantity.Should().Be(200);
+          scaled.Servings.Should().Be(8);
+      }
+      [Fact]
+      public void Scale_HalvesIngredients()
+      {
+          var recipe = new Recipe("Soup", new List<Ingredient> { new("Salt", 10, "g") }, 4);
+          var scaled = RecipeScaler.Scale(recipe, 2);
+          scaled.Ingredients[0].Quantity.Should().Be(5);
+      }
+  }

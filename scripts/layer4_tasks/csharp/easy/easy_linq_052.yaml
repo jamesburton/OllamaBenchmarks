@@ -1,0 +1,31 @@
+name: easy_linq_052
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Mapper with a static method:
+    List<string> SelectIndexed(IEnumerable<string> items)
+  that returns strings formatted as "0: item0", "1: item1", etc. using LINQ Select with index overload + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MapperTests
+  {
+      [Fact]
+      public void SelectIndexed_BasicCase()
+      {
+          var result = Mapper.SelectIndexed(new[]{"apple","banana"});
+          result.Should().BeEquivalentTo(new[]{"0: apple","1: banana"}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void SelectIndexed_EmptySource_ReturnsEmpty()
+      {
+          Mapper.SelectIndexed(Array.Empty<string>()).Should().BeEmpty();
+      }
+  }

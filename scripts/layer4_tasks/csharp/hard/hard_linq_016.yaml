@@ -1,0 +1,87 @@
+name: hard_linq_016
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Survey(int Id, int RespondentId, string Question, int Score).
+  A class SurveyAggregator with constructor accepting IEnumerable<Survey> surveys.
+  Methods:
+    IEnumerable<QuestionInsight> QuestionInsights() — per Question: AverageScore,
+      StdDev (population), MinScore, MaxScore, ResponseCount. Orders by AverageScore descending.
+    IEnumerable<RespondentProfile> RespondentProfiles() — per Respondent: AverageScore,
+      list of Questions answered, TotalResponses. Orders by AverageScore descending.
+    IEnumerable<Survey> Outliers(double zScoreThreshold) — surveys whose score deviates
+      from the question mean by more than zScoreThreshold standard deviations.
+  Records: QuestionInsight(string Question, double AverageScore, double StdDev,
+                           int MinScore, int MaxScore, int ResponseCount),
+           RespondentProfile(int RespondentId, double AverageScore, IReadOnlyList<string> Questions, int TotalResponses).
+  Return only valid C# code in a single file.
+test_code: |
+  public class SurveyAggregatorTests
+  {
+      private static readonly List<Survey> Surveys = new()
+      {
+          new(1, 1, "Ease",      8),
+          new(2, 2, "Ease",      9),
+          new(3, 3, "Ease",      2),
+          new(4, 1, "Recommend", 7),
+          new(5, 2, "Recommend", 9),
+          new(6, 3, "Recommend", 8),
+      };
+
+      [Fact]
+      public void QuestionInsights_ReturnsTwoQuestions()
+      {
+          var result = new SurveyAggregator(Surveys).QuestionInsights().ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void QuestionInsights_EaseMinMaxCorrect()
+      {
+          var result = new SurveyAggregator(Surveys).QuestionInsights().ToList();
+          var ease = result.First(q => q.Question == "Ease");
+          ease.MinScore.Should().Be(2);
+          ease.MaxScore.Should().Be(9);
+      }
+
+      [Fact]
+      public void RespondentProfiles_ThreeRespondents()
+      {
+          var result = new SurveyAggregator(Surveys).RespondentProfiles().ToList();
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void RespondentProfiles_Respondent1AverageCorrect()
+      {
+          var result = new SurveyAggregator(Surveys).RespondentProfiles().ToList();
+          result.First(r => r.RespondentId == 1).AverageScore.Should().BeApproximately(7.5, 0.01);
+      }
+
+      [Fact]
+      public void Outliers_FindsLowScoreForEase()
+      {
+          var result = new SurveyAggregator(Surveys).Outliers(1.0).ToList();
+          result.Should().Contain(s => s.RespondentId == 3 && s.Question == "Ease");
+      }
+
+      [Fact]
+      public void Outliers_HighThreshold_ReturnsEmpty()
+      {
+          new SurveyAggregator(Surveys).Outliers(10.0).Should().BeEmpty();
+      }
+
+      [Fact]
+      public void QuestionInsights_EmptyInput_ReturnsEmpty()
+      {
+          new SurveyAggregator(Array.Empty<Survey>()).QuestionInsights().Should().BeEmpty();
+      }
+  }

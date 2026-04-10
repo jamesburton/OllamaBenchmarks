@@ -1,0 +1,38 @@
+name: easy_xunit_025
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncDatabase that implements IAsyncLifetime with:
+    List<string> Records { get; } = new()
+    ValueTask InitializeAsync() adds "seed1" and "seed2" to Records
+    ValueTask DisposeAsync() clears Records
+    void Insert(string record) adds record to Records
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncDatabaseTests : IAsyncLifetime
+  {
+      private readonly AsyncDatabase _db = new();
+
+      public ValueTask InitializeAsync() => _db.InitializeAsync();
+      public ValueTask DisposeAsync() => _db.DisposeAsync();
+
+      [Fact]
+      public void AfterInit_HasSeedRecords()
+      {
+          _db.Records.Should().Contain("seed1").And.Contain("seed2");
+      }
+      [Fact]
+      public void Insert_AddsRecord()
+      {
+          _db.Insert("record3");
+          _db.Records.Should().Contain("record3");
+      }
+  }

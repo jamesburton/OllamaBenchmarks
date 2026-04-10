@@ -1,0 +1,15 @@
+name: grammar_medium_038
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The lecture was long and confusing, and she spoke too quietly.
+  B) The lecture was long, confusing, and delivered too quietly.
+  C) The lecture was long, confusing, and she spoke quiet.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

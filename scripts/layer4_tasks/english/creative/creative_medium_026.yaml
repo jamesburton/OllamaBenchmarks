@@ -1,0 +1,22 @@
+name: creative_medium_026
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of an elderly person sitting alone in a cafe, watching the street outside.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "elderly"
+    - "alone"
+    - "cafe"
+    - "watching"
+    - "window"
+    - "quiet"
+    - "years"
+    - "distant"
+  min_words: 15
+  max_words: 60

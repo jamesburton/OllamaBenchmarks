@@ -1,0 +1,58 @@
+name: medium_aspnet_007
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class RateLimitingMiddleware with constructor accepting RequestDelegate next and int maxRequests.
+  Track requests per IP in a ConcurrentDictionary<string, int>.
+  If count for IP exceeds maxRequests, return 429 Too Many Requests; otherwise increment and call next.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RateLimitingMiddlewareTests
+  {
+      private HttpContext MakeContext(string ip)
+      {
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          ctx.Connection.RemoteIpAddress = System.Net.IPAddress.Parse(ip);
+          return ctx;
+      }
+
+      [Fact]
+      public async Task UnderLimit_CallsNext()
+      {
+          var called = 0;
+          var mw = new RateLimitingMiddleware(_ => { called++; return Task.CompletedTask; }, 3);
+          await mw.InvokeAsync(MakeContext("1.1.1.1"));
+          await mw.InvokeAsync(MakeContext("1.1.1.1"));
+          called.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task OverLimit_Returns429()
+      {
+          var mw = new RateLimitingMiddleware(_ => Task.CompletedTask, 2);
+          await mw.InvokeAsync(MakeContext("2.2.2.2"));
+          await mw.InvokeAsync(MakeContext("2.2.2.2"));
+          var ctx = MakeContext("2.2.2.2");
+          await mw.InvokeAsync(ctx);
+          ctx.Response.StatusCode.Should().Be(429);
+      }
+
+      [Fact]
+      public async Task DifferentIps_TrackedSeparately()
+      {
+          var called = 0;
+          var mw = new RateLimitingMiddleware(_ => { called++; return Task.CompletedTask; }, 1);
+          await mw.InvokeAsync(MakeContext("3.3.3.3"));
+          await mw.InvokeAsync(MakeContext("4.4.4.4"));
+          called.Should().Be(2);
+      }
+  }

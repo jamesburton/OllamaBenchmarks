@@ -1,0 +1,18 @@
+name: summarisation_medium_011
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The global talent shortage has prompted companies to rethink their hiring strategies. Many organisations are now prioritising skills over formal qualifications, reducing degree requirements for entry-level roles. This shift is expected to widen the talent pool and promote social mobility.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "talent"
+    - "skills"
+    - "hiring"
+    - "qualifications"
+  max_words: 25

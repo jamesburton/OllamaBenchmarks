@@ -1,0 +1,42 @@
+name: easy_vertical_010
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record UserProfile(string UserId, string DisplayName, string? AvatarUrl)
+  An interface IProfileRepository with methods:
+    Task SaveAsync(UserProfile profile)
+    Task<UserProfile?> GetAsync(string userId)
+  A class ProfileService with constructor taking IProfileRepository, and async methods:
+    Task UpdateDisplayNameAsync(string userId, string newName) loads profile, updates DisplayName using 'with', saves
+    Task<string> GetDisplayNameAsync(string userId) returns DisplayName or "Unknown" if not found
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProfileServiceTests
+  {
+      [Fact]
+      public async Task UpdateDisplayNameAsync_SavesUpdatedProfile()
+      {
+          var repo = Substitute.For<IProfileRepository>();
+          repo.GetAsync("u1").Returns(new UserProfile("u1", "OldName", null));
+          var service = new ProfileService(repo);
+          await service.UpdateDisplayNameAsync("u1", "NewName");
+          await repo.Received(1).SaveAsync(Arg.Is<UserProfile>(p => p.DisplayName == "NewName"));
+      }
+      [Fact]
+      public async Task GetDisplayNameAsync_NotFound_ReturnsUnknown()
+      {
+          var repo = Substitute.For<IProfileRepository>();
+          repo.GetAsync("u99").Returns((UserProfile?)null);
+          var service = new ProfileService(repo);
+          var name = await service.GetDisplayNameAsync("u99");
+          name.Should().Be("Unknown");
+      }
+  }

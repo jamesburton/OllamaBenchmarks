@@ -1,0 +1,114 @@
+name: hard_masstransit_003
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit multi-consumer pipeline with filtering:
+  Messages:
+    record NotificationMessage(Guid Id, string Channel, string Recipient, string Subject, string Body, int Priority);
+    record NotificationSent(Guid Id, string Channel, DateTime SentAt);
+    record NotificationFailed(Guid Id, string Channel, string Reason);
+
+  Consumers:
+    EmailNotificationConsumer : IConsumer<NotificationMessage> —
+      processes messages where Channel=="Email". Publishes NotificationSent.
+    SmsNotificationConsumer : IConsumer<NotificationMessage> —
+      processes messages where Channel=="SMS". If Recipient doesn't start with "+", publishes NotificationFailed.
+    PushNotificationConsumer : IConsumer<NotificationMessage> —
+      processes messages where Channel=="Push". Always succeeds.
+
+  Each consumer filters by its channel using consumer configuration (not message headers).
+  The test verifies only the correct consumer handles each message type.
+  Use MassTransit in-memory test harness with consumer filters configured.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MultiConsumerPipelineTests
+  {
+      [Fact]
+      public async Task EmailMessage_ConsumedByEmailConsumer()
+      {
+          var harness = new InMemoryTestHarness();
+          var emailConsumer = harness.Consumer<EmailNotificationConsumer>();
+          harness.Consumer<SmsNotificationConsumer>();
+          harness.Consumer<PushNotificationConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new NotificationMessage(NewId.NextGuid(), "Email", "user@example.com", "Hello", "Body", 1));
+              await Task.Delay(200);
+              emailConsumer.Consumed.Select<NotificationMessage>().Should().NotBeEmpty();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EmailMessage_PublishesNotificationSent()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<EmailNotificationConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new NotificationMessage(NewId.NextGuid(), "Email", "user@example.com", "Hi", "Msg", 2));
+              (await harness.Published.Any<NotificationSent>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SmsMessage_InvalidRecipient_PublishesNotificationFailed()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<SmsNotificationConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new NotificationMessage(NewId.NextGuid(), "SMS", "invalid-number", "Hi", "Msg", 1));
+              (await harness.Published.Any<NotificationFailed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SmsMessage_ValidRecipient_PublishesNotificationSent()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<SmsNotificationConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new NotificationMessage(NewId.NextGuid(), "SMS", "+447700900000", "Hi", "Msg", 1));
+              (await harness.Published.Any<NotificationSent>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task PushMessage_AlwaysPublishesSent()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<PushNotificationConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new NotificationMessage(NewId.NextGuid(), "Push", "device-token-xyz", "Alert", "Push body", 3));
+              (await harness.Published.Any<NotificationSent>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+  }

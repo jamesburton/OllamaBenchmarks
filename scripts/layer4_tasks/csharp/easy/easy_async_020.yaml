@@ -1,0 +1,36 @@
+name: easy_async_020
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncPipeline with a static method:
+    async Task<TResult> PipeAsync<T, TResult>(Task<T> source, Func<T, Task<TResult>> transform)
+  that awaits the source task, passes the result to transform, and returns the transformed result.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncPipelineTests
+  {
+      [Fact]
+      public async Task PipeAsync_TransformsResult()
+      {
+          var result = await AsyncPipeline.PipeAsync(
+              Task.FromResult(5),
+              x => Task.FromResult(x * 3));
+          result.Should().Be(15);
+      }
+      [Fact]
+      public async Task PipeAsync_StringTransform()
+      {
+          var result = await AsyncPipeline.PipeAsync(
+              Task.FromResult("hello"),
+              s => Task.FromResult(s.ToUpper()));
+          result.Should().Be("HELLO");
+      }
+  }

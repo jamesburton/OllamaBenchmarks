@@ -1,0 +1,15 @@
+name: grammar_medium_079
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which sentence does NOT contain a run-on error?
+  A) She took on more work her performance declined her manager intervened.
+  B) She took on more work; her performance declined, and her manager intervened.
+  C) She took on more work, her performance declined, her manager intervened.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

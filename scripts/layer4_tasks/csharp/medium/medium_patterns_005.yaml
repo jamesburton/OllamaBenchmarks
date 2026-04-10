@@ -1,0 +1,62 @@
+name: medium_patterns_005
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A generic class EventBus with:
+    void Subscribe<TEvent>(Action<TEvent> handler)
+    void Publish<TEvent>(TEvent evt)
+    int HandlerCount<TEvent>()
+  Handlers called synchronously in subscription order.
+  Return only valid C# code in a single file.
+test_code: |
+  public record UserCreated(string UserName);
+  public record OrderPlaced(int OrderId);
+
+  public class EventBusTests
+  {
+      [Fact]
+      public void Subscribe_Publish_HandlerCalled()
+      {
+          var bus = new EventBus();
+          string? received = null;
+          bus.Subscribe<UserCreated>(e => received = e.UserName);
+          bus.Publish(new UserCreated("Alice"));
+          received.Should().Be("Alice");
+      }
+
+      [Fact]
+      public void MultipleHandlers_AllCalled()
+      {
+          var bus = new EventBus();
+          var results = new List<string>();
+          bus.Subscribe<UserCreated>(e => results.Add("h1:" + e.UserName));
+          bus.Subscribe<UserCreated>(e => results.Add("h2:" + e.UserName));
+          bus.Publish(new UserCreated("Bob"));
+          results.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Publish_NoHandlers_NoException()
+      {
+          Action act = () => new EventBus().Publish(new OrderPlaced(1));
+          act.Should().NotThrow();
+      }
+
+      [Fact]
+      public void HandlerCount_ReflectsSubscriptions()
+      {
+          var bus = new EventBus();
+          bus.Subscribe<UserCreated>(_ => {});
+          bus.Subscribe<UserCreated>(_ => {});
+          bus.HandlerCount<UserCreated>().Should().Be(2);
+          bus.HandlerCount<OrderPlaced>().Should().Be(0);
+      }
+  }

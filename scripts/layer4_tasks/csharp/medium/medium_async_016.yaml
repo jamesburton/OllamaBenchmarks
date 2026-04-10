@@ -1,0 +1,60 @@
+name: medium_async_016
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IRepository<T> with:
+    Task<T?> GetByIdAsync(int id, CancellationToken ct = default)
+    Task SaveAsync(T entity, CancellationToken ct = default)
+  A class CachingRepository<T> with constructor accepting IRepository<T> inner.
+  GetByIdAsync checks an in-memory cache first; on miss, calls inner and caches the result.
+  SaveAsync invalidates the cache entry for the entity (T must have int Id property via interface IHasId).
+  IHasId has: int Id { get; }
+  Return only valid C# code in a single file.
+test_code: |
+  public record Widget(int Id, string Name) : IHasId;
+
+  public class CachingRepositoryTests
+  {
+      [Fact]
+      public async Task GetByIdAsync_CachesMiss()
+      {
+          var inner = Substitute.For<IRepository<Widget>>();
+          inner.GetByIdAsync(1, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Widget?>(new Widget(1,"A")));
+          var repo = new CachingRepository<Widget>(inner);
+          await repo.GetByIdAsync(1);
+          await repo.GetByIdAsync(1);
+          await inner.Received(1).GetByIdAsync(1, Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task GetByIdAsync_NullNotCached()
+      {
+          var inner = Substitute.For<IRepository<Widget>>();
+          inner.GetByIdAsync(99, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Widget?>(null));
+          var repo = new CachingRepository<Widget>(inner);
+          await repo.GetByIdAsync(99);
+          await repo.GetByIdAsync(99);
+          await inner.Received(2).GetByIdAsync(99, Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task SaveAsync_InvalidatesCache()
+      {
+          var inner = Substitute.For<IRepository<Widget>>();
+          inner.GetByIdAsync(1, Arg.Any<CancellationToken>()).Returns(Task.FromResult<Widget?>(new Widget(1,"A")));
+          inner.SaveAsync(Arg.Any<Widget>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var repo = new CachingRepository<Widget>(inner);
+          await repo.GetByIdAsync(1);
+          await repo.SaveAsync(new Widget(1,"B"));
+          await repo.GetByIdAsync(1);
+          await inner.Received(2).GetByIdAsync(1, Arg.Any<CancellationToken>());
+      }
+  }

@@ -1,0 +1,58 @@
+name: medium_linq_022
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record StockItem with: string Sku, string Warehouse, int Quantity, decimal CostPerUnit.
+  A class InventoryReport with a constructor accepting IEnumerable<StockItem> items.
+  Expose:
+    IEnumerable<SkuSummary> BySkuTotals()
+      — for each Sku: TotalQuantity and TotalValue (sum of Quantity*CostPerUnit), ordered by TotalValue desc
+    IEnumerable<StockItem> LowStock(int threshold)
+      — items whose Quantity <= threshold, ordered by Quantity asc
+  SkuSummary is a record with: string Sku, int TotalQuantity, decimal TotalValue.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryReportTests
+  {
+      private readonly StockItem[] _items = {
+          new("W001","WH-A", 100, 2.00m),
+          new("W001","WH-B",  50, 2.00m),
+          new("W002","WH-A",  10, 50.00m),
+          new("W003","WH-A",   3, 1.00m),
+      };
+
+      [Fact]
+      public void BySkuTotals_ReturnsThreeSkus()
+      {
+          new InventoryReport(_items).BySkuTotals().Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void BySkuTotals_W001TotalQuantity150()
+      {
+          var w001 = new InventoryReport(_items).BySkuTotals().First(s => s.Sku == "W001");
+          w001.TotalQuantity.Should().Be(150);
+          w001.TotalValue.Should().Be(300m);
+      }
+
+      [Fact]
+      public void BySkuTotals_OrderedByValueDesc()
+      {
+          var result = new InventoryReport(_items).BySkuTotals().ToList();
+          result.Select(s => s.TotalValue).Should().BeInDescendingOrder();
+      }
+
+      [Fact]
+      public void LowStock_Threshold5_ReturnsW003()
+      {
+          new InventoryReport(_items).LowStock(5).Should().ContainSingle(i => i.Sku == "W003");
+      }
+  }

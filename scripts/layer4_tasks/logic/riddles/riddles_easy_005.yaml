@@ -1,0 +1,16 @@
+name: riddles_easy_005
+category: logic
+subcategory: riddles
+difficulty: easy
+weight: 1
+validator_type: logic
+max_tokens: 64
+prompt: |
+  What has a head and a tail, but no body?
+  Reply with only the answer.
+expected_answer: "A coin"
+validator_config:
+  accepted_answers:
+  - "A coin"
+  - "coin"
+  - "a coin"

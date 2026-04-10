@@ -1,0 +1,46 @@
+name: medium_patterns_018
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Template with constructor accepting string template ({name} style placeholders).
+  Expose:
+    string Render(Dictionary<string,string> variables) — replaces {key} with value
+    IEnumerable<string> GetPlaceholders() — distinct placeholder names
+  Unmatched placeholders left as-is.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TemplateTests
+  {
+      [Fact]
+      public void Render_ReplacesPlaceholders()
+      {
+          new Template("Hello, {name}! Age {age}.").Render(new(){{"name","Alice"},{"age","30"}})
+              .Should().Be("Hello, Alice! Age 30.");
+      }
+
+      [Fact]
+      public void Render_Unmatched_LeftAsIs()
+      {
+          new Template("Hi {name} from {place}").Render(new(){{"name","Bob"}}).Should().Contain("{place}");
+      }
+
+      [Fact]
+      public void GetPlaceholders_Distinct()
+      {
+          new Template("{a} and {b} and {a}").GetPlaceholders().Should().BeEquivalentTo(new[]{"a","b"});
+      }
+
+      [Fact]
+      public void Render_NoPlaceholders_ReturnsOriginal()
+      {
+          new Template("no placeholders").Render(new()).Should().Be("no placeholders");
+      }
+  }

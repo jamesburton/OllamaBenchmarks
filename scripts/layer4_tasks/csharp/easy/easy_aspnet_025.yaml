@@ -1,0 +1,40 @@
+name: easy_aspnet_025
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class EndpointHandlers with a static method:
+    IResult UpdateItem(int id, string? name)
+  that returns Results.BadRequest("Invalid id") if id <= 0,
+  Results.BadRequest("Name required") if name is null/empty,
+  otherwise Results.Ok(new { Id = id, Name = name }).
+  Return only valid C# code in a single file.
+test_code: |
+  public class EndpointHandlersTests
+  {
+      [Fact]
+      public void UpdateItem_Valid_ReturnsOk()
+      {
+          var result = EndpointHandlers.UpdateItem(1, "Widget");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<object>>();
+      }
+      [Fact]
+      public void UpdateItem_InvalidId_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.UpdateItem(0, "Widget");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+      [Fact]
+      public void UpdateItem_EmptyName_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.UpdateItem(1, "");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+  }

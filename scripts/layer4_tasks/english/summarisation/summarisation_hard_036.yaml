@@ -1,0 +1,18 @@
+name: summarisation_hard_036
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The measurement problem in quantum mechanics — the question of how a quantum superposition collapses to a definite classical outcome upon observation — remains unresolved despite a century of debate. Interpretations range from the Copenhagen collapse postulate to the many-worlds hypothesis, each carrying different ontological commitments. Recent experiments involving quantum Zeno effects have sharpened but not resolved the controversy.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "quantum"
+    - "superposition"
+    - "measurement"
+    - "Copenhagen"
+  max_words: 25

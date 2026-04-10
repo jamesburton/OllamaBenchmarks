@@ -1,0 +1,13 @@
+name: statistics_easy_016
+category: maths
+subcategory: statistics
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  There are 5 cards numbered 1-5. What is the probability of drawing a number greater than 3? Reply with only the decimal.
+expected_answer: "0.4"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

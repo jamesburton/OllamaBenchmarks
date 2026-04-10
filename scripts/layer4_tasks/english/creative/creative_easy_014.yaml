@@ -1,0 +1,22 @@
+name: creative_easy_014
+category: english
+subcategory: creative
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a crowded train station during rush hour.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "train"
+    - "station"
+    - "crowd"
+    - "rush"
+    - "people"
+    - "luggage"
+    - "platform"
+    - "loud"
+  min_words: 15
+  max_words: 60

@@ -1,0 +1,55 @@
+name: medium_blazor_019
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class WindowService with:
+    bool IsFullscreen, (int Width, int Height) WindowSize, event Action? OnWindowChanged, void SetFullscreen(bool), void SetWindowSize(int w, int h)
+  Return only valid C# code in a single file.
+test_code: |
+  public class WindowServiceTests
+  {
+      [Fact]
+      public void SetFullscreen_True_SetsFlag()
+      {
+          var svc = new WindowService();
+          svc.SetFullscreen(true);
+          svc.IsFullscreen.Should().BeTrue();
+      }
+
+      [Fact]
+      public void SetFullscreen_FiresEvent()
+      {
+          var svc = new WindowService();
+          var fired = false;
+          svc.OnWindowChanged += () => fired = true;
+          svc.SetFullscreen(false);
+          fired.Should().BeTrue();
+      }
+
+      [Fact]
+      public void SetWindowSize_StoresSize()
+      {
+          var svc = new WindowService();
+          svc.SetWindowSize(1920, 1080);
+          svc.WindowSize.Width.Should().Be(1920);
+          svc.WindowSize.Height.Should().Be(1080);
+      }
+
+      [Fact]
+      public void SetWindowSize_FiresEvent()
+      {
+          var svc = new WindowService();
+          var fired = false;
+          svc.OnWindowChanged += () => fired = true;
+          svc.SetWindowSize(800, 600);
+          fired.Should().BeTrue();
+      }
+  }

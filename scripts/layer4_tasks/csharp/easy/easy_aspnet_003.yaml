@@ -1,0 +1,48 @@
+name: easy_aspnet_003
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AppOptions with:
+    string ConnectionString { get; set; }
+    int MaxRetries { get; set; }
+    bool EnableCaching { get; set; }
+  and a static class OptionsValidator with:
+    (bool IsValid, string? Error) Validate(AppOptions options)
+  that returns (false, "ConnectionString is required") if ConnectionString is null/empty,
+  (false, "MaxRetries must be positive") if MaxRetries <= 0,
+  otherwise (true, null).
+  Return only valid C# code in a single file.
+test_code: |
+  public class OptionsValidatorTests
+  {
+      [Fact]
+      public void Validate_ValidOptions_ReturnsTrue()
+      {
+          var opts = new AppOptions { ConnectionString = "server=...", MaxRetries = 3, EnableCaching = true };
+          var (isValid, error) = OptionsValidator.Validate(opts);
+          isValid.Should().BeTrue();
+          error.Should().BeNull();
+      }
+      [Fact]
+      public void Validate_EmptyConnectionString_ReturnsFalse()
+      {
+          var opts = new AppOptions { ConnectionString = "", MaxRetries = 3 };
+          var (isValid, _) = OptionsValidator.Validate(opts);
+          isValid.Should().BeFalse();
+      }
+      [Fact]
+      public void Validate_ZeroMaxRetries_ReturnsFalse()
+      {
+          var opts = new AppOptions { ConnectionString = "server=...", MaxRetries = 0 };
+          var (isValid, _) = OptionsValidator.Validate(opts);
+          isValid.Should().BeFalse();
+      }
+  }

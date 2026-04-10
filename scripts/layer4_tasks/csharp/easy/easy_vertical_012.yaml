@@ -1,0 +1,38 @@
+name: easy_vertical_012
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Inventory(string Sku, string Name, int Quantity)
+  A class InventoryManager with:
+    void AddStock(Inventory item)
+    bool Deduct(string sku, int quantity) returns false if insufficient stock, deducts and returns true otherwise
+    int GetQuantity(string sku) returns current quantity or 0 if not found
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryManagerTests
+  {
+      [Fact]
+      public void Deduct_SufficientStock_ReturnsTrue()
+      {
+          var manager = new InventoryManager();
+          manager.AddStock(new Inventory("SKU1", "Widget", 10));
+          manager.Deduct("SKU1", 3).Should().BeTrue();
+          manager.GetQuantity("SKU1").Should().Be(7);
+      }
+      [Fact]
+      public void Deduct_InsufficientStock_ReturnsFalse()
+      {
+          var manager = new InventoryManager();
+          manager.AddStock(new Inventory("SKU2", "Gadget", 2));
+          manager.Deduct("SKU2", 5).Should().BeFalse();
+          manager.GetQuantity("SKU2").Should().Be(2);
+      }
+  }

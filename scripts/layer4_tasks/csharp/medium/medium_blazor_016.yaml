@@ -1,0 +1,65 @@
+name: medium_blazor_016
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TabService with:
+    IReadOnlyList<string> Tabs, string? ActiveTab, AddTab(string), RemoveTab(string), SetActiveTab(string), event Action? OnTabChanged
+  Return only valid C# code in a single file.
+test_code: |
+  public class TabServiceTests
+  {
+      [Fact]
+      public void AddTab_AddToList()
+      {
+          var svc = new TabService();
+          svc.AddTab("Home");
+          svc.Tabs.Should().Contain("Home");
+      }
+
+      [Fact]
+      public void SetActiveTab_SetsActive()
+      {
+          var svc = new TabService();
+          svc.AddTab("Settings");
+          svc.SetActiveTab("Settings");
+          svc.ActiveTab.Should().Be("Settings");
+      }
+
+      [Fact]
+      public void RemoveTab_RemovesTab()
+      {
+          var svc = new TabService();
+          svc.AddTab("Tab1");
+          svc.RemoveTab("Tab1");
+          svc.Tabs.Should().NotContain("Tab1");
+      }
+
+      [Fact]
+      public void RemoveActiveTab_ClearsActiveTab()
+      {
+          var svc = new TabService();
+          svc.AddTab("X");
+          svc.SetActiveTab("X");
+          svc.RemoveTab("X");
+          svc.ActiveTab.Should().BeNull();
+      }
+
+      [Fact]
+      public void SetActiveTab_FiresEvent()
+      {
+          var svc = new TabService();
+          svc.AddTab("T");
+          var fired = false;
+          svc.OnTabChanged += () => fired = true;
+          svc.SetActiveTab("T");
+          fired.Should().BeTrue();
+      }
+  }

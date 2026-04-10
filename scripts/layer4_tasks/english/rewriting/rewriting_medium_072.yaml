@@ -1,0 +1,20 @@
+name: rewriting_medium_072
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Split this compound sentence into two shorter sentences:
+  'Global temperatures continue to rise, and more extreme weather events are becoming increasingly common.'
+  Write only the two rewritten sentences.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "temperatures"
+    - "rise"
+    - "weather"
+    - "extreme"
+  min_words: 7
+  max_words: 30

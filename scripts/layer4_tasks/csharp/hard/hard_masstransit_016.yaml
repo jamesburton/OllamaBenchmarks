@@ -1,0 +1,118 @@
+name: hard_masstransit_016
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit transactional outbox pattern simulation:
+  Messages:
+    record PlaceOrder(Guid OrderId, string CustomerId, IReadOnlyList<string> Items);
+    record OrderPlaced(Guid OrderId, string CustomerId, int ItemCount, DateTime PlacedAt);
+    record OrderRejected(Guid OrderId, string Reason);
+
+  Interface IOrderRepository:
+    Task<bool> SaveOrderAsync(Guid orderId, string customerId, IReadOnlyList<string> items, CancellationToken ct)
+
+  Class OrderConsumer : IConsumer<PlaceOrder>:
+    Constructor takes IOrderRepository.
+    Call SaveOrderAsync; if returns true, publish OrderPlaced.
+    If returns false or throws, publish OrderRejected.
+    Simulate outbox: collect messages, publish after successful save.
+
+  Class OrderConsumerDefinition : ConsumerDefinition<OrderConsumer>:
+    Configure retry 2 times with 50ms delay.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderConsumerTests
+  {
+      [Fact]
+      public async Task SuccessfulSave_PublishesOrderPlaced()
+      {
+          var repo = Substitute.For<IOrderRepository>();
+          repo.SaveOrderAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new OrderConsumer(repo));
+          await harness.Start();
+          try
+          {
+              var id = Guid.NewGuid();
+              await harness.InputQueueSendEndpoint.Send(new PlaceOrder(id, "cust1", new[] { "item1", "item2" }));
+              await Task.Delay(300);
+              (await harness.Published.Any<OrderPlaced>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task FailedSave_PublishesOrderRejected()
+      {
+          var repo = Substitute.For<IOrderRepository>();
+          repo.SaveOrderAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+              .Returns(false);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new OrderConsumer(repo));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new PlaceOrder(Guid.NewGuid(), "cust2", new[] { "x" }));
+              await Task.Delay(300);
+              (await harness.Published.Any<OrderRejected>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ExceptionInSave_PublishesOrderRejected()
+      {
+          var repo = Substitute.For<IOrderRepository>();
+          repo.SaveOrderAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+              .ThrowsAsync(new Exception("DB error"));
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new OrderConsumer(repo));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new PlaceOrder(Guid.NewGuid(), "cust3", Array.Empty<string>()));
+              await Task.Delay(300);
+              (await harness.Published.Any<OrderRejected>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task OrderPlaced_ContainsCorrectItemCount()
+      {
+          var repo = Substitute.For<IOrderRepository>();
+          repo.SaveOrderAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<IReadOnlyList<string>>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new OrderConsumer(repo));
+          await harness.Start();
+          try
+          {
+              var items = new[] { "a", "b", "c" };
+              await harness.InputQueueSendEndpoint.Send(new PlaceOrder(Guid.NewGuid(), "cust4", items));
+              await Task.Delay(300);
+              var msg = harness.Published.Select<OrderPlaced>().First().Context.Message;
+              msg.ItemCount.Should().Be(3);
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ConsumerDefinition_CanBeInstantiated()
+      {
+          var def = new OrderConsumerDefinition();
+          def.Should().NotBeNull();
+      }
+  }

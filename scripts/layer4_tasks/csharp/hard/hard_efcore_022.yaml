@@ -1,0 +1,99 @@
+name: hard_efcore_022
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core interceptor for query performance logging:
+  Class SlowQueryInterceptor(TimeSpan threshold, List<SlowQueryRecord> log) : DbCommandInterceptor —
+    override ReaderExecuted and ReaderExecutedAsync to record commands exceeding threshold.
+  Record: SlowQueryRecord(string CommandText, TimeSpan Duration, DateTime ExecutedAt).
+  Entity: Widget(int Id, string Name, decimal Price).
+  DbContext: WidgetDbContext — add interceptor via options.
+  Class WidgetRepository(WidgetDbContext db):
+    Task<Widget> AddAsync(Widget widget, CancellationToken ct)
+    Task<IReadOnlyList<Widget>> GetAllAsync(CancellationToken ct)
+    Task<Widget?> GetByIdAsync(int id, CancellationToken ct)
+  Demonstrate interceptor captures slow queries in tests by using a threshold of 0ms.
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SlowQueryInterceptorTests : IDisposable
+  {
+      private readonly List<SlowQueryRecord> _log;
+      private readonly WidgetDbContext _db;
+      private readonly WidgetRepository _repo;
+
+      public SlowQueryInterceptorTests()
+      {
+          _log = new List<SlowQueryRecord>();
+          var opts = new DbContextOptionsBuilder<WidgetDbContext>()
+              .UseSqlite("Data Source=:memory:")
+              .AddInterceptors(new SlowQueryInterceptor(TimeSpan.Zero, _log))
+              .Options;
+          _db = new WidgetDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new WidgetRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task Interceptor_RecordsGetAllQuery()
+      {
+          await _repo.AddAsync(new Widget { Name = "A", Price = 1m }, CancellationToken.None);
+          _log.Clear();
+          await _repo.GetAllAsync(CancellationToken.None);
+          _log.Should().NotBeEmpty();
+      }
+
+      [Fact]
+      public async Task Interceptor_RecordsCommandText()
+      {
+          await _repo.GetAllAsync(CancellationToken.None);
+          _log.Should().Contain(r => r.CommandText.Contains("Widget", StringComparison.OrdinalIgnoreCase));
+      }
+
+      [Fact]
+      public async Task Interceptor_RecordsDuration()
+      {
+          await _repo.GetAllAsync(CancellationToken.None);
+          _log.Should().Contain(r => r.Duration >= TimeSpan.Zero);
+      }
+
+      [Fact]
+      public async Task Repository_AddAndGet_Works()
+      {
+          var w = await _repo.AddAsync(new Widget { Name = "Test", Price = 5m }, CancellationToken.None);
+          var found = await _repo.GetByIdAsync(w.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.Name.Should().Be("Test");
+      }
+
+      [Fact]
+      public async Task Repository_GetById_UnknownId_ReturnsNull()
+      {
+          var result = await _repo.GetByIdAsync(9999, CancellationToken.None);
+          result.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task Interceptor_AboveThreshold_NoRecord()
+      {
+          var slowLog = new List<SlowQueryRecord>();
+          var opts = new DbContextOptionsBuilder<WidgetDbContext>()
+              .UseSqlite("Data Source=:memory:")
+              .AddInterceptors(new SlowQueryInterceptor(TimeSpan.FromHours(1), slowLog))
+              .Options;
+          await using var db = new WidgetDbContext(opts);
+          db.Database.EnsureCreated();
+          var repo = new WidgetRepository(db);
+          await repo.GetAllAsync(CancellationToken.None);
+          slowLog.Should().BeEmpty();
+      }
+  }

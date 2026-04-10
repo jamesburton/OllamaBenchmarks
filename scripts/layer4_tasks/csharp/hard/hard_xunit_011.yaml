@@ -1,0 +1,92 @@
+name: hard_xunit_011
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing with NSubstitute and complex argument matching:
+  Records:
+    AuditEvent(Guid Id, string UserId, string Action, string Resource, DateTime Timestamp, Dictionary<string, object> Metadata)
+    AuditQuery(string? UserId, string? Action, DateTime? From, DateTime? To, int Page, int PageSize)
+    AuditPage(IReadOnlyList<AuditEvent> Events, int Total, int Page, int TotalPages)
+
+  Interface IAuditRepository:
+    Task LogAsync(AuditEvent evt, CancellationToken ct)
+    Task<AuditPage> QueryAsync(AuditQuery query, CancellationToken ct)
+
+  Class AuditService(IAuditRepository repo):
+    Task LogActionAsync(string userId, string action, string resource, Dictionary<string, object>? metadata, CancellationToken ct):
+      Creates AuditEvent with new Guid, current UTC time, logs via repo.
+    Task<AuditPage> SearchAsync(AuditQuery query, CancellationToken ct)
+
+  Use NSubstitute: verify LogAsync called with specific userId, verify metadata in Arg.Is<> matcher.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuditServiceTests
+  {
+      private readonly IAuditRepository _repo = Substitute.For<IAuditRepository>();
+
+      [Fact]
+      public async Task LogAction_CreatesEventWithCorrectUserId()
+      {
+          _repo.LogAsync(Arg.Any<AuditEvent>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var svc = new AuditService(_repo);
+          await svc.LogActionAsync("user-1", "read", "orders", null, CancellationToken.None);
+          await _repo.Received(1).LogAsync(
+              Arg.Is<AuditEvent>(e => e.UserId == "user-1"),
+              Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task LogAction_SetsTimestampToUtcNow()
+      {
+          _repo.LogAsync(Arg.Any<AuditEvent>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var svc = new AuditService(_repo);
+          var before = DateTime.UtcNow;
+          await svc.LogActionAsync("u", "a", "r", null, CancellationToken.None);
+          await _repo.Received(1).LogAsync(
+              Arg.Is<AuditEvent>(e => e.Timestamp >= before),
+              Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task LogAction_WithMetadata_PassesMetadata()
+      {
+          _repo.LogAsync(Arg.Any<AuditEvent>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var svc = new AuditService(_repo);
+          var meta = new Dictionary<string, object> { ["key"] = "value" };
+          await svc.LogActionAsync("u2", "write", "products", meta, CancellationToken.None);
+          await _repo.Received(1).LogAsync(
+              Arg.Is<AuditEvent>(e => e.Metadata.ContainsKey("key")),
+              Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task SearchAsync_DelegatesToRepo()
+      {
+          var page = new AuditPage(Array.Empty<AuditEvent>(), 0, 1, 0);
+          _repo.QueryAsync(Arg.Any<AuditQuery>(), Arg.Any<CancellationToken>()).Returns(page);
+          var svc = new AuditService(_repo);
+          var result = await svc.SearchAsync(new AuditQuery("u1", null, null, null, 1, 10), CancellationToken.None);
+          result.Should().BeSameAs(page);
+      }
+
+      [Fact]
+      public async Task LogAction_GeneratesNewIdEachCall()
+      {
+          var ids = new List<Guid>();
+          _repo.LogAsync(Arg.Do<AuditEvent>(e => ids.Add(e.Id)), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          var svc = new AuditService(_repo);
+          await svc.LogActionAsync("u", "a", "r", null, CancellationToken.None);
+          await svc.LogActionAsync("u", "a", "r", null, CancellationToken.None);
+          ids.Should().HaveCount(2);
+          ids[0].Should().NotBe(ids[1]);
+      }
+  }

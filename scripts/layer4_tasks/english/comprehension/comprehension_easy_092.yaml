@@ -1,0 +1,24 @@
+name: comprehension_easy_092
+category: english
+subcategory: comprehension
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  The fall of the Western Roman Empire in 476 AD is one of the most studied and debated events in history. Historians have proposed numerous explanations, including military overextension, political instability, economic decline, and the migration of peoples from Central Asia that pushed Germanic tribes into Roman territory. Some scholars emphasise internal factors — particularly the corruption of the political class and the debasement of currency — while others focus on external pressures such as the Hunnic invasions. Edward Gibbon's eighteenth-century account blamed the rise of Christianity for sapping civic virtue and military spirit, a view that has been contested by modern historians. Most contemporary scholars view the fall as a gradual transformation rather than a sudden collapse, with Roman institutions, laws, and culture persisting in successor kingdoms. The Eastern Roman Empire, centred on Constantinople, survived for nearly another thousand years, eventually falling in 1453.
+  
+  Answer in one sentence:
+  Name one internal cause of Rome's fall mentioned in the passage.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "corruption"
+    - "currency"
+    - "debasement"
+    - "political instability"
+    - "internal"
+  min_words: 8
+  max_words: 40

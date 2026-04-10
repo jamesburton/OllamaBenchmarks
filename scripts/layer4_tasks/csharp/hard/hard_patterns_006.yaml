@@ -1,0 +1,101 @@
+name: hard_patterns_006
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A decorator chain pattern for request processing:
+  Interface IRequestHandler<TRequest, TResponse> with:
+    Task<TResponse> HandleAsync(TRequest request, CancellationToken ct)
+  Abstract class RequestHandlerDecorator<TRequest, TResponse> that wraps an inner handler.
+  Decorators:
+    LoggingDecorator<TReq, TRes>(IRequestHandler<TReq, TRes> inner, List<string> log) —
+      logs "Handling {typeof(TReq).Name}" before and "Handled in {ms}ms" after.
+    ValidationDecorator<TReq, TRes>(IRequestHandler<TReq, TRes> inner, Func<TReq, string?> validate) —
+      if validate returns non-null, throws ValidationException(message) without calling inner.
+    CachingDecorator<TReq, TRes>(IRequestHandler<TReq, TRes> inner, Func<TReq, string> keySelector) —
+      returns cached result for same key; calls inner on cache miss.
+  A concrete AddNumbersHandler : IRequestHandler<AddRequest, int> that returns A + B.
+  Record: AddRequest(int A, int B).
+  Return only valid C# code in a single file.
+test_code: |
+  public class RequestHandlerDecoratorTests
+  {
+      [Fact]
+      public async Task LoggingDecorator_LogsBeforeAndAfter()
+      {
+          var log = new List<string>();
+          IRequestHandler<AddRequest, int> handler =
+              new LoggingDecorator<AddRequest, int>(new AddNumbersHandler(), log);
+          await handler.HandleAsync(new(2, 3), CancellationToken.None);
+          log.Should().HaveCount(2);
+          log[0].Should().Contain("Handling");
+          log[1].Should().Contain("Handled in");
+      }
+
+      [Fact]
+      public async Task ValidationDecorator_PassesValidRequest()
+      {
+          IRequestHandler<AddRequest, int> handler =
+              new ValidationDecorator<AddRequest, int>(new AddNumbersHandler(), _ => null);
+          var result = await handler.HandleAsync(new(1, 2), CancellationToken.None);
+          result.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task ValidationDecorator_ThrowsOnInvalid()
+      {
+          IRequestHandler<AddRequest, int> handler =
+              new ValidationDecorator<AddRequest, int>(new AddNumbersHandler(),
+                  r => r.A < 0 ? "A must be positive" : null);
+          var act = async () => await handler.HandleAsync(new(-1, 2), CancellationToken.None);
+          await act.Should().ThrowAsync<ValidationException>().WithMessage("A must be positive");
+      }
+
+      [Fact]
+      public async Task CachingDecorator_ReturnsCachedResult()
+      {
+          int callCount = 0;
+          var inner = new CountingHandler(new AddNumbersHandler(), ref callCount);
+          IRequestHandler<AddRequest, int> handler =
+              new CachingDecorator<AddRequest, int>(new AddNumbersHandler(), r => $"{r.A}+{r.B}");
+          await handler.HandleAsync(new(1, 2), CancellationToken.None);
+          await handler.HandleAsync(new(1, 2), CancellationToken.None);
+          var result = await handler.HandleAsync(new(1, 2), CancellationToken.None);
+          result.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task DecoratorChain_LogsAndValidatesAndHandles()
+      {
+          var log = new List<string>();
+          IRequestHandler<AddRequest, int> chain =
+              new LoggingDecorator<AddRequest, int>(
+                  new ValidationDecorator<AddRequest, int>(
+                      new AddNumbersHandler(),
+                      r => r.B < 0 ? "B negative" : null),
+                  log);
+          var result = await chain.HandleAsync(new(10, 5), CancellationToken.None);
+          result.Should().Be(15);
+          log.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task CachingDecorator_DifferentKey_CallsInnerAgain()
+      {
+          int calls = 0;
+          IRequestHandler<AddRequest, int> handler =
+              new CachingDecorator<AddRequest, int>(
+                  new DelegateHandler<AddRequest, int>(_ => { calls++; return Task.FromResult(0); }),
+                  r => $"{r.A}+{r.B}");
+          await handler.HandleAsync(new(1, 2), CancellationToken.None);
+          await handler.HandleAsync(new(3, 4), CancellationToken.None);
+          calls.Should().Be(2);
+      }
+  }

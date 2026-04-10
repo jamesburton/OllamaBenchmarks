@@ -1,0 +1,41 @@
+name: easy_patterns_044
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Fraction(int Numerator, int Denominator)
+  with:
+    double ToDouble() => (double)Numerator / Denominator
+    static Fraction Simplify(Fraction f) — divides both parts by their GCD
+  Return only valid C# code in a single file.
+test_code: |
+  public class FractionTests
+  {
+      [Fact]
+      public void ToDouble_BasicCase()
+      {
+          new Fraction(1, 2).ToDouble().Should().BeApproximately(0.5, 0.001);
+      }
+      [Fact]
+      public void Simplify_ReducesFraction()
+      {
+          var simplified = Fraction.Simplify(new Fraction(6, 9));
+          simplified.Numerator.Should().Be(2);
+          simplified.Denominator.Should().Be(3);
+      }
+      [Fact]
+      public void Simplify_AlreadySimplified_ReturnsSame()
+      {
+          var simplified = Fraction.Simplify(new Fraction(1, 3));
+          simplified.Numerator.Should().Be(1);
+          simplified.Denominator.Should().Be(3);
+      }
+  }

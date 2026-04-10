@@ -1,0 +1,79 @@
+name: hard_xunit_001
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit assembly fixture with IAsyncLifetime:
+  Create a DatabaseFixture : IAsyncLifetime:
+    InitializeAsync: creates an in-memory SQLite database, runs migrations (CREATE TABLE).
+    DisposeAsync: disposes DbConnection.
+    DbConnection Connection { get; }
+    string ConnectionString { get; }
+
+  Attach fixture to assembly with [assembly: AssemblyFixture(typeof(DatabaseFixture))].
+
+  Class CustomerRepository(DbConnection conn):
+    Task<int> CreateAsync(string name, string email, CancellationToken ct)
+    Task<(int Id, string Name, string Email)?> GetAsync(int id, CancellationToken ct)
+    Task<bool> DeleteAsync(int id, CancellationToken ct)
+    Task<int> CountAsync(CancellationToken ct)
+
+  Tests use IAssemblyFixture<DatabaseFixture> and receive DatabaseFixture via constructor injection.
+  Use Microsoft.Data.Sqlite and Dapper for queries.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CustomerRepositoryTests : IAssemblyFixture<DatabaseFixture>
+  {
+      private readonly CustomerRepository _repo;
+
+      public CustomerRepositoryTests(DatabaseFixture fixture)
+      {
+          _repo = new CustomerRepository(fixture.Connection);
+      }
+
+      [Fact]
+      public async Task Create_ReturnsPositiveId()
+      {
+          var id = await _repo.CreateAsync("Alice", "alice@example.com", CancellationToken.None);
+          id.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task Get_ReturnsCreatedCustomer()
+      {
+          var id = await _repo.CreateAsync("Bob", "bob@example.com", CancellationToken.None);
+          var customer = await _repo.GetAsync(id, CancellationToken.None);
+          customer.Should().NotBeNull();
+          customer!.Value.Name.Should().Be("Bob");
+      }
+
+      [Fact]
+      public async Task Get_UnknownId_ReturnsNull()
+      {
+          var result = await _repo.GetAsync(9999, CancellationToken.None);
+          result.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task Delete_RemovesCustomer()
+      {
+          var id = await _repo.CreateAsync("Carol", "carol@example.com", CancellationToken.None);
+          var result = await _repo.DeleteAsync(id, CancellationToken.None);
+          result.Should().BeTrue();
+          (await _repo.GetAsync(id, CancellationToken.None)).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task Delete_UnknownId_ReturnsFalse()
+      {
+          var result = await _repo.DeleteAsync(99999, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+  }

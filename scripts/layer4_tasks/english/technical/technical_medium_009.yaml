@@ -1,0 +1,23 @@
+name: technical_medium_009
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Overview' section for a REST API that manages user authentication.
+  Explain what the API does and why it is useful.
+  Keep it under 100 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "API"
+    - "authentication"
+    - "REST"
+    - "token"
+    - "endpoint"
+    - "users"
+    - "overview"
+  min_words: 12
+  max_words: 100

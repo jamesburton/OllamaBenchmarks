@@ -1,0 +1,20 @@
+name: rewriting_medium_067
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Split this compound sentence into two shorter sentences:
+  'Consumer confidence fell sharply in the third quarter yet the unemployment rate remained historically low.'
+  Write only the two rewritten sentences.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "confidence"
+    - "fell"
+    - "unemployment"
+    - "low"
+  min_words: 7
+  max_words: 30

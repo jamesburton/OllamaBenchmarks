@@ -1,0 +1,15 @@
+name: syllogisms_medium_018
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All triangles have three angles summing to 180 degrees.
+  2. An equilateral triangle has all equal angles.
+  3. Triangle T is equilateral.
+  What is each angle of Triangle T? Reply with only the number in degrees.
+expected_answer: "60"
+validator_config: {}

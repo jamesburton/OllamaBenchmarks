@@ -1,0 +1,51 @@
+name: medium_patterns_006
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Person with string FirstName, string LastName, int Age.
+  A class PersonBuilder implementing fluent builder:
+    PersonBuilder WithFirstName(string)
+    PersonBuilder WithLastName(string)
+    PersonBuilder WithAge(int)
+    Person Build() — throws InvalidOperationException if FirstName or LastName is empty/null
+  Return only valid C# code in a single file.
+test_code: |
+  public class PersonBuilderTests
+  {
+      [Fact]
+      public void Build_ValidPerson()
+      {
+          var p = new PersonBuilder().WithFirstName("Alice").WithLastName("Smith").WithAge(30).Build();
+          p.FirstName.Should().Be("Alice");
+          p.LastName.Should().Be("Smith");
+          p.Age.Should().Be(30);
+      }
+
+      [Fact]
+      public void Build_MissingFirstName_Throws()
+      {
+          Action act = () => new PersonBuilder().WithLastName("Smith").Build();
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Build_MissingLastName_Throws()
+      {
+          Action act = () => new PersonBuilder().WithFirstName("Bob").Build();
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Build_DefaultAge_Zero()
+      {
+          new PersonBuilder().WithFirstName("X").WithLastName("Y").Build().Age.Should().Be(0);
+      }
+  }

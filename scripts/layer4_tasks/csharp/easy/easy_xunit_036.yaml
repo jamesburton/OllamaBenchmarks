@@ -1,0 +1,32 @@
+name: easy_xunit_036
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class StringTransformer with static methods:
+    string ToSnakeCase(string input) converts "HelloWorld" or "helloWorld" to "hello_world"
+    string ToCamelCase(string input) converts "hello_world" to "helloWorld"
+  Return only valid C# code in a single file.
+test_code: |
+  public class StringTransformerTests
+  {
+      [Theory]
+      [InlineData("HelloWorld", "hello_world")]
+      [InlineData("helloWorld", "hello_world")]
+      public void ToSnakeCase_ConvertsCorrectly(string input, string expected)
+      {
+          StringTransformer.ToSnakeCase(input).Should().Be(expected);
+      }
+      [Fact]
+      public void ToCamelCase_ConvertsCorrectly()
+      {
+          StringTransformer.ToCamelCase("hello_world").Should().Be("helloWorld");
+      }
+  }

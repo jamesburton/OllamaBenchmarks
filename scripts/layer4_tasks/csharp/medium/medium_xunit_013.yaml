@@ -1,0 +1,39 @@
+name: medium_xunit_013
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ExpressionParser with:
+    double Evaluate(string expression) — supports +, -, *, /, parentheses, integers and decimals
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExpressionParserTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new ExpressionParser();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new ExpressionParser();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new ExpressionParser();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

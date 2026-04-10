@@ -1,0 +1,66 @@
+name: medium_vertical_007
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for applying discounts.
+  Include:
+    record ApplyDiscountCommand(decimal OriginalPrice, string CouponCode, string CustomerTier)
+    record ApplyDiscountResult(decimal OriginalPrice, decimal Discount, decimal FinalPrice, string AppliedRule)
+    class ApplyDiscountHandler with method:
+      ApplyDiscountResult Handle(ApplyDiscountCommand command)
+  Rules (applied in order, first match wins):
+    CouponCode "SAVE20" = 20% discount.
+    CouponCode "FLAT50" = $50 off (min 0).
+    CustomerTier "Gold" = 15% discount.
+    CustomerTier "Silver" = 10% discount.
+    Otherwise = no discount.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApplyDiscountHandlerTests
+  {
+      private readonly ApplyDiscountHandler _handler = new();
+
+      [Fact]
+      public void Handle_Save20Coupon_Applies20Percent()
+      {
+          var result = _handler.Handle(new ApplyDiscountCommand(100m, "SAVE20", "Regular"));
+          result.FinalPrice.Should().Be(80m);
+          result.Discount.Should().Be(20m);
+      }
+
+      [Fact]
+      public void Handle_Flat50Coupon_AppliesFlat50()
+      {
+          var result = _handler.Handle(new ApplyDiscountCommand(100m, "FLAT50", "Regular"));
+          result.FinalPrice.Should().Be(50m);
+      }
+
+      [Fact]
+      public void Handle_GoldTier_Applies15Percent()
+      {
+          var result = _handler.Handle(new ApplyDiscountCommand(100m, "", "Gold"));
+          result.FinalPrice.Should().Be(85m);
+      }
+
+      [Fact]
+      public void Handle_SilverTier_Applies10Percent()
+      {
+          var result = _handler.Handle(new ApplyDiscountCommand(200m, "", "Silver"));
+          result.FinalPrice.Should().Be(180m);
+      }
+
+      [Fact]
+      public void Handle_NoDiscount_ReturnsOriginalPrice()
+      {
+          var result = _handler.Handle(new ApplyDiscountCommand(100m, "", "Regular"));
+          result.FinalPrice.Should().Be(100m);
+          result.Discount.Should().Be(0m);
+      }
+  }

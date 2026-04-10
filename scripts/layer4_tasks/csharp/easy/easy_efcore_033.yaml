@@ -1,0 +1,39 @@
+name: easy_efcore_033
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Campaign with properties: int Id, string Name, bool IsActive, decimal Budget
+  A DbContext class CampaignContext with:
+    DbSet<Campaign> Campaigns { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class CampaignRepository with:
+    int DeactivateAll(CampaignContext context)
+  that sets IsActive = false for all active campaigns using ExecuteUpdate and returns count updated.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CampaignRepositoryTests
+  {
+      [Fact]
+      public void DeactivateAll_DeactivatesActiveCampaigns()
+      {
+          using var context = new CampaignContext();
+          context.Database.EnsureCreated();
+          context.Campaigns.AddRange(
+              new Campaign { Name = "A", IsActive = true, Budget = 1000m },
+              new Campaign { Name = "B", IsActive = true, Budget = 2000m },
+              new Campaign { Name = "C", IsActive = false, Budget = 500m });
+          context.SaveChanges();
+          var count = CampaignRepository.DeactivateAll(context);
+          count.Should().Be(2);
+          context.Campaigns.Count(c => c.IsActive).Should().Be(0);
+      }
+  }

@@ -1,0 +1,21 @@
+name: rewriting_medium_045
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'We wish to draw your attention to the fact that payment has not yet been received.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "haven't paid"
+    - "payment"
+    - "not received"
+    - "still waiting"
+    - "overdue"
+  min_words: 5
+  max_words: 20

@@ -1,0 +1,64 @@
+name: medium_linq_041
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record LibraryBook with: int Id, string Title, string Genre, bool IsAvailable, int BorrowCount.
+  A class LibraryCatalogue with a constructor accepting IEnumerable<LibraryBook> books.
+  Expose:
+    IEnumerable<LibraryBook> Available() — available books ordered by Title
+    IEnumerable<GenrePopularity> GenrePopularities()
+      — each genre with total borrows and available count, ordered by TotalBorrows desc
+    LibraryBook MostBorrowed() — book with highest BorrowCount; throws InvalidOperationException if empty
+  GenrePopularity is a record with: string Genre, int TotalBorrows, int AvailableCount.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LibraryCatalogueTests
+  {
+      private readonly LibraryBook[] _books = {
+          new(1,"Clean Code",    "Tech",    true,  150),
+          new(2,"DDIA",          "Tech",    false, 200),
+          new(3,"Sapiens",       "History", true,  300),
+          new(4,"Brief History", "Science", true,  80),
+          new(5,"Cosmos",        "Science", false, 120),
+      };
+
+      [Fact]
+      public void Available_ThreeBooks()
+      {
+          new LibraryCatalogue(_books).Available().Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void Available_OrderedByTitle()
+      {
+          var result = new LibraryCatalogue(_books).Available().ToList();
+          result.Select(b => b.Title).Should().BeInAscendingOrder();
+      }
+
+      [Fact]
+      public void MostBorrowed_IsSapiens()
+      {
+          new LibraryCatalogue(_books).MostBorrowed().Title.Should().Be("Sapiens");
+      }
+
+      [Fact]
+      public void MostBorrowed_Empty_Throws()
+      {
+          Action act = () => new LibraryCatalogue(Array.Empty<LibraryBook>()).MostBorrowed();
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void GenrePopularities_TechFirst()
+      {
+          new LibraryCatalogue(_books).GenrePopularities().First().Genre.Should().Be("Tech");
+      }
+  }

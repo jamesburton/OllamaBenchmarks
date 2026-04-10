@@ -1,0 +1,36 @@
+name: easy_patterns_034
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Pair<T>(T First, T Second)
+  and a static class PairHelper with:
+    Pair<T> Swap<T>(Pair<T> pair)
+  that returns a new Pair with First and Second swapped.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PairHelperTests
+  {
+      [Fact]
+      public void Swap_IntsSwapped()
+      {
+          var result = PairHelper.Swap(new Pair<int>(1, 2));
+          result.First.Should().Be(2);
+          result.Second.Should().Be(1);
+      }
+      [Fact]
+      public void Swap_StringsSwapped()
+      {
+          var result = PairHelper.Swap(new Pair<string>("hello", "world"));
+          result.First.Should().Be("world");
+          result.Second.Should().Be("hello");
+      }
+  }

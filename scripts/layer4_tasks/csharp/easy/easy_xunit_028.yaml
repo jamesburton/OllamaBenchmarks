@@ -1,0 +1,35 @@
+name: easy_xunit_028
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ListExtensions with extension methods:
+    List<T> Shuffle<T>(this List<T> list) returns a new list with elements in random order using Fisher-Yates
+    T RandomElement<T>(this List<T> list) throws InvalidOperationException if list is empty, returns a random element
+  Return only valid C# code in a single file.
+test_code: |
+  public class ListExtensionsTests
+  {
+      [Fact]
+      public void Shuffle_ReturnsSameElements()
+      {
+          var list = new List<int> { 1, 2, 3, 4, 5 };
+          var shuffled = list.Shuffle();
+          shuffled.Should().BeEquivalentTo(list);
+          shuffled.Should().HaveCount(5);
+      }
+      [Fact]
+      public void RandomElement_EmptyList_ThrowsInvalidOperationException()
+      {
+          var empty = new List<int>();
+          var act = () => empty.RandomElement();
+          act.Should().Throw<InvalidOperationException>();
+      }
+  }

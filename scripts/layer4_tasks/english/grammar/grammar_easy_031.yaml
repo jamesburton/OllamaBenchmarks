@@ -1,0 +1,15 @@
+name: grammar_easy_031
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) She likes hiking, swimming, and to run.
+  B) She likes hiking, swimming, and running.
+  C) She likes to hike, swimming, and running.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

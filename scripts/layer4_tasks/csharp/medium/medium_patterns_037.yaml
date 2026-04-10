@@ -1,0 +1,50 @@
+name: medium_patterns_037
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class WeakCache<TKey, TValue> where TKey : notnull and TValue : class.
+  Uses WeakReference<TValue> so entries may be garbage collected.
+  Expose: void Set(TKey key, TValue value), bool TryGet(TKey key, out TValue? value), void Compact(), int Count.
+  Return only valid C# code in a single file.
+test_code: |
+  public class WeakCacheTests
+  {
+      [Fact]
+      public void Set_TryGet_ReturnsValue()
+      {
+          var cache = new WeakCache<string,object>();
+          var obj = new object();
+          cache.Set("key", obj);
+          cache.TryGet("key", out var r).Should().BeTrue();
+          r.Should().BeSameAs(obj);
+      }
+
+      [Fact]
+      public void TryGet_Missing_False() { new WeakCache<string,object>().TryGet("x", out _).Should().BeFalse(); }
+
+      [Fact]
+      public void Count_Reflects()
+      {
+          var cache = new WeakCache<int,object>();
+          cache.Set(1, new object()); cache.Set(2, new object());
+          cache.Count.Should().Be(2);
+      }
+
+      [Fact]
+      public void Compact_RemovesCollected()
+      {
+          var cache = new WeakCache<int,object>();
+          cache.Set(1, new object());
+          GC.Collect(); GC.WaitForPendingFinalizers();
+          cache.Compact();
+          cache.Count.Should().BeLessThanOrEqualTo(1);
+      }
+  }

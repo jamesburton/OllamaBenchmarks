@@ -1,0 +1,18 @@
+name: summarisation_hard_055
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The commodification of sport through private equity investment and media rights mega-deals has transformed club governance, prioritising financial returns over community identity and sporting tradition. The failed European Super League proposal crystallised tensions between a globalised revenue model and the principles of sporting merit embedded in pyramid structures. Regulatory responses from UEFA and national leagues attempt to balance commercial viability with competitive integrity.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Super League"
+    - "private equity"
+    - "governance"
+    - "competition"
+  max_words: 25

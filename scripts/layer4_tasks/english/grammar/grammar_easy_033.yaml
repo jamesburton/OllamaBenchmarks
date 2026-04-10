@@ -1,0 +1,15 @@
+name: grammar_easy_033
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) He wants to travel, to learn, and meeting new people.
+  B) He wants to travel, to learn, and to meet new people.
+  C) He wants traveling, learning, and to meet new people.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

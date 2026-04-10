@@ -1,0 +1,14 @@
+name: word_problems_medium_008
+category: maths
+subcategory: word_problems
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  Worker A can build a wall in 8 days and Worker B in 12 days. How many days does it take them to build the wall together?
+  Reply with only the number.
+expected_answer: "4.8"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

@@ -1,0 +1,94 @@
+name: hard_efcore_006
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core ExecuteUpdate and ExecuteDelete bulk operations:
+  Entity: BlogPost(int Id, string Title, string Author, string Status, int ViewCount,
+    DateTime PublishedAt, DateTime? ArchivedAt).
+  DbContext: BlogDbContext.
+  Class BlogBulkOperations(BlogDbContext db):
+    Task<int> ArchiveOldPostsAsync(DateTime olderThan, CancellationToken ct) —
+      uses ExecuteUpdateAsync to set Status="Archived" and ArchivedAt=now for posts older than date.
+    Task<int> DeleteArchivedAsync(CancellationToken ct) — uses ExecuteDeleteAsync for archived posts.
+    Task<int> IncrementViewsAsync(string author, CancellationToken ct) — increments ViewCount by 1 for all posts by author.
+    Task<int> PublishDraftsAsync(IEnumerable<int> ids, CancellationToken ct) — sets Status="Published" for given IDs.
+  Use SQLite in-memory. Seed test data.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BlogBulkOperationsTests : IDisposable
+  {
+      private readonly BlogDbContext _db;
+      private readonly BlogBulkOperations _ops;
+
+      public BlogBulkOperationsTests()
+      {
+          var opts = new DbContextOptionsBuilder<BlogDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new BlogDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData();
+          _ops = new BlogBulkOperations(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          _db.BlogPosts.AddRange(
+              new BlogPost { Title = "Old Post",    Author = "Alice", Status = "Published", ViewCount = 10, PublishedAt = DateTime.UtcNow.AddYears(-2) },
+              new BlogPost { Title = "Recent Post", Author = "Alice", Status = "Published", ViewCount = 5,  PublishedAt = DateTime.UtcNow.AddDays(-10) },
+              new BlogPost { Title = "Bob's Post",  Author = "Bob",   Status = "Published", ViewCount = 0,  PublishedAt = DateTime.UtcNow.AddYears(-1) },
+              new BlogPost { Title = "Draft",       Author = "Carol", Status = "Draft",     ViewCount = 0,  PublishedAt = DateTime.UtcNow.AddDays(-1) }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task ArchiveOldPosts_UpdatesStatus()
+      {
+          var count = await _ops.ArchiveOldPostsAsync(DateTime.UtcNow.AddMonths(-6), CancellationToken.None);
+          count.Should().BeGreaterThan(0);
+          _db.BlogPosts.Count(p => p.Status == "Archived").Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task DeleteArchived_RemovesArchivedPosts()
+      {
+          await _ops.ArchiveOldPostsAsync(DateTime.UtcNow.AddMonths(-6), CancellationToken.None);
+          int archivedCount = _db.BlogPosts.Count(p => p.Status == "Archived");
+          var deleted = await _ops.DeleteArchivedAsync(CancellationToken.None);
+          deleted.Should().Be(archivedCount);
+          _db.BlogPosts.Count(p => p.Status == "Archived").Should().Be(0);
+      }
+
+      [Fact]
+      public async Task IncrementViews_UpdatesCorrectAuthor()
+      {
+          await _ops.IncrementViewsAsync("Alice", CancellationToken.None);
+          var alicePosts = _db.BlogPosts.Where(p => p.Author == "Alice").ToList();
+          alicePosts.Should().AllSatisfy(p => p.ViewCount.Should().BeGreaterThan(0));
+      }
+
+      [Fact]
+      public async Task PublishDrafts_UpdatesStatus()
+      {
+          var draft = _db.BlogPosts.First(p => p.Status == "Draft");
+          await _ops.PublishDraftsAsync(new[] { draft.Id }, CancellationToken.None);
+          _db.Entry(draft).Reload();
+          draft.Status.Should().Be("Published");
+      }
+
+      [Fact]
+      public async Task DeleteArchived_NoArchived_ReturnsZero()
+      {
+          var deleted = await _ops.DeleteArchivedAsync(CancellationToken.None);
+          deleted.Should().Be(0);
+      }
+  }

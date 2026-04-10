@@ -1,0 +1,96 @@
+name: hard_vertical_022
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + value objects + CQRS for e-commerce cart:
+  Value objects:
+    Address(string Street, string City, string PostalCode, string Country): validate in constructor.
+    Money(decimal Amount, string Currency): Amount >= 0, Currency is 3 chars uppercase.
+
+  Entities:
+    Cart(int Id, string SessionId, List<CartItem> Items, Address? ShippingAddress, DateTime CreatedAt, DateTime UpdatedAt)
+    CartItem(int Id, int CartId, string ProductId, string ProductName, Money UnitPrice, int Quantity)
+  DbContext: CartDbContext (SQLite in-memory, Money as owned entity, Address as owned entity).
+
+  Records:
+    AddToCartCommand(string SessionId, string ProductId, string ProductName, decimal Price, string Currency, int Quantity)
+    SetShippingAddressCommand(string SessionId, string Street, string City, string PostalCode, string Country)
+    CartSummaryDto(string SessionId, int ItemCount, decimal SubtotalAmount, string Currency, bool HasShippingAddress)
+
+  Class CartService(CartDbContext db):
+    Task<CartSummaryDto> AddItemAsync(AddToCartCommand cmd, CancellationToken ct): creates cart if not exists.
+    Task SetShippingAddressAsync(SetShippingAddressCommand cmd, CancellationToken ct)
+    Task<CartSummaryDto?> GetSummaryAsync(string sessionId, CancellationToken ct)
+    Task<bool> RemoveItemAsync(string sessionId, string productId, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class CartServiceTests : IDisposable
+  {
+      private readonly CartDbContext _db;
+      private readonly CartService _svc;
+
+      public CartServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<CartDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new CartDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new CartService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task AddItem_CreatesCartAndItem()
+      {
+          var cmd = new AddToCartCommand("sess-1", "prod-1", "Widget", 9.99m, "USD", 2);
+          var summary = await _svc.AddItemAsync(cmd, CancellationToken.None);
+          summary.SessionId.Should().Be("sess-1");
+          summary.ItemCount.Should().Be(2);
+          summary.SubtotalAmount.Should().Be(19.98m);
+      }
+
+      [Fact]
+      public async Task AddItem_ExistingCart_AddsToExisting()
+      {
+          await _svc.AddItemAsync(new AddToCartCommand("sess-2", "p1", "A", 10m, "USD", 1), CancellationToken.None);
+          await _svc.AddItemAsync(new AddToCartCommand("sess-2", "p2", "B", 20m, "USD", 1), CancellationToken.None);
+          var summary = await _svc.GetSummaryAsync("sess-2", CancellationToken.None);
+          summary!.ItemCount.Should().Be(2);
+          summary.SubtotalAmount.Should().Be(30m);
+      }
+
+      [Fact]
+      public async Task SetShippingAddress_UpdatesCart()
+      {
+          await _svc.AddItemAsync(new AddToCartCommand("sess-3", "p1", "X", 5m, "USD", 1), CancellationToken.None);
+          await _svc.SetShippingAddressAsync(new SetShippingAddressCommand("sess-3", "123 St", "NYC", "10001", "US"), CancellationToken.None);
+          var summary = await _svc.GetSummaryAsync("sess-3", CancellationToken.None);
+          summary!.HasShippingAddress.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task RemoveItem_DecreasesCount()
+      {
+          await _svc.AddItemAsync(new AddToCartCommand("sess-4", "p1", "A", 10m, "USD", 1), CancellationToken.None);
+          await _svc.AddItemAsync(new AddToCartCommand("sess-4", "p2", "B", 20m, "USD", 1), CancellationToken.None);
+          var result = await _svc.RemoveItemAsync("sess-4", "p1", CancellationToken.None);
+          result.Should().BeTrue();
+          var summary = await _svc.GetSummaryAsync("sess-4", CancellationToken.None);
+          summary!.ItemCount.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task GetSummary_NonexistentSession_ReturnsNull()
+      {
+          var result = await _svc.GetSummaryAsync("nonexistent-session", CancellationToken.None);
+          result.Should().BeNull();
+      }
+  }

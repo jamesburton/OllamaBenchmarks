@@ -1,0 +1,52 @@
+name: medium_aspnet_015
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record CategoryDto(int Id, string Name, int ProductCount).
+  An interface ICategoryService with:
+    Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
+    Task<CategoryDto?> GetCategoryAsync(int id)
+  A class CategoriesController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts ICategoryService.
+  Actions: GET all categories, GET by id (404 if null).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CategoriesControllerTests
+  {
+      [Fact]
+      public async Task GetAll_ReturnsCategories()
+      {
+          var svc = Substitute.For<ICategoryService>();
+          svc.GetCategoriesAsync().Returns(new[] { new CategoryDto(1, "Electronics", 10) }.AsEnumerable());
+          var ctrl = new CategoriesController(svc);
+          var result = await ctrl.GetAll() as OkObjectResult;
+          (result!.Value as IEnumerable<CategoryDto>).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task GetById_Found()
+      {
+          var svc = Substitute.For<ICategoryService>();
+          svc.GetCategoryAsync(1).Returns(new CategoryDto(1, "Books", 5));
+          var ctrl = new CategoriesController(svc);
+          var result = await ctrl.GetById(1) as OkObjectResult;
+          (result!.Value as CategoryDto)!.Name.Should().Be("Books");
+      }
+
+      [Fact]
+      public async Task GetById_NotFound_Returns404()
+      {
+          var svc = Substitute.For<ICategoryService>();
+          svc.GetCategoryAsync(99).Returns((CategoryDto?)null);
+          var ctrl = new CategoriesController(svc);
+          (await ctrl.GetById(99)).Should().BeOfType<NotFoundResult>();
+      }
+  }

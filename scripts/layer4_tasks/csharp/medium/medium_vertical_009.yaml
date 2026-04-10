@@ -1,0 +1,63 @@
+name: medium_vertical_009
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for generating invoices.
+  Include:
+    record InvoiceLineItem(string Description, int Quantity, decimal UnitPrice)
+    record GenerateInvoiceCommand(string ClientId, IEnumerable<InvoiceLineItem> LineItems, decimal TaxRate)
+    record GenerateInvoiceResult(Guid InvoiceId, decimal Subtotal, decimal Tax, decimal Total, DateTime IssuedAt)
+    class GenerateInvoiceHandler with method:
+      GenerateInvoiceResult Handle(GenerateInvoiceCommand command)
+    Validates: ClientId not empty, LineItems not empty, TaxRate >= 0.
+    Subtotal = sum of Quantity * UnitPrice. Tax = Subtotal * TaxRate. Total = Subtotal + Tax.
+  Return only valid C# code in a single file.
+test_code: |
+  public class GenerateInvoiceHandlerTests
+  {
+      private readonly GenerateInvoiceHandler _handler = new();
+
+      [Fact]
+      public void Handle_ValidCommand_CalculatesCorrectly()
+      {
+          var cmd = new GenerateInvoiceCommand("client1", new[]
+          {
+              new InvoiceLineItem("Service A", 2, 50m),
+              new InvoiceLineItem("Service B", 1, 30m)
+          }, 0.2m);
+          var result = _handler.Handle(cmd);
+          result.Subtotal.Should().Be(130m);
+          result.Tax.Should().BeApproximately(26m, 0.01m);
+          result.Total.Should().BeApproximately(156m, 0.01m);
+      }
+
+      [Fact]
+      public void Handle_EmptyClientId_Throws()
+      {
+          var cmd = new GenerateInvoiceCommand("", new[] { new InvoiceLineItem("X", 1, 10m) }, 0.1m);
+          _handler.Invoking(h => h.Handle(cmd)).Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Handle_EmptyLineItems_Throws()
+      {
+          var cmd = new GenerateInvoiceCommand("c1", Array.Empty<InvoiceLineItem>(), 0.1m);
+          _handler.Invoking(h => h.Handle(cmd)).Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Handle_GeneratesUniqueInvoiceId()
+      {
+          var cmd = new GenerateInvoiceCommand("c1", new[] { new InvoiceLineItem("X", 1, 10m) }, 0m);
+          var r1 = _handler.Handle(cmd);
+          var r2 = _handler.Handle(cmd);
+          r1.InvoiceId.Should().NotBe(r2.InvoiceId);
+      }
+  }

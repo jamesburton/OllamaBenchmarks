@@ -1,0 +1,30 @@
+name: easy_linq_009
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Counter with a static method:
+    int CountLongerThan(IEnumerable<string> items, int length)
+  that returns the count of strings whose length is greater than the given length using LINQ Count.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CounterTests
+  {
+      [Fact]
+      public void CountLongerThan_BasicCase()
+      {
+          Counter.CountLongerThan(new[]{"hi","hello","yo","world"}, 3).Should().Be(2);
+      }
+      [Fact]
+      public void CountLongerThan_NoneMatch_ReturnsZero()
+      {
+          Counter.CountLongerThan(new[]{"a","b"}, 5).Should().Be(0);
+      }
+  }

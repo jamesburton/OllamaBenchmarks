@@ -1,0 +1,33 @@
+name: easy_async_029
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncString with a static method:
+    async Task<string> ConcatAsync(IEnumerable<Task<string>> tasks)
+  that awaits all tasks and concatenates the results in order.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncStringTests
+  {
+      [Fact]
+      public async Task ConcatAsync_BasicCase()
+      {
+          var tasks = new[]{Task.FromResult("Hello"), Task.FromResult(", "), Task.FromResult("World")};
+          var result = await AsyncString.ConcatAsync(tasks);
+          result.Should().Be("Hello, World");
+      }
+      [Fact]
+      public async Task ConcatAsync_EmptyTasks_ReturnsEmpty()
+      {
+          var result = await AsyncString.ConcatAsync(Array.Empty<Task<string>>());
+          result.Should().Be("");
+      }
+  }

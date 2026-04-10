@@ -1,0 +1,21 @@
+name: rewriting_easy_105
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'We are of the opinion that the proposal is not viable.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "think"
+    - "believe"
+    - "proposal"
+    - "viable"
+    - "not"
+  min_words: 4
+  max_words: 12

@@ -1,0 +1,18 @@
+name: summarisation_hard_040
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Neuroplasticity research has overturned the long-held belief that adult brains are structurally fixed. Studies using longitudinal neuroimaging demonstrate that targeted cognitive training can induce measurable changes in grey matter density and white matter connectivity. However, the degree to which laboratory-induced plasticity transfers to real-world functional outcomes remains contentious.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "neuroplasticity"
+    - "brain"
+    - "cognitive"
+    - "plasticity"
+  max_words: 25

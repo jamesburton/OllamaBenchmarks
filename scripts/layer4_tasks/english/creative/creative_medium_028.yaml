@@ -1,0 +1,22 @@
+name: creative_medium_028
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a soldier returning home after a long deployment.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "soldier"
+    - "home"
+    - "returning"
+    - "weary"
+    - "relief"
+    - "family"
+    - "long"
+    - "streets"
+  min_words: 15
+  max_words: 60

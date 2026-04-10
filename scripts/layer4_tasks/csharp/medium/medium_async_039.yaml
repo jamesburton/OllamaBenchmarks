@@ -1,0 +1,57 @@
+name: medium_async_039
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IBackgroundTask with Task StartAsync(CancellationToken ct) and Task StopAsync(CancellationToken ct).
+  A class BackgroundTaskRunner with constructor accepting IEnumerable<IBackgroundTask> tasks.
+  Exposes Task StartAllAsync(CancellationToken ct = default), Task StopAllAsync(CancellationToken ct = default), int RunningCount.
+  Starts/stops all tasks in parallel. RunningCount reflects started tasks.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BackgroundTaskRunnerTests
+  {
+      [Fact]
+      public async Task StartAllAsync_StartsAll()
+      {
+          var t1 = Substitute.For<IBackgroundTask>();
+          t1.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var t2 = Substitute.For<IBackgroundTask>();
+          t2.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          await new BackgroundTaskRunner(new[]{t1,t2}).StartAllAsync();
+          await t1.Received(1).StartAsync(Arg.Any<CancellationToken>());
+          await t2.Received(1).StartAsync(Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task StopAllAsync_StopsAll()
+      {
+          var t1 = Substitute.For<IBackgroundTask>();
+          t1.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          t1.StopAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var r = new BackgroundTaskRunner(new[]{t1});
+          await r.StartAllAsync();
+          await r.StopAllAsync();
+          await t1.Received(1).StopAsync(Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task RunningCount_Equals3()
+      {
+          var tasks = Enumerable.Range(0, 3).Select(_ => {
+              var t = Substitute.For<IBackgroundTask>();
+              t.StartAsync(Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+              return t;
+          }).ToArray();
+          var r = new BackgroundTaskRunner(tasks);
+          await r.StartAllAsync();
+          r.RunningCount.Should().Be(3);
+      }
+  }

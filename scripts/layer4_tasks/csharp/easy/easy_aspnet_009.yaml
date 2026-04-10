@@ -1,0 +1,45 @@
+name: easy_aspnet_009
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class SearchOptions with:
+    [StringLength(100)] string? Query { get; set; }
+    [Range(1, 100)] int PageSize { get; set; } = 10
+    [Range(1, int.MaxValue)] int Page { get; set; } = 1
+  Return only valid C# code in a single file.
+test_code: |
+  public class SearchOptionsTests
+  {
+      private static IList<ValidationResult> Validate(object obj)
+      {
+          var results = new List<ValidationResult>();
+          Validator.TryValidateObject(obj, new ValidationContext(obj), results, true);
+          return results;
+      }
+      [Fact]
+      public void DefaultValues_PassValidation()
+      {
+          var opts = new SearchOptions();
+          Validate(opts).Should().BeEmpty();
+      }
+      [Fact]
+      public void PageSizeZero_FailsValidation()
+      {
+          var opts = new SearchOptions { PageSize = 0 };
+          Validate(opts).Should().NotBeEmpty();
+      }
+      [Fact]
+      public void PageSizeOverMax_FailsValidation()
+      {
+          var opts = new SearchOptions { PageSize = 101 };
+          Validate(opts).Should().NotBeEmpty();
+      }
+  }

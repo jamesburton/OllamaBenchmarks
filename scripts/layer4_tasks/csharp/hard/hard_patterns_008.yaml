@@ -1,0 +1,90 @@
+name: hard_patterns_008
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A specification pattern for filtering domain objects:
+  Abstract class Specification<T> with:
+    abstract bool IsSatisfiedBy(T candidate)
+    Specification<T> And(Specification<T> other) — returns AndSpecification
+    Specification<T> Or(Specification<T> other) — returns OrSpecification
+    Specification<T> Not() — returns NotSpecification
+  Implementations for Product(int Id, string Category, decimal Price, bool InStock):
+    InCategorySpec(string category)
+    PriceRangeSpec(decimal min, decimal max)
+    InStockSpec()
+  Class ProductCatalogue with constructor accepting IEnumerable<Product>:
+    IEnumerable<Product> Filter(Specification<Product> spec)
+    int Count(Specification<Product> spec)
+  Return only valid C# code in a single file.
+test_code: |
+  public class SpecificationTests
+  {
+      private static readonly List<Product> Products = new()
+      {
+          new(1, "Books",       12.00m, true),
+          new(2, "Books",       45.00m, false),
+          new(3, "Electronics", 99.00m, true),
+          new(4, "Electronics",500.00m, true),
+          new(5, "Clothing",    25.00m, false),
+      };
+      private readonly ProductCatalogue _cat = new(Products);
+
+      [Fact]
+      public void InCategorySpec_FiltersByCategory()
+      {
+          var result = _cat.Filter(new InCategorySpec("Books")).ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void PriceRangeSpec_FiltersInRange()
+      {
+          var result = _cat.Filter(new PriceRangeSpec(10m, 100m)).ToList();
+          result.Should().Contain(p => p.Id == 3);
+          result.Should().NotContain(p => p.Id == 4);
+      }
+
+      [Fact]
+      public void AndSpec_CombinesCategoryAndPrice()
+      {
+          var spec = new InCategorySpec("Books").And(new PriceRangeSpec(0m, 20m));
+          _cat.Count(spec).Should().Be(1);
+      }
+
+      [Fact]
+      public void OrSpec_EitherCondition()
+      {
+          var spec = new InCategorySpec("Clothing").Or(new InCategorySpec("Books"));
+          _cat.Count(spec).Should().Be(3);
+      }
+
+      [Fact]
+      public void NotSpec_ExcludesCategory()
+      {
+          var spec = new InCategorySpec("Books").Not();
+          var result = _cat.Filter(spec).ToList();
+          result.Should().NotContain(p => p.Category == "Books");
+      }
+
+      [Fact]
+      public void InStockSpec_FiltersInStockOnly()
+      {
+          var result = _cat.Filter(new InStockSpec()).ToList();
+          result.Should().AllSatisfy(p => p.InStock.Should().BeTrue());
+      }
+
+      [Fact]
+      public void ComplexSpec_InStockBooksCheapThan15()
+      {
+          var spec = new InCategorySpec("Books").And(new PriceRangeSpec(0m, 15m)).And(new InStockSpec());
+          _cat.Count(spec).Should().Be(1);
+      }
+  }

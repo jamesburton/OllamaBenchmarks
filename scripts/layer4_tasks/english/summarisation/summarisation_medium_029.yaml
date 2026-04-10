@@ -1,0 +1,18 @@
+name: summarisation_medium_029
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The human gut microbiome plays a crucial role in immune function, mental health, and metabolic processes. Research suggests that the diversity of gut bacteria is linked to reduced rates of obesity, depression, and autoimmune disease. Diet, particularly the consumption of fermented foods and fibre, strongly influences microbiome composition.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "microbiome"
+    - "gut"
+    - "immune"
+    - "bacteria"
+  max_words: 25

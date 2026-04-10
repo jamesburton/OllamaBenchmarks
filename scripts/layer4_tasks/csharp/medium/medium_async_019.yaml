@@ -1,0 +1,61 @@
+name: medium_async_019
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface ISearchProvider with method:
+    Task<IReadOnlyList<string>> SearchAsync(string query, CancellationToken ct = default)
+  A class FederatedSearch with constructor accepting IEnumerable<ISearchProvider> providers.
+  Expose:
+    Task<IReadOnlyList<string>> SearchAsync(string query, CancellationToken ct = default)
+  Queries all providers in parallel, merges results, deduplicates preserving order of first appearance,
+  and returns a list ordered as received.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FederatedSearchTests
+  {
+      [Fact]
+      public async Task SearchAsync_MergesResults()
+      {
+          var p1 = Substitute.For<ISearchProvider>();
+          p1.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<IReadOnlyList<string>>(new[]{"a","b"}));
+          var p2 = Substitute.For<ISearchProvider>();
+          p2.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<IReadOnlyList<string>>(new[]{"c","d"}));
+          var result = await new FederatedSearch(new[]{p1,p2}).SearchAsync("test");
+          result.Should().Contain("a").And.Contain("c");
+      }
+
+      [Fact]
+      public async Task SearchAsync_DeduplicatesResults()
+      {
+          var p1 = Substitute.For<ISearchProvider>();
+          p1.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<IReadOnlyList<string>>(new[]{"a","b"}));
+          var p2 = Substitute.For<ISearchProvider>();
+          p2.SearchAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult<IReadOnlyList<string>>(new[]{"b","c"}));
+          var result = await new FederatedSearch(new[]{p1,p2}).SearchAsync("test");
+          result.Where(r => r == "b").Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task SearchAsync_NoProviders_ReturnsEmpty()
+      {
+          var result = await new FederatedSearch(Array.Empty<ISearchProvider>()).SearchAsync("test");
+          result.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task SearchAsync_QueriesAllProviders()
+      {
+          var p = Substitute.For<ISearchProvider>();
+          p.SearchAsync("q", Arg.Any<CancellationToken>()).Returns(Task.FromResult<IReadOnlyList<string>>(new[]{"x"}));
+          await new FederatedSearch(new[]{p,p}).SearchAsync("q");
+          await p.Received(2).SearchAsync("q", Arg.Any<CancellationToken>());
+      }
+  }

@@ -1,0 +1,98 @@
+name: hard_aspnet_024
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A streaming response endpoint using IAsyncEnumerable:
+  Record: DataPoint(int Index, double Value, DateTime Timestamp).
+  Interface IDataStreamService:
+    IAsyncEnumerable<DataPoint> StreamAsync(int count, TimeSpan interval, CancellationToken ct)
+  Class SimulatedDataStreamService : IDataStreamService — generates random data points.
+  Static class StreamEndpoints with MapStreamEndpoints(this WebApplication app):
+    GET /stream?count=100&intervalMs=10 — streams DataPoints as newline-delimited JSON (NDJSON).
+      Validates: count 1-10000, intervalMs 0-5000. Returns 400 on validation failure.
+    GET /stream/batch?count=50 — returns all points as a JSON array (collected from async stream).
+  Static class DataPointStatistics:
+    (double Min, double Max, double Avg, double StdDev) Compute(IReadOnlyList<DataPoint> points)
+    Throws ArgumentException if points is empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class StreamEndpointsTests
+  {
+      private static WebApplication BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddSingleton<IDataStreamService, SimulatedDataStreamService>();
+          var app = builder.Build();
+          app.MapStreamEndpoints();
+          return app;
+      }
+
+      [Fact]
+      public async Task StreamEndpoint_Returns200()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/stream?count=5&intervalMs=0");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+
+      [Fact]
+      public async Task StreamEndpoint_InvalidCount_Returns400()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/stream?count=0&intervalMs=0");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+      }
+
+      [Fact]
+      public async Task BatchEndpoint_ReturnsCorrectCount()
+      {
+          await using var app = BuildApp();
+          var items = await (await app.GetTestClient().GetAsync("/stream/batch?count=10"))
+              .Content.ReadFromJsonAsync<IReadOnlyList<DataPoint>>();
+          items.Should().HaveCount(10);
+      }
+
+      [Fact]
+      public async Task BatchEndpoint_DataPointsHaveIndexes()
+      {
+          await using var app = BuildApp();
+          var items = await (await app.GetTestClient().GetAsync("/stream/batch?count=5"))
+              .Content.ReadFromJsonAsync<IReadOnlyList<DataPoint>>();
+          items!.Select(p => p.Index).Should().BeInAscendingOrder();
+      }
+
+      [Fact]
+      public void Statistics_ComputesCorrectly()
+      {
+          var points = new[] { new DataPoint(0, 1.0, DateTime.UtcNow), new DataPoint(1, 3.0, DateTime.UtcNow) };
+          var (min, max, avg, _) = DataPointStatistics.Compute(points);
+          min.Should().Be(1.0);
+          max.Should().Be(3.0);
+          avg.Should().Be(2.0);
+      }
+
+      [Fact]
+      public void Statistics_EmptyInput_ThrowsArgumentException()
+      {
+          var act = () => DataPointStatistics.Compute(Array.Empty<DataPoint>());
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task StreamService_GeneratesRequestedCount()
+      {
+          var svc = new SimulatedDataStreamService();
+          var results = new List<DataPoint>();
+          await foreach (var p in svc.StreamAsync(7, TimeSpan.Zero, CancellationToken.None))
+              results.Add(p);
+          results.Should().HaveCount(7);
+      }
+  }

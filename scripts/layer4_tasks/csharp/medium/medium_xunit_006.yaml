@@ -1,0 +1,63 @@
+name: medium_xunit_006
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Matrix with:
+    int[,] Data { get; }
+    int Rows { get; }
+    int Columns { get; }
+    Constructor accepting int[,] data.
+    Matrix Add(Matrix other) — throws if dimensions don't match.
+    Matrix Multiply(Matrix other) — throws if incompatible dimensions.
+    Matrix Transpose()
+  Return only valid C# code in a single file.
+test_code: |
+  public class MatrixTests
+  {
+      [Fact]
+      public void Add_SameDimensions_AddsCorrectly()
+      {
+          var a = new Matrix(new int[,] { { 1, 2 }, { 3, 4 } });
+          var b = new Matrix(new int[,] { { 5, 6 }, { 7, 8 } });
+          var result = a.Add(b);
+          result.Data[0, 0].Should().Be(6);
+          result.Data[1, 1].Should().Be(12);
+      }
+
+      [Fact]
+      public void Add_DifferentDimensions_Throws()
+      {
+          var a = new Matrix(new int[,] { { 1, 2 } });
+          var b = new Matrix(new int[,] { { 1 }, { 2 } });
+          a.Invoking(m => m.Add(b)).Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Multiply_CompatibleDimensions_MultipliesCorrectly()
+      {
+          var a = new Matrix(new int[,] { { 1, 2 }, { 3, 4 } });
+          var b = new Matrix(new int[,] { { 1, 0 }, { 0, 1 } });
+          var result = a.Multiply(b);
+          result.Data[0, 0].Should().Be(1);
+          result.Data[1, 1].Should().Be(4);
+      }
+
+      [Fact]
+      public void Transpose_SwapsRowsAndColumns()
+      {
+          var a = new Matrix(new int[,] { { 1, 2, 3 }, { 4, 5, 6 } });
+          var t = a.Transpose();
+          t.Rows.Should().Be(3);
+          t.Columns.Should().Be(2);
+          t.Data[0, 0].Should().Be(1);
+          t.Data[2, 0].Should().Be(3);
+      }
+  }

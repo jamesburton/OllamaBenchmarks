@@ -1,0 +1,62 @@
+name: medium_aspnet_009
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record PaginatedResult<T>(IEnumerable<T> Items, int TotalCount, int Page, int PageSize).
+  An extension method on IQueryable<T>:
+    PaginatedResult<T> ToPaginated<T>(int page, int pageSize)
+  A class ItemsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Action: GET api/items?page=1&pageSize=10 — returns PaginatedResult from a hardcoded list of 25 items.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ItemsControllerTests
+  {
+      [Fact]
+      public void GetItems_DefaultPaging()
+      {
+          var ctrl = new ItemsController();
+          var result = ctrl.GetItems(1, 10) as OkObjectResult;
+          var paged = result!.Value as PaginatedResult<string>;
+          paged!.Items.Count().Should().Be(10);
+          paged.TotalCount.Should().Be(25);
+          paged.Page.Should().Be(1);
+      }
+
+      [Fact]
+      public void GetItems_SecondPage()
+      {
+          var ctrl = new ItemsController();
+          var result = ctrl.GetItems(2, 10) as OkObjectResult;
+          var paged = result!.Value as PaginatedResult<string>;
+          paged!.Items.Count().Should().Be(10);
+          paged.Page.Should().Be(2);
+      }
+
+      [Fact]
+      public void GetItems_LastPage_PartialItems()
+      {
+          var ctrl = new ItemsController();
+          var result = ctrl.GetItems(3, 10) as OkObjectResult;
+          var paged = result!.Value as PaginatedResult<string>;
+          paged!.Items.Count().Should().Be(5);
+      }
+
+      [Fact]
+      public void ToPaginated_ExtensionCorrect()
+      {
+          var data = Enumerable.Range(1, 20).AsQueryable();
+          var result = data.ToPaginated(2, 5);
+          result.Items.Should().HaveCount(5);
+          result.TotalCount.Should().Be(20);
+          result.Page.Should().Be(2);
+          result.PageSize.Should().Be(5);
+      }
+  }

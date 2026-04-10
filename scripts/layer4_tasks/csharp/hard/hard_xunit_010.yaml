@@ -1,0 +1,90 @@
+name: hard_xunit_010
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit snapshot/golden file testing pattern:
+  Records:
+    SnapshotOptions(string SnapshotDirectory, bool UpdateSnapshots)
+    SnapshotMismatch(string SnapshotName, string Expected, string Actual)
+
+  Class SnapshotTester:
+    Task AssertMatchesSnapshotAsync(string snapshotName, string actual, SnapshotOptions options, CancellationToken ct):
+      If snapshot file doesn't exist and UpdateSnapshots=true: write file, pass.
+      If snapshot file doesn't exist and UpdateSnapshots=false: fail (throws SnapshotMissingException).
+      If snapshot exists: compare; if mismatch throw SnapshotMismatchException with details.
+    string Normalize(string content): trims whitespace, normalizes line endings.
+
+  Class SnapshotMissingException(string name) : Exception
+  Class SnapshotMismatchException(SnapshotMismatch mismatch) : Exception
+
+  Class JsonSnapshotSerializer:
+    string Serialize<T>(T obj): serializes to indented JSON.
+    T? Deserialize<T>(string json): deserializes from JSON.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SnapshotTesterTests
+  {
+      private readonly SnapshotTester _tester = new();
+      private readonly string _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+      [Fact]
+      public async Task Snapshot_Create_WhenMissingAndUpdateTrue()
+      {
+          var opts = new SnapshotOptions(_tempDir, UpdateSnapshots: true);
+          await _tester.AssertMatchesSnapshotAsync("test1", "hello world", opts, CancellationToken.None);
+          File.Exists(Path.Combine(_tempDir, "test1.snap")).Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task Snapshot_Missing_UpdateFalse_ThrowsMissingException()
+      {
+          var opts = new SnapshotOptions(_tempDir, UpdateSnapshots: false);
+          var act = async () => await _tester.AssertMatchesSnapshotAsync("nonexistent", "data", opts, CancellationToken.None);
+          await act.Should().ThrowAsync<SnapshotMissingException>();
+      }
+
+      [Fact]
+      public async Task Snapshot_Match_DoesNotThrow()
+      {
+          var opts = new SnapshotOptions(_tempDir, UpdateSnapshots: true);
+          await _tester.AssertMatchesSnapshotAsync("match-test", "exact content", opts, CancellationToken.None);
+          var verifyOpts = new SnapshotOptions(_tempDir, UpdateSnapshots: false);
+          var act = async () => await _tester.AssertMatchesSnapshotAsync("match-test", "exact content", verifyOpts, CancellationToken.None);
+          await act.Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Snapshot_Mismatch_ThrowsMismatchException()
+      {
+          var opts = new SnapshotOptions(_tempDir, UpdateSnapshots: true);
+          await _tester.AssertMatchesSnapshotAsync("mismatch-test", "original", opts, CancellationToken.None);
+          var verifyOpts = new SnapshotOptions(_tempDir, UpdateSnapshots: false);
+          var act = async () => await _tester.AssertMatchesSnapshotAsync("mismatch-test", "changed", verifyOpts, CancellationToken.None);
+          await act.Should().ThrowAsync<SnapshotMismatchException>();
+      }
+
+      [Fact]
+      public void JsonSerializer_SerializeDeserialize_RoundTrip()
+      {
+          var serializer = new JsonSnapshotSerializer();
+          var obj = new { Name = "Test", Value = 42 };
+          var json = serializer.Serialize(obj);
+          json.Should().Contain("Test");
+          json.Should().Contain("42");
+      }
+
+      [Fact]
+      public void Normalize_TrimsAndNormalizesLineEndings()
+      {
+          var result = _tester.Normalize("  hello\r\nworld  \n");
+          result.Should().Be("hello\nworld");
+      }
+  }

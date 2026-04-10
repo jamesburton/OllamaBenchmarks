@@ -1,0 +1,37 @@
+name: easy_xunit_005
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface ILogger with method:
+    void Log(string message)
+  A class AuditService with constructor taking ILogger, and method:
+    void RecordAction(string action) calls logger.Log($"Action: {action}")
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuditServiceTests
+  {
+      [Fact]
+      public void RecordAction_CallsLoggerWithFormattedMessage()
+      {
+          var logger = Substitute.For<ILogger>();
+          var service = new AuditService(logger);
+          service.RecordAction("login");
+          logger.Received(1).Log("Action: login");
+      }
+      [Fact]
+      public void RecordAction_DifferentAction_CallsLogger()
+      {
+          var logger = Substitute.For<ILogger>();
+          var service = new AuditService(logger);
+          service.RecordAction("logout");
+          logger.Received(1).Log("Action: logout");
+      }
+  }

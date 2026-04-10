@@ -1,0 +1,18 @@
+name: summarisation_easy_025
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Plastic pollution in the ocean is harming marine life, with over eight million tonnes entering the sea each year. Microplastics have been found in fish, seabirds, and even human blood. Governments and environmental groups are calling for a global treaty to reduce plastic production.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "plastic"
+    - "ocean"
+    - "microplastics"
+    - "pollution"
+  max_words: 25

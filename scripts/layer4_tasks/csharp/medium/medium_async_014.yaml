@@ -1,0 +1,57 @@
+name: medium_async_014
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IHealthCheck with method: Task<bool> CheckAsync(CancellationToken ct = default)
+  A class HealthMonitor with constructor accepting IEnumerable<(string Name, IHealthCheck Check)> checks.
+  Expose:
+    Task<HealthReport> RunAsync(CancellationToken ct = default)
+  Runs all checks in parallel. HealthReport has:
+    bool Healthy (all checks passed)
+    IReadOnlyList<CheckResult> Results
+  CheckResult is a record with: string Name, bool Passed, string? ErrorMessage.
+  If a check throws, Passed = false and ErrorMessage is the exception message.
+  Return only valid C# code in a single file.
+test_code: |
+  public class HealthMonitorTests
+  {
+      [Fact]
+      public async Task RunAsync_AllHealthy_ReportsHealthy()
+      {
+          var hc = Substitute.For<IHealthCheck>();
+          hc.CheckAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(true));
+          var monitor = new HealthMonitor(new[]{("db", hc),("cache", hc)});
+          var report = await monitor.RunAsync();
+          report.Healthy.Should().BeTrue();
+          report.Results.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task RunAsync_OneUnhealthy_NotHealthy()
+      {
+          var good = Substitute.For<IHealthCheck>();
+          good.CheckAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(true));
+          var bad = Substitute.For<IHealthCheck>();
+          bad.CheckAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(false));
+          var report = await new HealthMonitor(new[]{("ok", good),("bad", bad)}).RunAsync();
+          report.Healthy.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task RunAsync_CheckThrows_ResultHasErrorMessage()
+      {
+          var bad = Substitute.For<IHealthCheck>();
+          bad.CheckAsync(Arg.Any<CancellationToken>()).Returns(Task.FromException<bool>(new Exception("oops")));
+          var report = await new HealthMonitor(new[]{("ex", bad)}).RunAsync();
+          report.Results[0].Passed.Should().BeFalse();
+          report.Results[0].ErrorMessage.Should().Be("oops");
+      }
+  }

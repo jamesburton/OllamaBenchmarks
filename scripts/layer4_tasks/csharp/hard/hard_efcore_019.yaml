@@ -1,0 +1,105 @@
+name: hard_efcore_019
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with complex filtered includes and split queries:
+  Entities: Department(int Id, string Name, string Location, List<Employee> Employees),
+  Employee(int Id, string Name, string Title, decimal Salary, int DepartmentId,
+    List<ProjectAssignment> Assignments),
+  Project(int Id, string Name, string Status, decimal Budget),
+  ProjectAssignment(int EmployeeId, int ProjectId, string Role, decimal HoursAllocated).
+  DbContext: CompanyDbContext with many-to-many via ProjectAssignment.
+  Class CompanyRepository(CompanyDbContext db):
+    Task<Department?> GetDeptWithTopEarnersAsync(int deptId, int topN, CancellationToken ct) —
+      loads department with only top N earners (ordered by Salary desc).
+    Task<IReadOnlyList<ProjectBudgetReport>> GetProjectBudgetReportAsync(CancellationToken ct) —
+      per project: Name, Budget, TotalHoursAllocated, EmployeeCount.
+    Task<IReadOnlyList<Employee>> GetEmployeesOnActiveProjectsAsync(CancellationToken ct)
+  Record: ProjectBudgetReport(string Name, decimal Budget, decimal TotalHoursAllocated, int EmployeeCount).
+  Use SQLite in-memory with seed data.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CompanyRepositoryTests : IDisposable
+  {
+      private readonly CompanyDbContext _db;
+      private readonly CompanyRepository _repo;
+
+      public CompanyRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<CompanyDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new CompanyDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData();
+          _repo = new CompanyRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          var dept = new Department { Name = "Engineering", Location = "London" };
+          _db.Departments.Add(dept);
+          _db.SaveChanges();
+          var e1 = new Employee { Name = "Alice", Title = "Sr Dev",  Salary = 90000m, DepartmentId = dept.Id };
+          var e2 = new Employee { Name = "Bob",   Title = "Dev",     Salary = 70000m, DepartmentId = dept.Id };
+          var e3 = new Employee { Name = "Carol",  Title = "Jr Dev",  Salary = 55000m, DepartmentId = dept.Id };
+          _db.Employees.AddRange(e1, e2, e3);
+          var p1 = new Project { Name = "Alpha", Status = "Active",   Budget = 100000m };
+          var p2 = new Project { Name = "Beta",  Status = "Inactive", Budget = 50000m  };
+          _db.Projects.AddRange(p1, p2);
+          _db.SaveChanges();
+          _db.ProjectAssignments.AddRange(
+              new ProjectAssignment { EmployeeId = e1.Id, ProjectId = p1.Id, Role = "Lead", HoursAllocated = 100 },
+              new ProjectAssignment { EmployeeId = e2.Id, ProjectId = p1.Id, Role = "Dev",  HoursAllocated = 80  },
+              new ProjectAssignment { EmployeeId = e3.Id, ProjectId = p2.Id, Role = "Dev",  HoursAllocated = 40  }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task GetDeptWithTopEarners_LimitsToTopN()
+      {
+          var deptId = _db.Departments.First().Id;
+          var dept = await _repo.GetDeptWithTopEarnersAsync(deptId, 2, CancellationToken.None);
+          dept!.Employees.Should().HaveCount(2);
+          dept.Employees[0].Salary.Should().BeGreaterThanOrEqualTo(dept.Employees[1].Salary);
+      }
+
+      [Fact]
+      public async Task GetProjectBudgetReport_HasCorrectHours()
+      {
+          var result = await _repo.GetProjectBudgetReportAsync(CancellationToken.None);
+          var alpha = result.First(p => p.Name == "Alpha");
+          alpha.TotalHoursAllocated.Should().Be(180m);
+          alpha.EmployeeCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task GetEmployeesOnActiveProjects_FiltersCorrectly()
+      {
+          var result = await _repo.GetEmployeesOnActiveProjectsAsync(CancellationToken.None);
+          result.Should().Contain(e => e.Name == "Alice");
+          result.Should().NotContain(e => e.Name == "Carol");
+      }
+
+      [Fact]
+      public async Task GetDeptWithTopEarners_UnknownId_ReturnsNull()
+      {
+          (await _repo.GetDeptWithTopEarnersAsync(9999, 5, CancellationToken.None)).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task GetProjectBudgetReport_ReturnsBothProjects()
+      {
+          var result = await _repo.GetProjectBudgetReportAsync(CancellationToken.None);
+          result.Should().HaveCount(2);
+      }
+  }

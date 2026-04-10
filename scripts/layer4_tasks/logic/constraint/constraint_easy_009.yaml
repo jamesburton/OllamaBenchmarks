@@ -1,0 +1,15 @@
+name: constraint_easy_009
+category: logic
+subcategory: constraint
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Alice, Bob, and Carol each have a ball: red, white, or blue.
+  Clues:
+  1. Alice has the red ball.
+  2. Bob does not have the white ball.
+  What ball does Carol have? Reply with only the colour.
+expected_answer: "White"
+validator_config: {}

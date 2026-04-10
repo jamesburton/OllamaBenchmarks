@@ -1,0 +1,76 @@
+name: hard_patterns_014
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A template method pattern for data import pipelines:
+  Abstract class DataImporter<T>:
+    abstract Task<IReadOnlyList<T>> ReadSourceAsync(CancellationToken ct)
+    abstract IReadOnlyList<T> Transform(IReadOnlyList<T> raw)
+    abstract Task ValidateAsync(IReadOnlyList<T> items, CancellationToken ct)
+    abstract Task PersistAsync(IReadOnlyList<T> items, CancellationToken ct)
+    Task<ImportResult> RunAsync(CancellationToken ct) — template method calling all steps in order.
+  Record: ImportResult(int ReadCount, int TransformedCount, int PersistedCount, IReadOnlyList<string> Errors).
+  If ValidateAsync throws ValidationException, RunAsync catches it, adds error message to Errors,
+  returns ImportResult with PersistedCount=0.
+  Concrete: CsvUserImporter(string csv) — parses "name,email" CSV lines into UserRecord items.
+    Transforms: trims whitespace. Validates: all emails contain "@". Persists to List<UserRecord>.
+  Record: UserRecord(string Name, string Email).
+  Return only valid C# code in a single file.
+test_code: |
+  public class DataImporterTests
+  {
+      [Fact]
+      public async Task RunAsync_ValidCsv_ImportsAll()
+      {
+          var csv = "Alice,alice@example.com\nBob,bob@example.com";
+          var importer = new CsvUserImporter(csv);
+          var result = await importer.RunAsync(CancellationToken.None);
+          result.ReadCount.Should().Be(2);
+          result.PersistedCount.Should().Be(2);
+          result.Errors.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task RunAsync_InvalidEmail_ReturnsErrorNotPersisted()
+      {
+          var csv = "Alice,notanemail\nBob,bob@example.com";
+          var importer = new CsvUserImporter(csv);
+          var result = await importer.RunAsync(CancellationToken.None);
+          result.PersistedCount.Should().Be(0);
+          result.Errors.Should().NotBeEmpty();
+      }
+
+      [Fact]
+      public async Task RunAsync_EmptyCsv_ZeroCounts()
+      {
+          var result = await new CsvUserImporter("").RunAsync(CancellationToken.None);
+          result.ReadCount.Should().Be(0);
+          result.PersistedCount.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task RunAsync_TrimsWhitespace()
+      {
+          var csv = "  Alice  ,  alice@example.com  ";
+          var importer = new CsvUserImporter(csv);
+          var result = await importer.RunAsync(CancellationToken.None);
+          result.PersistedCount.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task RunAsync_CancellationToken_PropagatedToSteps()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var act = async () => await new SlowCsvUserImporter("Alice,alice@x.com").RunAsync(cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+  }

@@ -1,0 +1,16 @@
+name: vocabulary_medium_027
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The professor was known for her didactic style', which word best replaces 'didactic'?
+  A) Entertaining
+  B) Instructive
+  C) Casual
+  D) Abstract
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

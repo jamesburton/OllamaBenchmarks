@@ -1,0 +1,45 @@
+name: easy_aspnet_018
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ProductRequest with:
+    [Required][StringLength(200, MinimumLength = 1)] string Name { get; set; }
+    [Range(0.01, 1000000)] decimal Price { get; set; }
+    [Range(0, int.MaxValue)] int Stock { get; set; }
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductRequestTests
+  {
+      private static IList<ValidationResult> Validate(object obj)
+      {
+          var results = new List<ValidationResult>();
+          Validator.TryValidateObject(obj, new ValidationContext(obj), results, true);
+          return results;
+      }
+      [Fact]
+      public void ValidRequest_PassesValidation()
+      {
+          var req = new ProductRequest { Name = "Widget", Price = 9.99m, Stock = 100 };
+          Validate(req).Should().BeEmpty();
+      }
+      [Fact]
+      public void NegativePrice_FailsValidation()
+      {
+          var req = new ProductRequest { Name = "Widget", Price = -1m, Stock = 0 };
+          Validate(req).Should().NotBeEmpty();
+      }
+      [Fact]
+      public void NegativeStock_FailsValidation()
+      {
+          var req = new ProductRequest { Name = "Widget", Price = 9.99m, Stock = -1 };
+          Validate(req).Should().NotBeEmpty();
+      }
+  }

@@ -1,0 +1,49 @@
+name: medium_patterns_003
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A generic class Maybe<T> representing an optional value.
+  Expose:
+    static Maybe<T> Some(T value)
+    static Maybe<T> None()
+    bool HasValue
+    T Value (throws InvalidOperationException if None)
+    Maybe<TOut> Bind<TOut>(Func<T, Maybe<TOut>> f)
+    Maybe<T> Where(Func<T, bool> predicate)
+  Return only valid C# code in a single file.
+test_code: |
+  public class MaybeTests
+  {
+      [Fact]
+      public void Some_HasValue() { Maybe<int>.Some(42).HasValue.Should().BeTrue(); }
+
+      [Fact]
+      public void None_HasNoValue() { Maybe<int>.None().HasValue.Should().BeFalse(); }
+
+      [Fact]
+      public void Value_None_Throws()
+      {
+          Action act = () => { var _ = Maybe<int>.None().Value; };
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Bind_Some_Transforms()
+      {
+          Maybe<int>.Some(5).Bind(x => Maybe<string>.Some(x.ToString())).Value.Should().Be("5");
+      }
+
+      [Fact]
+      public void Where_ConditionFalse_None()
+      {
+          Maybe<int>.Some(3).Where(x => x > 10).HasValue.Should().BeFalse();
+      }
+  }

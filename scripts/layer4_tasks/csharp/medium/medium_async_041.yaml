@@ -1,0 +1,46 @@
+name: medium_async_041
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IReportGenerator with Task<byte[]> GenerateAsync(string reportId, CancellationToken ct = default).
+  A class ReportOrchestrator with constructor accepting IReportGenerator generator and int maxParallel.
+  Exposes Task<Dictionary<string, byte[]>> GenerateAllAsync(IEnumerable<string> reportIds, CancellationToken ct = default).
+  Generates all reports with at most maxParallel concurrent operations.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReportOrchestratorTests
+  {
+      [Fact]
+      public async Task AllGenerated()
+      {
+          var gen = Substitute.For<IReportGenerator>();
+          gen.GenerateAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(ci => Task.FromResult(new byte[]{1}));
+          var result = await new ReportOrchestrator(gen, 2).GenerateAllAsync(new[]{"r1","r2","r3"});
+          result.Should().HaveCount(3);
+          result.Keys.Should().BeEquivalentTo(new[]{"r1","r2","r3"});
+      }
+
+      [Fact]
+      public async Task Empty_ReturnsEmpty()
+      {
+          (await new ReportOrchestrator(Substitute.For<IReportGenerator>(), 2)
+              .GenerateAllAsync(Array.Empty<string>())).Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task CalledForEach()
+      {
+          var gen = Substitute.For<IReportGenerator>();
+          gen.GenerateAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(Array.Empty<byte>()));
+          await new ReportOrchestrator(gen, 5).GenerateAllAsync(new[]{"a","b"});
+          await gen.Received(2).GenerateAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+      }
+  }

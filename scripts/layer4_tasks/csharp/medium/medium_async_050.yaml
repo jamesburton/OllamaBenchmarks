@@ -1,0 +1,49 @@
+name: medium_async_050
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IAuditLogger with Task LogAsync(string action, string details, CancellationToken ct = default).
+  A class AuditingService with constructor accepting IAuditLogger logger.
+  Exposes Task<T> ExecuteWithAuditAsync<T>(string action, Func<Task<T>> operation).
+  Logs 'Started' before, 'Completed' after success, 'Failed: {msg}' on exception then rethrows.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuditingServiceTests
+  {
+      [Fact]
+      public async Task LogsStartAndComplete()
+      {
+          var logger = Substitute.For<IAuditLogger>();
+          logger.LogAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          await new AuditingService(logger).ExecuteWithAuditAsync("test", () => Task.FromResult(1));
+          await logger.Received(1).LogAsync("test", "Started", Arg.Any<CancellationToken>());
+          await logger.Received(1).LogAsync("test", "Completed", Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task OnFail_LogsAndRethrows()
+      {
+          var logger = Substitute.For<IAuditLogger>();
+          logger.LogAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          await Assert.ThrowsAsync<InvalidOperationException>(() =>
+              new AuditingService(logger).ExecuteWithAuditAsync("act",
+                  () => Task.FromException<int>(new InvalidOperationException("boom"))));
+          await logger.Received(1).LogAsync("act", "Failed: boom", Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task ReturnsResult()
+      {
+          var logger = Substitute.For<IAuditLogger>();
+          logger.LogAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          (await new AuditingService(logger).ExecuteWithAuditAsync("x", () => Task.FromResult(99))).Should().Be(99);
+      }
+  }

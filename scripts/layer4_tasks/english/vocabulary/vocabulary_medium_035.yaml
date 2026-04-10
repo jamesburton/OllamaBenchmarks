@@ -1,0 +1,16 @@
+name: vocabulary_medium_035
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The company took a prudent approach to risk', which word best replaces 'prudent'?
+  A) Reckless
+  B) Cautious
+  C) Aggressive
+  D) Naive
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

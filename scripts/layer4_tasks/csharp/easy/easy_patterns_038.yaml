@@ -1,0 +1,42 @@
+name: easy_patterns_038
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Student(string Name, double Gpa)
+  and a static class GradeHelper with:
+    string GetLetterGrade(Student student)
+  that uses a switch expression on GPA:
+    >= 3.7 -> "A"
+    >= 3.3 -> "B+"
+    >= 3.0 -> "B"
+    >= 2.7 -> "C+"
+    _ -> "C or below"
+  Return only valid C# code in a single file.
+test_code: |
+  public class GradeHelperTests
+  {
+      [Fact]
+      public void GetLetterGrade_A()
+      {
+          GradeHelper.GetLetterGrade(new Student("Alice", 3.9)).Should().Be("A");
+      }
+      [Fact]
+      public void GetLetterGrade_BPlus()
+      {
+          GradeHelper.GetLetterGrade(new Student("Bob", 3.5)).Should().Be("B+");
+      }
+      [Fact]
+      public void GetLetterGrade_C()
+      {
+          GradeHelper.GetLetterGrade(new Student("Charlie", 2.0)).Should().Be("C or below");
+      }
+  }

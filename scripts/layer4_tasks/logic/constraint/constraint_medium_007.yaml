@@ -1,0 +1,12 @@
+name: constraint_medium_007
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Five people sit in seats 1-5. Ann is in seat 2. Ben is not in seat 1 or 5. Carol is in seat 4. Dave is next to Carol. Eve is in seat 1.
+  What seat is Ben in? Reply with only the number.
+expected_answer: "3"
+validator_config: {}

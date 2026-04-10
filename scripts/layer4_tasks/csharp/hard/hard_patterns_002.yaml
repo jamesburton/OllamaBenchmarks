@@ -1,0 +1,75 @@
+name: hard_patterns_002
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A visitor pattern for an expression tree:
+  Abstract class Expr with subclasses: NumberExpr(double Value), AddExpr(Expr Left, Expr Right),
+  MulExpr(Expr Left, Expr Right), NegateExpr(Expr Operand), VariableExpr(string Name).
+  Interface IExprVisitor<T> with Visit method overloads for each node type.
+  Class EvalVisitor : IExprVisitor<double> — evaluates the expression given a
+    Dictionary<string, double> variables. Throws KeyNotFoundException for unknown variables.
+  Class PrintVisitor : IExprVisitor<string> — converts expression to infix string with parentheses.
+  Class CountNodesVisitor : IExprVisitor<int> — counts total nodes.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExprVisitorTests
+  {
+      [Fact]
+      public void EvalVisitor_SimpleAdd()
+      {
+          var expr = new AddExpr(new NumberExpr(3), new NumberExpr(4));
+          new EvalVisitor(new()).Visit(expr).Should().Be(7.0);
+      }
+
+      [Fact]
+      public void EvalVisitor_NestedMulAdd()
+      {
+          var expr = new MulExpr(new NumberExpr(2), new AddExpr(new NumberExpr(3), new NumberExpr(4)));
+          new EvalVisitor(new()).Visit(expr).Should().Be(14.0);
+      }
+
+      [Fact]
+      public void EvalVisitor_WithVariable()
+      {
+          var vars = new Dictionary<string, double> { ["x"] = 5.0 };
+          var expr = new AddExpr(new VariableExpr("x"), new NumberExpr(1));
+          new EvalVisitor(vars).Visit(expr).Should().Be(6.0);
+      }
+
+      [Fact]
+      public void EvalVisitor_UnknownVariable_ThrowsKeyNotFoundException()
+      {
+          var act = () => new EvalVisitor(new()).Visit(new VariableExpr("z"));
+          act.Should().Throw<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public void PrintVisitor_NegateExpr()
+      {
+          var expr = new NegateExpr(new NumberExpr(5));
+          var str = new PrintVisitor().Visit(expr);
+          str.Should().Contain("5");
+      }
+
+      [Fact]
+      public void CountNodesVisitor_CorrectCount()
+      {
+          var expr = new AddExpr(new NumberExpr(1), new MulExpr(new NumberExpr(2), new NumberExpr(3)));
+          new CountNodesVisitor().Visit(expr).Should().Be(5);
+      }
+
+      [Fact]
+      public void EvalVisitor_Negate()
+      {
+          var expr = new NegateExpr(new NumberExpr(7));
+          new EvalVisitor(new()).Visit(expr).Should().Be(-7.0);
+      }
+  }

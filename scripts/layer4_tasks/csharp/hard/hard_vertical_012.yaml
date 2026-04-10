@@ -1,0 +1,100 @@
+name: hard_vertical_012
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + async + CQRS for hotel booking system:
+  Entities:
+    Room(int Id, string RoomNumber, string Type, decimal PricePerNight, int Capacity, bool IsAvailable)
+    Booking(int Id, int RoomId, Room Room, string GuestName, string GuestEmail,
+      DateTime CheckIn, DateTime CheckOut, decimal TotalPrice, string Status)
+  DbContext: HotelDbContext (SQLite in-memory).
+
+  Records:
+    SearchRoomsQuery(DateTime CheckIn, DateTime CheckOut, int Guests, string? Type)
+    BookRoomCommand(int RoomId, string GuestName, string GuestEmail, DateTime CheckIn, DateTime CheckOut)
+    BookingDto(int Id, string RoomNumber, string RoomType, string GuestName, DateTime CheckIn, DateTime CheckOut, decimal TotalPrice, string Status)
+
+  Class HotelService(HotelDbContext db):
+    Task<IReadOnlyList<Room>> SearchAvailableAsync(SearchRoomsQuery q, CancellationToken ct):
+      Rooms where no overlapping booking and Capacity >= Guests and optionally Type matches.
+    Task<BookingDto> BookAsync(BookRoomCommand cmd, CancellationToken ct):
+      Throws if room not found or unavailable for dates. Creates booking, total = nights * price.
+    Task<bool> CancelBookingAsync(int bookingId, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class HotelServiceTests : IDisposable
+  {
+      private readonly HotelDbContext _db;
+      private readonly HotelService _svc;
+
+      public HotelServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<HotelDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new HotelDbContext(opts);
+          _db.Database.EnsureCreated();
+          _db.Rooms.AddRange(
+              new Room { RoomNumber = "101", Type = "Single", PricePerNight = 99m, Capacity = 1, IsAvailable = true },
+              new Room { RoomNumber = "201", Type = "Double", PricePerNight = 149m, Capacity = 2, IsAvailable = true },
+              new Room { RoomNumber = "301", Type = "Suite", PricePerNight = 299m, Capacity = 4, IsAvailable = true }
+          );
+          _db.SaveChanges();
+          _svc = new HotelService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task SearchAvailable_ReturnsRoomsForCapacity()
+      {
+          var q = new SearchRoomsQuery(DateTime.Today.AddDays(10), DateTime.Today.AddDays(12), 2, null);
+          var rooms = await _svc.SearchAvailableAsync(q, CancellationToken.None);
+          rooms.Should().NotContain(r => r.Capacity < 2);
+      }
+
+      [Fact]
+      public async Task Book_CreatesBookingWithCorrectTotal()
+      {
+          var room = _db.Rooms.First(r => r.RoomNumber == "101");
+          var checkIn = DateTime.Today.AddDays(5);
+          var checkOut = DateTime.Today.AddDays(7);
+          var booking = await _svc.BookAsync(new BookRoomCommand(room.Id, "Alice", "a@b.com", checkIn, checkOut), CancellationToken.None);
+          booking.TotalPrice.Should().Be(2 * 99m);
+          booking.Status.Should().Be("Confirmed");
+      }
+
+      [Fact]
+      public async Task Book_RoomAlreadyBooked_Throws()
+      {
+          var room = _db.Rooms.First(r => r.RoomNumber == "201");
+          var checkIn = DateTime.Today.AddDays(15);
+          var checkOut = DateTime.Today.AddDays(17);
+          await _svc.BookAsync(new BookRoomCommand(room.Id, "Bob", "b@c.com", checkIn, checkOut), CancellationToken.None);
+          var act = async () => await _svc.BookAsync(new BookRoomCommand(room.Id, "Carol", "c@d.com", checkIn.AddDays(1), checkOut.AddDays(1)), CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task CancelBooking_SetsStatusCancelled()
+      {
+          var room = _db.Rooms.First(r => r.RoomNumber == "301");
+          var booking = await _svc.BookAsync(new BookRoomCommand(room.Id, "Dave", "d@e.com", DateTime.Today.AddDays(20), DateTime.Today.AddDays(22)), CancellationToken.None);
+          var result = await _svc.CancelBookingAsync(booking.Id, CancellationToken.None);
+          result.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task SearchAvailable_FiltersByType()
+      {
+          var q = new SearchRoomsQuery(DateTime.Today.AddDays(30), DateTime.Today.AddDays(32), 1, "Suite");
+          var rooms = await _svc.SearchAvailableAsync(q, CancellationToken.None);
+          rooms.Should().AllSatisfy(r => r.Type.Should().Be("Suite"));
+      }
+  }

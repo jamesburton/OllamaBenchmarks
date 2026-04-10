@@ -1,0 +1,15 @@
+name: syllogisms_easy_018
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All insects have six legs.
+  2. An ant is an insect.
+  3. All six-legged creatures are arthropods.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "An ant is an arthropod."
+validator_config: {}

@@ -1,0 +1,63 @@
+name: medium_async_011
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncBatchProcessor<T, TResult> with constructor accepting:
+    Func<IReadOnlyList<T>, CancellationToken, Task<IReadOnlyList<TResult>>> batchHandler
+    int batchSize
+  Expose:
+    Task<IReadOnlyList<TResult>> ProcessAsync(IEnumerable<T> items, CancellationToken ct = default)
+  Splits items into batches of batchSize and processes sequentially, collecting all results.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncBatchProcessorTests
+  {
+      [Fact]
+      public async Task ProcessAsync_SingleBatch()
+      {
+          var processor = new AsyncBatchProcessor<int, string>(
+              async (batch, ct) => { await Task.Yield(); return batch.Select(i => i.ToString()).ToArray(); },
+              10);
+          var result = await processor.ProcessAsync(new[]{1,2,3});
+          result.Should().BeEquivalentTo(new[]{"1","2","3"});
+      }
+
+      [Fact]
+      public async Task ProcessAsync_MultipleBatches_AllProcessed()
+      {
+          int batchCount = 0;
+          var processor = new AsyncBatchProcessor<int, int>(
+              async (batch, ct) => { batchCount++; await Task.Yield(); return batch.ToArray(); },
+              3);
+          var result = await processor.ProcessAsync(Enumerable.Range(1,7));
+          result.Should().HaveCount(7);
+          batchCount.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task ProcessAsync_Empty_ReturnsEmpty()
+      {
+          var processor = new AsyncBatchProcessor<int, int>(
+              async (batch, ct) => { await Task.Yield(); return batch.ToArray(); },
+              5);
+          (await processor.ProcessAsync(Array.Empty<int>())).Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task ProcessAsync_ResultsInOrder()
+      {
+          var processor = new AsyncBatchProcessor<int, int>(
+              async (batch, ct) => { await Task.Yield(); return batch.ToArray(); },
+              2);
+          var result = await processor.ProcessAsync(new[]{1,2,3,4,5});
+          result.Should().BeEquivalentTo(new[]{1,2,3,4,5}, cfg => cfg.WithStrictOrdering());
+      }
+  }

@@ -1,0 +1,82 @@
+name: hard_aspnet_025
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A composite service with multiple IOptions patterns and PostConfigure:
+  Class CachingOptions: int DefaultTtlSeconds (default 300), int MaxEntries (default 1000),
+    bool SlidingExpiration (default true).
+  Class LoggingOptions: string LogLevel (default "Information"), bool StructuredLogging (default true),
+    bool IncludeScopes (default false).
+  Class AppConfig: CachingOptions Caching, LoggingOptions Logging. (not IOptions, just composition)
+  Class AppOptionsPostConfigure : IPostConfigureOptions<CachingOptions> —
+    ensures DefaultTtlSeconds >= 1; if not, sets to 1. Ensures MaxEntries >= 1.
+  Class AppSettingsService(IOptions<CachingOptions> cache, IOptions<LoggingOptions> log):
+    AppConfig GetConfig() — returns merged config.
+    bool IsCachingEnabled() — returns true if DefaultTtlSeconds > 0 and MaxEntries > 0.
+    string GetLogLevel() — returns Logging.LogLevel.
+  Static: AddAppSettings(this IServiceCollection svc, Action<CachingOptions>? cacheCfg = null,
+    Action<LoggingOptions>? logCfg = null)
+  Return only valid C# code in a single file.
+test_code: |
+  public class AppSettingsServiceTests
+  {
+      private static AppSettingsService Build(Action<CachingOptions>? cacheCfg = null,
+          Action<LoggingOptions>? logCfg = null)
+      {
+          var svc = new ServiceCollection();
+          svc.AddAppSettings(cacheCfg, logCfg);
+          return svc.BuildServiceProvider().GetRequiredService<AppSettingsService>();
+      }
+
+      [Fact]
+      public void GetConfig_DefaultValues()
+      {
+          var svc = Build();
+          var config = svc.GetConfig();
+          config.Caching.DefaultTtlSeconds.Should().Be(300);
+          config.Logging.LogLevel.Should().Be("Information");
+      }
+
+      [Fact]
+      public void GetConfig_CustomValues()
+      {
+          var svc = Build(c => c.DefaultTtlSeconds = 60, l => l.LogLevel = "Debug");
+          var config = svc.GetConfig();
+          config.Caching.DefaultTtlSeconds.Should().Be(60);
+          config.Logging.LogLevel.Should().Be("Debug");
+      }
+
+      [Fact]
+      public void PostConfigure_ClampsInvalidTtl()
+      {
+          var svc = Build(c => c.DefaultTtlSeconds = -5);
+          svc.GetConfig().Caching.DefaultTtlSeconds.Should().BeGreaterThanOrEqualTo(1);
+      }
+
+      [Fact]
+      public void PostConfigure_ClampsInvalidMaxEntries()
+      {
+          var svc = Build(c => c.MaxEntries = 0);
+          svc.GetConfig().Caching.MaxEntries.Should().BeGreaterThanOrEqualTo(1);
+      }
+
+      [Fact]
+      public void IsCachingEnabled_ValidConfig_ReturnsTrue()
+      {
+          Build().IsCachingEnabled().Should().BeTrue();
+      }
+
+      [Fact]
+      public void GetLogLevel_ReturnsConfiguredLevel()
+      {
+          Build(logCfg: l => l.LogLevel = "Warning").GetLogLevel().Should().Be("Warning");
+      }
+  }

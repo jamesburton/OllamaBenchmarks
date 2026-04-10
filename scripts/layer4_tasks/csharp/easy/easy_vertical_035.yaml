@@ -1,0 +1,36 @@
+name: easy_vertical_035
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record PriceTier(string Name, decimal MinAmount, decimal MaxAmount, decimal Multiplier)
+  A class PricingEngine with:
+    void AddTier(PriceTier tier)
+    decimal CalculatePrice(decimal baseAmount) finds matching tier where baseAmount is between MinAmount and MaxAmount (inclusive), returns baseAmount * Multiplier, or baseAmount if no tier matches
+  Return only valid C# code in a single file.
+test_code: |
+  public class PricingEngineTests
+  {
+      [Fact]
+      public void CalculatePrice_AppliesMatchingTier()
+      {
+          var engine = new PricingEngine();
+          engine.AddTier(new PriceTier("Silver", 100m, 499m, 0.9m));
+          engine.AddTier(new PriceTier("Gold", 500m, 999m, 0.8m));
+          engine.CalculatePrice(200m).Should().Be(180m);
+      }
+      [Fact]
+      public void CalculatePrice_NoMatchingTier_ReturnsBaseAmount()
+      {
+          var engine = new PricingEngine();
+          engine.AddTier(new PriceTier("Silver", 100m, 499m, 0.9m));
+          engine.CalculatePrice(50m).Should().Be(50m);
+      }
+  }

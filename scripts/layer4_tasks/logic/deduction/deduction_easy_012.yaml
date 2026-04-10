@@ -1,0 +1,14 @@
+name: deduction_easy_012
+category: logic
+subcategory: deduction
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All dogs bark.
+  2. Rex does not bark.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "Rex is not a dog."
+validator_config: {}

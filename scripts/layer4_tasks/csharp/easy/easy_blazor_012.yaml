@@ -1,0 +1,43 @@
+name: easy_blazor_012
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class RatingComponent that extends ComponentBase with:
+    [Parameter] int MaxStars { get; set; } = 5
+    int CurrentRating { get; private set; } = 0
+    [Parameter] EventCallback<int> OnRatingChanged { get; set; }
+    async Task SetRating(int rating) — sets CurrentRating to rating (clamped 1..MaxStars) and invokes OnRatingChanged
+  Return only valid C# code in a single file.
+test_code: |
+  public class RatingComponentTests
+  {
+      [Fact]
+      public async Task SetRating_SetsRating()
+      {
+          var c = new RatingComponent { MaxStars = 5 };
+          await c.SetRating(3);
+          c.CurrentRating.Should().Be(3);
+      }
+      [Fact]
+      public async Task SetRating_ClampedToMax()
+      {
+          var c = new RatingComponent { MaxStars = 5 };
+          await c.SetRating(10);
+          c.CurrentRating.Should().Be(5);
+      }
+      [Fact]
+      public async Task SetRating_ClampedToMin()
+      {
+          var c = new RatingComponent { MaxStars = 5 };
+          await c.SetRating(0);
+          c.CurrentRating.Should().Be(1);
+      }
+  }

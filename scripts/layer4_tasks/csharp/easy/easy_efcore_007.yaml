@@ -1,0 +1,45 @@
+name: easy_efcore_007
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Tag with properties: int Id, string Name, string Color
+  A DbContext class TagContext with:
+    DbSet<Tag> Tags { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class TagRepository with:
+    Tag Upsert(TagContext context, string name, string color)
+  that finds existing tag by name (case-insensitive), updates its color if found, or creates a new one.
+  Returns the tag.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TagRepositoryTests
+  {
+      [Fact]
+      public void Upsert_NewTag_CreatesTag()
+      {
+          using var context = new TagContext();
+          context.Database.EnsureCreated();
+          var tag = TagRepository.Upsert(context, "C#", "#178600");
+          tag.Name.Should().Be("C#");
+          context.Tags.Should().HaveCount(1);
+      }
+      [Fact]
+      public void Upsert_ExistingTag_UpdatesColor()
+      {
+          using var context = new TagContext();
+          context.Database.EnsureCreated();
+          TagRepository.Upsert(context, "Java", "#red");
+          TagRepository.Upsert(context, "java", "#orange");
+          context.Tags.Should().HaveCount(1);
+          context.Tags.First().Color.Should().Be("#orange");
+      }
+  }

@@ -1,0 +1,104 @@
+name: hard_vertical_005
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Async pipeline + CQRS for document processing:
+  Records:
+    ProcessDocumentCommand(Guid DocumentId, string FileName, string ContentType, byte[] Content)
+    DocumentProcessed(Guid DocumentId, string FileName, int PageCount, string[] ExtractedKeywords, DateTime ProcessedAt)
+    ProcessingFailed(Guid DocumentId, string Error)
+    ProcessDocumentResult: OneOf<DocumentProcessed, ProcessingFailed>
+
+  Interface IDocumentParser:
+    Task<(int PageCount, string[] Keywords)> ParseAsync(byte[] content, string contentType, CancellationToken ct)
+
+  Interface IDocumentStore:
+    Task<Guid> StoreAsync(Guid documentId, string fileName, byte[] content, CancellationToken ct)
+    Task<bool> ExistsAsync(Guid documentId, CancellationToken ct)
+
+  Class ProcessDocumentCommandHandler(IDocumentParser parser, IDocumentStore store):
+    Task<ProcessDocumentResult> HandleAsync(ProcessDocumentCommand cmd, CancellationToken ct):
+      If document already exists: return ProcessingFailed("already processed").
+      Store, parse, return DocumentProcessed.
+      On exception: return ProcessingFailed with error message.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProcessDocumentCommandHandlerTests
+  {
+      private IDocumentParser CreateParser(int pages = 5, string[] keywords = null!)
+      {
+          var p = Substitute.For<IDocumentParser>();
+          p.ParseAsync(Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns((pages, keywords ?? new[] { "key1", "key2" }));
+          return p;
+      }
+
+      private IDocumentStore CreateStore(bool exists = false)
+      {
+          var s = Substitute.For<IDocumentStore>();
+          s.ExistsAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(exists);
+          s.StoreAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult(ci.Arg<Guid>()));
+          return s;
+      }
+
+      [Fact]
+      public async Task NewDocument_ReturnsDocumentProcessed()
+      {
+          var handler = new ProcessDocumentCommandHandler(CreateParser(), CreateStore());
+          var cmd = new ProcessDocumentCommand(Guid.NewGuid(), "test.pdf", "application/pdf", new byte[] { 1, 2 });
+          var result = await handler.HandleAsync(cmd, CancellationToken.None);
+          result.IsT0.Should().BeTrue();
+          result.AsT0.PageCount.Should().Be(5);
+      }
+
+      [Fact]
+      public async Task AlreadyExists_ReturnsProcessingFailed()
+      {
+          var handler = new ProcessDocumentCommandHandler(CreateParser(), CreateStore(exists: true));
+          var cmd = new ProcessDocumentCommand(Guid.NewGuid(), "dup.pdf", "application/pdf", new byte[] { 1 });
+          var result = await handler.HandleAsync(cmd, CancellationToken.None);
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Error.Should().Contain("already");
+      }
+
+      [Fact]
+      public async Task ParserException_ReturnsProcessingFailed()
+      {
+          var parser = Substitute.For<IDocumentParser>();
+          parser.ParseAsync(Arg.Any<byte[]>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .ThrowsAsync(new InvalidOperationException("parse fail"));
+          var handler = new ProcessDocumentCommandHandler(parser, CreateStore());
+          var cmd = new ProcessDocumentCommand(Guid.NewGuid(), "bad.pdf", "application/pdf", new byte[] { 0 });
+          var result = await handler.HandleAsync(cmd, CancellationToken.None);
+          result.IsT1.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task DocumentProcessed_ContainsKeywords()
+      {
+          var handler = new ProcessDocumentCommandHandler(
+              CreateParser(3, new[] { "alpha", "beta" }), CreateStore());
+          var cmd = new ProcessDocumentCommand(Guid.NewGuid(), "kw.pdf", "application/pdf", new byte[] { 1 });
+          var result = await handler.HandleAsync(cmd, CancellationToken.None);
+          result.AsT0.ExtractedKeywords.Should().Contain("alpha");
+      }
+
+      [Fact]
+      public async Task DocumentProcessed_HasTimestamp()
+      {
+          var before = DateTime.UtcNow;
+          var handler = new ProcessDocumentCommandHandler(CreateParser(), CreateStore());
+          var cmd = new ProcessDocumentCommand(Guid.NewGuid(), "ts.pdf", "application/pdf", new byte[] { 1 });
+          var result = await handler.HandleAsync(cmd, CancellationToken.None);
+          result.AsT0.ProcessedAt.Should().BeOnOrAfter(before);
+      }
+  }

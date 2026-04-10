@@ -1,0 +1,18 @@
+name: summarisation_hard_098
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The trajectory of Moore's Law has decelerated as transistor dimensions approach atomic limits, spurring alternative computing paradigms including neuromorphic chips, photonic computing, and in-memory processing architectures. Each approach trades against classical CMOS in different dimensions — energy efficiency, programmability, and fabrication cost. The industry's response is a heterogeneous integration of specialised chiplets rather than a single successor architecture.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Moore's Law"
+    - "transistor"
+    - "neuromorphic"
+    - "chiplet"
+  max_words: 25

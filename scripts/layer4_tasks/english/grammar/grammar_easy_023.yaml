@@ -1,0 +1,15 @@
+name: grammar_easy_023
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Nobody but her knew the answer.
+  B) Nobody but she knew the answer.
+  C) Nobody but herself knew the answer.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

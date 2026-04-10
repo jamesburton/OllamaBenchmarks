@@ -1,0 +1,78 @@
+name: medium_efcore_021
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Project with: int Id, string Name, string OwnerId, DateTime StartDate, DateTime? EndDate, string Status.
+  An entity ProjectMember with: int Id, int ProjectId, string UserId, string Role.
+  A class ProjectDbContext : DbContext with DbSets and one-to-many configured.
+  A class ProjectRepository with constructor accepting ProjectDbContext.
+  Methods:
+    Task<IEnumerable<Project>> GetForUserAsync(string userId)
+    Task<IEnumerable<ProjectMember>> GetMembersAsync(int projectId)
+    Task AddMemberAsync(int projectId, string userId, string role)
+    Task RemoveMemberAsync(int projectId, string userId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProjectRepositoryTests : IAsyncLifetime
+  {
+      private ProjectDbContext _db = null!;
+      private ProjectRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<ProjectDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new ProjectDbContext(opts);
+          _repo = new ProjectRepository(_db);
+          _db.Add(new Project
+          {
+              Id = 1, Name = "Alpha", OwnerId = "u1",
+              StartDate = DateTime.UtcNow, Status = "Active",
+              Members = new List<ProjectMember>
+              {
+                  new() { UserId = "u1", Role = "Owner" },
+                  new() { UserId = "u2", Role = "Member" }
+              }
+          });
+          _db.Add(new Project { Id = 2, Name = "Beta", OwnerId = "u3", StartDate = DateTime.UtcNow, Status = "Active" });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetForUser_ReturnsUserProjects()
+      {
+          (await _repo.GetForUserAsync("u1")).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task GetMembers_ReturnsProjectMembers()
+      {
+          (await _repo.GetMembersAsync(1)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task AddMember_IncreasesCount()
+      {
+          await _repo.AddMemberAsync(1, "u3", "Viewer");
+          _db.ChangeTracker.Clear();
+          (await _repo.GetMembersAsync(1)).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task RemoveMember_DecreasesCount()
+      {
+          await _repo.RemoveMemberAsync(1, "u2");
+          _db.ChangeTracker.Clear();
+          (await _repo.GetMembersAsync(1)).Should().HaveCount(1);
+      }
+  }

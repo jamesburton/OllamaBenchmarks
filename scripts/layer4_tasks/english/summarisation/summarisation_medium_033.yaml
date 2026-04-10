@@ -1,0 +1,18 @@
+name: summarisation_medium_033
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Scientists have mapped the complete neural connectome of a small vertebrate brain, identifying thousands of synaptic connections between neurons. The achievement marks a milestone in neuroscience, providing new insights into how sensory information is processed and behaviour is generated. The researchers hope the connectome will inform the development of more sophisticated artificial neural networks.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "connectome"
+    - "neurons"
+    - "neuroscience"
+    - "brain"
+  max_words: 25

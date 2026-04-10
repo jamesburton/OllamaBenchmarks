@@ -1,0 +1,21 @@
+name: rewriting_medium_112
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'The fact that she had extensive experience in the field was a contributing factor to her appointment.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "experience"
+    - "contributed"
+    - "appointment"
+    - "field"
+    - "led to"
+  min_words: 4
+  max_words: 15

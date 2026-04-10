@@ -1,0 +1,94 @@
+name: hard_efcore_007
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with JSON column support for metadata storage:
+  Entity: Product(int Id, string Name, string Category, decimal Price,
+    ProductMetadata Metadata) where Metadata is stored as JSON in a single column.
+  Class ProductMetadata: Dictionary<string, string> Tags, List<string> Images,
+    Dictionary<string, decimal> PriceHistory, string? WarrantyInfo.
+  DbContext: ProductCatalogDbContext — configure Metadata to serialize as JSON using .ToJson().
+  Class ProductMetadataRepository(ProductCatalogDbContext db):
+    Task<Product> CreateAsync(Product product, CancellationToken ct)
+    Task<Product?> GetAsync(int id, CancellationToken ct)
+    Task<IReadOnlyList<Product>> GetByTagAsync(string tagKey, string tagValue, CancellationToken ct)
+    Task UpdateMetadataAsync(int id, ProductMetadata metadata, CancellationToken ct)
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductMetadataRepositoryTests : IDisposable
+  {
+      private readonly ProductCatalogDbContext _db;
+      private readonly ProductMetadataRepository _repo;
+
+      public ProductMetadataRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<ProductCatalogDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new ProductCatalogDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new ProductMetadataRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task Create_And_Get_MetadataRoundtrips()
+      {
+          var meta = new ProductMetadata
+          {
+              Tags = new() { ["color"] = "red", ["size"] = "L" },
+              Images = new() { "img1.png", "img2.png" },
+              PriceHistory = new() { ["2024-01"] = 9.99m },
+              WarrantyInfo = "1 year"
+          };
+          var p = await _repo.CreateAsync(new Product { Name = "Widget", Category = "Tools", Price = 9.99m, Metadata = meta }, CancellationToken.None);
+          var found = await _repo.GetAsync(p.Id, CancellationToken.None);
+          found!.Metadata.Tags["color"].Should().Be("red");
+          found.Metadata.Images.Should().HaveCount(2);
+          found.Metadata.WarrantyInfo.Should().Be("1 year");
+      }
+
+      [Fact]
+      public async Task UpdateMetadata_Persists()
+      {
+          var p = await _repo.CreateAsync(new Product { Name = "Gadget", Category = "Tech", Price = 20m, Metadata = new() { Tags = new(), Images = new(), PriceHistory = new() } }, CancellationToken.None);
+          var newMeta = new ProductMetadata { Tags = new() { ["brand"] = "ACME" }, Images = new(), PriceHistory = new() };
+          await _repo.UpdateMetadataAsync(p.Id, newMeta, CancellationToken.None);
+          var found = await _repo.GetAsync(p.Id, CancellationToken.None);
+          found!.Metadata.Tags["brand"].Should().Be("ACME");
+      }
+
+      [Fact]
+      public async Task GetByTag_FiltersCorrectly()
+      {
+          await _repo.CreateAsync(new Product { Name = "A", Category = "X", Price = 1m, Metadata = new() { Tags = new() { ["type"] = "premium" }, Images = new(), PriceHistory = new() } }, CancellationToken.None);
+          await _repo.CreateAsync(new Product { Name = "B", Category = "X", Price = 2m, Metadata = new() { Tags = new() { ["type"] = "basic" }, Images = new(), PriceHistory = new() } }, CancellationToken.None);
+          var result = await _repo.GetByTagAsync("type", "premium", CancellationToken.None);
+          result.Should().ContainSingle(p => p.Name == "A");
+      }
+
+      [Fact]
+      public async Task Get_UnknownId_ReturnsNull()
+      {
+          (await _repo.GetAsync(9999, CancellationToken.None)).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task Create_EmptyMetadata_Works()
+      {
+          var p = await _repo.CreateAsync(new Product
+          {
+              Name = "Minimal", Category = "X", Price = 5m,
+              Metadata = new ProductMetadata { Tags = new(), Images = new(), PriceHistory = new() }
+          }, CancellationToken.None);
+          p.Id.Should().BeGreaterThan(0);
+      }
+  }

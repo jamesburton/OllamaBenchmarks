@@ -1,0 +1,49 @@
+name: medium_async_040
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncMemoize with static method:
+    Func<TArg, CancellationToken, Task<TResult>> Wrap<TArg, TResult>(
+        Func<TArg, CancellationToken, Task<TResult>> func) where TArg : notnull
+  Returns a thread-safe memoized version. Concurrent calls with same arg only call func once.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncMemoizeTests
+  {
+      [Fact]
+      public async Task CallsOnce()
+      {
+          int calls = 0;
+          var m = AsyncMemoize.Wrap<int, string>(async (n, ct) => { calls++; await Task.Yield(); return n.ToString(); });
+          await m(5, default);
+          await m(5, default);
+          calls.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task DifferentArgs_CalledSeparately()
+      {
+          int calls = 0;
+          var m = AsyncMemoize.Wrap<int, int>(async (n, ct) => { calls++; await Task.Yield(); return n * 2; });
+          (await m(3, default)).Should().Be(6);
+          (await m(4, default)).Should().Be(8);
+          calls.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task Concurrent_SameArg_CalledOnce()
+      {
+          int calls = 0;
+          var m = AsyncMemoize.Wrap<string, int>(async (s, ct) => { calls++; await Task.Delay(30); return s.Length; });
+          await Task.WhenAll(Enumerable.Range(0, 5).Select(_ => m("hello", default)));
+          calls.Should().Be(1);
+      }
+  }

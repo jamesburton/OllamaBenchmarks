@@ -1,0 +1,92 @@
+name: hard_efcore_017
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with change tracking and domain events:
+  Abstract class DomainEntity: List<IDomainEvent> DomainEvents (not mapped), void AddEvent(IDomainEvent).
+  Interface IDomainEvent: DateTime OccurredAt.
+  Entity: Inventory(int Id, string Sku, int Quantity, int ReorderThreshold) : DomainEntity.
+  Domain events: StockAddedEvent(string Sku, int Quantity, DateTime OccurredAt),
+    StockRemovedEvent(string Sku, int Quantity, DateTime OccurredAt),
+    StockLowEvent(string Sku, int CurrentLevel, int Threshold, DateTime OccurredAt).
+  DbContext: InventoryDbContext — override SaveChangesAsync to collect and clear domain events.
+  Interface IDomainEventPublisher: Task PublishAsync(IReadOnlyList<IDomainEvent> events, CancellationToken ct).
+  Class InventoryService(InventoryDbContext db, IDomainEventPublisher publisher):
+    Task AddStockAsync(string sku, int qty, CancellationToken ct)
+    Task<bool> RemoveStockAsync(string sku, int qty, CancellationToken ct) — false if insufficient.
+    Task<Inventory?> GetAsync(string sku, CancellationToken ct)
+  Use SQLite in-memory. NSubstitute for publisher mock.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryDomainEventsTests : IDisposable
+  {
+      private readonly InventoryDbContext _db;
+      private readonly IDomainEventPublisher _publisher;
+      private readonly InventoryService _svc;
+
+      public InventoryDomainEventsTests()
+      {
+          var opts = new DbContextOptionsBuilder<InventoryDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new InventoryDbContext(opts);
+          _db.Database.EnsureCreated();
+          _publisher = Substitute.For<IDomainEventPublisher>();
+          _publisher.PublishAsync(Arg.Any<IReadOnlyList<IDomainEvent>>(), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          _svc = new InventoryService(_db, _publisher);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task AddStock_CreatesInventoryEntry()
+      {
+          await _svc.AddStockAsync("SKU-1", 100, CancellationToken.None);
+          var inv = await _svc.GetAsync("SKU-1", CancellationToken.None);
+          inv.Should().NotBeNull();
+          inv!.Quantity.Should().Be(100);
+      }
+
+      [Fact]
+      public async Task AddStock_PublishesDomainEvent()
+      {
+          await _svc.AddStockAsync("SKU-2", 50, CancellationToken.None);
+          await _publisher.Received(1).PublishAsync(
+              Arg.Is<IReadOnlyList<IDomainEvent>>(e => e.Any(ev => ev is StockAddedEvent)),
+              Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task RemoveStock_PublishesLowStockEventWhenBelowThreshold()
+      {
+          await _svc.AddStockAsync("SKU-3", 15, CancellationToken.None);
+          _db.Inventories.First(i => i.Sku == "SKU-3").ReorderThreshold = 10;
+          await _db.SaveChangesAsync();
+          await _svc.RemoveStockAsync("SKU-3", 8, CancellationToken.None);
+          await _publisher.Received().PublishAsync(
+              Arg.Is<IReadOnlyList<IDomainEvent>>(e => e.Any(ev => ev is StockLowEvent)),
+              Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task RemoveStock_InsufficientQty_ReturnsFalse()
+      {
+          await _svc.AddStockAsync("SKU-4", 5, CancellationToken.None);
+          var result = await _svc.RemoveStockAsync("SKU-4", 10, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task GetAsync_UnknownSku_ReturnsNull()
+      {
+          var result = await _svc.GetAsync("UNKNOWN", CancellationToken.None);
+          result.Should().BeNull();
+      }
+  }

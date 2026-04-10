@@ -1,0 +1,18 @@
+name: summarisation_medium_094
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Blockchain technology's promise of decentralised trust has found limited practical adoption outside cryptocurrency speculation and digital art NFTs. The environmental cost of proof-of-work consensus mechanisms, the poor user experience of wallet management, and the lack of legal enforceability of smart contracts have constrained enterprise uptake. Proof-of-stake protocols offer improved energy efficiency but introduce different trust assumptions.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "blockchain"
+    - "cryptocurrency"
+    - "NFT"
+    - "proof-of-stake"
+  max_words: 25

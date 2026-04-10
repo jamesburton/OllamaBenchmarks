@@ -1,0 +1,58 @@
+name: medium_linq_019
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Invoice with: int Id, string Client, decimal Amount, bool Paid.
+  A class InvoiceManager with a constructor accepting IEnumerable<Invoice> invoices.
+  Expose:
+    decimal TotalOutstanding()  — sum of Amount where Paid == false
+    decimal TotalPaid()         — sum of Amount where Paid == true
+    Dictionary<string, decimal> OutstandingByClient() — unpaid total per client
+    IEnumerable<Invoice> Overdue(decimal limit) — unpaid invoices exceeding limit, ordered by Amount desc
+  Return only valid C# code in a single file.
+test_code: |
+  public class InvoiceManagerTests
+  {
+      private readonly Invoice[] _invoices = {
+          new(1, "Acme",  500m,  false),
+          new(2, "Acme",  300m,  true),
+          new(3, "BetaCo",200m,  false),
+          new(4, "BetaCo",800m,  false),
+          new(5, "Acme",  100m,  true),
+      };
+
+      [Fact]
+      public void TotalOutstanding_IsCorrect()
+      {
+          new InvoiceManager(_invoices).TotalOutstanding().Should().Be(1500m);
+      }
+
+      [Fact]
+      public void TotalPaid_IsCorrect()
+      {
+          new InvoiceManager(_invoices).TotalPaid().Should().Be(400m);
+      }
+
+      [Fact]
+      public void OutstandingByClient_AcmeIs500()
+      {
+          var result = new InvoiceManager(_invoices).OutstandingByClient();
+          result["Acme"].Should().Be(500m);
+          result["BetaCo"].Should().Be(1000m);
+      }
+
+      [Fact]
+      public void Overdue_Above400_ReturnsBetaCoOnly()
+      {
+          var result = new InvoiceManager(_invoices).Overdue(400m).ToList();
+          result.Should().ContainSingle(i => i.Id == 4);
+      }
+  }

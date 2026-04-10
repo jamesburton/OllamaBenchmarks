@@ -1,0 +1,42 @@
+name: easy_patterns_040
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Interval(DateTime Start, DateTime End)
+  with a method:
+    bool Overlaps(Interval other) — returns true if intervals overlap (touching endpoints count as overlapping)
+  Return only valid C# code in a single file.
+test_code: |
+  public class IntervalTests
+  {
+      [Fact]
+      public void Overlaps_Overlapping_ReturnsTrue()
+      {
+          var a = new Interval(new DateTime(2024,1,1), new DateTime(2024,1,10));
+          var b = new Interval(new DateTime(2024,1,5), new DateTime(2024,1,15));
+          a.Overlaps(b).Should().BeTrue();
+      }
+      [Fact]
+      public void Overlaps_NonOverlapping_ReturnsFalse()
+      {
+          var a = new Interval(new DateTime(2024,1,1), new DateTime(2024,1,5));
+          var b = new Interval(new DateTime(2024,1,6), new DateTime(2024,1,10));
+          a.Overlaps(b).Should().BeFalse();
+      }
+      [Fact]
+      public void Overlaps_Touching_ReturnsTrue()
+      {
+          var a = new Interval(new DateTime(2024,1,1), new DateTime(2024,1,5));
+          var b = new Interval(new DateTime(2024,1,5), new DateTime(2024,1,10));
+          a.Overlaps(b).Should().BeTrue();
+      }
+  }

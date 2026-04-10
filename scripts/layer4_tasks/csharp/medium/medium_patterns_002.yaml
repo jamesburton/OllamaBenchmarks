@@ -1,0 +1,58 @@
+name: medium_patterns_002
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Result<T> with bool IsSuccess, T? Value, string? Error.
+  Static factories: Result<T>.Ok(T value) and Result<T>.Fail(string error).
+  Extension methods on Result<T>:
+    Result<TOut> Map<TOut>(Func<T, TOut> f)
+    Result<T> OnError(Action<string> handler)
+    T GetValueOrDefault(T defaultValue)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ResultTests
+  {
+      [Fact]
+      public void Ok_IsSuccess()
+      {
+          var r = Result<int>.Ok(42);
+          r.IsSuccess.Should().BeTrue();
+          r.Value.Should().Be(42);
+      }
+
+      [Fact]
+      public void Fail_IsNotSuccess()
+      {
+          var r = Result<int>.Fail("err");
+          r.IsSuccess.Should().BeFalse();
+          r.Error.Should().Be("err");
+      }
+
+      [Fact]
+      public void Map_Success_Transforms()
+      {
+          Result<int>.Ok(5).Map(x => x * 2).Value.Should().Be(10);
+      }
+
+      [Fact]
+      public void Map_Failure_PropagatesError()
+      {
+          var r = Result<int>.Fail("oops").Map(x => x * 2);
+          r.IsSuccess.Should().BeFalse();
+          r.Error.Should().Be("oops");
+      }
+
+      [Fact]
+      public void GetValueOrDefault_Failure_ReturnsDefault()
+      {
+          Result<int>.Fail("x").GetValueOrDefault(99).Should().Be(99);
+      }
+  }

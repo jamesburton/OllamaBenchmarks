@@ -1,0 +1,36 @@
+name: easy_async_049
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class TaskChain with a static method:
+    async Task<int> ChainAsync(int start)
+  that:
+    1. Awaits Task.FromResult(start) to get the initial value
+    2. Awaits a second task that adds 10
+    3. Awaits a third task that multiplies by 2
+    4. Returns the final result
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaskChainTests
+  {
+      [Fact]
+      public async Task ChainAsync_BasicCase()
+      {
+          var result = await TaskChain.ChainAsync(5);
+          result.Should().Be(30);
+      }
+      [Fact]
+      public async Task ChainAsync_StartsAtZero()
+      {
+          var result = await TaskChain.ChainAsync(0);
+          result.Should().Be(20);
+      }
+  }

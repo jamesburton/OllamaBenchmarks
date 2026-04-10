@@ -1,0 +1,53 @@
+name: medium_async_008
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ValueTaskCache<T> with a constructor accepting Func<CancellationToken, ValueTask<T>> factory.
+  Expose:
+    ValueTask<T> GetAsync(CancellationToken ct = default)
+  Computes the value once via factory and caches it.
+  Subsequent calls return the cached value without invoking factory again.
+  Thread-safe using SemaphoreSlim.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ValueTaskCacheTests
+  {
+      [Fact]
+      public async Task GetAsync_CallsFactoryOnce()
+      {
+          int calls = 0;
+          var cache = new ValueTaskCache<int>(async ct => { calls++; await Task.Yield(); return 99; });
+          _ = await cache.GetAsync();
+          _ = await cache.GetAsync();
+          _ = await cache.GetAsync();
+          calls.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task GetAsync_ReturnsCachedValue()
+      {
+          var cache = new ValueTaskCache<string>(async ct => { await Task.Yield(); return "hello"; });
+          var a = await cache.GetAsync();
+          var b = await cache.GetAsync();
+          a.Should().Be("hello");
+          b.Should().Be("hello");
+      }
+
+      [Fact]
+      public async Task GetAsync_ConcurrentAccess_FactoryOnce()
+      {
+          int calls = 0;
+          var cache = new ValueTaskCache<int>(async ct => { calls++; await Task.Delay(30, ct); return 42; });
+          var tasks = Enumerable.Range(0, 10).Select(_ => cache.GetAsync().AsTask());
+          await Task.WhenAll(tasks);
+          calls.Should().Be(1);
+      }
+  }

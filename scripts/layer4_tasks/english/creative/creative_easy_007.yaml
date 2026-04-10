@@ -1,0 +1,22 @@
+name: creative_easy_007
+category: english
+subcategory: creative
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a child discovering snow for the first time.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "snow"
+    - "child"
+    - "wonder"
+    - "white"
+    - "cold"
+    - "first"
+    - "flakes"
+    - "amazed"
+  min_words: 15
+  max_words: 60

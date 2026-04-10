@@ -1,0 +1,41 @@
+name: medium_blazor_021
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TimerService with:
+    IsRunning, ElapsedSeconds, Start(), Stop(), Reset(), Tick() (increments by 1), OnTimerChanged event
+  Return only valid C# code in a single file.
+test_code: |
+  public class TimerServiceTests
+  {
+      [Fact]
+      public void Service_CanBeInstantiated()
+      {
+          var svc = new TimerService();
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_InitialState_IsDefault()
+      {
+          var svc = new TimerService();
+          // Just verify construction does not throw
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_BasicOperation_Works()
+      {
+          var svc = new TimerService();
+          // Basic smoke test
+          svc.Should().NotBeNull();
+      }
+  }

@@ -1,0 +1,12 @@
+name: truth_tables_medium_010
+category: logic
+subcategory: truth_tables
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Evaluate: (True IMPLIES True) AND (False IMPLIES False) AND NOT (True IMPLIES False)
+  Reply with only True or False.
+expected_answer: "True"
+validator_config: {}

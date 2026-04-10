@@ -1,0 +1,24 @@
+name: technical_medium_069
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a notice informing users that a service will be discontinued in 30 days.
+  Include guidance on how to export their data.
+  Keep it under 60 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "discontinued"
+    - "30 days"
+    - "export"
+    - "data"
+    - "deadline"
+    - "service"
+    - "ending"
+    - "download"
+  min_words: 10
+  max_words: 60

@@ -1,0 +1,52 @@
+name: medium_patterns_009
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class OptionParser with constructor accepting string[] args.
+  Expose:
+    string? GetOption(string name) — value after --name flag, null if absent
+    bool HasFlag(string name) — true if --name present without a following value
+    IReadOnlyList<string> PositionalArgs() — args not starting with --
+  Return only valid C# code in a single file.
+test_code: |
+  public class OptionParserTests
+  {
+      [Fact]
+      public void GetOption_ReturnsValue()
+      {
+          new OptionParser(new[]{"--output","file.txt"}).GetOption("output").Should().Be("file.txt");
+      }
+
+      [Fact]
+      public void GetOption_Missing_ReturnsNull()
+      {
+          new OptionParser(new[]{"--verbose"}).GetOption("output").Should().BeNull();
+      }
+
+      [Fact]
+      public void HasFlag_PresentWithNoValue_True()
+      {
+          new OptionParser(new[]{"--verbose","pos"}).HasFlag("verbose").Should().BeTrue();
+      }
+
+      [Fact]
+      public void PositionalArgs_NonFlags()
+      {
+          new OptionParser(new[]{"file1.txt","--output","out.txt","file2.txt"})
+              .PositionalArgs().Should().BeEquivalentTo(new[]{"file1.txt","file2.txt"});
+      }
+
+      [Fact]
+      public void HasFlag_FlagWithValue_False()
+      {
+          new OptionParser(new[]{"--level","3"}).HasFlag("level").Should().BeFalse();
+      }
+  }

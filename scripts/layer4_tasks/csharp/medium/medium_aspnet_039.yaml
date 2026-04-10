@@ -1,0 +1,55 @@
+name: medium_aspnet_039
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record AddressDto(string Street, string City, string PostalCode, string Country).
+  A record GeocodingResult(AddressDto Address, double Latitude, double Longitude).
+  An interface IGeocodingService with:
+    Task<GeocodingResult?> GeocodeAsync(AddressDto address)
+  A class GeocodingController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IGeocodingService.
+  Action: POST api/geocoding — returns geocoding result or 404 if address not found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class GeocodingControllerTests
+  {
+      [Fact]
+      public async Task Geocode_Found_ReturnsResult()
+      {
+          var svc = Substitute.For<IGeocodingService>();
+          var addr = new AddressDto("10 Downing St", "London", "SW1A 2AA", "UK");
+          svc.GeocodeAsync(addr).Returns(new GeocodingResult(addr, 51.503, -0.127));
+          var ctrl = new GeocodingController(svc);
+          var result = await ctrl.Geocode(addr) as OkObjectResult;
+          (result!.Value as GeocodingResult)!.Latitude.Should().BeApproximately(51.503, 0.001);
+      }
+
+      [Fact]
+      public async Task Geocode_NotFound_Returns404()
+      {
+          var svc = Substitute.For<IGeocodingService>();
+          svc.GeocodeAsync(Arg.Any<AddressDto>()).Returns((GeocodingResult?)null);
+          var ctrl = new GeocodingController(svc);
+          (await ctrl.Geocode(new AddressDto("Unknown", "City", "00000", "XX")))
+              .Should().BeOfType<NotFoundResult>();
+      }
+
+      [Fact]
+      public async Task Geocode_CallsServiceWithAddress()
+      {
+          var svc = Substitute.For<IGeocodingService>();
+          var addr = new AddressDto("1 Main St", "Springfield", "12345", "US");
+          svc.GeocodeAsync(addr).Returns(new GeocodingResult(addr, 0, 0));
+          var ctrl = new GeocodingController(svc);
+          await ctrl.Geocode(addr);
+          await svc.Received(1).GeocodeAsync(addr);
+      }
+  }

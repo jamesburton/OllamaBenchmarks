@@ -1,0 +1,45 @@
+name: medium_patterns_021
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CollectionDiff<T> where T : IEquatable<T> with constructor accepting IEnumerable<T> before, IEnumerable<T> after.
+  Expose: IEnumerable<T> Added, IEnumerable<T> Removed, IEnumerable<T> Unchanged.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CollectionDiffTests
+  {
+      [Fact]
+      public void Added_NewItems()
+      {
+          new CollectionDiff<int>(new[]{1,2,3}, new[]{1,2,3,4,5}).Added.Should().BeEquivalentTo(new[]{4,5});
+      }
+
+      [Fact]
+      public void Removed_MissingItems()
+      {
+          new CollectionDiff<string>(new[]{"a","b","c"}, new[]{"a","c"}).Removed.Should().BeEquivalentTo(new[]{"b"});
+      }
+
+      [Fact]
+      public void Unchanged_CommonItems()
+      {
+          new CollectionDiff<int>(new[]{1,2,3}, new[]{2,3,4}).Unchanged.Should().BeEquivalentTo(new[]{2,3});
+      }
+
+      [Fact]
+      public void NoChanges_AllUnchanged()
+      {
+          var diff = new CollectionDiff<int>(new[]{1,2}, new[]{1,2});
+          diff.Added.Should().BeEmpty();
+          diff.Removed.Should().BeEmpty();
+          diff.Unchanged.Should().BeEquivalentTo(new[]{1,2});
+      }
+  }

@@ -1,0 +1,20 @@
+name: rewriting_hard_029
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in the passive voice:
+  'The committee is going to consider all proposals submitted before the deadline.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "are going to be considered"
+    - "will be considered"
+    - "proposals"
+    - "considered"
+  min_words: 6
+  max_words: 30

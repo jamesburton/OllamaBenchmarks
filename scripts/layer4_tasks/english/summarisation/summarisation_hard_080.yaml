@@ -1,0 +1,18 @@
+name: summarisation_hard_080
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The administrative state, through its quasi-legislative rulemaking and quasi-judicial adjudication functions, exercises powers that sit uneasily within classical separation of powers doctrine. Proponents of a strong administrative state argue that technical governance requires expert bureaucracies insulated from electoral pressure. The non-delegation doctrine, revived in recent jurisprudence, holds that Congress cannot transfer broad lawmaking authority to executive agencies without an intelligible principle constraining discretion.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "administrative state"
+    - "delegation"
+    - "Congress"
+    - "rulemaking"
+  max_words: 25

@@ -1,0 +1,22 @@
+name: technical_easy_005
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Getting Started' section for a mobile app.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "download"
+    - "install"
+    - "sign up"
+    - "launch"
+    - "start"
+    - "app"
+    - "getting started"
+  min_words: 10
+  max_words: 80

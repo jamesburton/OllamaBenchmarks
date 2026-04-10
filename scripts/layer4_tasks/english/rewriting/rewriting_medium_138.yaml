@@ -1,0 +1,21 @@
+name: rewriting_medium_138
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'Having spoken to both parties, the issue seems to stem from a misunderstanding that occurred at the outset of the project, which could have been avoided with clearer initial communication.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "misunderstanding"
+    - "communication"
+    - "initial"
+    - "project"
+    - "avoidable"
+  min_words: 5
+  max_words: 25

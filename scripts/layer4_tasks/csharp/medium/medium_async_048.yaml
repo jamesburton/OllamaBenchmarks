@@ -1,0 +1,54 @@
+name: medium_async_048
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncSlidingWindowRateLimiter with constructor accepting int maxRequests and TimeSpan window.
+  Exposes Task<bool> TryAcquireAsync(CancellationToken ct = default) and int CurrentCount.
+  Thread-safe. Requests older than the window expire.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncSlidingWindowRateLimiterTests
+  {
+      [Fact]
+      public async Task WithinLimit_ReturnsTrue()
+      {
+          var lim = new AsyncSlidingWindowRateLimiter(5, TimeSpan.FromSeconds(10));
+          for (int i = 0; i < 5; i++)
+              (await lim.TryAcquireAsync()).Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task ExceedsLimit_ReturnsFalse()
+      {
+          var lim = new AsyncSlidingWindowRateLimiter(3, TimeSpan.FromSeconds(10));
+          for (int i = 0; i < 3; i++) await lim.TryAcquireAsync();
+          (await lim.TryAcquireAsync()).Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task CurrentCount_Tracks()
+      {
+          var lim = new AsyncSlidingWindowRateLimiter(10, TimeSpan.FromSeconds(10));
+          await lim.TryAcquireAsync();
+          await lim.TryAcquireAsync();
+          lim.CurrentCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task AfterWindow_AllowsAgain()
+      {
+          var lim = new AsyncSlidingWindowRateLimiter(1, TimeSpan.FromMilliseconds(50));
+          await lim.TryAcquireAsync();
+          (await lim.TryAcquireAsync()).Should().BeFalse();
+          await Task.Delay(100);
+          (await lim.TryAcquireAsync()).Should().BeTrue();
+      }
+  }

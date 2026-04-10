@@ -1,0 +1,38 @@
+name: easy_efcore_020
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Session with properties: int Id, string UserId, DateTime StartedAt, DateTime? EndedAt
+  A DbContext class SessionContext with:
+    DbSet<Session> Sessions { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class SessionRepository with:
+    List<Session> GetActiveSessions(SessionContext context)
+  that returns sessions where EndedAt is null (still active).
+  Return only valid C# code in a single file.
+test_code: |
+  public class SessionRepositoryTests
+  {
+      [Fact]
+      public void GetActiveSessions_ReturnsActiveSessions()
+      {
+          using var context = new SessionContext();
+          context.Database.EnsureCreated();
+          context.Sessions.AddRange(
+              new Session { UserId = "u1", StartedAt = DateTime.UtcNow, EndedAt = null },
+              new Session { UserId = "u2", StartedAt = DateTime.UtcNow, EndedAt = DateTime.UtcNow });
+          context.SaveChanges();
+          var result = SessionRepository.GetActiveSessions(context);
+          result.Should().HaveCount(1);
+          result[0].UserId.Should().Be("u1");
+      }
+  }

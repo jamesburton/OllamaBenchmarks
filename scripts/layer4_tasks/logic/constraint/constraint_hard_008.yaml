@@ -1,0 +1,18 @@
+name: constraint_hard_008
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Five cards face down: Ace, 2, 3, 4, 5. Cards are in positions 1-5.
+  Clues:
+  1. The Ace is between the 2 and the 3.
+  2. The 4 is in position 1.
+  3. The 5 is in position 5.
+  4. The 2 is in position 2.
+  5. The 3 is to the right of the Ace.
+  What position is the Ace? Reply with only the number.
+expected_answer: "3"
+validator_config: {}

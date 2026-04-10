@@ -1,0 +1,31 @@
+name: easy_linq_027
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Mapper with a static method:
+    List<int> SelectSquares(IEnumerable<int> numbers)
+  that returns each number squared using LINQ Select + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MapperTests
+  {
+      [Fact]
+      public void SelectSquares_BasicCase()
+      {
+          var result = Mapper.SelectSquares(new[]{1,2,3,4});
+          result.Should().BeEquivalentTo(new[]{1,4,9,16}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void SelectSquares_EmptySource_ReturnsEmpty()
+      {
+          Mapper.SelectSquares(Array.Empty<int>()).Should().BeEmpty();
+      }
+  }

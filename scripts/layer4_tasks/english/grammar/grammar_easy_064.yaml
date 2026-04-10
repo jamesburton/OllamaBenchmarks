@@ -1,0 +1,15 @@
+name: grammar_easy_064
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The flight was delayed, however the passengers waited patiently.
+  B) The flight was delayed; however, the passengers waited patiently.
+  C) The flight was delayed however the passengers waited patiently.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

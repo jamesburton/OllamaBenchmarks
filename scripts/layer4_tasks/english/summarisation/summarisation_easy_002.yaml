@@ -1,0 +1,18 @@
+name: summarisation_easy_002
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Remote work has become standard practice for many businesses since the pandemic. Companies have reduced office space and invested in collaboration tools. Employee surveys show that most workers prefer a hybrid model combining home and office time.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "remote"
+    - "hybrid"
+    - "office"
+    - "pandemic"
+  max_words: 25

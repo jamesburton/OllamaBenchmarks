@@ -1,0 +1,38 @@
+name: easy_aspnet_024
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class SmtpOptions with:
+    string Host { get; set; }
+    int Port { get; set; } = 587
+    string Username { get; set; }
+    string Password { get; set; }
+    bool UseSsl { get; set; } = true
+  and a static class SmtpOptionsHelper with:
+    string GetConnectionInfo(SmtpOptions options)
+  that returns "{options.Host}:{options.Port} (ssl={options.UseSsl})".
+  Return only valid C# code in a single file.
+test_code: |
+  public class SmtpOptionsHelperTests
+  {
+      [Fact]
+      public void GetConnectionInfo_DefaultSsl()
+      {
+          var opts = new SmtpOptions { Host = "smtp.example.com", Port = 587, Username = "user", Password = "pass" };
+          SmtpOptionsHelper.GetConnectionInfo(opts).Should().Be("smtp.example.com:587 (ssl=True)");
+      }
+      [Fact]
+      public void GetConnectionInfo_NoSsl()
+      {
+          var opts = new SmtpOptions { Host = "localhost", Port = 25, Username = "", Password = "", UseSsl = false };
+          SmtpOptionsHelper.GetConnectionInfo(opts).Should().Be("localhost:25 (ssl=False)");
+      }
+  }

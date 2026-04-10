@@ -1,0 +1,42 @@
+name: easy_masstransit_028
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record LoginAttempt(string UserId, bool Success, string IpAddress)
+  A consumer class LoginAttemptConsumer that implements IConsumer<LoginAttempt>:
+    Has a public Dictionary<string, int> FailedAttemptsByIp = new()
+    Consume method: if Success is false, increments count for IpAddress in FailedAttemptsByIp
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class LoginAttemptConsumerTests
+  {
+      [Fact]
+      public async Task Consume_FailedLogin_TracksIp()
+      {
+          var consumer = new LoginAttemptConsumer();
+          var context = Substitute.For<ConsumeContext<LoginAttempt>>();
+          context.Message.Returns(new LoginAttempt("u1", false, "1.2.3.4"));
+          await consumer.Consume(context);
+          await consumer.Consume(context);
+          consumer.FailedAttemptsByIp["1.2.3.4"].Should().Be(2);
+      }
+      [Fact]
+      public async Task Consume_SuccessfulLogin_NotTracked()
+      {
+          var consumer = new LoginAttemptConsumer();
+          var context = Substitute.For<ConsumeContext<LoginAttempt>>();
+          context.Message.Returns(new LoginAttempt("u1", true, "1.2.3.4"));
+          await consumer.Consume(context);
+          consumer.FailedAttemptsByIp.Should().BeEmpty();
+      }
+  }

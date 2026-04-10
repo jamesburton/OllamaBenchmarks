@@ -1,0 +1,41 @@
+name: easy_masstransit_007
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record ProductPriceChanged(string ProductId, decimal OldPrice, decimal NewPrice)
+  A consumer class ProductPriceChangedConsumer that implements IConsumer<ProductPriceChanged>:
+    Has a public List<ProductPriceChanged> Changes = new()
+    Consume method adds message to Changes only if NewPrice != OldPrice
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class ProductPriceChangedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_PriceChanged_AddsToList()
+      {
+          var consumer = new ProductPriceChangedConsumer();
+          var context = Substitute.For<ConsumeContext<ProductPriceChanged>>();
+          context.Message.Returns(new ProductPriceChanged("P1", 10m, 15m));
+          await consumer.Consume(context);
+          consumer.Changes.Should().HaveCount(1);
+      }
+      [Fact]
+      public async Task Consume_SamePrice_DoesNotAdd()
+      {
+          var consumer = new ProductPriceChangedConsumer();
+          var context = Substitute.For<ConsumeContext<ProductPriceChanged>>();
+          context.Message.Returns(new ProductPriceChanged("P1", 10m, 10m));
+          await consumer.Consume(context);
+          consumer.Changes.Should().BeEmpty();
+      }
+  }

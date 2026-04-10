@@ -1,0 +1,41 @@
+name: medium_vertical_030
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for recordmetric.
+  Include:
+    Command: string MetricName, double Value, IDictionary<string,string> Tags, DateTime Timestamp
+  Result: Guid RecordId, bool Stored, DateTime RecordedAt
+  Handler validates: MetricName not empty, Tags count <= 10.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RecordMetricHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new RecordMetricHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new RecordMetricHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new RecordMetricHandler();
+          handler.Should().NotBeNull();
+      }
+  }

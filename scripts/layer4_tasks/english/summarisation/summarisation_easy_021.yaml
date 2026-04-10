@@ -1,0 +1,18 @@
+name: summarisation_easy_021
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Researchers have developed a new vaccine that shows a 90 percent efficacy rate against a common respiratory virus. Clinical trials involving thousands of participants demonstrated the vaccine is safe and produces a strong immune response. Health authorities expect regulatory approval within the next six months.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "vaccine"
+    - "efficacy"
+    - "clinical"
+    - "immune"
+  max_words: 25

@@ -1,0 +1,64 @@
+name: medium_async_027
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncPaginatedFetcher<T> with constructor accepting:
+    Func<int, CancellationToken, Task<Page<T>>> fetchPage
+  where Page<T> is a record with: IReadOnlyList<T> Items, bool HasNextPage, int PageNumber.
+  Expose:
+    IAsyncEnumerable<T> FetchAllAsync(CancellationToken ct = default)
+  Fetches pages starting from 1, yielding items from each page until HasNextPage is false.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncPaginatedFetcherTests
+  {
+      [Fact]
+      public async Task FetchAllAsync_ThreePages_AllItemsYielded()
+      {
+          int call = 0;
+          Task<Page<string>> FetchPage(int page, CancellationToken ct) {
+              call++;
+              return Task.FromResult(page switch {
+                  1 => new Page<string>(new[]{"a","b"}, true,  1),
+                  2 => new Page<string>(new[]{"c","d"}, true,  2),
+                  _ => new Page<string>(new[]{"e"},     false, 3)
+              });
+          }
+          var fetcher = new AsyncPaginatedFetcher<string>(FetchPage);
+          var items = new List<string>();
+          await foreach (var item in fetcher.FetchAllAsync())
+              items.Add(item);
+          items.Should().BeEquivalentTo(new[]{"a","b","c","d","e"}, cfg => cfg.WithStrictOrdering());
+          call.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task FetchAllAsync_SinglePageNoNext_ReturnsItems()
+      {
+          var fetcher = new AsyncPaginatedFetcher<int>(
+              (p, ct) => Task.FromResult(new Page<int>(new[]{1,2,3}, false, p)));
+          var items = new List<int>();
+          await foreach (var item in fetcher.FetchAllAsync())
+              items.Add(item);
+          items.Should().BeEquivalentTo(new[]{1,2,3});
+      }
+
+      [Fact]
+      public async Task FetchAllAsync_EmptyFirstPage_ReturnsEmpty()
+      {
+          var fetcher = new AsyncPaginatedFetcher<string>(
+              (p, ct) => Task.FromResult(new Page<string>(Array.Empty<string>(), false, p)));
+          var items = new List<string>();
+          await foreach (var item in fetcher.FetchAllAsync())
+              items.Add(item);
+          items.Should().BeEmpty();
+      }
+  }

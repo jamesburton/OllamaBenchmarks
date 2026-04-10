@@ -1,0 +1,19 @@
+name: rewriting_easy_104
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'The report is of a confidential nature.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "confidential"
+    - "report"
+    - "is"
+  min_words: 3
+  max_words: 8

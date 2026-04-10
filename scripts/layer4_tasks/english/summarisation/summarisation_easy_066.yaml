@@ -1,0 +1,18 @@
+name: summarisation_easy_066
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The mayor announced a ban on single-use plastics in the city starting from next January. Restaurants and retailers will be required to switch to biodegradable alternatives. A 50-dollar fine will be issued to businesses that do not comply within the transition period.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "plastics"
+    - "ban"
+    - "biodegradable"
+    - "fine"
+  max_words: 25

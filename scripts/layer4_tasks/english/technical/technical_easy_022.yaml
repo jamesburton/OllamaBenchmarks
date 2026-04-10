@@ -1,0 +1,21 @@
+name: technical_easy_022
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for a function that takes a list and returns its length.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Returns:"
+    - "list"
+    - "length"
+    - "int"
+    - "parameter"
+    - "returns"
+  min_words: 8
+  max_words: 60

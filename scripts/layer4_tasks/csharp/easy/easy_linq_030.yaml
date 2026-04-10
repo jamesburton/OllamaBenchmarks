@@ -1,0 +1,30 @@
+name: easy_linq_030
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Stats with a static method:
+    int CountWhere(IEnumerable<string> items, int minLength)
+  that returns the count of strings with length >= minLength using LINQ Count with predicate.
+  Return only valid C# code in a single file.
+test_code: |
+  public class StatsTests
+  {
+      [Fact]
+      public void CountWhere_BasicCase()
+      {
+          Stats.CountWhere(new[]{"a","bb","ccc","dddd"}, 3).Should().Be(2);
+      }
+      [Fact]
+      public void CountWhere_NoneMatch_ReturnsZero()
+      {
+          Stats.CountWhere(new[]{"a","b"}, 5).Should().Be(0);
+      }
+  }

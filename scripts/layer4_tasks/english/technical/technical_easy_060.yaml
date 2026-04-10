@@ -1,0 +1,23 @@
+name: technical_easy_060
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a brief cookie consent notice.
+  Keep it under 40 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "cookies"
+    - "accept"
+    - "website"
+    - "improve"
+    - "privacy"
+    - "consent"
+    - "policy"
+    - "third"
+  min_words: 8
+  max_words: 40

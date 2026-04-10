@@ -1,0 +1,95 @@
+name: hard_linq_009
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: SalesRep(int Id, string Region, string Name) and
+  Deal(int Id, int RepId, decimal Value, DateOnly CloseDate, bool Won).
+  A class SalesDashboard with constructor accepting IEnumerable<SalesRep> reps and
+  IEnumerable<Deal> deals.
+  Methods:
+    IEnumerable<RegionPerformance> RegionSummary() — joins reps to deals, groups by Region,
+      computes WonCount, LostCount, WinRate, TotalWonValue. Orders by TotalWonValue descending.
+    IEnumerable<RepLeaderboard> TopReps(int topN) — joins reps to won deals, sums value per rep,
+      returns top N ordered by TotalWon descending. Includes rep Name.
+    IEnumerable<Deal> RecentWins(int days, DateOnly referenceDate) — won deals closed within
+      last N days from referenceDate. Orders by CloseDate descending.
+  Records: RegionPerformance(string Region, int WonCount, int LostCount, double WinRate, decimal TotalWonValue),
+           RepLeaderboard(string Name, decimal TotalWon).
+  Return only valid C# code in a single file.
+test_code: |
+  public class SalesDashboardTests
+  {
+      private static readonly List<SalesRep> Reps = new()
+      {
+          new(1, "North", "Alice"),
+          new(2, "North", "Bob"),
+          new(3, "South", "Carol"),
+      };
+      private static readonly List<Deal> Deals = new()
+      {
+          new(1, 1, 10000m, new DateOnly(2024,1,5),  true),
+          new(2, 1, 5000m,  new DateOnly(2024,1,10), false),
+          new(3, 2, 8000m,  new DateOnly(2024,1,15), true),
+          new(4, 3, 12000m, new DateOnly(2024,1,20), true),
+          new(5, 3, 3000m,  new DateOnly(2024,1,25), false),
+      };
+
+      [Fact]
+      public void RegionSummary_ReturnsTwoRegions()
+      {
+          var result = new SalesDashboard(Reps, Deals).RegionSummary().ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void RegionSummary_NorthWonCountIsTwo()
+      {
+          var result = new SalesDashboard(Reps, Deals).RegionSummary().ToList();
+          result.First(r => r.Region == "North").WonCount.Should().Be(2);
+      }
+
+      [Fact]
+      public void TopReps_ReturnsTopN()
+      {
+          var result = new SalesDashboard(Reps, Deals).TopReps(2).ToList();
+          result.Should().HaveCount(2);
+          result[0].Name.Should().Be("Carol");
+      }
+
+      [Fact]
+      public void TopReps_ZeroN_ReturnsEmpty()
+      {
+          new SalesDashboard(Reps, Deals).TopReps(0).Should().BeEmpty();
+      }
+
+      [Fact]
+      public void RecentWins_FiltersCorrectly()
+      {
+          var result = new SalesDashboard(Reps, Deals)
+              .RecentWins(15, new DateOnly(2024,1,25)).ToList();
+          result.Should().AllSatisfy(d => d.Won.Should().BeTrue());
+          result.Should().Contain(d => d.CloseDate == new DateOnly(2024,1,15));
+      }
+
+      [Fact]
+      public void RecentWins_NoWinsInRange_ReturnsEmpty()
+      {
+          new SalesDashboard(Reps, Deals)
+              .RecentWins(1, new DateOnly(2024,1,1)).Should().BeEmpty();
+      }
+
+      [Fact]
+      public void RegionSummary_EmptyDeals_AllZeroStats()
+      {
+          var result = new SalesDashboard(Reps, Array.Empty<Deal>()).RegionSummary().ToList();
+          result.Should().BeEmpty();
+      }
+  }

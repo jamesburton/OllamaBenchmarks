@@ -1,0 +1,33 @@
+name: easy_xunit_020
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class WordUtils with static methods:
+    int CountWords(string text) returns the number of words (split by whitespace)
+    string Capitalize(string text) returns text with the first letter of each word capitalized
+  Return only valid C# code in a single file.
+test_code: |
+  public class WordUtilsTests
+  {
+      [Theory]
+      [InlineData("hello world", 2)]
+      [InlineData("one", 1)]
+      [InlineData("  spaces   here  ", 2)]
+      public void CountWords_ReturnsCorrectCount(string text, int expected)
+      {
+          WordUtils.CountWords(text).Should().Be(expected);
+      }
+      [Fact]
+      public void Capitalize_CapitalizesEachWord()
+      {
+          WordUtils.Capitalize("hello world").Should().Be("Hello World");
+      }
+  }

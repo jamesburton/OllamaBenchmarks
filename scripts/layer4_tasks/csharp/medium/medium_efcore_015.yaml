@@ -1,0 +1,72 @@
+name: medium_efcore_015
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Session with: int Id, string UserId, string Token, DateTime CreatedAt, DateTime ExpiresAt, bool IsRevoked.
+  A class SessionDbContext : DbContext with DbSet<Session> Sessions.
+  A class SessionRepository with constructor accepting SessionDbContext.
+  Methods:
+    Task<Session> CreateSessionAsync(string userId, TimeSpan duration)
+    Task<Session?> GetValidSessionAsync(string token)
+    Task RevokeSessionAsync(string token)
+    Task RevokeAllUserSessionsAsync(string userId)
+  GetValidSessionAsync returns session only if not revoked and ExpiresAt > UtcNow.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SessionRepositoryTests : IAsyncLifetime
+  {
+      private SessionDbContext _db = null!;
+      private SessionRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<SessionDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new SessionDbContext(opts);
+          _repo = new SessionRepository(_db);
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task CreateSession_ReturnsSession()
+      {
+          var s = await _repo.CreateSessionAsync("u1", TimeSpan.FromHours(1));
+          s.Should().NotBeNull();
+          s.Token.Should().NotBeNullOrEmpty();
+          s.ExpiresAt.Should().BeAfter(DateTime.UtcNow);
+      }
+
+      [Fact]
+      public async Task GetValidSession_ReturnsActive()
+      {
+          var s = await _repo.CreateSessionAsync("u1", TimeSpan.FromHours(1));
+          (await _repo.GetValidSessionAsync(s.Token)).Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task RevokeSession_InvalidatesSession()
+      {
+          var s = await _repo.CreateSessionAsync("u2", TimeSpan.FromHours(1));
+          await _repo.RevokeSessionAsync(s.Token);
+          (await _repo.GetValidSessionAsync(s.Token)).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task RevokeAllUserSessions_RevokesAll()
+      {
+          var s1 = await _repo.CreateSessionAsync("u3", TimeSpan.FromHours(1));
+          var s2 = await _repo.CreateSessionAsync("u3", TimeSpan.FromHours(1));
+          await _repo.RevokeAllUserSessionsAsync("u3");
+          (await _repo.GetValidSessionAsync(s1.Token)).Should().BeNull();
+          (await _repo.GetValidSessionAsync(s2.Token)).Should().BeNull();
+      }
+  }

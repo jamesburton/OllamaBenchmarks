@@ -1,0 +1,80 @@
+name: hard_blazor_016
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor search with autocomplete and debounce:
+  Records:
+    SearchSuggestion(string Text, string Category, int RelevanceScore)
+    SearchResult(string Id, string Title, string Snippet, string Category, double Score)
+    SearchQuery(string Term, string? Category, int MaxResults)
+
+  Interface ISearchIndex:
+    Task<IReadOnlyList<SearchSuggestion>> GetSuggestionsAsync(string prefix, CancellationToken ct)
+    Task<IReadOnlyList<SearchResult>> SearchAsync(SearchQuery query, CancellationToken ct)
+
+  Class InMemorySearchIndex : ISearchIndex:
+    Seeded with 15 items across 3 categories: "docs", "products", "users".
+    GetSuggestionsAsync: returns up to 5 suggestions where Text starts with prefix (case-insensitive).
+    SearchAsync: filters by Term (contains in Title), Category (if set), limits by MaxResults.
+      Sorts by relevance (title starts with term = higher score).
+
+  Class SearchDebouncer:
+    Task<T> DebounceAsync<T>(Func<CancellationToken, Task<T>> operation, TimeSpan delay, CancellationToken ct):
+      Cancels any pending operation and runs new one after delay.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InMemorySearchIndexTests
+  {
+      private readonly ISearchIndex _index = new InMemorySearchIndex();
+
+      [Fact]
+      public async Task GetSuggestions_ReturnsMatchingPrefix()
+      {
+          var suggestions = await _index.GetSuggestionsAsync("doc", CancellationToken.None);
+          suggestions.Should().NotBeEmpty();
+          suggestions.Should().AllSatisfy(s => s.Text.ToLower().Should().StartWith("doc"));
+      }
+
+      [Fact]
+      public async Task GetSuggestions_CaseInsensitive()
+      {
+          var suggestions = await _index.GetSuggestionsAsync("DOC", CancellationToken.None);
+          suggestions.Should().NotBeEmpty();
+      }
+
+      [Fact]
+      public async Task GetSuggestions_LimitsFive()
+      {
+          var suggestions = await _index.GetSuggestionsAsync("", CancellationToken.None);
+          suggestions.Should().HaveCountLessOrEqualTo(5);
+      }
+
+      [Fact]
+      public async Task Search_FiltersByCategory()
+      {
+          var results = await _index.SearchAsync(new SearchQuery("", "products", 20), CancellationToken.None);
+          results.Should().AllSatisfy(r => r.Category.Should().Be("products"));
+      }
+
+      [Fact]
+      public async Task Search_LimitsByMaxResults()
+      {
+          var results = await _index.SearchAsync(new SearchQuery("", null, 3), CancellationToken.None);
+          results.Should().HaveCountLessOrEqualTo(3);
+      }
+
+      [Fact]
+      public async Task Search_TermFiltersResults()
+      {
+          var results = await _index.SearchAsync(new SearchQuery("user", null, 10), CancellationToken.None);
+          results.Should().AllSatisfy(r => r.Title.ToLower().Should().Contain("user"));
+      }
+  }

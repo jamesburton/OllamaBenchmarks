@@ -1,0 +1,60 @@
+name: medium_aspnet_041
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Coupon(string Code, decimal Value, bool IsPercentage, int UsageLimit, int UsageCount).
+  A class CouponsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<Coupon> (for testability).
+  Actions:
+    GET api/coupons — all coupons
+    POST api/coupons/apply — accepts {code, orderTotal}: validates code exists, not exceeded limit, computes final price, returns {originalPrice, discount, finalPrice}
+  Return only valid C# code in a single file.
+test_code: |
+  public class CouponsControllerTests
+  {
+      private CouponsController MakeController() => new(new List<Coupon>
+      {
+          new("FLAT10", 10m, false, 100, 0),
+          new("PCT20", 20m, true, 50, 49),
+          new("USED", 5m, false, 1, 1)
+      });
+
+      [Fact]
+      public void GetAll_ReturnsAll()
+      {
+          (MakeController().GetAll() as OkObjectResult)!.Value.Should().BeAssignableTo<IEnumerable<Coupon>>()
+              .Which.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void Apply_FlatDiscount_CorrectPrice()
+      {
+          var result = MakeController().Apply("FLAT10", 50m) as OkObjectResult;
+          var val = result!.Value!;
+          var type = val.GetType();
+          ((decimal)type.GetProperty("finalPrice")!.GetValue(val)!).Should().Be(40m);
+      }
+
+      [Fact]
+      public void Apply_PercentageDiscount_CorrectPrice()
+      {
+          var result = MakeController().Apply("PCT20", 100m) as OkObjectResult;
+          var val = result!.Value!;
+          var type = val.GetType();
+          ((decimal)type.GetProperty("finalPrice")!.GetValue(val)!).Should().Be(80m);
+      }
+
+      [Fact]
+      public void Apply_ExceededLimit_Returns400()
+      {
+          MakeController().Apply("USED", 100m).Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

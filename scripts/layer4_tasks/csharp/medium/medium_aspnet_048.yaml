@@ -1,0 +1,54 @@
+name: medium_aspnet_048
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record PublishRequest(string TopicName, string Message, IDictionary<string, string> Metadata).
+  A record PublishResult(Guid MessageId, string TopicName, DateTime PublishedAt).
+  An interface IMessageBus with:
+    Task<PublishResult> PublishAsync(string topic, string message, IDictionary<string, string> metadata)
+  A class MessagingController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IMessageBus.
+  Action: POST api/messaging/publish — validates topic and message not empty, publishes, returns 200.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MessagingControllerTests
+  {
+      [Fact]
+      public async Task Publish_Valid_Returns200WithResult()
+      {
+          var bus = Substitute.For<IMessageBus>();
+          var result = new PublishResult(Guid.NewGuid(), "orders", DateTime.UtcNow);
+          bus.PublishAsync("orders", Arg.Any<string>(), Arg.Any<IDictionary<string, string>>()).Returns(result);
+          var ctrl = new MessagingController(bus);
+          var req = new PublishRequest("orders", "order placed", new Dictionary<string, string>());
+          var response = await ctrl.Publish(req) as OkObjectResult;
+          response!.StatusCode.Should().Be(200);
+          (response.Value as PublishResult)!.TopicName.Should().Be("orders");
+      }
+
+      [Fact]
+      public async Task Publish_EmptyTopic_Returns400()
+      {
+          var bus = Substitute.For<IMessageBus>();
+          var ctrl = new MessagingController(bus);
+          var req = new PublishRequest("", "msg", new Dictionary<string, string>());
+          (await ctrl.Publish(req)).Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public async Task Publish_EmptyMessage_Returns400()
+      {
+          var bus = Substitute.For<IMessageBus>();
+          var ctrl = new MessagingController(bus);
+          var req = new PublishRequest("topic", "", new Dictionary<string, string>());
+          (await ctrl.Publish(req)).Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

@@ -1,0 +1,94 @@
+name: hard_blazor_007
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor navigation guard and route service:
+  Records:
+    RouteGuardResult(bool CanNavigate, string? RedirectTo, string? Message)
+    NavigationEntry(string Path, DateTime NavigatedAt, string? UserId)
+
+  Interface IRouteGuard:
+    Task<RouteGuardResult> CanNavigateAsync(string targetPath, string? userId, CancellationToken ct)
+
+  Class AuthRouteGuard : IRouteGuard:
+    Protected paths: "/admin", "/dashboard", "/profile" require authenticated user.
+    If userId is null and path is protected: redirect to "/login".
+    Admin-only paths: "/admin" requires userId to start with "admin-".
+    If user lacks permission: redirect to "/unauthorized".
+    Otherwise: allow navigation.
+
+  Class NavigationHistory:
+    void Record(string path, string? userId)
+    IReadOnlyList<NavigationEntry> GetHistory()
+    IReadOnlyList<NavigationEntry> GetUserHistory(string userId)
+    void Clear()
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuthRouteGuardTests
+  {
+      private readonly IRouteGuard _guard = new AuthRouteGuard();
+
+      [Fact]
+      public async Task PublicPath_AnyUser_CanNavigate()
+      {
+          var result = await _guard.CanNavigateAsync("/home", null, CancellationToken.None);
+          result.CanNavigate.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task ProtectedPath_NullUser_RedirectsToLogin()
+      {
+          var result = await _guard.CanNavigateAsync("/dashboard", null, CancellationToken.None);
+          result.CanNavigate.Should().BeFalse();
+          result.RedirectTo.Should().Be("/login");
+      }
+
+      [Fact]
+      public async Task ProtectedPath_AuthenticatedUser_CanNavigate()
+      {
+          var result = await _guard.CanNavigateAsync("/dashboard", "user-123", CancellationToken.None);
+          result.CanNavigate.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task AdminPath_NonAdminUser_RedirectsToUnauthorized()
+      {
+          var result = await _guard.CanNavigateAsync("/admin", "user-123", CancellationToken.None);
+          result.CanNavigate.Should().BeFalse();
+          result.RedirectTo.Should().Be("/unauthorized");
+      }
+
+      [Fact]
+      public async Task AdminPath_AdminUser_CanNavigate()
+      {
+          var result = await _guard.CanNavigateAsync("/admin", "admin-001", CancellationToken.None);
+          result.CanNavigate.Should().BeTrue();
+      }
+
+      [Fact]
+      public void NavigationHistory_RecordsAndRetrieves()
+      {
+          var history = new NavigationHistory();
+          history.Record("/home", "u1");
+          history.Record("/about", "u2");
+          history.GetHistory().Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void NavigationHistory_FiltersByUser()
+      {
+          var history = new NavigationHistory();
+          history.Record("/a", "u1");
+          history.Record("/b", "u2");
+          history.Record("/c", "u1");
+          history.GetUserHistory("u1").Should().HaveCount(2);
+      }
+  }

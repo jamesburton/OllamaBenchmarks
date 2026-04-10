@@ -1,0 +1,44 @@
+name: easy_masstransit_016
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record BackupCompleted(Guid BackupId, string BackupType, long SizeBytes, bool Success)
+  A consumer class BackupCompletedConsumer that implements IConsumer<BackupCompleted>:
+    Has a public int SuccessCount = 0
+    Has a public int FailureCount = 0
+    Consume method increments SuccessCount if Success, else FailureCount
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class BackupCompletedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_Success_IncrementsSuccessCount()
+      {
+          var consumer = new BackupCompletedConsumer();
+          var context = Substitute.For<ConsumeContext<BackupCompleted>>();
+          context.Message.Returns(new BackupCompleted(Guid.NewGuid(), "full", 1000000, true));
+          await consumer.Consume(context);
+          consumer.SuccessCount.Should().Be(1);
+          consumer.FailureCount.Should().Be(0);
+      }
+      [Fact]
+      public async Task Consume_Failure_IncrementsFailureCount()
+      {
+          var consumer = new BackupCompletedConsumer();
+          var context = Substitute.For<ConsumeContext<BackupCompleted>>();
+          context.Message.Returns(new BackupCompleted(Guid.NewGuid(), "incremental", 0, false));
+          await consumer.Consume(context);
+          consumer.FailureCount.Should().Be(1);
+          consumer.SuccessCount.Should().Be(0);
+      }
+  }

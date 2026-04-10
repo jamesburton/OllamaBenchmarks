@@ -1,0 +1,54 @@
+name: medium_async_033
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncTransactionScope with constructor accepting:
+    Func<CancellationToken, Task> operation
+    Func<CancellationToken, Task> rollback
+  Exposes Task ExecuteAsync(CancellationToken ct = default).
+  On success: completes normally.
+  On operation failure: calls rollback then rethrows.
+  If rollback also throws: wraps both in AggregateException.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncTransactionScopeTests
+  {
+      [Fact]
+      public async Task Success_NoRollback()
+      {
+          bool rolled = false;
+          var scope = new AsyncTransactionScope(
+              ct => Task.CompletedTask,
+              async ct => { await Task.Yield(); rolled = true; });
+          await scope.ExecuteAsync();
+          rolled.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task OperationFails_RollbackCalled()
+      {
+          bool rolled = false;
+          var scope = new AsyncTransactionScope(
+              ct => Task.FromException(new Exception("fail")),
+              async ct => { await Task.Yield(); rolled = true; });
+          await Assert.ThrowsAnyAsync<Exception>(() => scope.ExecuteAsync());
+          rolled.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task BothFail_ThrowsAggregate()
+      {
+          var scope = new AsyncTransactionScope(
+              ct => Task.FromException(new Exception("op")),
+              ct => Task.FromException(new Exception("rb")));
+          await Assert.ThrowsAsync<AggregateException>(() => scope.ExecuteAsync());
+      }
+  }

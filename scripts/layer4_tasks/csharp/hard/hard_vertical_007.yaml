@@ -1,0 +1,97 @@
+name: hard_vertical_007
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Mediator pattern with pipeline behaviors for a todo API:
+  Records:
+    CreateTodoCommand(string Title, string? Description, string Priority, Guid? AssigneeId)
+    CompleteTodoCommand(Guid TodoId, string CompletedBy)
+    GetTodosQuery(Guid? AssigneeId, bool? IsCompleted, string? Priority)
+    TodoDto(Guid Id, string Title, string? Description, string Priority, bool IsCompleted, Guid? AssigneeId, DateTime CreatedAt, DateTime? CompletedAt)
+    TodoCommandResult(bool Success, TodoDto? Todo, string? Error)
+
+  Interface ITodoRepository:
+    Task<TodoDto> CreateAsync(CreateTodoCommand cmd, CancellationToken ct)
+    Task<TodoDto?> CompleteAsync(Guid id, string completedBy, CancellationToken ct)
+    Task<IReadOnlyList<TodoDto>> GetAsync(GetTodosQuery query, CancellationToken ct)
+
+  Class ValidationBehavior<TRequest, TResponse>:
+    Wraps handler; validates request before dispatching.
+
+  Class CreateTodoCommandHandler(ITodoRepository repo):
+    Validates Title not empty, Priority in ["Low","Medium","High"].
+
+  Class CompleteTodoCommandHandler(ITodoRepository repo):
+    Returns error if todo not found.
+
+  Use NSubstitute.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CreateTodoCommandHandlerTests
+  {
+      [Fact]
+      public async Task ValidCommand_ReturnsSuccess()
+      {
+          var repo = Substitute.For<ITodoRepository>();
+          repo.CreateAsync(Arg.Any<CreateTodoCommand>(), Arg.Any<CancellationToken>())
+              .Returns(new TodoDto(Guid.NewGuid(), "Task", null, "High", false, null, DateTime.UtcNow, null));
+          var handler = new CreateTodoCommandHandler(repo);
+          var result = await handler.HandleAsync(new CreateTodoCommand("Task", null, "High", null), CancellationToken.None);
+          result.Success.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task EmptyTitle_ReturnsValidationError()
+      {
+          var repo = Substitute.For<ITodoRepository>();
+          var handler = new CreateTodoCommandHandler(repo);
+          var result = await handler.HandleAsync(new CreateTodoCommand("", null, "High", null), CancellationToken.None);
+          result.Success.Should().BeFalse();
+          result.Error.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public async Task InvalidPriority_ReturnsValidationError()
+      {
+          var repo = Substitute.For<ITodoRepository>();
+          var handler = new CreateTodoCommandHandler(repo);
+          var result = await handler.HandleAsync(new CreateTodoCommand("Task", null, "Urgent", null), CancellationToken.None);
+          result.Success.Should().BeFalse();
+      }
+  }
+
+  public class CompleteTodoCommandHandlerTests
+  {
+      [Fact]
+      public async Task CompleteExisting_ReturnsSuccess()
+      {
+          var repo = Substitute.For<ITodoRepository>();
+          var id = Guid.NewGuid();
+          repo.CompleteAsync(id, Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(new TodoDto(id, "T", null, "Low", true, null, DateTime.UtcNow, DateTime.UtcNow));
+          var handler = new CompleteTodoCommandHandler(repo);
+          var result = await handler.HandleAsync(new CompleteTodoCommand(id, "user1"), CancellationToken.None);
+          result.Success.Should().BeTrue();
+          result.Todo!.IsCompleted.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task CompleteNotFound_ReturnsError()
+      {
+          var repo = Substitute.For<ITodoRepository>();
+          repo.CompleteAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns((TodoDto?)null);
+          var handler = new CompleteTodoCommandHandler(repo);
+          var result = await handler.HandleAsync(new CompleteTodoCommand(Guid.NewGuid(), "user"), CancellationToken.None);
+          result.Success.Should().BeFalse();
+          result.Error.Should().NotBeNullOrEmpty();
+      }
+  }

@@ -1,0 +1,15 @@
+name: grammar_easy_056
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) James' report was excellent.
+  B) James's report was excellent.
+  C) Both A and B are acceptable.
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

@@ -1,0 +1,21 @@
+name: rewriting_medium_089
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'The city built a new bridge. It reduced traffic congestion. Commuting times fell.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "bridge"
+    - "congestion"
+    - "commuting"
+    - "reduced"
+    - "fell"
+  min_words: 8
+  max_words: 30

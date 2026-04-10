@@ -1,0 +1,18 @@
+name: summarisation_hard_035
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Epigenetic inheritance — the transmission of gene expression patterns across generations without changes to the underlying DNA sequence — challenges the traditional Mendelian framework of genetics. Evidence from both plant and animal models suggests that environmentally induced epigenetic marks can persist for several generations. This finding has significant implications for our understanding of evolutionary adaptation and disease risk.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "epigenetic"
+    - "inheritance"
+    - "DNA"
+    - "evolution"
+  max_words: 25

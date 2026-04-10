@@ -1,0 +1,34 @@
+name: easy_patterns_026
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class TupleHelper with a static method:
+    (int Sum, int Product) SumAndProduct(int a, int b)
+  that returns both the sum and product of two integers as a named tuple.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TupleHelperTests
+  {
+      [Fact]
+      public void SumAndProduct_BasicCase()
+      {
+          var result = TupleHelper.SumAndProduct(3, 4);
+          result.Sum.Should().Be(7);
+          result.Product.Should().Be(12);
+      }
+      [Fact]
+      public void SumAndProduct_WithZero()
+      {
+          var result = TupleHelper.SumAndProduct(5, 0);
+          result.Sum.Should().Be(5);
+          result.Product.Should().Be(0);
+      }
+  }

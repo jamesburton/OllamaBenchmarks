@@ -1,0 +1,35 @@
+name: easy_async_005
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Cancellable with a static method:
+    async Task<string> GetValueAsync(CancellationToken cancellationToken)
+  that awaits Task.Delay(100, cancellationToken) then returns "done".
+  If cancellation is requested, the OperationCanceledException propagates naturally.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CancellableTests
+  {
+      [Fact]
+      public async Task GetValueAsync_Completes()
+      {
+          var result = await Cancellable.GetValueAsync(CancellationToken.None);
+          result.Should().Be("done");
+      }
+      [Fact]
+      public async Task GetValueAsync_Cancelled_Throws()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(
+              () => Cancellable.GetValueAsync(cts.Token));
+      }
+  }

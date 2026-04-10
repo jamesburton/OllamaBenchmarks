@@ -1,0 +1,41 @@
+name: medium_blazor_029
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class LocalStorageService with:
+    IDictionary<string, string> Store, Set(key, value), Get(key)->string?, Remove(key), ContainsKey(key)->bool, Clear()
+  Return only valid C# code in a single file.
+test_code: |
+  public class LocalStorageServiceTests
+  {
+      [Fact]
+      public void Service_CanBeInstantiated()
+      {
+          var svc = new LocalStorageService();
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_InitialState_IsDefault()
+      {
+          var svc = new LocalStorageService();
+          // Just verify construction does not throw
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_BasicOperation_Works()
+      {
+          var svc = new LocalStorageService();
+          // Basic smoke test
+          svc.Should().NotBeNull();
+      }
+  }

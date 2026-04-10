@@ -1,0 +1,18 @@
+name: summarisation_hard_096
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The debate between centralised and decentralised AI governance architectures reflects deeper tensions between the speed of innovation and the rigour of safety evaluation. Compute governance — controlling access to large training clusters — is proposed as a choke point for preventing the development of dangerous capabilities. Critics argue that export controls and licensing regimes will cede AI advantage to adversaries who face fewer regulatory constraints.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "AI governance"
+    - "compute"
+    - "safety"
+    - "regulation"
+  max_words: 25

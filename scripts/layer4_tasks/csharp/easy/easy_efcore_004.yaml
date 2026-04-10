@@ -1,0 +1,44 @@
+name: easy_efcore_004
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class User with properties: int Id, string Username, string Email, DateTime CreatedAt
+  A DbContext class UserContext with:
+    DbSet<User> Users { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class UserRepository with:
+    bool Delete(UserContext context, int id)
+  that deletes the user with the given id (returns true if found and deleted, false if not found).
+  Return only valid C# code in a single file.
+test_code: |
+  public class UserRepositoryTests
+  {
+      [Fact]
+      public void Delete_ExistingUser_ReturnsTrue()
+      {
+          using var context = new UserContext();
+          context.Database.EnsureCreated();
+          context.Users.Add(new User { Username = "alice", Email = "alice@test.com", CreatedAt = DateTime.UtcNow });
+          context.SaveChanges();
+          var id = context.Users.First().Id;
+          var result = UserRepository.Delete(context, id);
+          result.Should().BeTrue();
+          context.Users.Should().BeEmpty();
+      }
+      [Fact]
+      public void Delete_NonExistingUser_ReturnsFalse()
+      {
+          using var context = new UserContext();
+          context.Database.EnsureCreated();
+          UserRepository.Delete(context, 999).Should().BeFalse();
+      }
+  }

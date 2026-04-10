@@ -1,0 +1,35 @@
+name: easy_masstransit_027
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record TemperatureReading(string SensorId, double Temperature, DateTime Timestamp)
+  A consumer class TemperatureReadingConsumer that implements IConsumer<TemperatureReading>:
+    Has a public Dictionary<string, double> LatestReadings = new()
+    Consume method stores SensorId -> Temperature (overwriting previous)
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class TemperatureReadingConsumerTests
+  {
+      [Fact]
+      public async Task Consume_StoresLatestReading()
+      {
+          var consumer = new TemperatureReadingConsumer();
+          var ctx1 = Substitute.For<ConsumeContext<TemperatureReading>>();
+          ctx1.Message.Returns(new TemperatureReading("sensor1", 20.5, DateTime.UtcNow));
+          var ctx2 = Substitute.For<ConsumeContext<TemperatureReading>>();
+          ctx2.Message.Returns(new TemperatureReading("sensor1", 21.0, DateTime.UtcNow));
+          await consumer.Consume(ctx1);
+          await consumer.Consume(ctx2);
+          consumer.LatestReadings["sensor1"].Should().Be(21.0);
+      }
+  }

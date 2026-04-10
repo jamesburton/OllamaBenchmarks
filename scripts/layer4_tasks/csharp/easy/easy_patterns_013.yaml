@@ -1,0 +1,38 @@
+name: easy_patterns_013
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An enum Season { Spring, Summer, Autumn, Winter }
+  and a static class SeasonHelper with:
+    string GetDescription(Season season)
+  that uses a switch expression to return a description for each season.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SeasonHelperTests
+  {
+      [Fact]
+      public void GetDescription_Spring()
+      {
+          SeasonHelper.GetDescription(Season.Spring).Should().NotBeNullOrEmpty();
+      }
+      [Fact]
+      public void GetDescription_Summer()
+      {
+          SeasonHelper.GetDescription(Season.Summer).Should().NotBeNullOrEmpty();
+      }
+      [Fact]
+      public void GetDescription_AllSeasonsUnique()
+      {
+          var descriptions = new[]{Season.Spring, Season.Summer, Season.Autumn, Season.Winter}
+              .Select(SeasonHelper.GetDescription).ToList();
+          descriptions.Should().OnlyHaveUniqueItems();
+      }
+  }

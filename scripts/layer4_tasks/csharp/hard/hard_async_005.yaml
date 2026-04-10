@@ -1,0 +1,77 @@
+name: hard_async_005
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class DeadlineCancellationService that combines caller CancellationToken with a deadline:
+    CancellationTokenSource CreateDeadlineSource(TimeSpan deadline, CancellationToken callerCt) —
+      returns a linked CancellationTokenSource that cancels after deadline OR when caller cancels.
+    Task<T> RunWithDeadlineAsync<T>(Func<CancellationToken, Task<T>> work,
+      TimeSpan deadline, CancellationToken callerCt) — runs work with combined token;
+      on timeout wraps OperationCanceledException in TimeoutException with message "Deadline exceeded".
+      If caller cancelled, rethrows OperationCanceledException as-is.
+    Task<T> RunWithFallbackAsync<T>(Func<CancellationToken, Task<T>> work,
+      Func<Task<T>> fallback, TimeSpan deadline, CancellationToken callerCt) —
+      returns result of work if it completes within deadline, otherwise returns fallback result.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DeadlineCancellationServiceTests
+  {
+      private readonly DeadlineCancellationService _svc = new();
+
+      [Fact]
+      public async Task RunWithDeadlineAsync_CompletesInTime_ReturnsResult()
+      {
+          var result = await _svc.RunWithDeadlineAsync(
+              _ => Task.FromResult(42),
+              TimeSpan.FromSeconds(5), CancellationToken.None);
+          result.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task RunWithDeadlineAsync_ExceedsDeadline_ThrowsTimeoutException()
+      {
+          var act = async () => await _svc.RunWithDeadlineAsync(
+              async ct => { await Task.Delay(500, ct); return 1; },
+              TimeSpan.FromMilliseconds(50), CancellationToken.None);
+          await act.Should().ThrowAsync<TimeoutException>().WithMessage("*Deadline exceeded*");
+      }
+
+      [Fact]
+      public async Task RunWithDeadlineAsync_CallerCancels_ThrowsOperationCancelled()
+      {
+          var cts = new CancellationTokenSource();
+          cts.CancelAfter(50);
+          var act = async () => await _svc.RunWithDeadlineAsync(
+              async ct => { await Task.Delay(500, ct); return 1; },
+              TimeSpan.FromSeconds(5), cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+
+      [Fact]
+      public async Task RunWithFallbackAsync_WorkSucceeds_ReturnsPrimary()
+      {
+          var result = await _svc.RunWithFallbackAsync(
+              _ => Task.FromResult("primary"),
+              () => Task.FromResult("fallback"),
+              TimeSpan.FromSeconds(5), CancellationToken.None);
+          result.Should().Be("primary");
+      }
+
+      [Fact]
+      public async Task RunWithFallbackAsync_WorkTimesOut_ReturnsFallback()
+      {
+          var result = await _svc.RunWithFallbackAsync(
+              async ct => { await Task.Delay(500, ct); return "slow"; },
+              () => Task.FromResult("fallback"),
+              TimeSpan.FromMilliseconds(50), CancellationToken.None);
+          result.Should().Be("fallback");
+      }
+  }

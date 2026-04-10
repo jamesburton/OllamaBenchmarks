@@ -1,0 +1,33 @@
+name: easy_async_008
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Transformer with a static method:
+    async Task<string> TransformAsync(int value)
+  that asynchronously doubles the value and returns it as a string, e.g. 5 -> "10".
+  Use async/await with Task.FromResult internally.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TransformerTests
+  {
+      [Fact]
+      public async Task TransformAsync_DoublesAndConverts()
+      {
+          var result = await Transformer.TransformAsync(5);
+          result.Should().Be("10");
+      }
+      [Fact]
+      public async Task TransformAsync_ZeroInput()
+      {
+          var result = await Transformer.TransformAsync(0);
+          result.Should().Be("0");
+      }
+  }

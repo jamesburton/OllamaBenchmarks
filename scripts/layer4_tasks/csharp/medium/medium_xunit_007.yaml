@@ -1,0 +1,62 @@
+name: medium_xunit_007
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class EventStore with:
+    void Append(string streamId, object @event)
+    IEnumerable<object> ReadStream(string streamId)
+    IEnumerable<object> ReadAll()
+    int GetVersion(string streamId) — returns event count for that stream
+  Events are stored in order. ReadAll returns all events across all streams.
+  Return only valid C# code in a single file.
+test_code: |
+  public record OrderCreated(Guid Id, decimal Total);
+  public record OrderShipped(Guid Id, string Carrier);
+
+  public class EventStoreTests
+  {
+      [Fact]
+      public void Append_ThenRead_ReturnsEvents()
+      {
+          var store = new EventStore();
+          store.Append("order-1", new OrderCreated(Guid.NewGuid(), 100m));
+          store.Append("order-1", new OrderShipped(Guid.NewGuid(), "UPS"));
+          store.ReadStream("order-1").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void ReadStream_DifferentStreams_Isolated()
+      {
+          var store = new EventStore();
+          store.Append("order-1", new OrderCreated(Guid.NewGuid(), 100m));
+          store.Append("order-2", new OrderCreated(Guid.NewGuid(), 200m));
+          store.ReadStream("order-1").Should().HaveCount(1);
+          store.ReadStream("order-2").Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void ReadAll_ReturnsAllEvents()
+      {
+          var store = new EventStore();
+          store.Append("s1", new OrderCreated(Guid.NewGuid(), 1m));
+          store.Append("s2", new OrderCreated(Guid.NewGuid(), 2m));
+          store.ReadAll().Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetVersion_ReturnsEventCount()
+      {
+          var store = new EventStore();
+          store.Append("s1", new OrderCreated(Guid.NewGuid(), 1m));
+          store.Append("s1", new OrderShipped(Guid.NewGuid(), "FedEx"));
+          store.GetVersion("s1").Should().Be(2);
+      }
+  }

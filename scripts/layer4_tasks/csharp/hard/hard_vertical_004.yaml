@@ -1,0 +1,100 @@
+name: hard_vertical_004
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core inventory management with domain events:
+  Entities:
+    Product(int Id, string Sku, string Name, int Quantity, int ReorderPoint, decimal Price)
+    StockMovement(int Id, int ProductId, string Type, int Quantity, string Reason, DateTime OccurredAt)
+  DbContext: InventoryDbContext (SQLite in-memory).
+
+  Domain events: StockReducedBelowReorder(string Sku, int CurrentQty, int ReorderPoint),
+    StockAddedEvent(string Sku, int Added, int NewTotal), OutOfStockEvent(string Sku).
+
+  Interface IDomainEventBus:
+    Task PublishAsync<T>(T evt, CancellationToken ct)
+
+  Class InventoryManager(InventoryDbContext db, IDomainEventBus bus):
+    Task<Product> AddProductAsync(string sku, string name, int qty, int reorderPoint, decimal price, CancellationToken ct)
+    Task AddStockAsync(string sku, int qty, string reason, CancellationToken ct):
+      Throws KeyNotFoundException if product not found. Publishes StockAddedEvent.
+    Task<bool> ReduceStockAsync(string sku, int qty, string reason, CancellationToken ct):
+      Returns false if insufficient. Publishes OutOfStockEvent if 0, StockReducedBelowReorder if below reorderPoint.
+    Task<IReadOnlyList<StockMovement>> GetMovementsAsync(string sku, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryManagerTests : IDisposable
+  {
+      private readonly InventoryDbContext _db;
+      private readonly IDomainEventBus _bus;
+      private readonly InventoryManager _mgr;
+
+      public InventoryManagerTests()
+      {
+          var opts = new DbContextOptionsBuilder<InventoryDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new InventoryDbContext(opts);
+          _db.Database.EnsureCreated();
+          _bus = Substitute.For<IDomainEventBus>();
+          _bus.PublishAsync(Arg.Any<object>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          _mgr = new InventoryManager(_db, _bus);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task AddProduct_PersistsProduct()
+      {
+          var p = await _mgr.AddProductAsync("SKU-1", "Widget", 100, 10, 9.99m, CancellationToken.None);
+          p.Id.Should().BeGreaterThan(0);
+          _db.Products.Should().ContainSingle(x => x.Sku == "SKU-1");
+      }
+
+      [Fact]
+      public async Task AddStock_IncreasesQuantity()
+      {
+          await _mgr.AddProductAsync("SKU-2", "Gadget", 10, 5, 5m, CancellationToken.None);
+          await _mgr.AddStockAsync("SKU-2", 20, "Restock", CancellationToken.None);
+          _db.Products.First(p => p.Sku == "SKU-2").Quantity.Should().Be(30);
+      }
+
+      [Fact]
+      public async Task AddStock_UnknownSku_ThrowsKeyNotFoundException()
+      {
+          var act = async () => await _mgr.AddStockAsync("NOPE", 10, "test", CancellationToken.None);
+          await act.Should().ThrowAsync<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public async Task ReduceStock_BelowReorder_PublishesEvent()
+      {
+          await _mgr.AddProductAsync("SKU-3", "Item", 15, 10, 3m, CancellationToken.None);
+          await _mgr.ReduceStockAsync("SKU-3", 8, "Sale", CancellationToken.None);
+          await _bus.Received().PublishAsync(Arg.Any<StockReducedBelowReorder>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task ReduceStock_Insufficient_ReturnsFalse()
+      {
+          await _mgr.AddProductAsync("SKU-4", "Rare", 5, 2, 1m, CancellationToken.None);
+          var result = await _mgr.ReduceStockAsync("SKU-4", 10, "Sale", CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task GetMovements_ReturnsHistory()
+      {
+          await _mgr.AddProductAsync("SKU-5", "Track", 20, 5, 2m, CancellationToken.None);
+          await _mgr.AddStockAsync("SKU-5", 10, "R1", CancellationToken.None);
+          await _mgr.ReduceStockAsync("SKU-5", 5, "S1", CancellationToken.None);
+          var movements = await _mgr.GetMovementsAsync("SKU-5", CancellationToken.None);
+          movements.Should().HaveCount(2);
+      }
+  }

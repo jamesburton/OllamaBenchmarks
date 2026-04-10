@@ -1,0 +1,56 @@
+name: medium_masstransit_030
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record CommentPosted(Guid CommentId, string AuthorId, string PostId, string Content).
+  A consumer CommentPostedConsumer implementing IConsumer<CommentPosted>.
+  Constructor accepts IModerationQueue service.
+  Interface IModerationQueue with: Task EnqueueAsync(Guid commentId, string content).
+  In Consume: calls service.EnqueueAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record CommentPosted(Guid CommentId, string AuthorId, string PostId, string Content); }
+  global using Contracts;
+
+  public class CommentPostedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IModerationQueue>();
+          var consumer = new CommentPostedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<CommentPosted>>();
+          ctx.Message.Returns(new CommentPosted(Guid.NewGuid(), "Aut", "Pos", "Con"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).EnqueueAsync(Arg.Any<Guid commentId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IModerationQueue>();
+          var consumer = new CommentPostedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<CommentPosted>>();
+          ctx.Message.Returns(new CommentPosted(Guid.NewGuid(), "Aut", "Pos", "Con"));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IModerationQueue>();
+          var consumer = new CommentPostedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<CommentPosted>>();
+          ctx.Message.Returns(new CommentPosted(Guid.NewGuid(), "Auth", "Post", "Cont"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).EnqueueAsync(Arg.Any<Guid commentId>(), Arg.Any<object>());
+      }
+  }

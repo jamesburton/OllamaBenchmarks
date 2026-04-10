@@ -1,0 +1,60 @@
+name: medium_vertical_003
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for placing orders.
+  Include:
+    record OrderLineItem(string ProductId, int Quantity, decimal UnitPrice)
+    record PlaceOrderCommand(string CustomerId, IEnumerable<OrderLineItem> Items)
+    record PlaceOrderResult(Guid OrderId, string CustomerId, decimal Total, DateTime PlacedAt)
+    class PlaceOrderHandler with method:
+      Task<PlaceOrderResult> HandleAsync(PlaceOrderCommand command)
+    Validates: CustomerId not empty, Items not empty, Quantity > 0, UnitPrice > 0.
+    Total = sum of Quantity * UnitPrice.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PlaceOrderHandlerTests
+  {
+      private readonly PlaceOrderHandler _handler = new();
+
+      [Fact]
+      public async Task HandleAsync_ValidOrder_ReturnsResult()
+      {
+          var cmd = new PlaceOrderCommand("cust1", new[]
+          {
+              new OrderLineItem("prod1", 2, 10m),
+              new OrderLineItem("prod2", 1, 25m)
+          });
+          var result = await _handler.HandleAsync(cmd);
+          result.Total.Should().Be(45m);
+          result.OrderId.Should().NotBe(Guid.Empty);
+      }
+
+      [Fact]
+      public async Task HandleAsync_EmptyCustomerId_Throws()
+      {
+          var cmd = new PlaceOrderCommand("", new[] { new OrderLineItem("p1", 1, 5m) });
+          await _handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_EmptyItems_Throws()
+      {
+          var cmd = new PlaceOrderCommand("cust1", Array.Empty<OrderLineItem>());
+          await _handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_ZeroQuantity_Throws()
+      {
+          var cmd = new PlaceOrderCommand("cust1", new[] { new OrderLineItem("p1", 0, 5m) });
+          await _handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+  }

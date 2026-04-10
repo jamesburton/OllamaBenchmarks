@@ -1,0 +1,22 @@
+name: rewriting_medium_106
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'In order to be able to complete the project on time, additional resources will be required.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "complete"
+    - "project"
+    - "additional"
+    - "resources"
+    - "required"
+    - "time"
+  min_words: 5
+  max_words: 18

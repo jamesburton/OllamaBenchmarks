@@ -1,0 +1,17 @@
+name: constraint_medium_010
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Four friends - W, X, Y, Z - each scored differently on a test: 60, 70, 80, 90.
+  Clues:
+  1. W scored higher than X.
+  2. Z scored 90.
+  3. Y scored 70.
+  4. X scored lower than Y.
+  What did W score? Reply with only the number.
+expected_answer: "80"
+validator_config: {}

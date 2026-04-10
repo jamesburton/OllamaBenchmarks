@@ -1,0 +1,57 @@
+name: medium_masstransit_002
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record UserRegistered(Guid UserId, string Email, string FullName, DateTime RegisteredAt).
+  A consumer WelcomeEmailConsumer implementing IConsumer<UserRegistered>.
+  Constructor accepts IEmailSender emailSender.
+  Interface IEmailSender with: Task SendAsync(string to, string subject, string body).
+  In Consume: sends welcome email to user's email address.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record UserRegistered(Guid UserId, string Email, string FullName, DateTime RegisteredAt); }
+  global using Contracts;
+
+  public class WelcomeEmailConsumerTests
+  {
+      [Fact]
+      public async Task Consume_SendsWelcomeEmail()
+      {
+          var sender = Substitute.For<IEmailSender>();
+          var consumer = new WelcomeEmailConsumer(sender);
+          var ctx = Substitute.For<ConsumeContext<UserRegistered>>();
+          ctx.Message.Returns(new UserRegistered(Guid.NewGuid(), "alice@test.com", "Alice Smith", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await sender.Received(1).SendAsync("alice@test.com", Arg.Any<string>(), Arg.Any<string>());
+      }
+
+      [Fact]
+      public async Task Consume_SubjectContainsWelcome()
+      {
+          var sender = Substitute.For<IEmailSender>();
+          var consumer = new WelcomeEmailConsumer(sender);
+          var ctx = Substitute.For<ConsumeContext<UserRegistered>>();
+          ctx.Message.Returns(new UserRegistered(Guid.NewGuid(), "bob@test.com", "Bob", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await sender.Received(1).SendAsync(Arg.Any<string>(), Arg.Is<string>(s => s.ToLower().Contains("welcome")), Arg.Any<string>());
+      }
+
+      [Fact]
+      public async Task Consume_BodyContainsName()
+      {
+          var sender = Substitute.For<IEmailSender>();
+          var consumer = new WelcomeEmailConsumer(sender);
+          var ctx = Substitute.For<ConsumeContext<UserRegistered>>();
+          ctx.Message.Returns(new UserRegistered(Guid.NewGuid(), "carol@test.com", "Carol Jones", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await sender.Received(1).SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Is<string>(b => b.Contains("Carol Jones")));
+      }
+  }

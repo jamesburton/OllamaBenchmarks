@@ -1,0 +1,34 @@
+name: easy_patterns_043
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class PatternParser with a static method:
+    (bool Success, int Value) TryParseInt(string input)
+  that tries to parse the string as an integer and returns a tuple indicating success and the value (0 if failed).
+  Return only valid C# code in a single file.
+test_code: |
+  public class PatternParserTests
+  {
+      [Fact]
+      public void TryParseInt_ValidNumber_Succeeds()
+      {
+          var (success, value) = PatternParser.TryParseInt("42");
+          success.Should().BeTrue();
+          value.Should().Be(42);
+      }
+      [Fact]
+      public void TryParseInt_InvalidInput_Fails()
+      {
+          var (success, value) = PatternParser.TryParseInt("abc");
+          success.Should().BeFalse();
+          value.Should().Be(0);
+      }
+  }

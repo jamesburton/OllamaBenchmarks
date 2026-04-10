@@ -1,0 +1,42 @@
+name: easy_vertical_003
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Customer(int Id, string Name, string Email)
+  An interface ICustomerRepository with methods:
+    Task AddAsync(Customer customer)
+    Task<Customer?> FindByEmailAsync(string email)
+  A class CustomerService with constructor taking ICustomerRepository, and async method:
+    Task<bool> RegisterAsync(Customer customer) returns false if email already exists, adds and returns true otherwise
+  Return only valid C# code in a single file.
+test_code: |
+  public class CustomerServiceTests
+  {
+      [Fact]
+      public async Task RegisterAsync_NewCustomer_ReturnsTrue()
+      {
+          var repo = Substitute.For<ICustomerRepository>();
+          repo.FindByEmailAsync("new@test.com").Returns((Customer?)null);
+          var service = new CustomerService(repo);
+          var result = await service.RegisterAsync(new Customer(1, "Alice", "new@test.com"));
+          result.Should().BeTrue();
+          await repo.Received(1).AddAsync(Arg.Any<Customer>());
+      }
+      [Fact]
+      public async Task RegisterAsync_DuplicateEmail_ReturnsFalse()
+      {
+          var repo = Substitute.For<ICustomerRepository>();
+          repo.FindByEmailAsync("exists@test.com").Returns(new Customer(1, "Bob", "exists@test.com"));
+          var service = new CustomerService(repo);
+          var result = await service.RegisterAsync(new Customer(2, "Carol", "exists@test.com"));
+          result.Should().BeFalse();
+      }
+  }

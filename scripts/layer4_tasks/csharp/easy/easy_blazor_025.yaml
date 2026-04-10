@@ -1,0 +1,38 @@
+name: easy_blazor_025
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class ThemeSwitcherComponent that extends ComponentBase with:
+    string Theme { get; set; } = "light"
+    bool IsDarkMode => Theme == "dark"
+    void SetDark() sets Theme = "dark"
+    void SetLight() sets Theme = "light"
+    void ToggleTheme() sets Theme to "dark" if currently "light", else "light"
+  Return only valid C# code in a single file.
+test_code: |
+  public class ThemeSwitcherComponentTests
+  {
+      [Fact]
+      public void ToggleTheme_SwitchesToDark()
+      {
+          var c = new ThemeSwitcherComponent();
+          c.ToggleTheme();
+          c.IsDarkMode.Should().BeTrue();
+      }
+      [Fact]
+      public void ToggleTheme_SwitchesBackToLight()
+      {
+          var c = new ThemeSwitcherComponent();
+          c.SetDark();
+          c.ToggleTheme();
+          c.Theme.Should().Be("light");
+      }
+  }

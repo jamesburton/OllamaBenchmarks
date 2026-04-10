@@ -1,0 +1,23 @@
+name: technical_hard_039
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for an abstract base class method that must be implemented by subclasses to process data.
+  Include a note on the contract subclasses must fulfil.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Returns:"
+    - "abstract"
+    - "subclass"
+    - "implement"
+    - "contract"
+    - "method"
+    - "raises"
+  min_words: 12
+  max_words: 100

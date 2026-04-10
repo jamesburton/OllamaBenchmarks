@@ -1,0 +1,40 @@
+name: easy_vertical_011
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Ticket(int Id, string Title, string Status, string Assignee)
+  A class TicketBoard with:
+    void AddTicket(Ticket ticket)
+    List<Ticket> GetByStatus(string status)
+    List<Ticket> GetByAssignee(string assignee)
+    int TotalCount => total number of tickets
+  Return only valid C# code in a single file.
+test_code: |
+  public class TicketBoardTests
+  {
+      [Fact]
+      public void GetByStatus_FiltersCorrectly()
+      {
+          var board = new TicketBoard();
+          board.AddTicket(new Ticket(1, "Bug", "open", "alice"));
+          board.AddTicket(new Ticket(2, "Feature", "closed", "bob"));
+          board.AddTicket(new Ticket(3, "Docs", "open", "alice"));
+          board.GetByStatus("open").Should().HaveCount(2);
+      }
+      [Fact]
+      public void GetByAssignee_FiltersCorrectly()
+      {
+          var board = new TicketBoard();
+          board.AddTicket(new Ticket(1, "Bug", "open", "alice"));
+          board.AddTicket(new Ticket(2, "Feature", "open", "bob"));
+          board.GetByAssignee("alice").Should().HaveCount(1);
+      }
+  }

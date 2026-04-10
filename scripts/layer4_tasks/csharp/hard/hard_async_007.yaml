@@ -1,0 +1,81 @@
+name: hard_async_007
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncEventBus that implements an in-process publish-subscribe pattern:
+    void Subscribe<T>(Func<T, CancellationToken, Task> handler) — registers async handler.
+    void Unsubscribe<T>(Func<T, CancellationToken, Task> handler) — removes handler.
+    Task PublishAsync<T>(T message, CancellationToken ct) — invokes all handlers for T
+      concurrently. Collects all exceptions into AggregateException if any fail.
+    Task PublishSequentialAsync<T>(T message, CancellationToken ct) — invokes handlers
+      one at a time in registration order. Stops and throws on first failure.
+    int HandlerCount<T>() — returns number of registered handlers for type T.
+  Thread-safe subscription management required.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncEventBusTests
+  {
+      private readonly AsyncEventBus _bus = new();
+
+      [Fact]
+      public async Task PublishAsync_InvokesAllHandlers()
+      {
+          var received = new List<int>();
+          _bus.Subscribe<int>(async (v, _) => { received.Add(v); await Task.CompletedTask; });
+          _bus.Subscribe<int>(async (v, _) => { received.Add(v * 10); await Task.CompletedTask; });
+          await _bus.PublishAsync(5, CancellationToken.None);
+          received.Should().BeEquivalentTo(new[] { 5, 50 });
+      }
+
+      [Fact]
+      public async Task PublishAsync_HandlerFails_ThrowsAggregateException()
+      {
+          _bus.Subscribe<string>((_, _) => throw new InvalidOperationException("err"));
+          var act = async () => await _bus.PublishAsync("test", CancellationToken.None);
+          await act.Should().ThrowAsync<AggregateException>();
+      }
+
+      [Fact]
+      public async Task Unsubscribe_RemovesHandler()
+      {
+          var count = 0;
+          Func<int, CancellationToken, Task> h = (_, _) => { count++; return Task.CompletedTask; };
+          _bus.Subscribe(h);
+          _bus.Unsubscribe(h);
+          await _bus.PublishAsync(1, CancellationToken.None);
+          count.Should().Be(0);
+      }
+
+      [Fact]
+      public void HandlerCount_ReturnsCorrectCount()
+      {
+          _bus.Subscribe<double>((_, _) => Task.CompletedTask);
+          _bus.Subscribe<double>((_, _) => Task.CompletedTask);
+          _bus.HandlerCount<double>().Should().Be(2);
+      }
+
+      [Fact]
+      public async Task PublishSequentialAsync_StopsOnFirstFailure()
+      {
+          var executed = new List<int>();
+          _bus.Subscribe<int>((v, _) => { executed.Add(1); throw new Exception(); });
+          _bus.Subscribe<int>((v, _) => { executed.Add(2); return Task.CompletedTask; });
+          var act = async () => await _bus.PublishSequentialAsync(0, CancellationToken.None);
+          await act.Should().ThrowAsync<Exception>();
+          executed.Should().ContainSingle(x => x == 1);
+      }
+
+      [Fact]
+      public async Task PublishAsync_NoHandlers_CompletesSuccessfully()
+      {
+          await _bus.PublishAsync("orphan", CancellationToken.None);
+      }
+  }

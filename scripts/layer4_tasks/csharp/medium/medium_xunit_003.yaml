@@ -1,0 +1,65 @@
+name: medium_xunit_003
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class BankAccount with:
+    decimal Balance { get; private set; }
+    IReadOnlyList<(string Type, decimal Amount, DateTime At)> Transactions { get; }
+    void Deposit(decimal amount) — throws ArgumentException if amount <= 0
+    void Withdraw(decimal amount) — throws ArgumentException if amount <= 0 or InsufficientFundsException if balance < amount
+    class InsufficientFundsException : Exception
+  Return only valid C# code in a single file.
+test_code: |
+  public class BankAccountTests
+  {
+      [Fact]
+      public void Deposit_IncreasesBalance()
+      {
+          var account = new BankAccount();
+          account.Deposit(100m);
+          account.Balance.Should().Be(100m);
+      }
+
+      [Fact]
+      public void Withdraw_DecreasesBalance()
+      {
+          var account = new BankAccount();
+          account.Deposit(100m);
+          account.Withdraw(30m);
+          account.Balance.Should().Be(70m);
+      }
+
+      [Fact]
+      public void Deposit_NegativeAmount_ThrowsArgumentException()
+      {
+          var account = new BankAccount();
+          account.Invoking(a => a.Deposit(-10m)).Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Withdraw_InsufficientFunds_ThrowsInsufficientFundsException()
+      {
+          var account = new BankAccount();
+          account.Deposit(50m);
+          account.Invoking(a => a.Withdraw(100m)).Should().Throw<BankAccount.InsufficientFundsException>();
+      }
+
+      [Fact]
+      public void Transactions_RecordDepositsAndWithdrawals()
+      {
+          var account = new BankAccount();
+          account.Deposit(200m);
+          account.Withdraw(50m);
+          account.Transactions.Should().HaveCount(2);
+          account.Transactions[0].Type.Should().Be("Deposit");
+          account.Transactions[1].Type.Should().Be("Withdrawal");
+      }
+  }

@@ -1,0 +1,88 @@
+name: hard_linq_006
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Student(int Id, string Name, List<Enrollment> Enrollments) and
+  Enrollment(string Course, decimal Grade).
+  A class GradeAnalyser with constructor accepting IEnumerable<Student> students.
+  Methods:
+    IEnumerable<CourseStats> CourseLeaderboard() — groups enrollments across all students
+      by Course, computes Average grade, PassRate (grade >= 50), EnrolledCount.
+      Orders by Average descending.
+    IEnumerable<Student> HonourRoll(decimal minAverage) — students whose average grade
+      across all enrollments >= minAverage. Orders by average descending.
+    IEnumerable<(string Course, Student TopStudent)> TopStudentPerCourse() — for each
+      course, find the student with the highest grade. Orders by Course ascending.
+  Record: CourseStats(string Course, double Average, double PassRate, int EnrolledCount).
+  Return only valid C# code in a single file.
+test_code: |
+  public class GradeAnalyserTests
+  {
+      private static readonly List<Student> Students = new()
+      {
+          new(1, "Alice", new(){ new("Math",90m), new("Science",85m) }),
+          new(2, "Bob",   new(){ new("Math",45m), new("Science",70m) }),
+          new(3, "Carol", new(){ new("Math",75m), new("History",88m) }),
+          new(4, "Dave",  new(){ new("Science",30m), new("History",55m) }),
+      };
+
+      [Fact]
+      public void CourseLeaderboard_ReturnsThreeCourses()
+      {
+          var result = new GradeAnalyser(Students).CourseLeaderboard().ToList();
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void CourseLeaderboard_MathAverageIsCorrect()
+      {
+          var result = new GradeAnalyser(Students).CourseLeaderboard().ToList();
+          var math = result.First(c => c.Course == "Math");
+          math.Average.Should().BeApproximately((90+45+75)/3.0, 0.01);
+      }
+
+      [Fact]
+      public void CourseLeaderboard_MathPassRateIsCorrect()
+      {
+          var result = new GradeAnalyser(Students).CourseLeaderboard().ToList();
+          var math = result.First(c => c.Course == "Math");
+          math.PassRate.Should().BeApproximately(2.0/3.0, 0.01);
+      }
+
+      [Fact]
+      public void HonourRoll_ReturnsStudentsAboveThreshold()
+      {
+          var result = new GradeAnalyser(Students).HonourRoll(70m).ToList();
+          result.Should().Contain(s => s.Name == "Alice");
+          result.Should().NotContain(s => s.Name == "Bob");
+      }
+
+      [Fact]
+      public void HonourRoll_EmptyWhenThresholdTooHigh()
+      {
+          new GradeAnalyser(Students).HonourRoll(99m).Should().BeEmpty();
+      }
+
+      [Fact]
+      public void TopStudentPerCourse_MathTopIsAlice()
+      {
+          var result = new GradeAnalyser(Students).TopStudentPerCourse().ToList();
+          var math = result.First(t => t.Course == "Math");
+          math.TopStudent.Name.Should().Be("Alice");
+      }
+
+      [Fact]
+      public void TopStudentPerCourse_OrderedByCourse()
+      {
+          var result = new GradeAnalyser(Students).TopStudentPerCourse().ToList();
+          result.Select(r => r.Course).Should().BeInAscendingOrder();
+      }
+  }

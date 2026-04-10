@@ -1,0 +1,86 @@
+name: hard_xunit_007
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit IAsyncLifetime test setup and teardown:
+  Class IntegrationTestBase : IAsyncLifetime:
+    Creates SqliteConnection in InitializeAsync, runs schema.
+    DisposeAsync closes connection.
+    Protected SqliteConnection Db { get; private set; }
+    Protected Task ExecuteAsync(string sql, object? param = null)
+    Protected Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? param = null)
+
+  Entity: Order(int Id, string CustomerId, decimal Total, string Status, DateTime CreatedAt).
+  Class OrderRepository(SqliteConnection db):
+    Task<int> CreateAsync(Order order, CancellationToken ct)
+    Task<Order?> GetAsync(int id, CancellationToken ct)
+    Task UpdateStatusAsync(int id, string status, CancellationToken ct)
+    Task<IReadOnlyList<Order>> GetByCustomerAsync(string customerId, CancellationToken ct)
+
+  OrderRepositoryTests : IntegrationTestBase — each test gets clean DB state via InitializeAsync.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderRepositoryTests : IntegrationTestBase
+  {
+      private OrderRepository _repo = null!;
+
+      public override async Task InitializeAsync()
+      {
+          await base.InitializeAsync();
+          _repo = new OrderRepository(Db);
+      }
+
+      [Fact]
+      public async Task Create_ReturnsId()
+      {
+          var order = new Order(0, "c1", 99.99m, "Pending", DateTime.UtcNow);
+          var id = await _repo.CreateAsync(order, CancellationToken.None);
+          id.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task Get_ReturnsCreatedOrder()
+      {
+          var order = new Order(0, "c2", 49.99m, "Pending", DateTime.UtcNow);
+          var id = await _repo.CreateAsync(order, CancellationToken.None);
+          var found = await _repo.GetAsync(id, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.CustomerId.Should().Be("c2");
+      }
+
+      [Fact]
+      public async Task Get_UnknownId_ReturnsNull()
+      {
+          var result = await _repo.GetAsync(9999, CancellationToken.None);
+          result.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task UpdateStatus_ChangesStatus()
+      {
+          var order = new Order(0, "c3", 10m, "Pending", DateTime.UtcNow);
+          var id = await _repo.CreateAsync(order, CancellationToken.None);
+          await _repo.UpdateStatusAsync(id, "Shipped", CancellationToken.None);
+          var updated = await _repo.GetAsync(id, CancellationToken.None);
+          updated!.Status.Should().Be("Shipped");
+      }
+
+      [Fact]
+      public async Task GetByCustomer_ReturnsCorrectOrders()
+      {
+          await _repo.CreateAsync(new Order(0, "cust-X", 10m, "Pending", DateTime.UtcNow), CancellationToken.None);
+          await _repo.CreateAsync(new Order(0, "cust-X", 20m, "Pending", DateTime.UtcNow), CancellationToken.None);
+          await _repo.CreateAsync(new Order(0, "cust-Y", 30m, "Pending", DateTime.UtcNow), CancellationToken.None);
+          var orders = await _repo.GetByCustomerAsync("cust-X", CancellationToken.None);
+          orders.Should().HaveCount(2);
+          orders.Should().AllSatisfy(o => o.CustomerId.Should().Be("cust-X"));
+      }
+  }

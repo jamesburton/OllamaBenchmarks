@@ -1,0 +1,14 @@
+name: word_problems_hard_002
+category: maths
+subcategory: word_problems
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  A boat goes 30 km upstream in 3 hours and 30 km downstream in 1.5 hours. What is the speed of the current in km/h?
+  Reply with only the number.
+expected_answer: "5"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

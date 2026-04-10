@@ -1,0 +1,36 @@
+name: easy_patterns_024
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Formatter with a static method:
+    string FormatCurrency(decimal amount, string currency)
+  that returns a string like "$42.50" for USD, "€42.50" for EUR, "£42.50" for GBP.
+  Use a switch expression on currency. For unknown currencies, prefix with currency code and space.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FormatterTests
+  {
+      [Fact]
+      public void FormatCurrency_USD()
+      {
+          Formatter.FormatCurrency(42.50m, "USD").Should().Be("$42.50");
+      }
+      [Fact]
+      public void FormatCurrency_EUR()
+      {
+          Formatter.FormatCurrency(10.00m, "EUR").Should().Be("€10.00");
+      }
+      [Fact]
+      public void FormatCurrency_GBP()
+      {
+          Formatter.FormatCurrency(5.99m, "GBP").Should().Be("£5.99");
+      }
+  }

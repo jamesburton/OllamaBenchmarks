@@ -1,0 +1,13 @@
+name: statistics_hard_006
+category: maths
+subcategory: statistics
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Two dice are rolled. What is the probability the sum is 7? Reply with only the decimal rounded to 2 places.
+expected_answer: "0.17"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

@@ -1,0 +1,43 @@
+name: easy_efcore_013
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Inventory with properties: int Id, string ProductName, int Quantity, decimal UnitPrice
+  A DbContext class InventoryContext with:
+    DbSet<Inventory> Items { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class InventoryRepository with:
+    decimal GetTotalValue(InventoryContext context)
+  that returns the sum of Quantity * UnitPrice for all items.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryRepositoryTests
+  {
+      [Fact]
+      public void GetTotalValue_CalculatesCorrectly()
+      {
+          using var context = new InventoryContext();
+          context.Database.EnsureCreated();
+          context.Items.AddRange(
+              new Inventory { ProductName = "A", Quantity = 10, UnitPrice = 5.00m },
+              new Inventory { ProductName = "B", Quantity = 3, UnitPrice = 20.00m });
+          context.SaveChanges();
+          InventoryRepository.GetTotalValue(context).Should().Be(110.00m);
+      }
+      [Fact]
+      public void GetTotalValue_EmptyDatabase_ReturnsZero()
+      {
+          using var context = new InventoryContext();
+          context.Database.EnsureCreated();
+          InventoryRepository.GetTotalValue(context).Should().Be(0m);
+      }
+  }

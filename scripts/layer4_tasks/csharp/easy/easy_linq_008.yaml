@@ -1,0 +1,35 @@
+name: easy_linq_008
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Checker with a static method:
+    bool AllPositive(IEnumerable<int> numbers)
+  that returns true if all numbers are greater than zero using LINQ All.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CheckerTests
+  {
+      [Fact]
+      public void AllPositive_AllArePositive_ReturnsTrue()
+      {
+          Checker.AllPositive(new[]{1,2,3}).Should().BeTrue();
+      }
+      [Fact]
+      public void AllPositive_HasZero_ReturnsFalse()
+      {
+          Checker.AllPositive(new[]{1,0,3}).Should().BeFalse();
+      }
+      [Fact]
+      public void AllPositive_Empty_ReturnsTrue()
+      {
+          Checker.AllPositive(Array.Empty<int>()).Should().BeTrue();
+      }
+  }

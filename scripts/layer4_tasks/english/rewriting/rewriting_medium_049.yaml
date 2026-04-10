@@ -1,0 +1,21 @@
+name: rewriting_medium_049
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'We have taken note of your feedback and will endeavour to improve our services accordingly.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "feedback"
+    - "try"
+    - "improve"
+    - "noted"
+    - "working on"
+  min_words: 5
+  max_words: 20

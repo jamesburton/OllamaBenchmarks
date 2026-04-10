@@ -1,0 +1,74 @@
+name: medium_blazor_004
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ToastService with:
+    record Toast(string Message, string Type, int Duration)
+    event Action<Toast>? OnShow
+    void ShowSuccess(string message, int duration = 3000)
+    void ShowError(string message, int duration = 5000)
+    void ShowInfo(string message, int duration = 3000)
+  Each Show method fires OnShow with appropriate Type ("success", "error", "info").
+  Return only valid C# code in a single file.
+test_code: |
+  public class ToastServiceTests
+  {
+      [Fact]
+      public void ShowSuccess_FiresWithCorrectType()
+      {
+          var svc = new ToastService();
+          Toast? received = null;
+          svc.OnShow += t => received = t;
+          svc.ShowSuccess("Done!");
+          received!.Type.Should().Be("success");
+          received.Message.Should().Be("Done!");
+      }
+
+      [Fact]
+      public void ShowError_FiresWithCorrectType()
+      {
+          var svc = new ToastService();
+          Toast? received = null;
+          svc.OnShow += t => received = t;
+          svc.ShowError("Failed!");
+          received!.Type.Should().Be("error");
+      }
+
+      [Fact]
+      public void ShowInfo_FiresWithCorrectType()
+      {
+          var svc = new ToastService();
+          Toast? received = null;
+          svc.OnShow += t => received = t;
+          svc.ShowInfo("Note");
+          received!.Type.Should().Be("info");
+      }
+
+      [Fact]
+      public void ShowSuccess_DefaultDuration_Is3000()
+      {
+          var svc = new ToastService();
+          Toast? received = null;
+          svc.OnShow += t => received = t;
+          svc.ShowSuccess("ok");
+          received!.Duration.Should().Be(3000);
+      }
+
+      [Fact]
+      public void ShowError_DefaultDuration_Is5000()
+      {
+          var svc = new ToastService();
+          Toast? received = null;
+          svc.OnShow += t => received = t;
+          svc.ShowError("err");
+          received!.Duration.Should().Be(5000);
+      }
+  }

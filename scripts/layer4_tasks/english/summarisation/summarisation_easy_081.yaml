@@ -1,0 +1,18 @@
+name: summarisation_easy_081
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A major tech company has launched a new smartphone with an all-day battery life and an improved camera system. The device will be available in three colours and starts at 799 dollars. Pre-orders opened this morning and sold out within hours.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "smartphone"
+    - "battery"
+    - "camera"
+    - "launch"
+  max_words: 25

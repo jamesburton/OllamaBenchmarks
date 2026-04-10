@@ -1,0 +1,62 @@
+name: medium_async_015
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncQueue<T> backed by Channel<T> with bounded capacity.
+  Constructor accepts int capacity.
+  Expose:
+    ValueTask EnqueueAsync(T item, CancellationToken ct = default)
+    ValueTask<T> DequeueAsync(CancellationToken ct = default)
+    int Count — approximate current count
+    void Close() — signals no more items will be enqueued
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncQueueTests
+  {
+      [Fact]
+      public async Task EnqueueDequeue_SingleItem()
+      {
+          var q = new AsyncQueue<int>(10);
+          await q.EnqueueAsync(42);
+          (await q.DequeueAsync()).Should().Be(42);
+      }
+
+      [Fact]
+      public async Task EnqueueDequeue_MultipleItems_FIFO()
+      {
+          var q = new AsyncQueue<string>(10);
+          await q.EnqueueAsync("first");
+          await q.EnqueueAsync("second");
+          (await q.DequeueAsync()).Should().Be("first");
+          (await q.DequeueAsync()).Should().Be("second");
+      }
+
+      [Fact]
+      public async Task Close_ConsumerFinishes()
+      {
+          var q = new AsyncQueue<int>(10);
+          await q.EnqueueAsync(1);
+          await q.EnqueueAsync(2);
+          q.Close();
+          var results = new List<int>();
+          try { while (true) results.Add(await q.DequeueAsync()); } catch { }
+          results.Should().BeEquivalentTo(new[]{1,2}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public async Task Count_ReflectsEnqueued()
+      {
+          var q = new AsyncQueue<int>(10);
+          await q.EnqueueAsync(1);
+          await q.EnqueueAsync(2);
+          q.Count.Should().BeGreaterThanOrEqualTo(1);
+      }
+  }

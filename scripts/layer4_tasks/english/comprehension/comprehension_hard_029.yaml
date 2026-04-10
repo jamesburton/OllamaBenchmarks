@@ -1,0 +1,24 @@
+name: comprehension_hard_029
+category: english
+subcategory: comprehension
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  The Industrial Revolution, which began in Britain in the mid-eighteenth century and spread across Europe and North America over the following century, fundamentally transformed human society. The transition from agrarian economies to mechanised manufacturing created new forms of labour, wealth, and social organisation. Steam power, initially harnessed by James Watt's improved steam engine, drove factories, railways, and ships. Urbanisation accelerated as workers migrated from rural areas to industrial cities. Living and working conditions in early industrial towns were often appalling, with overcrowding, child labour, and dangerous workplaces commonplace. However, over time, industrialisation generated enough wealth to raise living standards, fund public health improvements, and expand access to education. Historians continue to debate whether the long-term benefits of industrialisation outweigh its early human costs.
+  
+  Answer in one sentence:
+  Is the following a fact or opinion according to the passage: 'The long-term benefits of industrialisation outweigh its early human costs'?
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "opinion"
+    - "debated"
+    - "historians"
+    - "not settled"
+    - "contested"
+  min_words: 8
+  max_words: 40

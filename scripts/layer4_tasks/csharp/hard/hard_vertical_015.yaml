@@ -1,0 +1,97 @@
+name: hard_vertical_015
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Async + state machine + NSubstitute for workflow engine:
+  Enum WorkflowStatus { Created, Running, Paused, Completed, Failed, Cancelled }
+  Records:
+    WorkflowDefinition(string Name, IReadOnlyList<WorkflowStep> Steps)
+    WorkflowStep(string Name, string Type, Dictionary<string, object> Config)
+    WorkflowInstance(Guid Id, string Name, WorkflowStatus Status, int CurrentStepIndex, DateTime CreatedAt, DateTime? CompletedAt)
+    StepResult(bool Success, string? Output, string? Error)
+
+  Interface IStepExecutor:
+    Task<StepResult> ExecuteAsync(WorkflowStep step, Dictionary<string, object> context, CancellationToken ct)
+
+  Class WorkflowEngine(IStepExecutor executor):
+    Task<WorkflowInstance> StartAsync(WorkflowDefinition definition, CancellationToken ct)
+    Task<WorkflowInstance> ResumeAsync(Guid instanceId, CancellationToken ct)
+    Task<bool> PauseAsync(Guid instanceId, CancellationToken ct)
+    Task<bool> CancelAsync(Guid instanceId, CancellationToken ct)
+    WorkflowInstance? GetInstance(Guid instanceId)
+    IReadOnlyList<WorkflowInstance> GetAll()
+  Return only valid C# code in a single file.
+test_code: |
+  public class WorkflowEngineTests
+  {
+      private IStepExecutor CreateExecutor(bool success = true)
+      {
+          var executor = Substitute.For<IStepExecutor>();
+          executor.ExecuteAsync(Arg.Any<WorkflowStep>(), Arg.Any<Dictionary<string, object>>(), Arg.Any<CancellationToken>())
+              .Returns(new StepResult(success, success ? "done" : null, success ? null : "step failed"));
+          return executor;
+      }
+
+      private WorkflowDefinition CreateDef(int steps = 3) => new("TestFlow",
+          Enumerable.Range(1, steps).Select(i => new WorkflowStep($"Step{i}", "generic", new())).ToList());
+
+      [Fact]
+      public async Task Start_AllStepsSucceed_CompletesWorkflow()
+      {
+          var engine = new WorkflowEngine(CreateExecutor(true));
+          var instance = await engine.StartAsync(CreateDef(3), CancellationToken.None);
+          instance.Status.Should().Be(WorkflowStatus.Completed);
+          instance.CompletedAt.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task Start_StepFails_TransitionsToFailed()
+      {
+          var engine = new WorkflowEngine(CreateExecutor(false));
+          var instance = await engine.StartAsync(CreateDef(2), CancellationToken.None);
+          instance.Status.Should().Be(WorkflowStatus.Failed);
+      }
+
+      [Fact]
+      public async Task Pause_RunningWorkflow_TransitionsToPaused()
+      {
+          var executor = Substitute.For<IStepExecutor>();
+          executor.ExecuteAsync(Arg.Any<WorkflowStep>(), Arg.Any<Dictionary<string, object>>(), Arg.Any<CancellationToken>())
+              .Returns(async ci => { await Task.Delay(500); return new StepResult(true, "ok", null); });
+          var engine = new WorkflowEngine(executor);
+          var startTask = engine.StartAsync(CreateDef(5), CancellationToken.None);
+          await Task.Delay(50);
+          var instances = engine.GetAll();
+          if (instances.Any(i => i.Status == WorkflowStatus.Running))
+          {
+              var runningId = instances.First(i => i.Status == WorkflowStatus.Running).Id;
+              await engine.PauseAsync(runningId, CancellationToken.None);
+          }
+          await startTask;
+      }
+
+      [Fact]
+      public async Task Cancel_WorkflowInstance_TransitionsToCancelled()
+      {
+          var engine = new WorkflowEngine(CreateExecutor());
+          var instance = await engine.StartAsync(CreateDef(), CancellationToken.None);
+          var result = await engine.CancelAsync(instance.Id, CancellationToken.None);
+          result.Should().BeTrue();
+          engine.GetInstance(instance.Id)!.Status.Should().Be(WorkflowStatus.Cancelled);
+      }
+
+      [Fact]
+      public async Task GetInstance_UnknownId_ReturnsNull()
+      {
+          var engine = new WorkflowEngine(CreateExecutor());
+          engine.GetInstance(Guid.NewGuid()).Should().BeNull();
+      }
+  }

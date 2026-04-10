@@ -1,0 +1,13 @@
+name: statistics_medium_017
+category: maths
+subcategory: statistics
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  A bag has 5 red and 5 blue marbles. Two are drawn without replacement. What is the probability both are red? Reply with only the decimal.
+expected_answer: "0.22"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

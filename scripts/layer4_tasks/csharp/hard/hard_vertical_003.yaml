@@ -1,0 +1,109 @@
+name: hard_vertical_003
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  CQRS + OneOf result types for user management:
+  OneOf results:
+    CreateUserResult: OneOf<UserCreated, ValidationFailed, UserAlreadyExists>
+    DeleteUserResult: OneOf<UserDeleted, UserNotFound, CannotDeleteAdmin>
+
+  Records:
+    CreateUserCommand(string Username, string Email, string Password, string Role)
+    DeleteUserCommand(string Username, string RequestedByRole)
+    UserCreated(string Username, string Email, string Role, DateTime CreatedAt)
+    UserDeleted(string Username)
+    UserNotFound(string Username)
+    UserAlreadyExists(string Username)
+    CannotDeleteAdmin(string Username, string Reason)
+    ValidationFailed(IReadOnlyList<string> Errors)
+
+  Interface IUserStore:
+    Task<bool> ExistsAsync(string username, CancellationToken ct)
+    Task<UserCreated> CreateAsync(CreateUserCommand cmd, CancellationToken ct)
+    Task DeleteAsync(string username, CancellationToken ct)
+    Task<string?> GetRoleAsync(string username, CancellationToken ct)
+
+  Class CreateUserCommandHandler(IUserStore store):
+    Task<CreateUserResult> HandleAsync(CreateUserCommand cmd, CancellationToken ct).
+  Class DeleteUserCommandHandler(IUserStore store):
+    Task<DeleteUserResult> HandleAsync(DeleteUserCommand cmd, CancellationToken ct).
+
+  Use NSubstitute.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CreateUserCommandHandlerTests
+  {
+      [Fact]
+      public async Task NewUser_ReturnsUserCreated()
+      {
+          var store = Substitute.For<IUserStore>();
+          store.ExistsAsync("alice", Arg.Any<CancellationToken>()).Returns(false);
+          store.CreateAsync(Arg.Any<CreateUserCommand>(), Arg.Any<CancellationToken>())
+              .Returns(new UserCreated("alice", "a@b.com", "User", DateTime.UtcNow));
+          var handler = new CreateUserCommandHandler(store);
+          var result = await handler.HandleAsync(new CreateUserCommand("alice", "a@b.com", "P@ss1!", "User"), CancellationToken.None);
+          result.IsT0.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task ExistingUser_ReturnsUserAlreadyExists()
+      {
+          var store = Substitute.For<IUserStore>();
+          store.ExistsAsync("alice", Arg.Any<CancellationToken>()).Returns(true);
+          var handler = new CreateUserCommandHandler(store);
+          var result = await handler.HandleAsync(new CreateUserCommand("alice", "a@b.com", "P@ss1!", "User"), CancellationToken.None);
+          result.IsT2.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task InvalidInput_ReturnsValidationFailed()
+      {
+          var store = Substitute.For<IUserStore>();
+          store.ExistsAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(false);
+          var handler = new CreateUserCommandHandler(store);
+          var result = await handler.HandleAsync(new CreateUserCommand("", "", "x", "User"), CancellationToken.None);
+          result.IsT1.Should().BeTrue();
+      }
+  }
+
+  public class DeleteUserCommandHandlerTests
+  {
+      [Fact]
+      public async Task DeleteExistingUser_ReturnsUserDeleted()
+      {
+          var store = Substitute.For<IUserStore>();
+          store.GetRoleAsync("bob", Arg.Any<CancellationToken>()).Returns("User");
+          store.DeleteAsync("bob", Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var handler = new DeleteUserCommandHandler(store);
+          var result = await handler.HandleAsync(new DeleteUserCommand("bob", "Admin"), CancellationToken.None);
+          result.IsT0.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task DeleteNotFound_ReturnsUserNotFound()
+      {
+          var store = Substitute.For<IUserStore>();
+          store.GetRoleAsync("nobody", Arg.Any<CancellationToken>()).Returns((string?)null);
+          var handler = new DeleteUserCommandHandler(store);
+          var result = await handler.HandleAsync(new DeleteUserCommand("nobody", "Admin"), CancellationToken.None);
+          result.IsT1.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task DeleteAdmin_ReturnsCannotDeleteAdmin()
+      {
+          var store = Substitute.For<IUserStore>();
+          store.GetRoleAsync("admin1", Arg.Any<CancellationToken>()).Returns("Admin");
+          var handler = new DeleteUserCommandHandler(store);
+          var result = await handler.HandleAsync(new DeleteUserCommand("admin1", "User"), CancellationToken.None);
+          result.IsT2.Should().BeTrue();
+      }
+  }

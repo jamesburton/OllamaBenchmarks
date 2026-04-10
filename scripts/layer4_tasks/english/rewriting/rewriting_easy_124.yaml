@@ -1,0 +1,22 @@
+name: rewriting_easy_124
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'They agreed on the bus to meet later.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "bus"
+    - "agreed"
+    - "meet"
+    - "later"
+    - "while"
+    - "on"
+  min_words: 4
+  max_words: 18

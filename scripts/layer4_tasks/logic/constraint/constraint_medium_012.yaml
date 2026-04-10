@@ -1,0 +1,17 @@
+name: constraint_medium_012
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Five cities A, B, C, D, E are visited in order. Clues:
+  1. B is visited immediately after A.
+  2. D is visited before C.
+  3. E is last.
+  4. A is first.
+  5. C is not fourth.
+  What order are they visited? Reply with only the order as letters, e.g. ABCDE.
+expected_answer: "ABDCE"
+validator_config: {}

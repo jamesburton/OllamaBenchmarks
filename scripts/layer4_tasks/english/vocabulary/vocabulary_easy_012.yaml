@@ -1,0 +1,16 @@
+name: vocabulary_easy_012
+category: english
+subcategory: vocabulary
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the word closest in meaning to 'rich':
+  A) Poor
+  B) Empty
+  C) Wealthy
+  D) Thin
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

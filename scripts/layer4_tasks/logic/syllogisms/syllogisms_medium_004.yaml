@@ -1,0 +1,15 @@
+name: syllogisms_medium_004
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. No carnivores eat plants.
+  2. All herbivores eat plants.
+  3. A rabbit is an herbivore.
+  Conclusion about rabbits? Reply with only the conclusion.
+expected_answer: "A rabbit is not a carnivore."
+validator_config: {}

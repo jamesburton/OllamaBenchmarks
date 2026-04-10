@@ -1,0 +1,14 @@
+name: deduction_easy_018
+category: logic
+subcategory: deduction
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If John passes the test, he gets a certificate.
+  2. John did not get a certificate.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "John did not pass the test."
+validator_config: {}

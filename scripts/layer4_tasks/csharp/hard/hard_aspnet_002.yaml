@@ -1,0 +1,99 @@
+name: hard_aspnet_002
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A typed HttpClient with retry and error handling for a weather API:
+  Record: WeatherForecast(string Location, double TemperatureC, string Condition, DateOnly Date).
+  Interface IWeatherClient:
+    Task<WeatherForecast?> GetCurrentAsync(string location, CancellationToken ct)
+    Task<IReadOnlyList<WeatherForecast>> GetForecastAsync(string location, int days, CancellationToken ct)
+  Class WeatherApiClient : IWeatherClient — typed HttpClient implementation:
+    Constructor: WeatherApiClient(HttpClient httpClient) — httpClient.BaseAddress must be set.
+    Makes GET /weather/current?location={location} and GET /weather/forecast?location={location}&days={days}.
+    Returns null from GetCurrentAsync on 404. Throws HttpRequestException on other errors.
+  Class RetryDelegatingHandler : DelegatingHandler —
+    retries on transient errors (5xx, network) up to 3 times with 100ms delay between retries.
+  Static class WeatherApiExtensions:
+    static void AddWeatherClient(this IServiceCollection services, string baseUrl) —
+      registers IWeatherClient as typed HttpClient with RetryDelegatingHandler in the pipeline.
+  Return only valid C# code in a single file.
+test_code: |
+  public class WeatherApiClientTests
+  {
+      private static IWeatherClient BuildClient(HttpMessageHandler handler)
+      {
+          var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://weather.test/") };
+          return new WeatherApiClient(httpClient);
+      }
+
+      [Fact]
+      public async Task GetCurrentAsync_Returns200_ParsesForecast()
+      {
+          var json = """{"location":"London","temperatureC":15.0,"condition":"Cloudy","date":"2024-06-01"}""";
+          var handler = new StaticResponseHandler(200, json);
+          var result = await BuildClient(handler).GetCurrentAsync("London", CancellationToken.None);
+          result.Should().NotBeNull();
+          result!.Location.Should().Be("London");
+      }
+
+      [Fact]
+      public async Task GetCurrentAsync_Returns404_ReturnsNull()
+      {
+          var handler = new StaticResponseHandler(404, "");
+          var result = await BuildClient(handler).GetCurrentAsync("Unknown", CancellationToken.None);
+          result.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task GetCurrentAsync_Returns500_ThrowsHttpRequestException()
+      {
+          var handler = new StaticResponseHandler(500, "error");
+          var act = async () => await BuildClient(handler).GetCurrentAsync("London", CancellationToken.None);
+          await act.Should().ThrowAsync<HttpRequestException>();
+      }
+
+      [Fact]
+      public async Task GetForecastAsync_ReturnsListOfForecasts()
+      {
+          var json = """[{"location":"Paris","temperatureC":20.0,"condition":"Sunny","date":"2024-06-01"},{"location":"Paris","temperatureC":22.0,"condition":"Sunny","date":"2024-06-02"}]""";
+          var handler = new StaticResponseHandler(200, json);
+          var result = await BuildClient(handler).GetForecastAsync("Paris", 2, CancellationToken.None);
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task RetryHandler_RetriesOnTransientError()
+      {
+          int callCount = 0;
+          var handler = new CountingHandler(() =>
+          {
+              callCount++;
+              return callCount < 3
+                  ? new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError)
+                  : new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+                      { Content = new StringContent("""{"location":"X","temperatureC":0,"condition":"","date":"2024-01-01"}""") };
+          });
+          var retry = new RetryDelegatingHandler { InnerHandler = handler };
+          var httpClient = new HttpClient(retry) { BaseAddress = new Uri("https://test/") };
+          var client = new WeatherApiClient(httpClient);
+          var result = await client.GetCurrentAsync("X", CancellationToken.None);
+          callCount.Should().BeGreaterThanOrEqualTo(3);
+      }
+
+      [Fact]
+      public void AddWeatherClient_RegistersIWeatherClient()
+      {
+          var svc = new ServiceCollection();
+          svc.AddWeatherClient("https://weather.example.com/");
+          var provider = svc.BuildServiceProvider();
+          provider.GetService<IWeatherClient>().Should().NotBeNull();
+      }
+  }

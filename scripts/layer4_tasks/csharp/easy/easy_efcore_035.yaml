@@ -1,0 +1,41 @@
+name: easy_efcore_035
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Permission with properties: int Id, string RoleName, string Resource, string Action
+  A DbContext class PermContext with:
+    DbSet<Permission> Permissions { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class PermissionRepository with:
+    bool HasPermission(PermContext context, string roleName, string resource, string action)
+  that returns true if a matching permission exists.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PermissionRepositoryTests
+  {
+      [Fact]
+      public void HasPermission_Found_ReturnsTrue()
+      {
+          using var context = new PermContext();
+          context.Database.EnsureCreated();
+          context.Permissions.Add(new Permission { RoleName = "admin", Resource = "users", Action = "delete" });
+          context.SaveChanges();
+          PermissionRepository.HasPermission(context, "admin", "users", "delete").Should().BeTrue();
+      }
+      [Fact]
+      public void HasPermission_NotFound_ReturnsFalse()
+      {
+          using var context = new PermContext();
+          context.Database.EnsureCreated();
+          PermissionRepository.HasPermission(context, "guest", "users", "delete").Should().BeFalse();
+      }
+  }

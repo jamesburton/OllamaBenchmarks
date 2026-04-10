@@ -1,0 +1,40 @@
+name: easy_vertical_008
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Tag(int Id, string Name)
+  A record BlogPost(int Id, string Title, List<int> TagIds)
+  A class BlogRepository with:
+    void AddTag(Tag tag)
+    void AddPost(BlogPost post)
+    List<BlogPost> GetPostsByTag(int tagId) returns posts that contain the given tagId
+    int PostCount => total number of posts
+  Return only valid C# code in a single file.
+test_code: |
+  public class BlogRepositoryTests
+  {
+      [Fact]
+      public void GetPostsByTag_ReturnsMatchingPosts()
+      {
+          var repo = new BlogRepository();
+          repo.AddPost(new BlogPost(1, "Post A", new List<int> { 1, 2 }));
+          repo.AddPost(new BlogPost(2, "Post B", new List<int> { 2, 3 }));
+          repo.AddPost(new BlogPost(3, "Post C", new List<int> { 3 }));
+          repo.GetPostsByTag(2).Should().HaveCount(2);
+      }
+      [Fact]
+      public void PostCount_ReturnsTotal()
+      {
+          var repo = new BlogRepository();
+          repo.AddPost(new BlogPost(1, "A", new List<int>()));
+          repo.PostCount.Should().Be(1);
+      }
+  }

@@ -1,0 +1,23 @@
+name: technical_easy_058
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a brief notice confirming a successful account registration.
+  Keep it under 30 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "account"
+    - "created"
+    - "welcome"
+    - "confirm"
+    - "registered"
+    - "successfully"
+    - "email"
+    - "verify"
+  min_words: 6
+  max_words: 30

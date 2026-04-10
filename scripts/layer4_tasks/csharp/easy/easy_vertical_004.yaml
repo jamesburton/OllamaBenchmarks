@@ -1,0 +1,41 @@
+name: easy_vertical_004
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Category(int Id, string Name)
+  A record Article(int Id, string Title, int CategoryId)
+  A class ArticleCatalog with:
+    void AddCategory(Category category)
+    void AddArticle(Article article)
+    List<Article> GetByCategory(int categoryId)
+    int ArticleCount => total number of articles
+  Return only valid C# code in a single file.
+test_code: |
+  public class ArticleCatalogTests
+  {
+      [Fact]
+      public void GetByCategory_ReturnsCorrectArticles()
+      {
+          var catalog = new ArticleCatalog();
+          catalog.AddCategory(new Category(1, "Tech"));
+          catalog.AddArticle(new Article(1, "C# Tips", 1));
+          catalog.AddArticle(new Article(2, "Python Tips", 2));
+          catalog.GetByCategory(1).Should().HaveCount(1);
+      }
+      [Fact]
+      public void ArticleCount_ReturnsTotal()
+      {
+          var catalog = new ArticleCatalog();
+          catalog.AddArticle(new Article(1, "A", 1));
+          catalog.AddArticle(new Article(2, "B", 1));
+          catalog.ArticleCount.Should().Be(2);
+      }
+  }

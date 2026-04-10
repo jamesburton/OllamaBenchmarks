@@ -1,0 +1,16 @@
+name: vocabulary_medium_022
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The scientist made an astute observation', which word best replaces 'astute'?
+  A) Careless
+  B) Lengthy
+  C) Perceptive
+  D) Obvious
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

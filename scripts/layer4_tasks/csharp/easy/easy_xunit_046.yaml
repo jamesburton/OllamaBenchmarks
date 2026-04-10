@@ -1,0 +1,39 @@
+name: easy_xunit_046
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncResourcePool that implements IAsyncLifetime with:
+    List<string> AvailableResources { get; } = new()
+    ValueTask InitializeAsync() adds "resource-1", "resource-2", "resource-3" to AvailableResources
+    ValueTask DisposeAsync() clears AvailableResources
+    string? Acquire() removes and returns the last resource, or null if empty
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncResourcePoolTests : IAsyncLifetime
+  {
+      private readonly AsyncResourcePool _pool = new();
+
+      public ValueTask InitializeAsync() => _pool.InitializeAsync();
+      public ValueTask DisposeAsync() => _pool.DisposeAsync();
+
+      [Fact]
+      public void AfterInit_HasThreeResources()
+      {
+          _pool.AvailableResources.Should().HaveCount(3);
+      }
+      [Fact]
+      public void Acquire_ReturnsResource()
+      {
+          var resource = _pool.Acquire();
+          resource.Should().NotBeNull();
+          _pool.AvailableResources.Should().HaveCount(2);
+      }
+  }

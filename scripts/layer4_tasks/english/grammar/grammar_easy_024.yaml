@@ -1,0 +1,15 @@
+name: grammar_easy_024
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The winner was her.
+  B) The winner was she.
+  C) The winner was herself.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

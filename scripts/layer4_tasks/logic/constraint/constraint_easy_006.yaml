@@ -1,0 +1,16 @@
+name: constraint_easy_006
+category: logic
+subcategory: constraint
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three houses are red, blue, and yellow. They are owned by Tom, Sara, and Mike.
+  Clues:
+  1. Tom does not live in the red house.
+  2. Sara lives in the blue house.
+  3. Mike does not live in the yellow house.
+  What colour house does Tom live in? Reply with only the colour.
+expected_answer: "Yellow"
+validator_config: {}

@@ -1,0 +1,14 @@
+name: sequences_easy_020
+category: logic
+subcategory: sequences
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  What is the next number in the Fibonacci-like sequence: 2, 3, 5, 8, 13, ...?
+  Reply with only the number.
+expected_answer: "21"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

@@ -1,0 +1,22 @@
+name: creative_medium_043
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a street after a protest has ended.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "street"
+    - "aftermath"
+    - "quiet"
+    - "signs"
+    - "protesters"
+    - "discarded"
+    - "scattered"
+    - "empty"
+  min_words: 15
+  max_words: 60

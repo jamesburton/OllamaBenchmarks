@@ -1,0 +1,54 @@
+name: medium_linq_018
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Athlete with: int Id, string Name, string Sport, IReadOnlyList<double> Times.
+  A class LeaderBoard with a constructor accepting IEnumerable<Athlete> athletes.
+  Expose:
+    IEnumerable<Athlete> ByBestTime() — ordered by best (minimum) Time ascending per athlete
+    IEnumerable<Athlete> DistinctBy_Sport_BestAthlete()
+      — for each sport, the athlete with the best time; ordered by sport name ascending
+  Return only valid C# code in a single file.
+test_code: |
+  public class LeaderBoardTests
+  {
+      private readonly Athlete[] _athletes = {
+          new(1, "Alice", "Running", new[]{12.1,11.8,12.5}),
+          new(2, "Bob",   "Running", new[]{11.5,11.2,12.0}),
+          new(3, "Carol", "Swimming",new[]{60.0,58.5,59.0}),
+          new(4, "Dave",  "Swimming",new[]{61.0,60.5,63.0}),
+      };
+
+      [Fact]
+      public void ByBestTime_BobFirst()
+      {
+          new LeaderBoard(_athletes).ByBestTime().First().Name.Should().Be("Bob");
+      }
+
+      [Fact]
+      public void ByBestTime_ReturnsAll()
+      {
+          new LeaderBoard(_athletes).ByBestTime().Should().HaveCount(4);
+      }
+
+      [Fact]
+      public void DistinctBySportBestAthlete_ReturnsTwoAthletes()
+      {
+          new LeaderBoard(_athletes).DistinctBy_Sport_BestAthlete().Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void DistinctBySportBestAthlete_BestRunnerIsBob()
+      {
+          var result = new LeaderBoard(_athletes).DistinctBy_Sport_BestAthlete().ToList();
+          result.First(a => a.Sport == "Running").Name.Should().Be("Bob");
+      }
+  }

@@ -1,0 +1,60 @@
+name: medium_blazor_014
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class SelectionService<T> with:
+    IReadOnlyList<T> Selected, Select(T), Deselect(T), Toggle(T), SelectAll(IEnumerable<T>), ClearSelection(), IsSelected(T)->bool, OnSelectionChanged event
+  Return only valid C# code in a single file.
+test_code: |
+  public class SelectionServiceTests
+  {
+      [Fact]
+      public void Select_AddsItem()
+      {
+          var svc = new SelectionService<string>();
+          svc.Select("a");
+          svc.IsSelected("a").Should().BeTrue();
+      }
+
+      [Fact]
+      public void Deselect_RemovesItem()
+      {
+          var svc = new SelectionService<string>();
+          svc.Select("a");
+          svc.Deselect("a");
+          svc.IsSelected("a").Should().BeFalse();
+      }
+
+      [Fact]
+      public void Toggle_SelectsIfNot()
+      {
+          var svc = new SelectionService<string>();
+          svc.Toggle("b");
+          svc.IsSelected("b").Should().BeTrue();
+      }
+
+      [Fact]
+      public void Toggle_DeselectsIfSelected()
+      {
+          var svc = new SelectionService<string>();
+          svc.Select("c");
+          svc.Toggle("c");
+          svc.IsSelected("c").Should().BeFalse();
+      }
+
+      [Fact]
+      public void SelectAll_SelectsAll()
+      {
+          var svc = new SelectionService<string>();
+          svc.SelectAll(new[] { "x", "y", "z" });
+          svc.Selected.Should().HaveCount(3);
+      }
+  }

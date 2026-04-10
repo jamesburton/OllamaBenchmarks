@@ -1,0 +1,64 @@
+name: medium_aspnet_027
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record InventoryItem(string Sku, string Name, int Quantity, decimal UnitPrice).
+  A record StockAdjustment(string Sku, int Delta, string Reason).
+  A class InventoryController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<InventoryItem> (for testability).
+  Actions:
+    GET api/inventory — all items
+    GET api/inventory/low-stock?threshold=5 — items with Quantity < threshold
+    POST api/inventory/adjust — applies StockAdjustment (returns 404 if sku not found, 400 if resulting quantity < 0)
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryControllerTests
+  {
+      private InventoryController MakeController() => new(new List<InventoryItem>
+      {
+          new("SKU001", "Widget", 10, 5.99m),
+          new("SKU002", "Gadget", 3, 19.99m),
+          new("SKU003", "Doohickey", 0, 1.99m)
+      });
+
+      [Fact]
+      public void GetAll_ReturnsAllItems()
+      {
+          var result = MakeController().GetAll() as OkObjectResult;
+          (result!.Value as IEnumerable<InventoryItem>).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetLowStock_FiltersCorrectly()
+      {
+          var result = MakeController().GetLowStock(5) as OkObjectResult;
+          var items = result!.Value as IEnumerable<InventoryItem>;
+          items!.All(i => i.Quantity < 5).Should().BeTrue();
+      }
+
+      [Fact]
+      public void Adjust_ValidDelta_UpdatesQuantity()
+      {
+          var ctrl = MakeController();
+          ctrl.Adjust(new StockAdjustment("SKU001", -3, "sold"));
+          var result = ctrl.GetAll() as OkObjectResult;
+          var item = (result!.Value as IEnumerable<InventoryItem>)!.First(i => i.Sku == "SKU001");
+          item.Quantity.Should().Be(7);
+      }
+
+      [Fact]
+      public void Adjust_NegativeResult_Returns400()
+      {
+          var ctrl = MakeController();
+          var result = ctrl.Adjust(new StockAdjustment("SKU002", -10, "error"));
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

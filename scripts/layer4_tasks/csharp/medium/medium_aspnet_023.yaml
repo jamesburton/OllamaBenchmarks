@@ -1,0 +1,52 @@
+name: medium_aspnet_023
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record AuditLog(Guid Id, string UserId, string Action, DateTime Timestamp).
+  An interface IAuditStore with:
+    Task LogAsync(string userId, string action)
+    Task<IEnumerable<AuditLog>> GetLogsAsync(string userId)
+  A class AuditController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IAuditStore.
+  Actions: POST api/audit/log (body: userId, action), GET api/audit/{userId}.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuditControllerTests
+  {
+      [Fact]
+      public async Task Log_CallsStore()
+      {
+          var store = Substitute.For<IAuditStore>();
+          var ctrl = new AuditController(store);
+          await ctrl.Log("user1", "login");
+          await store.Received(1).LogAsync("user1", "login");
+      }
+
+      [Fact]
+      public async Task Log_Returns204()
+      {
+          var store = Substitute.For<IAuditStore>();
+          var ctrl = new AuditController(store);
+          var result = await ctrl.Log("user1", "action");
+          result.Should().BeOfType<NoContentResult>();
+      }
+
+      [Fact]
+      public async Task GetLogs_ReturnsUserLogs()
+      {
+          var store = Substitute.For<IAuditStore>();
+          var logs = new[] { new AuditLog(Guid.NewGuid(), "user2", "view", DateTime.UtcNow) };
+          store.GetLogsAsync("user2").Returns(logs.AsEnumerable());
+          var ctrl = new AuditController(store);
+          var result = await ctrl.GetLogs("user2") as OkObjectResult;
+          (result!.Value as IEnumerable<AuditLog>).Should().HaveCount(1);
+      }
+  }

@@ -1,0 +1,43 @@
+name: easy_vertical_018
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record NewsletterSubscription(string Email, bool IsActive)
+  An interface ISubscriptionRepository with methods:
+    Task AddAsync(NewsletterSubscription subscription)
+    Task<NewsletterSubscription?> FindByEmailAsync(string email)
+    Task UpdateAsync(NewsletterSubscription subscription)
+  A class SubscriptionService with constructor taking ISubscriptionRepository, and async methods:
+    Task SubscribeAsync(string email) adds active subscription if not exists, reactivates if inactive
+    Task UnsubscribeAsync(string email) sets IsActive = false if exists
+  Return only valid C# code in a single file.
+test_code: |
+  public class SubscriptionServiceTests
+  {
+      [Fact]
+      public async Task SubscribeAsync_NewEmail_AddsSubscription()
+      {
+          var repo = Substitute.For<ISubscriptionRepository>();
+          repo.FindByEmailAsync("new@test.com").Returns((NewsletterSubscription?)null);
+          var service = new SubscriptionService(repo);
+          await service.SubscribeAsync("new@test.com");
+          await repo.Received(1).AddAsync(Arg.Is<NewsletterSubscription>(s => s.Email == "new@test.com" && s.IsActive));
+      }
+      [Fact]
+      public async Task UnsubscribeAsync_ExistingSubscription_DeactivatesIt()
+      {
+          var repo = Substitute.For<ISubscriptionRepository>();
+          repo.FindByEmailAsync("old@test.com").Returns(new NewsletterSubscription("old@test.com", true));
+          var service = new SubscriptionService(repo);
+          await service.UnsubscribeAsync("old@test.com");
+          await repo.Received(1).UpdateAsync(Arg.Is<NewsletterSubscription>(s => !s.IsActive));
+      }
+  }

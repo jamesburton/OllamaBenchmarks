@@ -1,0 +1,68 @@
+name: medium_blazor_005
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class BreadcrumbService with:
+    record BreadcrumbItem(string Title, string? Href)
+    IReadOnlyList<BreadcrumbItem> Items { get; }
+    event Action? OnChanged
+    void SetBreadcrumbs(params BreadcrumbItem[] items)
+    void Push(BreadcrumbItem item)
+    void Pop()
+  Return only valid C# code in a single file.
+test_code: |
+  public class BreadcrumbServiceTests
+  {
+      [Fact]
+      public void SetBreadcrumbs_ReplacesItems()
+      {
+          var svc = new BreadcrumbService();
+          svc.SetBreadcrumbs(new BreadcrumbItem("Home", "/"), new BreadcrumbItem("Products", "/products"));
+          svc.Items.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Push_AddsItem()
+      {
+          var svc = new BreadcrumbService();
+          svc.Push(new BreadcrumbItem("Home", "/"));
+          svc.Push(new BreadcrumbItem("About", "/about"));
+          svc.Items.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Pop_RemovesLastItem()
+      {
+          var svc = new BreadcrumbService();
+          svc.Push(new BreadcrumbItem("Home", "/"));
+          svc.Push(new BreadcrumbItem("Products", "/products"));
+          svc.Pop();
+          svc.Items.Should().HaveCount(1);
+          svc.Items[0].Title.Should().Be("Home");
+      }
+
+      [Fact]
+      public void SetBreadcrumbs_FiresEvent()
+      {
+          var svc = new BreadcrumbService();
+          var fired = false;
+          svc.OnChanged += () => fired = true;
+          svc.SetBreadcrumbs(new BreadcrumbItem("Home", "/"));
+          fired.Should().BeTrue();
+      }
+
+      [Fact]
+      public void Pop_EmptyList_DoesNotThrow()
+      {
+          var svc = new BreadcrumbService();
+          svc.Invoking(s => s.Pop()).Should().NotThrow();
+      }
+  }

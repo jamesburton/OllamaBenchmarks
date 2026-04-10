@@ -1,0 +1,21 @@
+name: technical_easy_028
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for a function that reverses a string.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Returns:"
+    - "string"
+    - "reversed"
+    - "reverse"
+    - "returns"
+    - "str"
+  min_words: 8
+  max_words: 60

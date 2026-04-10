@@ -1,0 +1,39 @@
+name: easy_vertical_025
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Subscription(string UserId, string Plan, DateTime RenewsAt, bool IsActive)
+  A class SubscriptionManager with:
+    void Add(Subscription subscription)
+    bool IsActive(string userId) returns true if user has active subscription
+    List<Subscription> GetRenewingSoon(DateTime now, int withinDays) returns active subscriptions renewing within next 'withinDays' days
+  Return only valid C# code in a single file.
+test_code: |
+  public class SubscriptionManagerTests
+  {
+      [Fact]
+      public void IsActive_ReturnsCorrectStatus()
+      {
+          var manager = new SubscriptionManager();
+          manager.Add(new Subscription("u1", "Pro", DateTime.UtcNow.AddDays(30), true));
+          manager.IsActive("u1").Should().BeTrue();
+          manager.IsActive("u2").Should().BeFalse();
+      }
+      [Fact]
+      public void GetRenewingSoon_ReturnsUpcomingRenewals()
+      {
+          var manager = new SubscriptionManager();
+          var now = DateTime.UtcNow;
+          manager.Add(new Subscription("u1", "Pro", now.AddDays(3), true));
+          manager.Add(new Subscription("u2", "Pro", now.AddDays(10), true));
+          manager.GetRenewingSoon(now, 7).Should().HaveCount(1);
+      }
+  }

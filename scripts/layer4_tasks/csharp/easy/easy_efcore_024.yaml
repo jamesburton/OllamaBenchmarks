@@ -1,0 +1,39 @@
+name: easy_efcore_024
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Subscription with properties: int Id, string PlanName, decimal Price, DateTime ExpiresAt
+  A DbContext class SubContext with:
+    DbSet<Subscription> Subscriptions { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class SubscriptionRepository with:
+    List<Subscription> GetExpiringSoon(SubContext context, int daysAhead)
+  that returns subscriptions expiring within the next daysAhead days (from DateTime.UtcNow), ordered by ExpiresAt.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SubscriptionRepositoryTests
+  {
+      [Fact]
+      public void GetExpiringSoon_ReturnsExpiringSoon()
+      {
+          using var context = new SubContext();
+          context.Database.EnsureCreated();
+          var now = DateTime.UtcNow;
+          context.Subscriptions.AddRange(
+              new Subscription { PlanName = "Basic", Price = 9.99m, ExpiresAt = now.AddDays(5) },
+              new Subscription { PlanName = "Pro", Price = 19.99m, ExpiresAt = now.AddDays(30) });
+          context.SaveChanges();
+          var result = SubscriptionRepository.GetExpiringSoon(context, 10);
+          result.Should().HaveCount(1);
+          result[0].PlanName.Should().Be("Basic");
+      }
+  }

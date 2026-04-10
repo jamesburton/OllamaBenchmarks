@@ -1,0 +1,68 @@
+name: medium_efcore_028
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity ContactMessage with: int Id, string Name, string Email, string Subject, string Body, string Status, DateTime ReceivedAt, DateTime? RepliedAt.
+  A class ContactDbContext : DbContext with DbSet<ContactMessage> Messages.
+  A class ContactRepository with constructor accepting ContactDbContext.
+  Methods:
+    Task<IEnumerable<ContactMessage>> GetPendingAsync()
+    Task MarkRepliedAsync(int messageId)
+    Task<IDictionary<string, int>> GetCountByStatusAsync()
+  MarkRepliedAsync sets Status="Replied" and RepliedAt=UtcNow.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ContactRepositoryTests : IAsyncLifetime
+  {
+      private ContactDbContext _db = null!;
+      private ContactRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<ContactDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new ContactDbContext(opts);
+          _repo = new ContactRepository(_db);
+          _db.Messages.AddRange(
+              new ContactMessage { Name = "A", Email = "a@x.com", Subject = "S1", Body = "B1", Status = "Pending", ReceivedAt = DateTime.UtcNow },
+              new ContactMessage { Name = "B", Email = "b@x.com", Subject = "S2", Body = "B2", Status = "Pending", ReceivedAt = DateTime.UtcNow },
+              new ContactMessage { Name = "C", Email = "c@x.com", Subject = "S3", Body = "B3", Status = "Replied", ReceivedAt = DateTime.UtcNow, RepliedAt = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetPending_ReturnsOnlyPending()
+      {
+          (await _repo.GetPendingAsync()).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task MarkReplied_SetsStatusAndTime()
+      {
+          var id = _db.Messages.First(m => m.Status == "Pending").Id;
+          var before = DateTime.UtcNow.AddSeconds(-1);
+          await _repo.MarkRepliedAsync(id);
+          _db.ChangeTracker.Clear();
+          var msg = await _db.Messages.FindAsync(id);
+          msg!.Status.Should().Be("Replied");
+          msg.RepliedAt.Should().BeAfter(before);
+      }
+
+      [Fact]
+      public async Task GetCountByStatus_GroupsCorrectly()
+      {
+          var result = await _repo.GetCountByStatusAsync();
+          result["Pending"].Should().Be(2);
+          result["Replied"].Should().Be(1);
+      }
+  }

@@ -1,0 +1,15 @@
+name: grammar_medium_092
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) She is the candidate who I believe will win.
+  B) She is the candidate whom I believe will win.
+  C) She is the candidate that I believe will win.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

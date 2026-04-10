@@ -1,0 +1,101 @@
+name: hard_blazor_001
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor component with full CRUD and service layer:
+  Interface IProductService:
+    Task<IReadOnlyList<ProductDto>> GetAllAsync(CancellationToken ct)
+    Task<ProductDto?> GetByIdAsync(int id, CancellationToken ct)
+    Task<ProductDto> CreateAsync(CreateProductRequest req, CancellationToken ct)
+    Task<ProductDto> UpdateAsync(int id, UpdateProductRequest req, CancellationToken ct)
+    Task<bool> DeleteAsync(int id, CancellationToken ct)
+
+  Records:
+    ProductDto(int Id, string Name, string Category, decimal Price, int Stock)
+    CreateProductRequest(string Name, string Category, decimal Price, int Stock)
+    UpdateProductRequest(string Name, decimal Price, int Stock)
+
+  Class InMemoryProductService : IProductService:
+    In-memory list with thread-safe operations.
+    Seeded with 3 products in constructor.
+    GetByIdAsync returns null if not found.
+    DeleteAsync returns false if not found.
+
+  Use NSubstitute for mock tests.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InMemoryProductServiceTests
+  {
+      private readonly IProductService _svc = new InMemoryProductService();
+
+      [Fact]
+      public async Task GetAll_ReturnsSeedData()
+      {
+          var products = await _svc.GetAllAsync(CancellationToken.None);
+          products.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task Create_AddsProduct()
+      {
+          var req = new CreateProductRequest("Widget", "Tools", 9.99m, 100);
+          var created = await _svc.CreateAsync(req, CancellationToken.None);
+          created.Name.Should().Be("Widget");
+          created.Id.Should().BeGreaterThan(0);
+          var all = await _svc.GetAllAsync(CancellationToken.None);
+          all.Should().HaveCount(4);
+      }
+
+      [Fact]
+      public async Task GetById_ReturnsCorrectProduct()
+      {
+          var all = await _svc.GetAllAsync(CancellationToken.None);
+          var first = all.First();
+          var found = await _svc.GetByIdAsync(first.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.Name.Should().Be(first.Name);
+      }
+
+      [Fact]
+      public async Task GetById_UnknownId_ReturnsNull()
+      {
+          var result = await _svc.GetByIdAsync(9999, CancellationToken.None);
+          result.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task Update_ChangesProductData()
+      {
+          var all = await _svc.GetAllAsync(CancellationToken.None);
+          var first = all.First();
+          var updated = await _svc.UpdateAsync(first.Id, new UpdateProductRequest("Updated Name", 99.99m, 50), CancellationToken.None);
+          updated.Name.Should().Be("Updated Name");
+          updated.Price.Should().Be(99.99m);
+      }
+
+      [Fact]
+      public async Task Delete_RemovesProduct()
+      {
+          var all = await _svc.GetAllAsync(CancellationToken.None);
+          var first = all.First();
+          var result = await _svc.DeleteAsync(first.Id, CancellationToken.None);
+          result.Should().BeTrue();
+          var remaining = await _svc.GetAllAsync(CancellationToken.None);
+          remaining.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task Delete_UnknownId_ReturnsFalse()
+      {
+          var result = await _svc.DeleteAsync(9999, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+  }

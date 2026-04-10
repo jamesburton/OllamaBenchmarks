@@ -1,0 +1,46 @@
+name: easy_efcore_018
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Ticket with properties: int Id, string Title, string Status, int Priority
+  A DbContext class TicketContext with:
+    DbSet<Ticket> Tickets { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class TicketRepository with:
+    List<Ticket> GetByStatus(TicketContext context, string status)
+  that returns tickets with the given status ordered by Priority descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TicketRepositoryTests
+  {
+      [Fact]
+      public void GetByStatus_ReturnsMatchingTickets()
+      {
+          using var context = new TicketContext();
+          context.Database.EnsureCreated();
+          context.Tickets.AddRange(
+              new Ticket { Title = "A", Status = "open", Priority = 1 },
+              new Ticket { Title = "B", Status = "open", Priority = 3 },
+              new Ticket { Title = "C", Status = "closed", Priority = 2 });
+          context.SaveChanges();
+          var result = TicketRepository.GetByStatus(context, "open");
+          result.Should().HaveCount(2);
+          result[0].Title.Should().Be("B");
+      }
+      [Fact]
+      public void GetByStatus_NoMatch_ReturnsEmpty()
+      {
+          using var context = new TicketContext();
+          context.Database.EnsureCreated();
+          TicketRepository.GetByStatus(context, "pending").Should().BeEmpty();
+      }
+  }

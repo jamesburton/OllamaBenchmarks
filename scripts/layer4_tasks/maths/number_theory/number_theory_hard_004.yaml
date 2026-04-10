@@ -1,0 +1,14 @@
+name: number_theory_hard_004
+category: maths
+subcategory: number_theory
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Express 1001 as a product of prime factors. What is the largest prime factor?
+  Reply with only the number.
+expected_answer: "13"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

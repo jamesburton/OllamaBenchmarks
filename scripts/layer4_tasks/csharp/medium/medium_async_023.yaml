@@ -1,0 +1,57 @@
+name: medium_async_023
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncSemaphorePool that manages a pool of resources.
+  Constructor accepts IReadOnlyList<string> resources (connection strings, etc.).
+  Expose:
+    Task<string> AcquireAsync(CancellationToken ct = default) — waits for a free resource and returns it
+    void Release(string resource) — returns resource to pool
+    int Available — count of currently available resources
+  Uses SemaphoreSlim to control access.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncSemaphorePoolTests
+  {
+      [Fact]
+      public async Task AcquireRelease_SingleResource()
+      {
+          var pool = new AsyncSemaphorePool(new[]{"conn1"});
+          var r = await pool.AcquireAsync();
+          r.Should().Be("conn1");
+          pool.Release(r);
+          pool.Available.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task Acquire_AllResources_ThenWait()
+      {
+          var pool = new AsyncSemaphorePool(new[]{"r1","r2"});
+          var r1 = await pool.AcquireAsync();
+          var r2 = await pool.AcquireAsync();
+          pool.Available.Should().Be(0);
+          var cts = new CancellationTokenSource(100);
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() => pool.AcquireAsync(cts.Token));
+          pool.Release(r1);
+          pool.Release(r2);
+      }
+
+      [Fact]
+      public async Task AcquireRelease_TwoResources_BothAvailable()
+      {
+          var pool = new AsyncSemaphorePool(new[]{"a","b"});
+          pool.Available.Should().Be(2);
+          var r = await pool.AcquireAsync();
+          pool.Available.Should().Be(1);
+          pool.Release(r);
+          pool.Available.Should().Be(2);
+      }
+  }

@@ -1,0 +1,16 @@
+name: vocabulary_hard_059
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word carries a POSITIVE connotation about receiving unearned wealth?
+  A) Windfall
+  B) Inheritance
+  C) Spoils
+  D) Loot
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

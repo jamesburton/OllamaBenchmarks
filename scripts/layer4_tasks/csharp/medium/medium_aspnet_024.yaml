@@ -1,0 +1,52 @@
+name: medium_aspnet_024
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record NotificationRequest(string UserId, string Message, string Channel).
+  An interface INotificationSender with:
+    Task SendAsync(NotificationRequest request)
+  Register two implementations: EmailNotificationSender and PushNotificationSender.
+  A class NotificationsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IEnumerable<INotificationSender>.
+  Action: POST api/notifications — sends to all registered senders, returns 200.
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationsControllerTests
+  {
+      [Fact]
+      public async Task Post_SendsToAllSenders()
+      {
+          var sender1 = Substitute.For<INotificationSender>();
+          var sender2 = Substitute.For<INotificationSender>();
+          var ctrl = new NotificationsController(new[] { sender1, sender2 });
+          var req = new NotificationRequest("u1", "Hello", "email");
+          await ctrl.Send(req);
+          await sender1.Received(1).SendAsync(req);
+          await sender2.Received(1).SendAsync(req);
+      }
+
+      [Fact]
+      public async Task Post_Returns200()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          var ctrl = new NotificationsController(new[] { sender });
+          var result = await ctrl.Send(new NotificationRequest("u1", "msg", "push"));
+          result.Should().BeOfType<OkResult>();
+      }
+
+      [Fact]
+      public async Task Post_NoSenders_Returns200()
+      {
+          var ctrl = new NotificationsController(Enumerable.Empty<INotificationSender>());
+          var result = await ctrl.Send(new NotificationRequest("u1", "msg", "none"));
+          result.Should().BeOfType<OkResult>();
+      }
+  }

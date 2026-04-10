@@ -1,0 +1,15 @@
+name: grammar_easy_081
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) She walked into the room and sits down.
+  B) She walked into the room and sat down.
+  C) She walks into the room and sat down.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

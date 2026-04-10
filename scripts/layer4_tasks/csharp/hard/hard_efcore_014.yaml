@@ -1,0 +1,96 @@
+name: hard_efcore_014
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with raw SQL queries and stored procedure simulation:
+  Entity: SalesTransaction(int Id, string Region, string ProductCode, int Qty, decimal UnitPrice, DateTime SoldAt).
+  DbContext: SalesDbContext.
+  Class SalesAnalyticsRepository(SalesDbContext db):
+    Task<IReadOnlyList<RegionSalesDto>> GetRegionSalesAsync(DateOnly from, DateOnly to, CancellationToken ct) —
+      uses FromSqlRaw or LINQ to group by Region, compute TotalRevenue (Qty*UnitPrice) and TransactionCount.
+    Task<IReadOnlyList<TopProductDto>> GetTopProductsAsync(int topN, CancellationToken ct) —
+      groups by ProductCode, sums Qty (TotalQty) and Revenue, returns top N by Revenue.
+    Task<decimal> GetRevenueAsync(string region, DateOnly from, DateOnly to, CancellationToken ct)
+    Task BulkInsertAsync(IReadOnlyList<SalesTransaction> transactions, CancellationToken ct)
+  Records: RegionSalesDto(string Region, decimal TotalRevenue, int TransactionCount),
+           TopProductDto(string ProductCode, int TotalQty, decimal Revenue).
+  Use SQLite in-memory with seeded data.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SalesAnalyticsRepositoryTests : IDisposable
+  {
+      private readonly SalesDbContext _db;
+      private readonly SalesAnalyticsRepository _repo;
+
+      public SalesAnalyticsRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<SalesDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new SalesDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData();
+          _repo = new SalesAnalyticsRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          _db.SalesTransactions.AddRange(
+              new SalesTransaction { Region = "North", ProductCode = "P1", Qty = 10, UnitPrice = 5m,  SoldAt = new DateTime(2024,1,15) },
+              new SalesTransaction { Region = "North", ProductCode = "P2", Qty = 5,  UnitPrice = 20m, SoldAt = new DateTime(2024,1,20) },
+              new SalesTransaction { Region = "South", ProductCode = "P1", Qty = 20, UnitPrice = 5m,  SoldAt = new DateTime(2024,1,10) },
+              new SalesTransaction { Region = "South", ProductCode = "P1", Qty = 8,  UnitPrice = 5m,  SoldAt = new DateTime(2024,2,5)  }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task GetRegionSales_GroupsByRegion()
+      {
+          var result = await _repo.GetRegionSalesAsync(new DateOnly(2024,1,1), new DateOnly(2024,12,31), CancellationToken.None);
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetRegionSales_NorthRevenueCorrect()
+      {
+          var result = await _repo.GetRegionSalesAsync(new DateOnly(2024,1,1), new DateOnly(2024,12,31), CancellationToken.None);
+          var north = result.First(r => r.Region == "North");
+          north.TotalRevenue.Should().Be(10*5m + 5*20m);
+      }
+
+      [Fact]
+      public async Task GetTopProducts_ReturnsCorrectTopN()
+      {
+          var result = await _repo.GetTopProductsAsync(1, CancellationToken.None);
+          result.Should().ContainSingle();
+          result[0].ProductCode.Should().Be("P1");
+      }
+
+      [Fact]
+      public async Task GetRevenue_FiltersByRegionAndDate()
+      {
+          var rev = await _repo.GetRevenueAsync("North", new DateOnly(2024,1,1), new DateOnly(2024,1,31), CancellationToken.None);
+          rev.Should().Be(10*5m + 5*20m);
+      }
+
+      [Fact]
+      public async Task BulkInsert_AddsAllTransactions()
+      {
+          var newTxns = new[]
+          {
+              new SalesTransaction { Region = "East", ProductCode = "P3", Qty = 3, UnitPrice = 10m, SoldAt = DateTime.UtcNow },
+              new SalesTransaction { Region = "East", ProductCode = "P3", Qty = 7, UnitPrice = 10m, SoldAt = DateTime.UtcNow },
+          };
+          await _repo.BulkInsertAsync(newTxns, CancellationToken.None);
+          _db.SalesTransactions.Count(t => t.Region == "East").Should().Be(2);
+      }
+  }

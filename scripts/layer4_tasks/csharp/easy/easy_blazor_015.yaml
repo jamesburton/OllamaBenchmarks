@@ -1,0 +1,36 @@
+name: easy_blazor_015
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class SearchBoxComponent that extends ComponentBase with:
+    [Parameter] string Placeholder { get; set; } = "Search..."
+    string Query { get; set; } = ""
+    bool HasQuery => !string.IsNullOrWhiteSpace(Query)
+    void Clear() sets Query to ""
+  Return only valid C# code in a single file.
+test_code: |
+  public class SearchBoxComponentTests
+  {
+      [Fact]
+      public void HasQuery_WhenQuerySet_ReturnsTrue()
+      {
+          var c = new SearchBoxComponent { Query = "hello" };
+          c.HasQuery.Should().BeTrue();
+      }
+      [Fact]
+      public void Clear_ResetsQuery()
+      {
+          var c = new SearchBoxComponent { Query = "test" };
+          c.Clear();
+          c.Query.Should().BeEmpty();
+          c.HasQuery.Should().BeFalse();
+      }
+  }

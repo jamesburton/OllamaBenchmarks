@@ -1,0 +1,18 @@
+name: summarisation_medium_051
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Altitude training, once accessible only to elite athletes who could travel to high-altitude locations, is now being replicated using hypoxic tents and chambers. Research confirms that exposure to low-oxygen environments stimulates red blood cell production, improving endurance performance. However, the long-term health effects of artificial altitude exposure remain under investigation.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "altitude"
+    - "hypoxic"
+    - "endurance"
+    - "training"
+  max_words: 25

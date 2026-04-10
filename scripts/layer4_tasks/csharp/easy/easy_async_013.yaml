@@ -1,0 +1,34 @@
+name: easy_async_013
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Timeout with a static method:
+    async Task<T?> WithTimeoutAsync<T>(Task<T> task, int timeoutMs) where T : class
+  that returns the result if the task completes within timeoutMs, otherwise returns null.
+  Use Task.WhenAny with Task.Delay.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TimeoutTests
+  {
+      [Fact]
+      public async Task WithTimeoutAsync_Completes_ReturnsResult()
+      {
+          var result = await Timeout.WithTimeoutAsync(Task.FromResult("hello"), 1000);
+          result.Should().Be("hello");
+      }
+      [Fact]
+      public async Task WithTimeoutAsync_TimesOut_ReturnsNull()
+      {
+          var slow = Task.Delay(500).ContinueWith(_ => "slow");
+          var result = await Timeout.WithTimeoutAsync(slow, 50);
+          result.Should().BeNull();
+      }
+  }

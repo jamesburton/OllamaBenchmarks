@@ -1,0 +1,50 @@
+name: medium_linq_023
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class MatrixHelper with static methods:
+    IEnumerable<IEnumerable<T>> Transpose<T>(IEnumerable<IEnumerable<T>> matrix)
+      — transposes a jagged 2D structure (rectangular)
+    IEnumerable<(T Left, T Right)> CartesianProduct<T>(IEnumerable<T> left, IEnumerable<T> right)
+      — returns every combination of left × right
+  Return only valid C# code in a single file.
+test_code: |
+  public class MatrixHelperTests
+  {
+      [Fact]
+      public void Transpose_2x3_Becomes3x2()
+      {
+          var input = new[]{new[]{1,2,3}, new[]{4,5,6}};
+          var result = MatrixHelper.Transpose(input).Select(r => r.ToList()).ToList();
+          result.Should().HaveCount(3);
+          result[0].Should().BeEquivalentTo(new[]{1,4}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void Transpose_1x1_ReturnsSame()
+      {
+          var result = MatrixHelper.Transpose(new[]{new[]{42}}).Select(r => r.ToList()).ToList();
+          result[0][0].Should().Be(42);
+      }
+
+      [Fact]
+      public void CartesianProduct_2x2_ReturnsFour()
+      {
+          var result = MatrixHelper.CartesianProduct(new[]{1,2}, new[]{"a","b"}).ToList();
+          result.Should().HaveCount(4);
+      }
+
+      [Fact]
+      public void CartesianProduct_EmptyRight_ReturnsEmpty()
+      {
+          MatrixHelper.CartesianProduct(new[]{1,2}, Array.Empty<string>()).Should().BeEmpty();
+      }
+  }

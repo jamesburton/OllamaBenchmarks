@@ -1,0 +1,33 @@
+name: easy_patterns_042
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Vector2D(double X, double Y)
+  with:
+    double Magnitude => Math.Sqrt(X*X + Y*Y)
+    Vector2D Normalize() — returns a new Vector2D with X/Magnitude and Y/Magnitude
+  Return only valid C# code in a single file.
+test_code: |
+  public class Vector2DTests
+  {
+      [Fact]
+      public void Magnitude_BasicCase()
+      {
+          new Vector2D(3, 4).Magnitude.Should().BeApproximately(5.0, 0.001);
+      }
+      [Fact]
+      public void Normalize_UnitVector()
+      {
+          var v = new Vector2D(3, 4).Normalize();
+          v.Magnitude.Should().BeApproximately(1.0, 0.001);
+      }
+  }

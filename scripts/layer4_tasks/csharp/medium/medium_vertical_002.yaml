@@ -1,0 +1,57 @@
+name: medium_vertical_002
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for user registration.
+  Include:
+    record RegisterUserCommand(string Username, string Email, string Password)
+    record RegisterUserResult(Guid UserId, string Username, string Email)
+    class RegisterUserHandler with constructor accepting List<RegisterUserResult> existingUsers.
+    Method: Task<RegisterUserResult> HandleAsync(RegisterUserCommand command)
+    Validates: Username/Email not empty, Email contains @, Password min 8 chars.
+    Throws InvalidOperationException if Username or Email already taken.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RegisterUserHandlerTests
+  {
+      [Fact]
+      public async Task HandleAsync_Valid_ReturnsResult()
+      {
+          var handler = new RegisterUserHandler(new List<RegisterUserResult>());
+          var result = await handler.HandleAsync(new RegisterUserCommand("alice", "alice@test.com", "password123"));
+          result.Username.Should().Be("alice");
+          result.UserId.Should().NotBe(Guid.Empty);
+      }
+
+      [Fact]
+      public async Task HandleAsync_DuplicateUsername_Throws()
+      {
+          var existing = new List<RegisterUserResult> { new(Guid.NewGuid(), "alice", "alice@test.com") };
+          var handler = new RegisterUserHandler(existing);
+          await handler.Invoking(h => h.HandleAsync(new RegisterUserCommand("alice", "new@test.com", "password123")))
+              .Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_InvalidEmail_Throws()
+      {
+          var handler = new RegisterUserHandler(new List<RegisterUserResult>());
+          await handler.Invoking(h => h.HandleAsync(new RegisterUserCommand("bob", "notanemail", "password123")))
+              .Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_ShortPassword_Throws()
+      {
+          var handler = new RegisterUserHandler(new List<RegisterUserResult>());
+          await handler.Invoking(h => h.HandleAsync(new RegisterUserCommand("bob", "bob@test.com", "short")))
+              .Should().ThrowAsync<ArgumentException>();
+      }
+  }

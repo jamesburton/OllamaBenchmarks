@@ -1,0 +1,15 @@
+name: grammar_medium_076
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The conference was informative the speakers covered several important topics the audience was engaged.
+  B) The conference was informative; the speakers covered several important topics, and the audience was engaged.
+  C) The conference was informative, the speakers covered several important topics and the audience was engaged.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

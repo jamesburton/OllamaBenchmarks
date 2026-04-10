@@ -1,0 +1,104 @@
+name: hard_aspnet_020
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  An idempotency key middleware for POST requests:
+  Class IdempotencyOptions: string HeaderName (default "Idempotency-Key"), TimeSpan CacheExpiry (default 24h).
+  Interface IIdempotencyStore:
+    Task<IdempotencyRecord?> GetAsync(string key, CancellationToken ct)
+    Task SetAsync(string key, IdempotencyRecord record, TimeSpan expiry, CancellationToken ct)
+  Record: IdempotencyRecord(int StatusCode, string ContentType, byte[] Body, DateTime CreatedAt).
+  Class IdempotencyMiddleware:
+    For POST requests: if Idempotency-Key header present, check store.
+      If found: replay cached response. If not found: execute request, cache response.
+    Non-POST requests: pass through unchanged.
+  Class InMemoryIdempotencyStore : IIdempotencyStore.
+  Static: AddIdempotency(this IServiceCollection svc, Action<IdempotencyOptions>? configure = null)
+         UseIdempotency(this IApplicationBuilder app)
+  Return only valid C# code in a single file.
+test_code: |
+  public class IdempotencyMiddlewareTests
+  {
+      private static WebApplication BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddIdempotency();
+          var app = builder.Build();
+          app.UseIdempotency();
+          int callCount = 0;
+          app.MapPost("/orders", () =>
+          {
+              callCount++;
+              return Results.Created("/orders/1", new { Id = callCount });
+          });
+          return app;
+      }
+
+      [Fact]
+      public async Task Post_WithIdempotencyKey_FirstRequest_Returns201()
+      {
+          await using var app = BuildApp();
+          var req = new HttpRequestMessage(HttpMethod.Post, "/orders");
+          req.Headers.Add("Idempotency-Key", "key-001");
+          var resp = await app.GetTestClient().SendAsync(req);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+      }
+
+      [Fact]
+      public async Task Post_SameIdempotencyKey_ReturnsCachedResponse()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var req1 = new HttpRequestMessage(HttpMethod.Post, "/orders");
+          req1.Headers.Add("Idempotency-Key", "key-dupe");
+          var resp1 = await client.SendAsync(req1);
+          var body1 = await resp1.Content.ReadAsStringAsync();
+          var req2 = new HttpRequestMessage(HttpMethod.Post, "/orders");
+          req2.Headers.Add("Idempotency-Key", "key-dupe");
+          var resp2 = await client.SendAsync(req2);
+          var body2 = await resp2.Content.ReadAsStringAsync();
+          body1.Should().Be(body2);
+          resp1.StatusCode.Should().Be(resp2.StatusCode);
+      }
+
+      [Fact]
+      public async Task Post_DifferentIdempotencyKey_ExecutesBothRequests()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var r1 = new HttpRequestMessage(HttpMethod.Post, "/orders"); r1.Headers.Add("Idempotency-Key", "k1");
+          var r2 = new HttpRequestMessage(HttpMethod.Post, "/orders"); r2.Headers.Add("Idempotency-Key", "k2");
+          var b1 = await (await client.SendAsync(r1)).Content.ReadAsStringAsync();
+          var b2 = await (await client.SendAsync(r2)).Content.ReadAsStringAsync();
+          b1.Should().NotBe(b2);
+      }
+
+      [Fact]
+      public async Task Get_WithIdempotencyKey_PassesThrough()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddIdempotency();
+          var app = builder.Build();
+          app.UseIdempotency();
+          app.MapGet("/data", () => "hello");
+          await using var _ = app;
+          var resp = await app.GetTestClient().GetAsync("/data");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+
+      [Fact]
+      public async Task Post_WithoutIdempotencyKey_ExecutesNormally()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().PostAsync("/orders", null);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+      }
+  }

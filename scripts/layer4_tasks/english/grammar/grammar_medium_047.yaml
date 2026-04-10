@@ -1,0 +1,15 @@
+name: grammar_medium_047
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) As a long-time customer, your service has been unsatisfactory.
+  B) As a long-time customer, I find your service unsatisfactory.
+  C) As being a long-time customer, your service is unsatisfactory.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

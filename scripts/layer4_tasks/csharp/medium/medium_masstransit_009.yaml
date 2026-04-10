@@ -1,0 +1,62 @@
+name: medium_masstransit_009
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record FileUploaded(Guid FileId, string OwnerId, string FileName, string MimeType, long SizeBytes).
+  A consumer FileProcessingConsumer implementing IConsumer<FileUploaded>.
+  Constructor accepts IFileProcessor processor.
+  Interface IFileProcessor with: Task<bool> ProcessAsync(Guid fileId, string mimeType) and Task NotifyOwnerAsync(string ownerId, Guid fileId, bool success).
+  In Consume: processes file, notifies owner with result.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record FileUploaded(Guid FileId, string OwnerId, string FileName, string MimeType, long SizeBytes); }
+  global using Contracts;
+
+  public class FileProcessingConsumerTests
+  {
+      [Fact]
+      public async Task Consume_ProcessesAndNotifies()
+      {
+          var processor = Substitute.For<IFileProcessor>();
+          processor.ProcessAsync(Arg.Any<Guid>(), Arg.Any<string>()).Returns(true);
+          var consumer = new FileProcessingConsumer(processor);
+          var ctx = Substitute.For<ConsumeContext<FileUploaded>>();
+          var fileId = Guid.NewGuid();
+          ctx.Message.Returns(new FileUploaded(fileId, "u1", "photo.jpg", "image/jpeg", 1024));
+          await consumer.Consume(ctx);
+          await processor.Received(1).ProcessAsync(fileId, "image/jpeg");
+          await processor.Received(1).NotifyOwnerAsync("u1", fileId, true);
+      }
+
+      [Fact]
+      public async Task Consume_ProcessingFails_NotifiesFalse()
+      {
+          var processor = Substitute.For<IFileProcessor>();
+          processor.ProcessAsync(Arg.Any<Guid>(), Arg.Any<string>()).Returns(false);
+          var consumer = new FileProcessingConsumer(processor);
+          var ctx = Substitute.For<ConsumeContext<FileUploaded>>();
+          var fileId = Guid.NewGuid();
+          ctx.Message.Returns(new FileUploaded(fileId, "u2", "doc.pdf", "application/pdf", 2048));
+          await consumer.Consume(ctx);
+          await processor.Received(1).NotifyOwnerAsync("u2", fileId, false);
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var processor = Substitute.For<IFileProcessor>();
+          processor.ProcessAsync(Arg.Any<Guid>(), Arg.Any<string>()).Returns(true);
+          var consumer = new FileProcessingConsumer(processor);
+          var ctx = Substitute.For<ConsumeContext<FileUploaded>>();
+          ctx.Message.Returns(new FileUploaded(Guid.NewGuid(), "u3", "f.txt", "text/plain", 100));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+  }

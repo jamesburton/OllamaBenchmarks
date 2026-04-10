@@ -1,0 +1,34 @@
+name: easy_patterns_032
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Address(string Street, string City, string PostalCode)
+  and a static class AddressFormatter with:
+    string Format(Address address)
+  that returns "{Street}, {City} {PostalCode}" using string interpolation.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AddressFormatterTests
+  {
+      [Fact]
+      public void Format_BasicCase()
+      {
+          var addr = new Address("123 Main St", "Springfield", "12345");
+          AddressFormatter.Format(addr).Should().Be("123 Main St, Springfield 12345");
+      }
+      [Fact]
+      public void Format_DifferentAddress()
+      {
+          var addr = new Address("456 Oak Ave", "Shelbyville", "67890");
+          AddressFormatter.Format(addr).Should().Be("456 Oak Ave, Shelbyville 67890");
+      }
+  }

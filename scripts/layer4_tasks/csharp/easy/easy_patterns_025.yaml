@@ -1,0 +1,45 @@
+name: easy_patterns_025
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class BankAccount with:
+    decimal Balance { get; private set; }
+    void Deposit(decimal amount) — increases balance
+    bool Withdraw(decimal amount) — decreases balance if sufficient funds, returns true; returns false if insufficient
+  Return only valid C# code in a single file.
+test_code: |
+  public class BankAccountTests
+  {
+      [Fact]
+      public void Deposit_IncreasesBalance()
+      {
+          var account = new BankAccount();
+          account.Deposit(100m);
+          account.Balance.Should().Be(100m);
+      }
+      [Fact]
+      public void Withdraw_SufficientFunds_DecreasesBalance()
+      {
+          var account = new BankAccount();
+          account.Deposit(100m);
+          var result = account.Withdraw(50m);
+          result.Should().BeTrue();
+          account.Balance.Should().Be(50m);
+      }
+      [Fact]
+      public void Withdraw_InsufficientFunds_ReturnsFalse()
+      {
+          var account = new BankAccount();
+          var result = account.Withdraw(50m);
+          result.Should().BeFalse();
+          account.Balance.Should().Be(0m);
+      }
+  }

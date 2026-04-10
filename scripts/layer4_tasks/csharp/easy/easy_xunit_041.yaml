@@ -1,0 +1,35 @@
+name: easy_xunit_041
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class BinaryConverter with static methods:
+    string ToBinary(int n) converts non-negative integer to binary string (e.g., 5 -> "101")
+    int FromBinary(string binary) converts binary string to integer
+  throws ArgumentException if n < 0 or binary contains non-binary characters
+  Return only valid C# code in a single file.
+test_code: |
+  public class BinaryConverterTests
+  {
+      [Theory]
+      [InlineData(0, "0")]
+      [InlineData(5, "101")]
+      [InlineData(8, "1000")]
+      public void ToBinary_ConvertsCorrectly(int n, string expected)
+      {
+          BinaryConverter.ToBinary(n).Should().Be(expected);
+      }
+      [Fact]
+      public void FromBinary_ConvertsCorrectly()
+      {
+          BinaryConverter.FromBinary("101").Should().Be(5);
+          BinaryConverter.FromBinary("1000").Should().Be(8);
+      }
+  }

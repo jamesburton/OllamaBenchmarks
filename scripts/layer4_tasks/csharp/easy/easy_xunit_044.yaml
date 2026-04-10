@@ -1,0 +1,39 @@
+name: easy_xunit_044
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IWeatherService with method:
+    Task<string> GetConditionAsync(string city)
+  A class WeatherAlert with constructor taking IWeatherService, and async method:
+    Task<string> GetAlertAsync(string city) returns "ALERT: {condition} in {city}" if condition is "Storm", else "Clear: {city}"
+  Return only valid C# code in a single file.
+test_code: |
+  public class WeatherAlertTests
+  {
+      [Fact]
+      public async Task GetAlertAsync_Storm_ReturnsAlert()
+      {
+          var weather = Substitute.For<IWeatherService>();
+          weather.GetConditionAsync("London").Returns("Storm");
+          var alert = new WeatherAlert(weather);
+          var result = await alert.GetAlertAsync("London");
+          result.Should().Be("ALERT: Storm in London");
+      }
+      [Fact]
+      public async Task GetAlertAsync_Sunny_ReturnsClear()
+      {
+          var weather = Substitute.For<IWeatherService>();
+          weather.GetConditionAsync("Paris").Returns("Sunny");
+          var alert = new WeatherAlert(weather);
+          var result = await alert.GetAlertAsync("Paris");
+          result.Should().Be("Clear: Paris");
+      }
+  }

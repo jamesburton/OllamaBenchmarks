@@ -1,0 +1,67 @@
+name: medium_aspnet_050
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record PriceHistoryEntry(DateTime Date, decimal Price).
+  A record PriceAlert(string Symbol, decimal TargetPrice, bool IsAbove).
+  A class PricingController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts Dictionary<string, List<PriceHistoryEntry>> history and List<PriceAlert> alerts (for testability).
+  Actions:
+    GET api/pricing/{symbol}/history — price history for symbol (404 if not found)
+    GET api/pricing/{symbol}/current — most recent price (404 if not found)
+    POST api/pricing/alerts — adds alert, returns 201
+    GET api/pricing/alerts/triggered — alerts where current price crosses target
+  Return only valid C# code in a single file.
+test_code: |
+  public class PricingControllerTests
+  {
+      private PricingController MakeController()
+      {
+          var history = new Dictionary<string, List<PriceHistoryEntry>>
+          {
+              ["AAPL"] = new() { new(DateTime.UtcNow.AddDays(-2), 150m), new(DateTime.UtcNow, 160m) },
+              ["GOOG"] = new() { new(DateTime.UtcNow, 2800m) }
+          };
+          var alerts = new List<PriceAlert>
+          {
+              new("AAPL", 155m, true),
+              new("AAPL", 170m, true)
+          };
+          return new PricingController(history, alerts);
+      }
+
+      [Fact]
+      public void GetHistory_ReturnsEntries()
+      {
+          var result = MakeController().GetHistory("AAPL") as OkObjectResult;
+          (result!.Value as IEnumerable<PriceHistoryEntry>).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetHistory_NotFound_Returns404()
+      {
+          MakeController().GetHistory("TSLA").Should().BeOfType<NotFoundResult>();
+      }
+
+      [Fact]
+      public void GetCurrent_ReturnsMostRecent()
+      {
+          var result = MakeController().GetCurrent("AAPL") as OkObjectResult;
+          ((decimal)result!.Value!).Should().Be(160m);
+      }
+
+      [Fact]
+      public void AddAlert_Returns201()
+      {
+          var ctrl = MakeController();
+          ctrl.AddAlert(new PriceAlert("GOOG", 3000m, true)).Should().BeOfType<CreatedAtActionResult>();
+      }
+  }

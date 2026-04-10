@@ -1,0 +1,53 @@
+name: medium_patterns_004
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class DecoratorChain<T> with constructor accepting T instance.
+  Expose:
+    DecoratorChain<T> With<TDecorator>(Func<T, TDecorator> factory) where TDecorator : T
+    T Build()
+  Chains decorators in order of With() calls.
+  Return only valid C# code in a single file.
+test_code: |
+  public interface IGreeter { string Greet(string name); }
+  public class PlainGreeter : IGreeter { public string Greet(string n) => $"Hello, {n}"; }
+  public class ExcitedGreeter : IGreeter {
+      private readonly IGreeter _i; public ExcitedGreeter(IGreeter i) => _i = i;
+      public string Greet(string n) => _i.Greet(n) + "!";
+  }
+  public class FormalGreeter : IGreeter {
+      private readonly IGreeter _i; public FormalGreeter(IGreeter i) => _i = i;
+      public string Greet(string n) => "Dear " + _i.Greet(n);
+  }
+
+  public class DecoratorChainTests
+  {
+      [Fact]
+      public void Build_NoDecorators_ReturnsOriginal()
+      {
+          new DecoratorChain<IGreeter>(new PlainGreeter()).Build().Greet("Alice").Should().Be("Hello, Alice");
+      }
+
+      [Fact]
+      public void Build_WithDecorator_AppliesIt()
+      {
+          new DecoratorChain<IGreeter>(new PlainGreeter())
+              .With(i => new ExcitedGreeter(i)).Build().Greet("Bob").Should().EndWith("!");
+      }
+
+      [Fact]
+      public void Build_MultipleDecorators_ChainedCorrectly()
+      {
+          new DecoratorChain<IGreeter>(new PlainGreeter())
+              .With(i => new ExcitedGreeter(i))
+              .With(i => new FormalGreeter(i)).Build().Greet("Eve").Should().StartWith("Dear");
+      }
+  }

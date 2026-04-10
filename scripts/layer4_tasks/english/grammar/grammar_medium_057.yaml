@@ -1,0 +1,15 @@
+name: grammar_medium_057
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The two sisters' apartment is downtown.
+  B) The two sister's apartment is downtown.
+  C) The two sisters's apartment is downtown.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

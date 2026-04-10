@@ -1,0 +1,82 @@
+name: hard_patterns_013
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A proxy pattern for a data access layer with caching:
+  Interface IProductRepository:
+    Task<Product?> GetByIdAsync(int id, CancellationToken ct)
+    Task<IReadOnlyList<Product>> GetAllAsync(CancellationToken ct)
+    Task SaveAsync(Product product, CancellationToken ct)
+  Record: Product(int Id, string Name, decimal Price).
+  Class InMemoryProductRepository : IProductRepository — in-memory implementation.
+  Class CachingProductRepositoryProxy : IProductRepository —
+    wraps InMemoryProductRepository, caches GetByIdAsync and GetAllAsync results.
+    Cache is invalidated for the affected item when SaveAsync is called.
+    Constructor: CachingProductRepositoryProxy(IProductRepository inner)
+    int CacheHitCount — number of cache hits.
+    void ClearCache() — clears all cached entries.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CachingProxyTests
+  {
+      private static CachingProductRepositoryProxy BuildProxy(IEnumerable<Product>? seed = null)
+      {
+          var inner = new InMemoryProductRepository(seed ?? Array.Empty<Product>());
+          return new CachingProductRepositoryProxy(inner);
+      }
+
+      [Fact]
+      public async Task GetByIdAsync_ReturnsCachedOnSecondCall()
+      {
+          var proxy = BuildProxy(new[] { new Product(1, "Widget", 9.99m) });
+          await proxy.GetByIdAsync(1, CancellationToken.None);
+          await proxy.GetByIdAsync(1, CancellationToken.None);
+          proxy.CacheHitCount.Should().BeGreaterThanOrEqualTo(1);
+      }
+
+      [Fact]
+      public async Task GetByIdAsync_NotFound_ReturnsNull()
+      {
+          var proxy = BuildProxy();
+          var result = await proxy.GetByIdAsync(99, CancellationToken.None);
+          result.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task SaveAsync_InvalidatesCacheForItem()
+      {
+          var proxy = BuildProxy(new[] { new Product(1, "Old", 5m) });
+          await proxy.GetByIdAsync(1, CancellationToken.None);
+          await proxy.SaveAsync(new Product(1, "New", 10m), CancellationToken.None);
+          var result = await proxy.GetByIdAsync(1, CancellationToken.None);
+          result!.Name.Should().Be("New");
+      }
+
+      [Fact]
+      public async Task GetAllAsync_CachesResult()
+      {
+          var proxy = BuildProxy(new[] { new Product(1, "A", 1m), new Product(2, "B", 2m) });
+          await proxy.GetAllAsync(CancellationToken.None);
+          await proxy.GetAllAsync(CancellationToken.None);
+          proxy.CacheHitCount.Should().BeGreaterThanOrEqualTo(1);
+      }
+
+      [Fact]
+      public async Task ClearCache_ForcesReloadFromSource()
+      {
+          var proxy = BuildProxy(new[] { new Product(1, "Item", 1m) });
+          await proxy.GetByIdAsync(1, CancellationToken.None);
+          int hitsBefore = proxy.CacheHitCount;
+          proxy.ClearCache();
+          await proxy.GetByIdAsync(1, CancellationToken.None);
+          proxy.CacheHitCount.Should().Be(hitsBefore);
+      }
+  }

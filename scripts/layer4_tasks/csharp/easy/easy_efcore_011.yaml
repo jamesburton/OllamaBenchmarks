@@ -1,0 +1,45 @@
+name: easy_efcore_011
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Customer with properties: int Id, string Name, string Email, bool IsActive
+  A DbContext class CustomerContext with:
+    DbSet<Customer> Customers { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class CustomerRepository with:
+    Customer Update(CustomerContext context, int id, string newEmail)
+  that finds the customer by id, updates the Email, saves, and returns the updated customer.
+  Throws KeyNotFoundException if not found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CustomerRepositoryTests
+  {
+      [Fact]
+      public void Update_UpdatesEmail()
+      {
+          using var context = new CustomerContext();
+          context.Database.EnsureCreated();
+          context.Customers.Add(new Customer { Name = "Alice", Email = "old@test.com", IsActive = true });
+          context.SaveChanges();
+          var id = context.Customers.First().Id;
+          var result = CustomerRepository.Update(context, id, "new@test.com");
+          result.Email.Should().Be("new@test.com");
+      }
+      [Fact]
+      public void Update_NotFound_Throws()
+      {
+          using var context = new CustomerContext();
+          context.Database.EnsureCreated();
+          Action act = () => CustomerRepository.Update(context, 999, "x@x.com");
+          act.Should().Throw<KeyNotFoundException>();
+      }
+  }

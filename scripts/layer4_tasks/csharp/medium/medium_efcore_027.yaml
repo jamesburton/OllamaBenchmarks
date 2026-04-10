@@ -1,0 +1,65 @@
+name: medium_efcore_027
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity TimeEntry with: int Id, string UserId, string ProjectId, DateTime StartTime, DateTime EndTime, string Description.
+  A class TimesheetDbContext : DbContext with DbSet<TimeEntry> TimeEntries.
+  A class TimesheetRepository with constructor accepting TimesheetDbContext.
+  Methods:
+    Task<TimeSpan> GetTotalHoursAsync(string userId, DateTime periodStart, DateTime periodEnd)
+    Task<IDictionary<string, TimeSpan>> GetHoursByProjectAsync(string userId)
+    Task<IEnumerable<TimeEntry>> GetEntriesForPeriodAsync(string userId, DateTime start, DateTime end)
+  Return only valid C# code in a single file.
+test_code: |
+  public class TimesheetRepositoryTests : IAsyncLifetime
+  {
+      private TimesheetDbContext _db = null!;
+      private TimesheetRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<TimesheetDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new TimesheetDbContext(opts);
+          _repo = new TimesheetRepository(_db);
+          var start = new DateTime(2024, 1, 15, 9, 0, 0, DateTimeKind.Utc);
+          _db.TimeEntries.AddRange(
+              new TimeEntry { UserId = "u1", ProjectId = "proj1", StartTime = start, EndTime = start.AddHours(3), Description = "Work" },
+              new TimeEntry { UserId = "u1", ProjectId = "proj2", StartTime = start.AddHours(4), EndTime = start.AddHours(6), Description = "Other work" },
+              new TimeEntry { UserId = "u2", ProjectId = "proj1", StartTime = start, EndTime = start.AddHours(8), Description = "Full day" });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetTotalHours_CalculatesCorrectly()
+      {
+          var period = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc);
+          var total = await _repo.GetTotalHoursAsync("u1", period, period.AddDays(1));
+          total.TotalHours.Should().BeApproximately(5.0, 0.01);
+      }
+
+      [Fact]
+      public async Task GetHoursByProject_GroupsCorrectly()
+      {
+          var result = await _repo.GetHoursByProjectAsync("u1");
+          result.Should().ContainKey("proj1");
+          result["proj1"].TotalHours.Should().BeApproximately(3.0, 0.01);
+      }
+
+      [Fact]
+      public async Task GetEntriesForPeriod_FiltersCorrectly()
+      {
+          var period = new DateTime(2024, 1, 15, 0, 0, 0, DateTimeKind.Utc);
+          (await _repo.GetEntriesForPeriodAsync("u1", period, period.AddDays(1))).Should().HaveCount(2);
+      }
+  }

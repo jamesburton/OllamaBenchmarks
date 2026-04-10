@@ -1,0 +1,70 @@
+name: medium_efcore_043
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Feedback with: int Id, string Name, string Status, DateTime CreatedAt, string OwnerId.
+  A class FeedbackDbContext : DbContext with DbSet<Feedback> Items.
+  A class FeedbackRepository with constructor accepting FeedbackDbContext.
+  Methods:
+    Task<IEnumerable<Feedback>> GetByOwnerAsync(string ownerId)
+    Task<IEnumerable<Feedback>> GetByStatusAsync(string status)
+    Task<Feedback?> GetByIdAsync(int id)
+    Task UpdateStatusAsync(int id, string newStatus)
+  Return only valid C# code in a single file.
+test_code: |
+  public class FeedbackRepositoryTests : IAsyncLifetime
+  {
+      private FeedbackDbContext _db = null!;
+      private FeedbackRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<FeedbackDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new FeedbackDbContext(opts);
+          _repo = new FeedbackRepository(_db);
+          _db.Items.AddRange(
+              new Feedback { Name = "Item1", Status = "Active", CreatedAt = DateTime.UtcNow, OwnerId = "u1" },
+              new Feedback { Name = "Item2", Status = "Inactive", CreatedAt = DateTime.UtcNow, OwnerId = "u1" },
+              new Feedback { Name = "Item3", Status = "Active", CreatedAt = DateTime.UtcNow, OwnerId = "u2" });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByOwner_ReturnsCorrect()
+      {
+          (await _repo.GetByOwnerAsync("u1")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetByStatus_FiltersCorrectly()
+      {
+          (await _repo.GetByStatusAsync("Active")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetById_ReturnsItem()
+      {
+          var id = _db.Items.First().Id;
+          (await _repo.GetByIdAsync(id)).Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task UpdateStatus_ChangesStatus()
+      {
+          var id = _db.Items.First().Id;
+          await _repo.UpdateStatusAsync(id, "Archived");
+          _db.ChangeTracker.Clear();
+          (await _repo.GetByIdAsync(id))!.Status.Should().Be("Archived");
+      }
+  }

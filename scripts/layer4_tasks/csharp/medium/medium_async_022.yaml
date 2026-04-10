@@ -1,0 +1,58 @@
+name: medium_async_022
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncDebouncer<T> that debounces calls: only processes the last call within a window.
+  Constructor accepts TimeSpan debounceInterval and Func<T, CancellationToken, Task> handler.
+  Expose:
+    Task TriggerAsync(T value, CancellationToken ct = default)
+  Multiple calls within debounceInterval should result in only one handler invocation with the last value.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncDebouncerTests
+  {
+      [Fact]
+      public async Task TriggerAsync_SingleCall_HandlerCalled()
+      {
+          var values = new List<string>();
+          var debouncer = new AsyncDebouncer<string>(TimeSpan.FromMilliseconds(50),
+              async (v, ct) => { await Task.Yield(); values.Add(v); });
+          await debouncer.TriggerAsync("hello");
+          await Task.Delay(100);
+          values.Should().ContainSingle("hello");
+      }
+
+      [Fact]
+      public async Task TriggerAsync_MultipleCalls_OnlyLastExecuted()
+      {
+          var values = new List<string>();
+          var debouncer = new AsyncDebouncer<string>(TimeSpan.FromMilliseconds(80),
+              async (v, ct) => { await Task.Yield(); values.Add(v); });
+          await debouncer.TriggerAsync("first");
+          await Task.Delay(20);
+          await debouncer.TriggerAsync("last");
+          await Task.Delay(150);
+          values.Should().ContainSingle("last");
+      }
+
+      [Fact]
+      public async Task TriggerAsync_AfterInterval_MultipleCallsExecuted()
+      {
+          var values = new List<string>();
+          var debouncer = new AsyncDebouncer<string>(TimeSpan.FromMilliseconds(30),
+              async (v, ct) => { await Task.Yield(); values.Add(v); });
+          await debouncer.TriggerAsync("first");
+          await Task.Delay(80);
+          await debouncer.TriggerAsync("second");
+          await Task.Delay(80);
+          values.Should().HaveCount(2);
+      }
+  }

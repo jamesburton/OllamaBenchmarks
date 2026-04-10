@@ -1,0 +1,56 @@
+name: medium_aspnet_010
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class RequestLoggingMiddleware with constructor accepting RequestDelegate and Action<string> logger.
+  In InvokeAsync: log "{Method} {Path}" before calling next, then log "Response {StatusCode}" after.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RequestLoggingMiddlewareTests
+  {
+      [Fact]
+      public async Task Logs_RequestAndResponse()
+      {
+          var logs = new List<string>();
+          var mw = new RequestLoggingMiddleware(ctx => Task.CompletedTask, logs.Add);
+          var ctx = new DefaultHttpContext();
+          ctx.Request.Method = "GET";
+          ctx.Request.Path = "/api/test";
+          ctx.Response.Body = new System.IO.MemoryStream();
+          await mw.InvokeAsync(ctx);
+          logs.Should().Contain(s => s.Contains("GET") && s.Contains("/api/test"));
+          logs.Should().Contain(s => s.Contains("Response"));
+      }
+
+      [Fact]
+      public async Task Logs_CorrectStatusCode()
+      {
+          var logs = new List<string>();
+          var mw = new RequestLoggingMiddleware(ctx => { ctx.Response.StatusCode = 404; return Task.CompletedTask; }, logs.Add);
+          var ctx = new DefaultHttpContext();
+          ctx.Request.Method = "GET";
+          ctx.Request.Path = "/missing";
+          ctx.Response.Body = new System.IO.MemoryStream();
+          await mw.InvokeAsync(ctx);
+          logs.Should().Contain(s => s.Contains("404"));
+      }
+
+      [Fact]
+      public async Task CallsNextDelegate()
+      {
+          var called = false;
+          var mw = new RequestLoggingMiddleware(_ => { called = true; return Task.CompletedTask; }, _ => { });
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          await mw.InvokeAsync(ctx);
+          called.Should().BeTrue();
+      }
+  }

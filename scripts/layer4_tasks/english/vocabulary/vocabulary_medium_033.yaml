@@ -1,0 +1,16 @@
+name: vocabulary_medium_033
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The politician made a spurious claim', which word best replaces 'spurious'?
+  A) Valid
+  B) False
+  C) Popular
+  D) Detailed
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

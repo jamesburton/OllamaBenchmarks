@@ -1,0 +1,14 @@
+name: sequences_hard_010
+category: logic
+subcategory: sequences
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  What is the next number in the sequence: 1, 4, 10, 20, 35, 56, ...? (Tetrahedral numbers)
+  Reply with only the number.
+expected_answer: "84"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

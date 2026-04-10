@@ -1,0 +1,86 @@
+name: hard_blazor_020
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor role-based permission service:
+  Records:
+    Permission(string Resource, string Action)
+    Role(string Name, IReadOnlyList<Permission> Permissions)
+    UserRole(string UserId, string RoleName, DateTime AssignedAt)
+
+  Class PermissionService:
+    Constructor: pre-defines roles:
+      "Admin": all permissions for "users", "orders", "products" (read/write/delete).
+      "Manager": read+write for "orders", "products"; read for "users".
+      "Viewer": read for "orders", "products", "users".
+    void AssignRole(string userId, string roleName): throws ArgumentException if role unknown.
+    void RevokeRole(string userId, string roleName)
+    bool HasPermission(string userId, string resource, string action)
+    IReadOnlyList<string> GetUserRoles(string userId)
+    IReadOnlyList<Permission> GetEffectivePermissions(string userId): union of all role permissions.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PermissionServiceTests
+  {
+      private readonly PermissionService _svc = new();
+
+      [Fact]
+      public void Admin_HasDeletePermission()
+      {
+          _svc.AssignRole("u1", "Admin");
+          _svc.HasPermission("u1", "orders", "delete").Should().BeTrue();
+      }
+
+      [Fact]
+      public void Viewer_DoesNotHaveWritePermission()
+      {
+          _svc.AssignRole("u2", "Viewer");
+          _svc.HasPermission("u2", "orders", "write").Should().BeFalse();
+      }
+
+      [Fact]
+      public void Manager_HasWriteOrdersPermission()
+      {
+          _svc.AssignRole("u3", "Manager");
+          _svc.HasPermission("u3", "orders", "write").Should().BeTrue();
+      }
+
+      [Fact]
+      public void AssignRole_UnknownRole_ThrowsArgumentException()
+      {
+          var act = () => _svc.AssignRole("u4", "SuperAdmin");
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void RevokeRole_RemovesPermissions()
+      {
+          _svc.AssignRole("u5", "Admin");
+          _svc.RevokeRole("u5", "Admin");
+          _svc.HasPermission("u5", "users", "delete").Should().BeFalse();
+      }
+
+      [Fact]
+      public void MultipleRoles_UnionOfPermissions()
+      {
+          _svc.AssignRole("u6", "Viewer");
+          _svc.AssignRole("u6", "Manager");
+          _svc.HasPermission("u6", "orders", "write").Should().BeTrue();
+          _svc.GetEffectivePermissions("u6").Should().NotBeEmpty();
+      }
+
+      [Fact]
+      public void GetUserRoles_ReturnsAssignedRoles()
+      {
+          _svc.AssignRole("u7", "Viewer");
+          _svc.GetUserRoles("u7").Should().Contain("Viewer");
+      }
+  }

@@ -1,0 +1,54 @@
+name: medium_linq_025
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class NumberSequences with a constructor accepting IEnumerable<int> numbers.
+  Expose:
+    IEnumerable<int[]> ConsecutiveRuns()
+      — groups consecutive integers into arrays (e.g. [1,2,3,7,8] -> [[1,2,3],[7,8]])
+    IEnumerable<int> RunningSum()
+      — accumulated sum at each position
+    (int Min, int Max, double Avg) Stats() — min, max, average of the sequence
+  Return only valid C# code in a single file.
+test_code: |
+  public class NumberSequencesTests
+  {
+      [Fact]
+      public void ConsecutiveRuns_ThreeRuns()
+      {
+          var result = new NumberSequences(new[]{1,2,3,7,8,10}).ConsecutiveRuns().ToList();
+          result.Should().HaveCount(3);
+          result[0].Should().BeEquivalentTo(new[]{1,2,3}, cfg => cfg.WithStrictOrdering());
+          result[1].Should().BeEquivalentTo(new[]{7,8}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void RunningSum_Correct()
+      {
+          var result = new NumberSequences(new[]{1,2,3,4}).RunningSum().ToList();
+          result.Should().BeEquivalentTo(new[]{1,3,6,10}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void Stats_ReturnsCorrectValues()
+      {
+          var (min,max,avg) = new NumberSequences(new[]{2,4,6,8}).Stats();
+          min.Should().Be(2);
+          max.Should().Be(8);
+          avg.Should().Be(5.0);
+      }
+
+      [Fact]
+      public void ConsecutiveRuns_SingleElement_OneRun()
+      {
+          new NumberSequences(new[]{5}).ConsecutiveRuns().Should().ContainSingle();
+      }
+  }

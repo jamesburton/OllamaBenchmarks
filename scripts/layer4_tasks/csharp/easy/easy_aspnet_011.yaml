@@ -1,0 +1,42 @@
+name: easy_aspnet_011
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class DatabaseOptions with:
+    string ConnectionString { get; set; }
+    int CommandTimeout { get; set; } = 30
+    int MaxPoolSize { get; set; } = 10
+  and a static class DatabaseOptionsValidator with:
+    bool IsValid(DatabaseOptions options)
+  that returns true only if ConnectionString is non-empty, CommandTimeout > 0, and MaxPoolSize > 0.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DatabaseOptionsValidatorTests
+  {
+      [Fact]
+      public void IsValid_AllValid_ReturnsTrue()
+      {
+          var opts = new DatabaseOptions { ConnectionString = "server=localhost", CommandTimeout = 30, MaxPoolSize = 10 };
+          DatabaseOptionsValidator.IsValid(opts).Should().BeTrue();
+      }
+      [Fact]
+      public void IsValid_EmptyConnectionString_ReturnsFalse()
+      {
+          var opts = new DatabaseOptions { ConnectionString = "", CommandTimeout = 30, MaxPoolSize = 10 };
+          DatabaseOptionsValidator.IsValid(opts).Should().BeFalse();
+      }
+      [Fact]
+      public void IsValid_ZeroTimeout_ReturnsFalse()
+      {
+          var opts = new DatabaseOptions { ConnectionString = "server=localhost", CommandTimeout = 0, MaxPoolSize = 10 };
+          DatabaseOptionsValidator.IsValid(opts).Should().BeFalse();
+      }
+  }

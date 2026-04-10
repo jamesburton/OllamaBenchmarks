@@ -1,0 +1,36 @@
+name: easy_vertical_014
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record CouponCode(string Code, decimal DiscountPercent, DateTime Expiry)
+  A class CouponService with:
+    void AddCoupon(CouponCode coupon)
+    decimal? ApplyCoupon(string code, DateTime now) returns discount percent if coupon exists and not expired, null otherwise
+    List<CouponCode> GetExpired(DateTime now) returns coupons where Expiry < now
+  Return only valid C# code in a single file.
+test_code: |
+  public class CouponServiceTests
+  {
+      [Fact]
+      public void ApplyCoupon_ValidCoupon_ReturnsDiscount()
+      {
+          var service = new CouponService();
+          service.AddCoupon(new CouponCode("SAVE20", 20m, DateTime.UtcNow.AddDays(1)));
+          service.ApplyCoupon("SAVE20", DateTime.UtcNow).Should().Be(20m);
+      }
+      [Fact]
+      public void ApplyCoupon_ExpiredCoupon_ReturnsNull()
+      {
+          var service = new CouponService();
+          service.AddCoupon(new CouponCode("OLD10", 10m, DateTime.UtcNow.AddDays(-1)));
+          service.ApplyCoupon("OLD10", DateTime.UtcNow).Should().BeNull();
+      }
+  }

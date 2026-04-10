@@ -1,0 +1,22 @@
+name: technical_easy_006
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'License' section.
+  Keep it under 40 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "license"
+    - "MIT"
+    - "Apache"
+    - "permitted"
+    - "copyright"
+    - "open source"
+    - "use"
+  min_words: 5
+  max_words: 40

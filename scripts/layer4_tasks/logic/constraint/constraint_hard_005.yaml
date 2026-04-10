@@ -1,0 +1,18 @@
+name: constraint_hard_005
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Five athletes ran a race. Their finishing times were all different.
+  Clues:
+  1. Ava finished before Ben.
+  2. Carlos finished after Diana.
+  3. Eva finished last.
+  4. Ben finished immediately after Carlos.
+  5. Ava finished 1st.
+  In what position did Diana finish? Reply with only the number.
+expected_answer: "2"
+validator_config: {}

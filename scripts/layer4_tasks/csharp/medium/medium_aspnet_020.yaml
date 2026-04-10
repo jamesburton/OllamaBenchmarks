@@ -1,0 +1,52 @@
+name: medium_aspnet_020
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ReportDto(string Title, DateTime GeneratedAt, int RecordCount).
+  An interface IReportService with:
+    Task<ReportDto> GenerateAsync(string reportType)
+  A class ReportsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IReportService.
+  Action: GET api/reports/{reportType} — generates and returns report, or 400 if reportType is null/empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReportsControllerTests
+  {
+      [Fact]
+      public async Task Get_ValidType_ReturnsReport()
+      {
+          var svc = Substitute.For<IReportService>();
+          svc.GenerateAsync("sales").Returns(new ReportDto("Sales Report", DateTime.UtcNow, 42));
+          var ctrl = new ReportsController(svc);
+          var result = await ctrl.Get("sales") as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+          (result.Value as ReportDto)!.RecordCount.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task Get_EmptyType_Returns400()
+      {
+          var svc = Substitute.For<IReportService>();
+          var ctrl = new ReportsController(svc);
+          var result = await ctrl.Get("");
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public async Task Get_CallsServiceWithType()
+      {
+          var svc = Substitute.For<IReportService>();
+          svc.GenerateAsync("inventory").Returns(new ReportDto("Inv", DateTime.UtcNow, 0));
+          var ctrl = new ReportsController(svc);
+          await ctrl.Get("inventory");
+          await svc.Received(1).GenerateAsync("inventory");
+      }
+  }

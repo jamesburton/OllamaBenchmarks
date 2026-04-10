@@ -1,0 +1,57 @@
+name: medium_masstransit_004
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record InventoryReserved(Guid ReservationId, string ProductId, int Quantity, bool Success).
+  A consumer InventoryReservedConsumer implementing IConsumer<InventoryReserved>.
+  Constructor accepts INotificationService notificationService.
+  Interface INotificationService with: Task NotifyAsync(string message).
+  In Consume: if Success notifies "Reserved {Quantity} of {ProductId}"; else notifies "Failed to reserve {ProductId}".
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record InventoryReserved(Guid ReservationId, string ProductId, int Quantity, bool Success); }
+  global using Contracts;
+
+  public class InventoryReservedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_Success_NotifiesReserved()
+      {
+          var svc = Substitute.For<INotificationService>();
+          var consumer = new InventoryReservedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<InventoryReserved>>();
+          ctx.Message.Returns(new InventoryReserved(Guid.NewGuid(), "SKU001", 5, true));
+          await consumer.Consume(ctx);
+          await svc.Received(1).NotifyAsync(Arg.Is<string>(s => s.Contains("Reserved") && s.Contains("SKU001")));
+      }
+
+      [Fact]
+      public async Task Consume_Failure_NotifiesFailed()
+      {
+          var svc = Substitute.For<INotificationService>();
+          var consumer = new InventoryReservedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<InventoryReserved>>();
+          ctx.Message.Returns(new InventoryReserved(Guid.NewGuid(), "SKU002", 10, false));
+          await consumer.Consume(ctx);
+          await svc.Received(1).NotifyAsync(Arg.Is<string>(s => s.Contains("Failed") && s.Contains("SKU002")));
+      }
+
+      [Fact]
+      public async Task Consume_NotifiesExactlyOnce()
+      {
+          var svc = Substitute.For<INotificationService>();
+          var consumer = new InventoryReservedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<InventoryReserved>>();
+          ctx.Message.Returns(new InventoryReserved(Guid.NewGuid(), "SKU003", 1, true));
+          await consumer.Consume(ctx);
+          await svc.Received(1).NotifyAsync(Arg.Any<string>());
+      }
+  }

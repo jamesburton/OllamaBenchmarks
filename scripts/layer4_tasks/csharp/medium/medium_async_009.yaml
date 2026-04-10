@@ -1,0 +1,68 @@
+name: medium_async_009
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IProcessor<T> with method: Task<T> ProcessAsync(T input, CancellationToken ct = default)
+  A class AsyncPipeline<T> with a constructor accepting IEnumerable<IProcessor<T>> stages.
+  Expose:
+    Task<T> ExecuteAsync(T input, CancellationToken ct = default)
+  Passes input sequentially through each stage.
+  Throws OperationCanceledException immediately if ct is cancelled between stages.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncPipelineTests
+  {
+      private static IProcessor<int> MakeAdder(int n)
+      {
+          var p = Substitute.For<IProcessor<int>>();
+          p.ProcessAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult(ci.Arg<int>() + n));
+          return p;
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_TwoStages_AddsCorrectly()
+      {
+          var pipeline = new AsyncPipeline<int>(new[]{ MakeAdder(10), MakeAdder(5) });
+          (await pipeline.ExecuteAsync(0)).Should().Be(15);
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_NoStages_ReturnsInput()
+      {
+          var pipeline = new AsyncPipeline<int>(Array.Empty<IProcessor<int>>());
+          (await pipeline.ExecuteAsync(42)).Should().Be(42);
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_CancelledBeforeStart_Throws()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var pipeline = new AsyncPipeline<int>(new[]{ MakeAdder(1) });
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() => pipeline.ExecuteAsync(0, cts.Token));
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_StagesCalledInOrder()
+      {
+          var log = new List<string>();
+          var p1 = Substitute.For<IProcessor<string>>();
+          p1.ProcessAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(ci => { log.Add("p1"); return Task.FromResult(ci.Arg<string>() + "1"); });
+          var p2 = Substitute.For<IProcessor<string>>();
+          p2.ProcessAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(ci => { log.Add("p2"); return Task.FromResult(ci.Arg<string>() + "2"); });
+          var result = await new AsyncPipeline<string>(new[]{p1,p2}).ExecuteAsync("x");
+          result.Should().Be("x12");
+          log.Should().BeEquivalentTo(new[]{"p1","p2"}, cfg => cfg.WithStrictOrdering());
+      }
+  }

@@ -1,0 +1,120 @@
+name: hard_masstransit_013
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit consumer fault handling and retry:
+  Messages:
+    record ImportFile(Guid ImportId, string FileName, string Content);
+    record ImportSucceeded(Guid ImportId, int RowCount);
+    record ImportFailed(Guid ImportId, string FileName, string Error);
+
+  Interface IFileParser:
+    Task<int> ParseAsync(string content, CancellationToken ct)
+
+  Class FileImportConsumer : IConsumer<ImportFile>:
+    Constructor takes IFileParser.
+    Call ParseAsync; on success publish ImportSucceeded with row count.
+    On any exception publish ImportFailed with error message (do NOT rethrow).
+
+  Class FileImportConsumerDefinition : ConsumerDefinition<FileImportConsumer>:
+    Configure retry: 3 attempts, 50ms interval.
+
+  Class IFaultConsumer : IConsumer<Fault<ImportFile>>:
+    Logs fault by publishing ImportFailed if not already published.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FileImportConsumerTests
+  {
+      [Fact]
+      public async Task SuccessfulImport_PublishesSucceeded()
+      {
+          var parser = Substitute.For<IFileParser>();
+          parser.ParseAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(42);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new FileImportConsumer(parser));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ImportFile(Guid.NewGuid(), "data.csv", "a,b,c"));
+              await Task.Delay(200);
+              (await harness.Published.Any<ImportSucceeded>()).Should().BeTrue();
+              var msg = harness.Published.Select<ImportSucceeded>().First().Context.Message;
+              msg.RowCount.Should().Be(42);
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task FailedImport_PublishesFailed()
+      {
+          var parser = Substitute.For<IFileParser>();
+          parser.ParseAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .ThrowsAsync(new FormatException("bad csv"));
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new FileImportConsumer(parser));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ImportFile(Guid.NewGuid(), "bad.csv", "!!!"));
+              await Task.Delay(200);
+              (await harness.Published.Any<ImportFailed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task FailedImport_ErrorContainsMessage()
+      {
+          var parser = Substitute.For<IFileParser>();
+          parser.ParseAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .ThrowsAsync(new InvalidOperationException("parse error"));
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new FileImportConsumer(parser));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ImportFile(Guid.NewGuid(), "err.csv", "x"));
+              await Task.Delay(200);
+              var failed = harness.Published.Select<ImportFailed>().First().Context.Message;
+              failed.Error.Should().Contain("parse error");
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ConsumerDefinition_CanBeInstantiated()
+      {
+          var def = new FileImportConsumerDefinition();
+          def.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task SuccessfulImport_StoresImportId()
+      {
+          var parser = Substitute.For<IFileParser>();
+          parser.ParseAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(10);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new FileImportConsumer(parser));
+          await harness.Start();
+          try
+          {
+              var id = Guid.NewGuid();
+              await harness.InputQueueSendEndpoint.Send(new ImportFile(id, "test.csv", "rows"));
+              await Task.Delay(200);
+              var msg = harness.Published.Select<ImportSucceeded>().First().Context.Message;
+              msg.ImportId.Should().Be(id);
+          }
+          finally { await harness.Stop(); }
+      }
+  }

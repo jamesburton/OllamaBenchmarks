@@ -1,0 +1,33 @@
+name: easy_blazor_024
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class TimerDisplayComponent that extends ComponentBase with:
+    [Parameter] int TotalSeconds { get; set; }
+    string Display => $"{TotalSeconds / 60:D2}:{TotalSeconds % 60:D2}"
+    bool IsExpired => TotalSeconds <= 0
+  Return only valid C# code in a single file.
+test_code: |
+  public class TimerDisplayComponentTests
+  {
+      [Fact]
+      public void Display_FormatsCorrectly()
+      {
+          var c = new TimerDisplayComponent { TotalSeconds = 125 };
+          c.Display.Should().Be("02:05");
+      }
+      [Fact]
+      public void IsExpired_ReturnsTrueWhenZero()
+      {
+          var c = new TimerDisplayComponent { TotalSeconds = 0 };
+          c.IsExpired.Should().BeTrue();
+      }
+  }

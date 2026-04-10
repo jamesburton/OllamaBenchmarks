@@ -1,0 +1,18 @@
+name: summarisation_easy_086
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A team of engineers has built a robot that can harvest strawberries twice as fast as a human picker. The machine uses cameras and machine learning to identify ripe fruit without damaging the plant. Farmers say it could address labour shortages during the harvest season.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "robot"
+    - "harvest"
+    - "machine learning"
+    - "agriculture"
+  max_words: 25

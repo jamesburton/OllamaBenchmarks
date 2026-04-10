@@ -1,0 +1,39 @@
+name: easy_efcore_016
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Note with properties: int Id, string Title, string Body, bool IsDeleted
+  A DbContext class NoteContext with:
+    DbSet<Note> Notes { get; set; }
+  Configure a global query filter in OnModelCreating to exclude soft-deleted notes (IsDeleted == false).
+  Use InMemory database in OnConfiguring.
+  A static class NoteRepository with:
+    List<Note> GetAll(NoteContext context)
+  that returns all visible (non-deleted) notes.
+  Return only valid C# code in a single file.
+test_code: |
+  public class NoteRepositoryTests
+  {
+      [Fact]
+      public void GetAll_ExcludesDeletedNotes()
+      {
+          using var context = new NoteContext();
+          context.Database.EnsureCreated();
+          context.Notes.AddRange(
+              new Note { Title = "Active", Body = "...", IsDeleted = false },
+              new Note { Title = "Deleted", Body = "...", IsDeleted = true });
+          context.SaveChanges();
+          var result = NoteRepository.GetAll(context);
+          result.Should().HaveCount(1);
+          result[0].Title.Should().Be("Active");
+      }
+  }

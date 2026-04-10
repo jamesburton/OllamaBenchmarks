@@ -1,0 +1,41 @@
+name: easy_masstransit_030
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record UserStatusChanged(Guid UserId, string OldStatus, string NewStatus, DateTime ChangedAt)
+  A consumer class UserStatusChangedConsumer that implements IConsumer<UserStatusChanged>:
+    Has a public List<string> SuspendedUsers = new()
+    Consume method adds UserId.ToString() to SuspendedUsers if NewStatus == "suspended"
+  A consumer definition class UserStatusChangedConsumerDefinition that extends ConsumerDefinition<UserStatusChangedConsumer>:
+    Sets ConcurrentMessageLimit = 10 in the constructor
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class UserStatusChangedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_Suspended_AddsToList()
+      {
+          var consumer = new UserStatusChangedConsumer();
+          var id = Guid.NewGuid();
+          var context = Substitute.For<ConsumeContext<UserStatusChanged>>();
+          context.Message.Returns(new UserStatusChanged(id, "active", "suspended", DateTime.UtcNow));
+          await consumer.Consume(context);
+          consumer.SuspendedUsers.Should().Contain(id.ToString());
+      }
+      [Fact]
+      public void Definition_SetsConcurrentLimit()
+      {
+          var def = new UserStatusChangedConsumerDefinition();
+          def.ConcurrentMessageLimit.Should().Be(10);
+      }
+  }

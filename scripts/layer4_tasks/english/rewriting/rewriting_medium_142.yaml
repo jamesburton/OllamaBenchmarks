@@ -1,0 +1,21 @@
+name: rewriting_medium_142
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'The presentation was not without its merits in terms of the way in which the research was structured.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "presentation"
+    - "well-structured"
+    - "research"
+    - "clearly"
+    - "merit"
+  min_words: 4
+  max_words: 15

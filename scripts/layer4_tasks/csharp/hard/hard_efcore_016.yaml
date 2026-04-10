@@ -1,0 +1,93 @@
+name: hard_efcore_016
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core self-referential hierarchy for a category tree:
+  Entity: Category(int Id, string Name, string Description, int? ParentId, Category? Parent,
+    List<Category> Children).
+  DbContext: CategoryDbContext — configure self-referential relationship with cascade delete disabled.
+  Class CategoryTreeRepository(CategoryDbContext db):
+    Task<Category> CreateAsync(string name, string description, int? parentId, CancellationToken ct)
+      — throws ArgumentException if parentId provided but parent not found.
+    Task<Category?> GetWithChildrenAsync(int id, CancellationToken ct) — loads direct children.
+    Task<IReadOnlyList<Category>> GetRootCategoriesAsync(CancellationToken ct) — categories with no parent.
+    Task<IReadOnlyList<Category>> GetAncestorsAsync(int id, CancellationToken ct) — returns chain from root to parent.
+    Task<bool> MoveAsync(int id, int? newParentId, CancellationToken ct) — re-parents category.
+      Throws InvalidOperationException if would create cycle.
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CategoryTreeRepositoryTests : IDisposable
+  {
+      private readonly CategoryDbContext _db;
+      private readonly CategoryTreeRepository _repo;
+
+      public CategoryTreeRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<CategoryDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new CategoryDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new CategoryTreeRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task CreateRoot_ThenGetAsRoot()
+      {
+          await _repo.CreateAsync("Electronics", "Elec goods", null, CancellationToken.None);
+          var roots = await _repo.GetRootCategoriesAsync(CancellationToken.None);
+          roots.Should().ContainSingle(c => c.Name == "Electronics");
+      }
+
+      [Fact]
+      public async Task CreateChild_LinksToParent()
+      {
+          var root  = await _repo.CreateAsync("Root", "", null, CancellationToken.None);
+          var child = await _repo.CreateAsync("Child", "", root.Id, CancellationToken.None);
+          var found = await _repo.GetWithChildrenAsync(root.Id, CancellationToken.None);
+          found!.Children.Should().ContainSingle(c => c.Id == child.Id);
+      }
+
+      [Fact]
+      public async Task CreateChild_InvalidParent_ThrowsArgumentException()
+      {
+          var act = async () => await _repo.CreateAsync("C", "", 9999, CancellationToken.None);
+          await act.Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task GetAncestors_ReturnsChain()
+      {
+          var root  = await _repo.CreateAsync("Root",  "", null,    CancellationToken.None);
+          var mid   = await _repo.CreateAsync("Mid",   "", root.Id, CancellationToken.None);
+          var leaf  = await _repo.CreateAsync("Leaf",  "", mid.Id,  CancellationToken.None);
+          var ancestors = await _repo.GetAncestorsAsync(leaf.Id, CancellationToken.None);
+          ancestors.Should().HaveCount(2);
+          ancestors.Should().Contain(c => c.Name == "Root");
+          ancestors.Should().Contain(c => c.Name == "Mid");
+      }
+
+      [Fact]
+      public async Task Move_CycleDetection_ThrowsInvalidOperationException()
+      {
+          var root  = await _repo.CreateAsync("Root",  "", null,    CancellationToken.None);
+          var child = await _repo.CreateAsync("Child", "", root.Id, CancellationToken.None);
+          var act = async () => await _repo.MoveAsync(root.Id, child.Id, CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task GetWithChildren_UnknownId_ReturnsNull()
+      {
+          (await _repo.GetWithChildrenAsync(9999, CancellationToken.None)).Should().BeNull();
+      }
+  }

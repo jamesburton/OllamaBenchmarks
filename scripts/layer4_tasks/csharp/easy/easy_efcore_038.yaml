@@ -1,0 +1,41 @@
+name: easy_efcore_038
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class PageView with properties: int Id, string Path, string Country, DateTime ViewedAt
+  A DbContext class AnalyticsContext with:
+    DbSet<PageView> PageViews { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class AnalyticsRepository with:
+    List<(string Path, int Count)> GetTopPages(AnalyticsContext context, int limit)
+  that returns the top N paths by view count as a list of value tuples.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AnalyticsRepositoryTests
+  {
+      [Fact]
+      public void GetTopPages_ReturnsTopPages()
+      {
+          using var context = new AnalyticsContext();
+          context.Database.EnsureCreated();
+          context.PageViews.AddRange(
+              new PageView { Path = "/home", Country = "US", ViewedAt = DateTime.UtcNow },
+              new PageView { Path = "/home", Country = "UK", ViewedAt = DateTime.UtcNow },
+              new PageView { Path = "/about", Country = "US", ViewedAt = DateTime.UtcNow },
+              new PageView { Path = "/home", Country = "CA", ViewedAt = DateTime.UtcNow });
+          context.SaveChanges();
+          var result = AnalyticsRepository.GetTopPages(context, 2);
+          result.Should().HaveCount(2);
+          result[0].Path.Should().Be("/home");
+          result[0].Count.Should().Be(3);
+      }
+  }

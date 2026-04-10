@@ -1,0 +1,83 @@
+name: hard_linq_014
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A generic class Paginator<T> that provides:
+    PagedResult<T> Paginate(IEnumerable<T> source, int page, int pageSize) — 1-based page,
+      returns items for that page plus metadata.
+    IEnumerable<T> GetPage(IEnumerable<T> source, int page, int pageSize) — returns just items.
+  Record: PagedResult<T>(IReadOnlyList<T> Items, int Page, int PageSize, int TotalCount,
+                         int TotalPages, bool HasNext, bool HasPrevious).
+  Throws ArgumentOutOfRangeException if page < 1 or pageSize < 1.
+  A record Widget(int Id, string Name).
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaginatorTests
+  {
+      private static readonly List<Widget> Source =
+          Enumerable.Range(1, 25).Select(i => new Widget(i, $"Widget{i}")).ToList();
+      private readonly Paginator<Widget> _p = new();
+
+      [Fact]
+      public void Paginate_FirstPageHasCorrectItems()
+      {
+          var result = _p.Paginate(Source, 1, 10);
+          result.Items.Should().HaveCount(10);
+          result.Items[0].Id.Should().Be(1);
+      }
+
+      [Fact]
+      public void Paginate_LastPageHasRemainder()
+      {
+          var result = _p.Paginate(Source, 3, 10);
+          result.Items.Should().HaveCount(5);
+          result.TotalPages.Should().Be(3);
+      }
+
+      [Fact]
+      public void Paginate_MetadataCorrect()
+      {
+          var result = _p.Paginate(Source, 2, 10);
+          result.TotalCount.Should().Be(25);
+          result.HasNext.Should().BeTrue();
+          result.HasPrevious.Should().BeTrue();
+      }
+
+      [Fact]
+      public void Paginate_InvalidPage_ThrowsArgumentOutOfRangeException()
+      {
+          var act = () => _p.Paginate(Source, 0, 10);
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void Paginate_InvalidPageSize_ThrowsArgumentOutOfRangeException()
+      {
+          var act = () => _p.Paginate(Source, 1, -5);
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void GetPage_ReturnsCorrectSlice()
+      {
+          var result = _p.GetPage(Source, 2, 5).ToList();
+          result[0].Id.Should().Be(6);
+          result[4].Id.Should().Be(10);
+      }
+
+      [Fact]
+      public void Paginate_EmptySource_ZeroTotalPages()
+      {
+          var result = _p.Paginate(Array.Empty<Widget>(), 1, 10);
+          result.TotalPages.Should().Be(0);
+          result.Items.Should().BeEmpty();
+      }
+  }

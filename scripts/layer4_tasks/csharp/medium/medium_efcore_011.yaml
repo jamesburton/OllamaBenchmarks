@@ -1,0 +1,69 @@
+name: medium_efcore_011
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Appointment with: int Id, string PatientId, string DoctorId, DateTime ScheduledAt, int DurationMinutes, string Status.
+  A class ClinicDbContext : DbContext with DbSet<Appointment> Appointments.
+  A class AppointmentRepository with constructor accepting ClinicDbContext.
+  Methods:
+    Task<IEnumerable<Appointment>> GetForDoctorOnDateAsync(string doctorId, DateTime date)
+    Task<bool> HasConflictAsync(string doctorId, DateTime start, int durationMinutes)
+    Task CancelAsync(int appointmentId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class AppointmentRepositoryTests : IAsyncLifetime
+  {
+      private ClinicDbContext _db = null!;
+      private AppointmentRepository _repo = null!;
+      private readonly DateTime _today = new DateTime(2024, 6, 15, 10, 0, 0, DateTimeKind.Utc);
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<ClinicDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new ClinicDbContext(opts);
+          _repo = new AppointmentRepository(_db);
+          _db.Appointments.AddRange(
+              new Appointment { PatientId = "p1", DoctorId = "d1", ScheduledAt = _today, DurationMinutes = 30, Status = "Scheduled" },
+              new Appointment { PatientId = "p2", DoctorId = "d1", ScheduledAt = _today.AddHours(1), DurationMinutes = 30, Status = "Scheduled" },
+              new Appointment { PatientId = "p3", DoctorId = "d2", ScheduledAt = _today, DurationMinutes = 60, Status = "Scheduled" });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetForDoctorOnDate_ReturnsCorrect()
+      {
+          (await _repo.GetForDoctorOnDateAsync("d1", _today.Date)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task HasConflict_Overlapping_ReturnsTrue()
+      {
+          (await _repo.HasConflictAsync("d1", _today.AddMinutes(15), 30)).Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task HasConflict_NoOverlap_ReturnsFalse()
+      {
+          (await _repo.HasConflictAsync("d1", _today.AddHours(3), 30)).Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task Cancel_SetsStatusCancelled()
+      {
+          var id = _db.Appointments.First().Id;
+          await _repo.CancelAsync(id);
+          _db.ChangeTracker.Clear();
+          (await _db.Appointments.FindAsync(id))!.Status.Should().Be("Cancelled");
+      }
+  }

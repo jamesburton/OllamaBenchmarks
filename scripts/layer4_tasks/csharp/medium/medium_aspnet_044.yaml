@@ -1,0 +1,60 @@
+name: medium_aspnet_044
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record BudgetCategory(string Name, decimal Allocated, decimal Spent).
+  A class BudgetController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<BudgetCategory> (for testability).
+  Properties:
+    GET api/budget — all categories with Remaining (Allocated - Spent)
+    GET api/budget/summary — { totalAllocated, totalSpent, totalRemaining }
+    POST api/budget/{name}/spend — subtracts amount from category (400 if overspent, 404 if not found)
+  Return only valid C# code in a single file.
+test_code: |
+  public class BudgetControllerTests
+  {
+      private BudgetController MakeController() => new(new List<BudgetCategory>
+      {
+          new("Food", 500m, 200m),
+          new("Transport", 200m, 150m),
+          new("Entertainment", 100m, 80m)
+      });
+
+      [Fact]
+      public void GetAll_ReturnsCategories()
+      {
+          (MakeController().GetAll() as OkObjectResult)!.Value.Should().BeAssignableTo<IEnumerable<object>>()
+              .Which.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetSummary_CalculatesCorrectly()
+      {
+          var result = MakeController().GetSummary() as OkObjectResult;
+          var val = result!.Value!;
+          var type = val.GetType();
+          ((decimal)type.GetProperty("totalAllocated")!.GetValue(val)!).Should().Be(800m);
+          ((decimal)type.GetProperty("totalSpent")!.GetValue(val)!).Should().Be(430m);
+      }
+
+      [Fact]
+      public void Spend_ValidAmount_Updates()
+      {
+          var ctrl = MakeController();
+          ctrl.Spend("Food", 50m).Should().BeOfType<NoContentResult>();
+      }
+
+      [Fact]
+      public void Spend_Overspend_Returns400()
+      {
+          MakeController().Spend("Entertainment", 50m).Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

@@ -1,0 +1,94 @@
+name: hard_blazor_024
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor event aggregator / message bus:
+  Interface IEventHandler<TEvent>:
+    Task HandleAsync(TEvent evt, CancellationToken ct)
+
+  Interface IEventBus:
+    void Subscribe<TEvent>(IEventHandler<TEvent> handler)
+    void Unsubscribe<TEvent>(IEventHandler<TEvent> handler)
+    Task PublishAsync<TEvent>(TEvent evt, CancellationToken ct)
+
+  Class InMemoryEventBus : IEventBus:
+    Stores handlers per event type.
+    PublishAsync: calls all registered handlers concurrently.
+    If handler throws, exception is swallowed and publishing continues.
+
+  Records:
+    UserLoggedIn(string UserId, DateTime At)
+    PageViewed(string UserId, string Page, DateTime At)
+    ButtonClicked(string UserId, string ButtonId, DateTime At)
+
+  Class AnalyticsTracker : IEventHandler<UserLoggedIn>, IEventHandler<PageViewed>:
+    Tracks counts: LoginCount, PageViewCount.
+    Implements HandleAsync for each event type.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InMemoryEventBusTests
+  {
+      private readonly IEventBus _bus = new InMemoryEventBus();
+
+      [Fact]
+      public async Task Publish_CallsSubscribedHandler()
+      {
+          var handler = Substitute.For<IEventHandler<UserLoggedIn>>();
+          handler.HandleAsync(Arg.Any<UserLoggedIn>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          _bus.Subscribe(handler);
+          await _bus.PublishAsync(new UserLoggedIn("u1", DateTime.UtcNow), CancellationToken.None);
+          await handler.Received(1).HandleAsync(Arg.Any<UserLoggedIn>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Unsubscribe_StopsReceivingEvents()
+      {
+          var handler = Substitute.For<IEventHandler<PageViewed>>();
+          handler.HandleAsync(Arg.Any<PageViewed>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          _bus.Subscribe(handler);
+          _bus.Unsubscribe(handler);
+          await _bus.PublishAsync(new PageViewed("u1", "/home", DateTime.UtcNow), CancellationToken.None);
+          await handler.DidNotReceive().HandleAsync(Arg.Any<PageViewed>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Publish_HandlerThrows_OtherHandlerStillCalled()
+      {
+          var bad = Substitute.For<IEventHandler<ButtonClicked>>();
+          bad.HandleAsync(Arg.Any<ButtonClicked>(), Arg.Any<CancellationToken>())
+              .ThrowsAsync(new Exception("fail"));
+          var good = Substitute.For<IEventHandler<ButtonClicked>>();
+          good.HandleAsync(Arg.Any<ButtonClicked>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          _bus.Subscribe(bad);
+          _bus.Subscribe(good);
+          await _bus.PublishAsync(new ButtonClicked("u1", "btn1", DateTime.UtcNow), CancellationToken.None);
+          await good.Received(1).HandleAsync(Arg.Any<ButtonClicked>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task AnalyticsTracker_TracksLoginCount()
+      {
+          var tracker = new AnalyticsTracker();
+          _bus.Subscribe<UserLoggedIn>(tracker);
+          await _bus.PublishAsync(new UserLoggedIn("u2", DateTime.UtcNow), CancellationToken.None);
+          await _bus.PublishAsync(new UserLoggedIn("u3", DateTime.UtcNow), CancellationToken.None);
+          tracker.LoginCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task AnalyticsTracker_TracksPageViewCount()
+      {
+          var tracker = new AnalyticsTracker();
+          _bus.Subscribe<PageViewed>(tracker);
+          await _bus.PublishAsync(new PageViewed("u1", "/home", DateTime.UtcNow), CancellationToken.None);
+          tracker.PageViewCount.Should().Be(1);
+      }
+  }

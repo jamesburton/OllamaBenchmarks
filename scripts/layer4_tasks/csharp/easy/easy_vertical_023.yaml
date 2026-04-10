@@ -1,0 +1,42 @@
+name: easy_vertical_023
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Campaign(string Id, string Name, bool IsActive, decimal Budget)
+  An interface ICampaignRepository with methods:
+    Task SaveAsync(Campaign campaign)
+    Task<List<Campaign>> GetActiveAsync()
+    Task<Campaign?> GetByIdAsync(string id)
+  A class CampaignManager with constructor taking ICampaignRepository, and async method:
+    Task DeactivateAsync(string id) loads campaign, sets IsActive = false using 'with', saves
+  Return only valid C# code in a single file.
+test_code: |
+  public class CampaignManagerTests
+  {
+      [Fact]
+      public async Task DeactivateAsync_SavesDeactivatedCampaign()
+      {
+          var repo = Substitute.For<ICampaignRepository>();
+          repo.GetByIdAsync("c1").Returns(new Campaign("c1", "Summer Sale", true, 1000m));
+          var manager = new CampaignManager(repo);
+          await manager.DeactivateAsync("c1");
+          await repo.Received(1).SaveAsync(Arg.Is<Campaign>(c => c.Id == "c1" && !c.IsActive));
+      }
+      [Fact]
+      public async Task DeactivateAsync_NotFound_DoesNotThrow()
+      {
+          var repo = Substitute.For<ICampaignRepository>();
+          repo.GetByIdAsync("missing").Returns((Campaign?)null);
+          var manager = new CampaignManager(repo);
+          var act = async () => await manager.DeactivateAsync("missing");
+          await act.Should().NotThrowAsync();
+      }
+  }

@@ -1,0 +1,39 @@
+name: easy_vertical_033
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record SupportTicket(string Id, string Subject, string Priority, string Status)
+  A class SupportQueue with:
+    void Submit(SupportTicket ticket)
+    List<SupportTicket> GetByPriority(string priority)
+    SupportTicket? GetNext() returns first open high-priority ticket, then medium, then low (by submission order)
+    void Resolve(string ticketId) sets Status = "resolved" using 'with' expression
+  Return only valid C# code in a single file.
+test_code: |
+  public class SupportQueueTests
+  {
+      [Fact]
+      public void GetByPriority_FiltersCorrectly()
+      {
+          var queue = new SupportQueue();
+          queue.Submit(new SupportTicket("t1", "Crash", "high", "open"));
+          queue.Submit(new SupportTicket("t2", "Slow", "medium", "open"));
+          queue.GetByPriority("high").Should().HaveCount(1);
+      }
+      [Fact]
+      public void Resolve_ChangesStatusToResolved()
+      {
+          var queue = new SupportQueue();
+          queue.Submit(new SupportTicket("t1", "Bug", "high", "open"));
+          queue.Resolve("t1");
+          queue.GetByPriority("high").Where(t => t.Status == "open").Should().BeEmpty();
+      }
+  }

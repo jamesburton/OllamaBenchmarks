@@ -1,0 +1,18 @@
+name: summarisation_medium_052
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Women's football has experienced unprecedented growth in attendances and broadcast viewership over the past decade. Increased investment from clubs and sponsors, combined with more professional league structures, has narrowed the performance gap with the men's game. However, pay disparity remains a significant issue, with top female players earning a fraction of their male counterparts.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "women"
+    - "football"
+    - "pay"
+    - "investment"
+  max_words: 25

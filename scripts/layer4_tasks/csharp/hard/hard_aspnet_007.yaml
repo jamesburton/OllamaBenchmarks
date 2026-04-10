@@ -1,0 +1,98 @@
+name: hard_aspnet_007
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A controller-based API with versioning support:
+  Records: CreateUserRequest(string Username, string Email, string Password),
+           UserDto(Guid Id, string Username, string Email, DateTime CreatedAt).
+  Interface IUserService:
+    Task<UserDto> CreateAsync(CreateUserRequest req, CancellationToken ct)
+    Task<UserDto?> GetAsync(Guid id, CancellationToken ct)
+    Task<IReadOnlyList<UserDto>> ListAsync(int page, int pageSize, CancellationToken ct)
+  Class InMemoryUserService : IUserService.
+  [ApiController, Route("api/v1/users")] class UsersV1Controller(IUserService svc):
+    POST / — validates: Username min 3 chars, Email contains "@", Password min 8 chars.
+      Returns 201 Created with UserDto.
+    GET /{id} — returns 404 if not found.
+    GET / — accepts ?page=1&pageSize=20, returns list.
+  Validation: use DataAnnotations on CreateUserRequest.
+  Return only valid C# code in a single file.
+test_code: |
+  public class UsersV1ControllerTests
+  {
+      private static HttpClient BuildClient()
+      {
+          var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(b =>
+              b.ConfigureServices(svc =>
+              {
+                  svc.AddControllers();
+                  svc.AddSingleton<IUserService, InMemoryUserService>();
+              }));
+          return factory.CreateClient();
+      }
+
+      [Fact]
+      public async Task Post_ValidUser_Returns201()
+      {
+          var client = BuildClient();
+          var resp = await client.PostAsJsonAsync("/api/v1/users",
+              new CreateUserRequest("alice123", "alice@example.com", "Password1!"));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+      }
+
+      [Fact]
+      public async Task Post_ShortUsername_Returns400()
+      {
+          var client = BuildClient();
+          var resp = await client.PostAsJsonAsync("/api/v1/users",
+              new CreateUserRequest("ab", "alice@example.com", "Password1!"));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+      }
+
+      [Fact]
+      public async Task Post_InvalidEmail_Returns400()
+      {
+          var client = BuildClient();
+          var resp = await client.PostAsJsonAsync("/api/v1/users",
+              new CreateUserRequest("alice123", "notanemail", "Password1!"));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+      }
+
+      [Fact]
+      public async Task Get_ExistingUser_Returns200()
+      {
+          var client = BuildClient();
+          var dto = await (await client.PostAsJsonAsync("/api/v1/users",
+              new CreateUserRequest("bob123", "bob@example.com", "Password1!")))
+              .Content.ReadFromJsonAsync<UserDto>();
+          var resp = await client.GetAsync($"/api/v1/users/{dto!.Id}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+
+      [Fact]
+      public async Task Get_NonExistentUser_Returns404()
+      {
+          var resp = await BuildClient().GetAsync($"/api/v1/users/{Guid.NewGuid()}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+      }
+
+      [Fact]
+      public async Task List_ReturnsPaginatedResults()
+      {
+          var client = BuildClient();
+          for (int i = 0; i < 3; i++)
+              await client.PostAsJsonAsync("/api/v1/users",
+                  new CreateUserRequest($"user{i}xxx", $"u{i}@e.com", "Password1!"));
+          var resp = await client.GetAsync("/api/v1/users?page=1&pageSize=2");
+          var list = await resp.Content.ReadFromJsonAsync<IReadOnlyList<UserDto>>();
+          list.Should().HaveCount(2);
+      }
+  }

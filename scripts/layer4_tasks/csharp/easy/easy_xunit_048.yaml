@@ -1,0 +1,30 @@
+name: easy_xunit_048
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class NumberSequences with static methods:
+    IEnumerable<int> Range(int start, int count) yields count integers starting from start
+    IEnumerable<int> EvenNumbers(int count) yields the first count even positive integers (2, 4, 6...)
+  Return only valid C# code in a single file.
+test_code: |
+  public class NumberSequencesTests
+  {
+      [Fact]
+      public void Range_YieldsCorrectSequence()
+      {
+          NumberSequences.Range(5, 3).Should().Equal(5, 6, 7);
+      }
+      [Fact]
+      public void EvenNumbers_YieldsFirstNEvenNumbers()
+      {
+          NumberSequences.EvenNumbers(4).Should().Equal(2, 4, 6, 8);
+      }
+  }

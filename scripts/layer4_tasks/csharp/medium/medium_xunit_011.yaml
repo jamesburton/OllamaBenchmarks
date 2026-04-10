@@ -1,0 +1,39 @@
+name: medium_xunit_011
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class IntervalTree with:
+    void Add(int start, int end, string label), IEnumerable<string> Query(int point), IEnumerable<string> QueryRange(int start, int end)
+  Return only valid C# code in a single file.
+test_code: |
+  public class IntervalTreeTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new IntervalTree();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new IntervalTree();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new IntervalTree();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

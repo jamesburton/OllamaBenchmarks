@@ -1,0 +1,22 @@
+name: technical_hard_017
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Performance' section for a high-throughput data processing library, including benchmarks and tuning advice.
+  Keep it under 120 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "performance"
+    - "benchmark"
+    - "throughput"
+    - "tuning"
+    - "latency"
+    - "concurrent"
+    - "optimise"
+  min_words: 12
+  max_words: 120

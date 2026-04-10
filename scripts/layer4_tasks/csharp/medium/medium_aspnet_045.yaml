@@ -1,0 +1,58 @@
+name: medium_aspnet_045
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ChangelogEntry(string Version, DateTime ReleasedAt, IEnumerable<string> Changes).
+  A class ChangelogController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<ChangelogEntry> (for testability).
+  Actions:
+    GET api/changelog — all entries ordered by ReleasedAt descending
+    GET api/changelog/latest — most recent entry or 404 if empty
+    GET api/changelog/{version} — entry for that version or 404
+  Return only valid C# code in a single file.
+test_code: |
+  public class ChangelogControllerTests
+  {
+      private ChangelogController MakeController() => new(new List<ChangelogEntry>
+      {
+          new("1.0.0", DateTime.Parse("2024-01-01"), new[] { "Initial release" }),
+          new("1.1.0", DateTime.Parse("2024-03-01"), new[] { "Added feature X" }),
+          new("2.0.0", DateTime.Parse("2024-06-01"), new[] { "Major update", "Breaking change" })
+      });
+
+      [Fact]
+      public void GetAll_OrderedDesc()
+      {
+          var result = MakeController().GetAll() as OkObjectResult;
+          var items = (result!.Value as IEnumerable<ChangelogEntry>)!.ToList();
+          items.Should().BeInDescendingOrder(e => e.ReleasedAt);
+      }
+
+      [Fact]
+      public void GetLatest_ReturnsMostRecent()
+      {
+          var result = MakeController().GetLatest() as OkObjectResult;
+          (result!.Value as ChangelogEntry)!.Version.Should().Be("2.0.0");
+      }
+
+      [Fact]
+      public void GetByVersion_Found()
+      {
+          var result = MakeController().GetByVersion("1.1.0") as OkObjectResult;
+          (result!.Value as ChangelogEntry)!.Changes.Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void GetByVersion_NotFound_Returns404()
+      {
+          MakeController().GetByVersion("9.9.9").Should().BeOfType<NotFoundResult>();
+      }
+  }

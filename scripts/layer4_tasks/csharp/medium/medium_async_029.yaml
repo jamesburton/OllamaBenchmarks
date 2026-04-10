@@ -1,0 +1,56 @@
+name: medium_async_029
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncWorkQueue implementing IAsyncDisposable.
+  Constructor accepts int workerCount.
+  Expose:
+    ValueTask EnqueueAsync(Func<CancellationToken, Task> work, CancellationToken ct = default)
+    ValueTask DisposeAsync() — drains pending work, stops workers
+  Uses Channel<Func<CancellationToken, Task>> internally.
+  Multiple workers process items concurrently up to workerCount.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncWorkQueueTests
+  {
+      [Fact]
+      public async Task EnqueueAndDispose_AllWorkCompleted()
+      {
+          var results = new System.Collections.Concurrent.ConcurrentBag<int>();
+          await using var queue = new AsyncWorkQueue(2);
+          for (int i = 0; i < 5; i++)
+          {
+              var copy = i;
+              await queue.EnqueueAsync(async ct => { await Task.Yield(); results.Add(copy); });
+          }
+          await queue.DisposeAsync();
+          results.Should().HaveCount(5);
+      }
+
+      [Fact]
+      public async Task EnqueueAsync_WorkExecuted()
+      {
+          bool executed = false;
+          await using var queue = new AsyncWorkQueue(1);
+          await queue.EnqueueAsync(async ct => { await Task.Yield(); executed = true; });
+          await queue.DisposeAsync();
+          executed.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task DisposeAsync_CanBeCalledMultipleTimes()
+      {
+          var queue = new AsyncWorkQueue(1);
+          await queue.DisposeAsync();
+          Func<Task> act = () => queue.DisposeAsync().AsTask();
+          await act.Should().NotThrowAsync();
+      }
+  }

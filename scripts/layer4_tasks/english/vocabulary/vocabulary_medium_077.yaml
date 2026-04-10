@@ -1,0 +1,16 @@
+name: vocabulary_medium_077
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word is MORE INFORMAL for 'investigate'?
+  A) Examine
+  B) Scrutinise
+  C) Look into
+  D) Analyse
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

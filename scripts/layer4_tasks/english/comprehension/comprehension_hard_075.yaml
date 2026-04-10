@@ -1,0 +1,26 @@
+name: comprehension_hard_075
+category: english
+subcategory: comprehension
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  The Amazon rainforest, often described as the lungs of the Earth, covers approximately 5.5 million square kilometres across nine countries in South America. It is home to an estimated 10 percent of all species on Earth and plays a critical role in regulating the global climate by absorbing billions of tonnes of carbon dioxide annually. Deforestation, driven primarily by cattle ranching, soy farming, and illegal logging, has destroyed approximately 17 percent of the Amazon's original extent over the past 50 years. Scientists warn that if deforestation continues at current rates, the Amazon could reach a tipping point where it begins to generate more carbon dioxide than it absorbs, potentially accelerating climate change worldwide. Indigenous communities, who have protected the forest for thousands of years, are increasingly recognised as essential guardians of the Amazon's biodiversity. International pressure and domestic policy changes have produced some reduction in deforestation rates, but enforcement remains inconsistent.
+  
+  Answer in one sentence:
+  What does the phrase 'increasingly recognised' suggest about the status of indigenous communities historically?
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "historically"
+    - "overlooked"
+    - "marginalised"
+    - "not recognised"
+    - "changing"
+    - "shift"
+    - "acknowledgement"
+  min_words: 8
+  max_words: 40

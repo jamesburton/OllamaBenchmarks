@@ -1,0 +1,16 @@
+name: deduction_hard_010
+category: logic
+subcategory: deduction
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If the battery is dead, the car won't start.
+  2. If the car won't start, you'll be late.
+  3. If you're late, you'll miss the meeting.
+  4. The battery is dead.
+  What is the final conclusion? Reply with only the conclusion.
+expected_answer: "You will miss the meeting."
+validator_config: {}

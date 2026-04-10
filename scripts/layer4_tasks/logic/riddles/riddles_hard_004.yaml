@@ -1,0 +1,17 @@
+name: riddles_hard_004
+category: logic
+subcategory: riddles
+difficulty: hard
+weight: 3
+validator_type: logic
+max_tokens: 64
+prompt: |
+  A woman shoots her husband, then holds him underwater for five minutes. Later they go out for dinner together. How?
+  Reply with only the answer.
+expected_answer: "She photographed him and developed the photo in a darkroom"
+validator_config:
+  accepted_answers:
+  - "She photographed him"
+  - "She took a photo and developed it"
+  - "She shot him with a camera"
+  - "She took his photograph"

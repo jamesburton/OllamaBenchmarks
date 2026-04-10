@@ -1,0 +1,16 @@
+name: constraint_medium_009
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Alice, Bob, Carol each wear different hat colours (red, blue, green) and different shirt colours (red, blue, green). No one's hat and shirt are the same colour.
+  Clues:
+  1. Alice's hat is red.
+  2. Bob's shirt is red.
+  3. Carol's hat is blue.
+  What colour is Alice's shirt? Reply with only the colour.
+expected_answer: "Blue"
+validator_config: {}

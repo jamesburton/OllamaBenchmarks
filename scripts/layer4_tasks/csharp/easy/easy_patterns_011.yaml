@@ -1,0 +1,37 @@
+name: easy_patterns_011
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Color(byte R, byte G, byte B)
+  and a static class ColorHelper with:
+    string ToHex(Color color)
+  that returns the hex string like "#FF8800" (uppercase).
+  Return only valid C# code in a single file.
+test_code: |
+  public class ColorHelperTests
+  {
+      [Fact]
+      public void ToHex_BasicCase()
+      {
+          ColorHelper.ToHex(new Color(255, 136, 0)).Should().Be("#FF8800");
+      }
+      [Fact]
+      public void ToHex_Black()
+      {
+          ColorHelper.ToHex(new Color(0, 0, 0)).Should().Be("#000000");
+      }
+      [Fact]
+      public void ToHex_White()
+      {
+          ColorHelper.ToHex(new Color(255, 255, 255)).Should().Be("#FFFFFF");
+      }
+  }

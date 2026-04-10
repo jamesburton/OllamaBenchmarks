@@ -1,0 +1,14 @@
+name: arithmetic_hard_005
+category: maths
+subcategory: arithmetic
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Calculate: (3 + 5)^3 - (2^4 * 5) + 100
+  Reply with only the number.
+expected_answer: "492"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

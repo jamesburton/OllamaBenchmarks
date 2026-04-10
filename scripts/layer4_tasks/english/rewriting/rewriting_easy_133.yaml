@@ -1,0 +1,21 @@
+name: rewriting_easy_133
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'Tired and hungry, the food was quickly eaten.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "tired"
+    - "hungry"
+    - "ate"
+    - "quickly"
+    - "they"
+  min_words: 4
+  max_words: 15

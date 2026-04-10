@@ -1,0 +1,13 @@
+name: statistics_medium_013
+category: maths
+subcategory: statistics
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Data: {3, 7, 7, 19}. Mean = 9. Find the population standard deviation. Reply with only the number.
+expected_answer: "6"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

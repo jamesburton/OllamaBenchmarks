@@ -1,0 +1,56 @@
+name: medium_masstransit_027
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record SurveySubmitted(Guid SurveyId, string RespondentId, IDictionary<string, string> Answers).
+  A consumer SurveySubmittedConsumer implementing IConsumer<SurveySubmitted>.
+  Constructor accepts IAnalyticsService service.
+  Interface IAnalyticsService with: Task RecordResponseAsync(Guid surveyId, int answerCount).
+  In Consume: calls service.RecordResponseAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record SurveySubmitted(Guid SurveyId, string RespondentId, IDictionary<string, string> Answers); }
+  global using Contracts;
+
+  public class SurveySubmittedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IAnalyticsService>();
+          var consumer = new SurveySubmittedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SurveySubmitted>>();
+          ctx.Message.Returns(new SurveySubmitted(Guid.NewGuid(), "Res", new Dictionary<string,string>(), "Ans"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RecordResponseAsync(Arg.Any<Guid surveyId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IAnalyticsService>();
+          var consumer = new SurveySubmittedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SurveySubmitted>>();
+          ctx.Message.Returns(new SurveySubmitted(Guid.NewGuid(), "Res", new Dictionary<string,string>(), "Ans"));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IAnalyticsService>();
+          var consumer = new SurveySubmittedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SurveySubmitted>>();
+          ctx.Message.Returns(new SurveySubmitted(Guid.NewGuid(), "Resp", new Dictionary<string,string>(), "Answ"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RecordResponseAsync(Arg.Any<Guid surveyId>(), Arg.Any<object>());
+      }
+  }

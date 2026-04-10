@@ -1,0 +1,18 @@
+name: summarisation_hard_019
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The decarbonisation of heavy industry — including steel, cement, and chemicals — presents a more formidable challenge than the electrification of transport, due to process emissions that cannot be eliminated simply by switching energy sources. Green hydrogen and carbon capture technologies are being pursued, but neither has yet achieved the cost reductions needed for widespread deployment.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "decarbonisation"
+    - "hydrogen"
+    - "emissions"
+    - "industry"
+  max_words: 25

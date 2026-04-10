@@ -1,0 +1,45 @@
+name: medium_patterns_008
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A sealed class Money with decimal Amount and string Currency.
+  Override Equals/GetHashCode for value equality.
+  Overload operators +, -, ==, !=.
+  Add method throws InvalidOperationException for currency mismatch.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MoneyTests
+  {
+      [Fact]
+      public void Add_SameCurrency() { (new Money(10m,"GBP") + new Money(5m,"GBP")).Amount.Should().Be(15m); }
+
+      [Fact]
+      public void Add_DifferentCurrency_Throws()
+      {
+          Action act = () => { var _ = new Money(1,"USD") + new Money(1,"EUR"); };
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Equality_SameAmountCurrency()
+      {
+          (new Money(5m,"USD") == new Money(5m,"USD")).Should().BeTrue();
+      }
+
+      [Fact]
+      public void Subtract_Correct() { (new Money(20m,"USD") - new Money(7m,"USD")).Amount.Should().Be(13m); }
+
+      [Fact]
+      public void GetHashCode_EqualObjects_SameHash()
+      {
+          new Money(1m,"USD").GetHashCode().Should().Be(new Money(1m,"USD").GetHashCode());
+      }
+  }

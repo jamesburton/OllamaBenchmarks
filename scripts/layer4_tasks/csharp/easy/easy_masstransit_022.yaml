@@ -1,0 +1,41 @@
+name: easy_masstransit_022
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record HealthCheckFailed(string ServiceName, string Endpoint, int StatusCode)
+  A consumer class HealthCheckFailedConsumer that implements IConsumer<HealthCheckFailed>:
+    Has a public List<string> FailedServices = new()
+    Consume method adds ServiceName to FailedServices if StatusCode >= 500
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class HealthCheckFailedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_ServerError_AddsService()
+      {
+          var consumer = new HealthCheckFailedConsumer();
+          var context = Substitute.For<ConsumeContext<HealthCheckFailed>>();
+          context.Message.Returns(new HealthCheckFailed("auth-service", "/health", 503));
+          await consumer.Consume(context);
+          consumer.FailedServices.Should().Contain("auth-service");
+      }
+      [Fact]
+      public async Task Consume_ClientError_NotAdded()
+      {
+          var consumer = new HealthCheckFailedConsumer();
+          var context = Substitute.For<ConsumeContext<HealthCheckFailed>>();
+          context.Message.Returns(new HealthCheckFailed("api", "/health", 404));
+          await consumer.Consume(context);
+          consumer.FailedServices.Should().BeEmpty();
+      }
+  }

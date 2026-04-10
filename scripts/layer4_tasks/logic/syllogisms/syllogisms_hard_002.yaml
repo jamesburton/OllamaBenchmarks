@@ -1,0 +1,15 @@
+name: syllogisms_hard_002
+category: logic
+subcategory: syllogisms
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All who study logic can detect fallacies.
+  2. No one who cannot detect fallacies argues well.
+  3. Some debaters do not study logic.
+  Do all debaters argue well? Reply with only: Yes, No, or Cannot be determined.
+expected_answer: "No."
+validator_config: {}

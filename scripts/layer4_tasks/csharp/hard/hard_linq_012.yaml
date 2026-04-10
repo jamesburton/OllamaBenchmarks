@@ -1,0 +1,86 @@
+name: hard_linq_012
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Shipment(int Id, string Origin, string Destination, decimal WeightKg, DateTime Dispatched, DateTime? Arrived).
+  A class ShipmentTracker with constructor accepting IEnumerable<Shipment> shipments.
+  Methods:
+    IEnumerable<RouteStats> RoutePerformance() — groups by Origin+Destination pair,
+      computes ShipmentCount, AverageWeightKg, AverageTransitDays (only for arrived),
+      OnTimeRate (arrived within 7 days). Orders by ShipmentCount descending.
+    IEnumerable<Shipment> InTransit(DateTime asOf) — shipments dispatched but not arrived by asOf.
+    decimal AverageDaysInTransit(string origin, string destination) — average transit days
+      for completed shipments on that route. Returns -1 if no completed shipments.
+  Record: RouteStats(string Origin, string Destination, int ShipmentCount,
+           decimal AverageWeightKg, double AverageTransitDays, double OnTimeRate).
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShipmentTrackerTests
+  {
+      private static readonly DateTime D0 = new(2024,2,1);
+      private static readonly List<Shipment> Shipments = new()
+      {
+          new(1, "London", "Paris",    20m, D0,            D0.AddDays(2)),
+          new(2, "London", "Paris",    15m, D0.AddDays(1), D0.AddDays(5)),
+          new(3, "London", "Paris",    25m, D0.AddDays(2), D0.AddDays(12)),
+          new(4, "Berlin", "Madrid",   30m, D0,            D0.AddDays(4)),
+          new(5, "London", "Paris",    18m, D0.AddDays(3), null),
+      };
+
+      [Fact]
+      public void RoutePerformance_ReturnsTwoRoutes()
+      {
+          var result = new ShipmentTracker(Shipments).RoutePerformance().ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void RoutePerformance_LondonParisCountIsFour()
+      {
+          var result = new ShipmentTracker(Shipments).RoutePerformance().ToList();
+          result.First(r => r.Origin == "London").ShipmentCount.Should().Be(4);
+      }
+
+      [Fact]
+      public void RoutePerformance_LondonParisOnTimeRateIsCorrect()
+      {
+          var result = new ShipmentTracker(Shipments).RoutePerformance().ToList();
+          var lp = result.First(r => r.Origin == "London");
+          lp.OnTimeRate.Should().BeApproximately(2.0/3.0, 0.01);
+      }
+
+      [Fact]
+      public void InTransit_ReturnsUndeliveredByDate()
+      {
+          var result = new ShipmentTracker(Shipments).InTransit(D0.AddDays(10)).ToList();
+          result.Should().ContainSingle(s => s.Id == 5);
+      }
+
+      [Fact]
+      public void AverageDaysInTransit_LondonParisCorrect()
+      {
+          var avg = new ShipmentTracker(Shipments).AverageDaysInTransit("London", "Paris");
+          avg.Should().BeApproximately((2.0+4.0+10.0)/3.0, 0.01);
+      }
+
+      [Fact]
+      public void AverageDaysInTransit_UnknownRouteReturnsMinusOne()
+      {
+          new ShipmentTracker(Shipments).AverageDaysInTransit("Tokyo", "Oslo").Should().Be(-1m);
+      }
+
+      [Fact]
+      public void InTransit_EmptyIfAllArrived()
+      {
+          var arrived = Shipments.Where(s => s.Arrived != null).ToList();
+          new ShipmentTracker(arrived).InTransit(D0.AddDays(30)).Should().BeEmpty();
+      }
+  }

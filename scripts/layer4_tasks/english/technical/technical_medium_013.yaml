@@ -1,0 +1,23 @@
+name: technical_medium_013
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Deployment' section for a containerised web application.
+  Include Docker and a hosting reference.
+  Keep it under 100 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "docker"
+    - "deploy"
+    - "container"
+    - "image"
+    - "build"
+    - "run"
+    - "host"
+  min_words: 12
+  max_words: 100

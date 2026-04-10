@@ -1,0 +1,53 @@
+name: medium_patterns_038
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Retry with static methods:
+    T Execute<T>(Func<T> operation, int maxAttempts, Func<int, TimeSpan>? delay = null)
+    void Execute(Action operation, int maxAttempts, Func<int, TimeSpan>? delay = null)
+  Retries on any Exception. Throws last exception after maxAttempts.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RetryTests
+  {
+      [Fact]
+      public void Execute_FirstSucceeds()
+      {
+          int calls = 0;
+          Retry.Execute(() => { calls++; return 42; }, 3).Should().Be(42);
+          calls.Should().Be(1);
+      }
+
+      [Fact]
+      public void Execute_RetriesToSuccess()
+      {
+          int calls = 0;
+          Retry.Execute(() => { if (++calls < 3) throw new Exception("fail"); return 99; }, 5).Should().Be(99);
+          calls.Should().Be(3);
+      }
+
+      [Fact]
+      public void Execute_ExhaustsAttempts_Throws()
+      {
+          int calls = 0;
+          Action act = () => Retry.Execute(() => { calls++; throw new InvalidOperationException("err"); return 0; }, 3);
+          act.Should().Throw<InvalidOperationException>();
+          calls.Should().Be(3);
+      }
+
+      [Fact]
+      public void Execute_Action_Retries()
+      {
+          int calls = 0;
+          Retry.Execute(() => { if (++calls < 2) throw new Exception("fail"); }, 3);
+          calls.Should().Be(2);
+      }
+  }

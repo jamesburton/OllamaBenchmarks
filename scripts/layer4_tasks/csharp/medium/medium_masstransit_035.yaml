@@ -1,0 +1,56 @@
+name: medium_masstransit_035
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record LeadCreated(Guid LeadId, string Email, string Source, int Score).
+  A consumer LeadCreatedConsumer implementing IConsumer<LeadCreated>.
+  Constructor accepts ICrmService service.
+  Interface ICrmService with: Task CreateLeadAsync(Guid leadId, string email, int score).
+  In Consume: calls the service method with appropriate message properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record LeadCreated(Guid LeadId, string Email, string Source, int Score); }
+  global using Contracts;
+
+  public class LeadCreatedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<ICrmService>();
+          var consumer = new LeadCreatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<LeadCreated>>();
+          ctx.Message.Returns(new LeadCreated(Guid.NewGuid(), "test", "test", 1));
+          await consumer.Consume(ctx);
+          await svc.Received(1).CreateLeadAsync(Arg.Any<Guid>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<ICrmService>();
+          var consumer = new LeadCreatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<LeadCreated>>();
+          ctx.Message.Returns(new LeadCreated(Guid.NewGuid(), "test", "test", 1));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<ICrmService>();
+          var consumer = new LeadCreatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<LeadCreated>>();
+          ctx.Message.Returns(new LeadCreated(Guid.NewGuid(), "test", "test", 1));
+          await consumer.Consume(ctx);
+          await svc.Received(1).CreateLeadAsync(Arg.Any<Guid>(), Arg.Any<object>());
+      }
+  }

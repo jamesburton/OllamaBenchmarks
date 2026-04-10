@@ -1,0 +1,63 @@
+name: medium_async_010
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface INotificationSender with method:
+    Task SendAsync(string recipient, string message, CancellationToken ct = default)
+  A class BroadcastService with constructor accepting INotificationSender sender.
+  Expose:
+    Task BroadcastAsync(IEnumerable<string> recipients, string message, CancellationToken ct = default)
+  Sends to all recipients in parallel. If any send fails with Exception (not cancellation),
+  it collects all exceptions and throws AggregateException after all sends complete.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BroadcastServiceTests
+  {
+      [Fact]
+      public async Task BroadcastAsync_SendsToAll()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          sender.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          await new BroadcastService(sender).BroadcastAsync(new[]{"a","b","c"}, "hi");
+          await sender.Received(3).SendAsync(Arg.Any<string>(), "hi", Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task BroadcastAsync_PartialFailure_ThrowsAggregate()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          sender.SendAsync("good", Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          sender.SendAsync("bad",  Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(Task.FromException(new InvalidOperationException("fail")));
+          await Assert.ThrowsAsync<AggregateException>(() =>
+              new BroadcastService(sender).BroadcastAsync(new[]{"good","bad"}, "msg"));
+      }
+
+      [Fact]
+      public async Task BroadcastAsync_EmptyRecipients_Completes()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          await new BroadcastService(sender).BroadcastAsync(Array.Empty<string>(), "msg");
+          await sender.DidNotReceiveWithAnyArgs().SendAsync(default!, default!, default);
+      }
+
+      [Fact]
+      public async Task BroadcastAsync_AllFail_AggregateContainsAll()
+      {
+          var sender = Substitute.For<INotificationSender>();
+          sender.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(Task.FromException(new Exception("err")));
+          var ex = await Assert.ThrowsAsync<AggregateException>(() =>
+              new BroadcastService(sender).BroadcastAsync(new[]{"a","b","c"}, "msg"));
+          ex.InnerExceptions.Should().HaveCount(3);
+      }
+  }

@@ -1,0 +1,40 @@
+name: easy_vertical_005
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record CartItem(string ProductId, string Name, decimal Price, int Quantity)
+  A class ShoppingCart with:
+    void AddItem(CartItem item)
+    void RemoveItem(string productId)
+    decimal Total => sum of (Price * Quantity) for all items
+    int ItemCount => total quantity of all items
+    List<CartItem> Items { get; }
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShoppingCartTests
+  {
+      [Fact]
+      public void Total_CalculatesCorrectly()
+      {
+          var cart = new ShoppingCart();
+          cart.AddItem(new CartItem("p1", "Apple", 1.50m, 3));
+          cart.AddItem(new CartItem("p2", "Banana", 0.75m, 2));
+          cart.Total.Should().Be(6.00m);
+      }
+      [Fact]
+      public void RemoveItem_RemovesFromCart()
+      {
+          var cart = new ShoppingCart();
+          cart.AddItem(new CartItem("p1", "Widget", 10m, 1));
+          cart.RemoveItem("p1");
+          cart.Items.Should().BeEmpty();
+      }
+  }

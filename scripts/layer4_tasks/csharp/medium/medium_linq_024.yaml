@@ -1,0 +1,58 @@
+name: medium_linq_024
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Match with: string HomeTeam, string AwayTeam, int HomeGoals, int AwayGoals.
+  A class LeagueTable with a constructor accepting IEnumerable<Match> matches.
+  Expose:
+    IEnumerable<TeamStanding> GetTable()
+  where TeamStanding has: string Team, int Played, int Won, int Drawn, int Lost, int GoalsFor, int GoalsAgainst, int Points.
+  Points: Win=3, Draw=1, Loss=0.
+  Each match contributes to both home and away team records.
+  Table ordered by Points desc, then GoalDifference (GoalsFor-GoalsAgainst) desc, then Team asc.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LeagueTableTests
+  {
+      private readonly Match[] _matches = {
+          new("Arsenal","Chelsea",  2, 0),
+          new("Chelsea","Spurs",    1, 1),
+          new("Spurs",  "Arsenal", 0, 1),
+      };
+
+      [Fact]
+      public void GetTable_ReturnsThreeTeams()
+      {
+          new LeagueTable(_matches).GetTable().Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetTable_ArsenalTop()
+      {
+          new LeagueTable(_matches).GetTable().First().Team.Should().Be("Arsenal");
+      }
+
+      [Fact]
+      public void GetTable_ArsenalPoints6()
+      {
+          var arsenal = new LeagueTable(_matches).GetTable().First(t => t.Team == "Arsenal");
+          arsenal.Points.Should().Be(6);
+          arsenal.Won.Should().Be(2);
+      }
+
+      [Fact]
+      public void GetTable_ChelseaDraw1()
+      {
+          var chelsea = new LeagueTable(_matches).GetTable().First(t => t.Team == "Chelsea");
+          chelsea.Drawn.Should().Be(1);
+          chelsea.Points.Should().Be(1);
+      }
+  }

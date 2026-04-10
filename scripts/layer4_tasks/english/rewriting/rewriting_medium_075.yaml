@@ -1,0 +1,20 @@
+name: rewriting_medium_075
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Split this compound sentence into two shorter sentences:
+  'The workshop was well-attended, but feedback from participants suggested the content was too advanced.'
+  Write only the two rewritten sentences.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "workshop"
+    - "attended"
+    - "feedback"
+    - "advanced"
+  min_words: 7
+  max_words: 30

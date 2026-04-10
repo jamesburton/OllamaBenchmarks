@@ -1,0 +1,31 @@
+name: easy_linq_038
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class SetOps with a static method:
+    List<int> Intersection(IEnumerable<int> first, IEnumerable<int> second)
+  that returns elements present in both sequences without duplicates using LINQ Intersect + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SetOpsTests
+  {
+      [Fact]
+      public void Intersection_BasicCase()
+      {
+          var result = SetOps.Intersection(new[]{1,2,3,4}, new[]{3,4,5,6});
+          result.Should().BeEquivalentTo(new[]{3,4});
+      }
+      [Fact]
+      public void Intersection_NoCommonElements_ReturnsEmpty()
+      {
+          SetOps.Intersection(new[]{1,2}, new[]{3,4}).Should().BeEmpty();
+      }
+  }

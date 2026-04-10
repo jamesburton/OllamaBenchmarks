@@ -1,0 +1,15 @@
+name: grammar_easy_055
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The dog wagged it's tail.
+  B) The dog wagged its tail.
+  C) The dog wagged its' tail.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

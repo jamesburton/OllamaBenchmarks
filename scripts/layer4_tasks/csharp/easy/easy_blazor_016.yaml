@@ -1,0 +1,35 @@
+name: easy_blazor_016
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class AccordionComponent that extends ComponentBase with:
+    [Parameter] string Title { get; set; } = ""
+    bool IsExpanded { get; set; } = false
+    void Toggle() flips IsExpanded
+  Return only valid C# code in a single file.
+test_code: |
+  public class AccordionComponentTests
+  {
+      [Fact]
+      public void Toggle_ExpandsWhenCollapsed()
+      {
+          var c = new AccordionComponent();
+          c.Toggle();
+          c.IsExpanded.Should().BeTrue();
+      }
+      [Fact]
+      public void Toggle_CollapsesWhenExpanded()
+      {
+          var c = new AccordionComponent { IsExpanded = true };
+          c.Toggle();
+          c.IsExpanded.Should().BeFalse();
+      }
+  }

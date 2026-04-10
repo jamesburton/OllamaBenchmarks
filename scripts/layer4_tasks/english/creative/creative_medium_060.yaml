@@ -1,0 +1,22 @@
+name: creative_medium_060
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a nurse working a night shift in a hospital ward.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "nurse"
+    - "night"
+    - "hospital"
+    - "ward"
+    - "quiet"
+    - "tired"
+    - "monitoring"
+    - "patients"
+  min_words: 15
+  max_words: 60

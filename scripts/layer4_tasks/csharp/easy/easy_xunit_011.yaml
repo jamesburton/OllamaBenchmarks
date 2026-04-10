@@ -1,0 +1,34 @@
+name: easy_xunit_011
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class FizzBuzz with a static method:
+    string Get(int n) returns "FizzBuzz" if divisible by both 3 and 5, "Fizz" if by 3, "Buzz" if by 5, else the number as string
+  Return only valid C# code in a single file.
+test_code: |
+  public class FizzBuzzTests
+  {
+      [Theory]
+      [InlineData(1, "1")]
+      [InlineData(3, "Fizz")]
+      [InlineData(5, "Buzz")]
+      [InlineData(15, "FizzBuzz")]
+      [InlineData(30, "FizzBuzz")]
+      public void Get_ReturnsCorrectString(int n, string expected)
+      {
+          FizzBuzz.Get(n).Should().Be(expected);
+      }
+      [Fact]
+      public void Get_NonDivisible_ReturnsNumber()
+      {
+          FizzBuzz.Get(7).Should().Be("7");
+      }
+  }

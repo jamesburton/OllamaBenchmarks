@@ -1,0 +1,21 @@
+name: rewriting_medium_109
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'The primary purpose of this document is to provide guidance to employees with regard to acceptable workplace conduct.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "guides"
+    - "employees"
+    - "conduct"
+    - "workplace"
+    - "policy"
+  min_words: 5
+  max_words: 20

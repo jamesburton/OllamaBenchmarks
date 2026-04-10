@@ -1,0 +1,14 @@
+name: number_theory_medium_009
+category: maths
+subcategory: number_theory
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  How many prime numbers are there between 50 and 100?
+  Reply with only the number.
+expected_answer: "10"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

@@ -1,0 +1,16 @@
+name: vocabulary_medium_080
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word pair moves from INFORMAL to FORMAL register?
+  A) Show to demonstrate
+  B) Demonstrate to show
+  C) Help to lend a hand
+  D) Obtain to grab
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

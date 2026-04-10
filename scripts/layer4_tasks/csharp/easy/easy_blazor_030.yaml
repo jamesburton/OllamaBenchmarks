@@ -1,0 +1,34 @@
+name: easy_blazor_030
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class WordCountComponent that extends ComponentBase with:
+    [Parameter] string Text { get; set; } = ""
+    int WordCount => string.IsNullOrWhiteSpace(Text) ? 0 : Text.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length
+    int CharCount => Text.Length
+  Return only valid C# code in a single file.
+test_code: |
+  public class WordCountComponentTests
+  {
+      [Fact]
+      public void WordCount_CountsWords()
+      {
+          var c = new WordCountComponent { Text = "Hello world foo" };
+          c.WordCount.Should().Be(3);
+      }
+      [Fact]
+      public void WordCount_EmptyText_ReturnsZero()
+      {
+          var c = new WordCountComponent { Text = "" };
+          c.WordCount.Should().Be(0);
+          c.CharCount.Should().Be(0);
+      }
+  }

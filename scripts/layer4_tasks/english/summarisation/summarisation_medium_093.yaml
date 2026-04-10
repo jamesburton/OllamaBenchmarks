@@ -1,0 +1,18 @@
+name: summarisation_medium_093
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The development of foundation models trained on vast internet corpora has democratised access to powerful AI capabilities through APIs. However, these models embed the biases and errors present in their training data, which are difficult to audit or correct. Governance frameworks for foundation models lag behind the pace of deployment.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "foundation models"
+    - "bias"
+    - "AI"
+    - "governance"
+  max_words: 25

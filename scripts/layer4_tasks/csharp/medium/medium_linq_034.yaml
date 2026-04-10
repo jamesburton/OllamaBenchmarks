@@ -1,0 +1,59 @@
+name: medium_linq_034
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Review with: int ProductId, int Stars, string Text.
+  A class ReviewSummary with a constructor accepting IEnumerable<Review> reviews.
+  Expose:
+    IEnumerable<ProductScore> Scores()
+      — for each ProductId: AverageStars, ReviewCount, SentimentScore
+      where SentimentScore = (count of reviews with Stars >= 4) - (count with Stars <= 2)
+      ordered by AverageStars desc
+  ProductScore is a record with: int ProductId, double AverageStars, int ReviewCount, int SentimentScore.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReviewSummaryTests
+  {
+      private readonly Review[] _reviews = {
+          new(1, 5, "Great!"),
+          new(1, 4, "Good"),
+          new(1, 2, "Bad"),
+          new(2, 3, "OK"),
+          new(2, 3, "Meh"),
+      };
+
+      [Fact]
+      public void Scores_ReturnsTwoProducts()
+      {
+          new ReviewSummary(_reviews).Scores().Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Scores_Product1AverageCorrect()
+      {
+          var p1 = new ReviewSummary(_reviews).Scores().First(p => p.ProductId == 1);
+          p1.AverageStars.Should().BeApproximately(3.67, 0.01);
+      }
+
+      [Fact]
+      public void Scores_Product1SentimentCorrect()
+      {
+          var p1 = new ReviewSummary(_reviews).Scores().First(p => p.ProductId == 1);
+          p1.SentimentScore.Should().Be(1); // 2 positive - 1 negative
+      }
+
+      [Fact]
+      public void Scores_OrderedByAverageStarsDesc()
+      {
+          var result = new ReviewSummary(_reviews).Scores().ToList();
+          result.Select(p => p.AverageStars).Should().BeInDescendingOrder();
+      }
+  }

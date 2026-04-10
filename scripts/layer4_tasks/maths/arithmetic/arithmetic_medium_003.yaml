@@ -1,0 +1,14 @@
+name: arithmetic_medium_003
+category: maths
+subcategory: arithmetic
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  What is 35% of 460?
+  Reply with only the number.
+expected_answer: "161"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

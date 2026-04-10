@@ -1,0 +1,94 @@
+name: hard_aspnet_008
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A background service with health checks:
+  Class QueueProcessorOptions: int BatchSize (default 10), TimeSpan PollInterval (default 5s).
+  Interface IMessageQueue:
+    Task<IReadOnlyList<string>> DequeueAsync(int count, CancellationToken ct)
+    Task AcknowledgeAsync(IReadOnlyList<string> messageIds, CancellationToken ct)
+  Interface IMessageProcessor:
+    Task<bool> ProcessAsync(string message, CancellationToken ct) — returns false if processing failed.
+  Class QueueProcessorService : BackgroundService:
+    Constructor: QueueProcessorService(IMessageQueue queue, IMessageProcessor processor,
+      IOptions<QueueProcessorOptions> options, ILogger<QueueProcessorService> logger)
+    Processes batches in a loop; tracks ProcessedCount and FailedCount.
+  Class QueueHealthCheck : IHealthCheck — reports Healthy if FailedCount < 10.
+  Static extensions: AddQueueProcessor(this IServiceCollection svc, Action<QueueProcessorOptions>? configure = null)
+  Return only valid C# code in a single file.
+test_code: |
+  public class QueueProcessorServiceTests
+  {
+      [Fact]
+      public async Task ProcessorService_ProcessesBatch()
+      {
+          var processed = new List<string>();
+          var queue = new FakeMessageQueue(new[] { "msg1", "msg2", "msg3" });
+          var processor = new FakeMessageProcessor(m => { processed.Add(m); return true; });
+          var opts = Options.Create(new QueueProcessorOptions { BatchSize = 10, PollInterval = TimeSpan.FromMilliseconds(10) });
+          var svc = new QueueProcessorService(queue, processor, opts, NullLogger<QueueProcessorService>.Instance);
+          var cts = new CancellationTokenSource(200);
+          await svc.StartAsync(CancellationToken.None);
+          await Task.Delay(150);
+          await svc.StopAsync(CancellationToken.None);
+          processed.Should().Contain("msg1");
+      }
+
+      [Fact]
+      public async Task ProcessorService_TracksFailedCount()
+      {
+          var queue = new FakeMessageQueue(new[] { "bad1", "bad2" });
+          var processor = new FakeMessageProcessor(_ => false);
+          var opts = Options.Create(new QueueProcessorOptions { BatchSize = 5, PollInterval = TimeSpan.FromMilliseconds(10) });
+          var svc = new QueueProcessorService(queue, processor, opts, NullLogger<QueueProcessorService>.Instance);
+          await svc.StartAsync(CancellationToken.None);
+          await Task.Delay(100);
+          await svc.StopAsync(CancellationToken.None);
+          svc.FailedCount.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task HealthCheck_ReturnsHealthyWhenLowFailures()
+      {
+          var queue = new FakeMessageQueue(Array.Empty<string>());
+          var processor = new FakeMessageProcessor(_ => true);
+          var opts = Options.Create(new QueueProcessorOptions());
+          var svc = new QueueProcessorService(queue, processor, opts, NullLogger<QueueProcessorService>.Instance);
+          var check = new QueueHealthCheck(svc);
+          var result = await check.CheckHealthAsync(new HealthCheckContext(), CancellationToken.None);
+          result.Status.Should().Be(HealthStatus.Healthy);
+      }
+
+      [Fact]
+      public void AddQueueProcessor_RegistersService()
+      {
+          var svc = new ServiceCollection();
+          svc.AddLogging();
+          svc.AddSingleton<IMessageQueue, FakeMessageQueue>(_ => new FakeMessageQueue(Array.Empty<string>()));
+          svc.AddSingleton<IMessageProcessor, FakeMessageProcessor>(_ => new FakeMessageProcessor(_ => true));
+          svc.AddQueueProcessor(o => o.BatchSize = 5);
+          var provider = svc.BuildServiceProvider();
+          provider.GetService<QueueProcessorService>().Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task ProcessorService_StopsGracefullyOnCancellation()
+      {
+          var queue = new InfiniteMessageQueue();
+          var processor = new FakeMessageProcessor(_ => true);
+          var opts = Options.Create(new QueueProcessorOptions { BatchSize = 5, PollInterval = TimeSpan.FromMilliseconds(5) });
+          var svc = new QueueProcessorService(queue, processor, opts, NullLogger<QueueProcessorService>.Instance);
+          await svc.StartAsync(CancellationToken.None);
+          await Task.Delay(50);
+          var act = async () => await svc.StopAsync(CancellationToken.None);
+          await act.Should().NotThrowAsync();
+      }
+  }

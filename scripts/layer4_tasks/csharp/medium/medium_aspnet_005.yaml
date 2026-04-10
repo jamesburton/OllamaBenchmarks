@@ -1,0 +1,57 @@
+name: medium_aspnet_005
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record UserDto(int Id, string Username, string Email).
+  A class UsersController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<UserDto> users (for testability).
+  Actions:
+    GET api/users — returns all users
+    GET api/users/{id} — returns user by id or 404
+    POST api/users — adds user to list and returns 201 with the new user
+  Return only valid C# code in a single file.
+test_code: |
+  public class UsersControllerTests
+  {
+      private UsersController MakeController() =>
+          new(new List<UserDto> { new(1, "alice", "a@x.com"), new(2, "bob", "b@x.com") });
+
+      [Fact]
+      public void GetAll_ReturnsAllUsers()
+      {
+          var result = MakeController().GetAll() as OkObjectResult;
+          (result!.Value as IEnumerable<UserDto>).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetById_Found_ReturnsUser()
+      {
+          var result = MakeController().GetById(1) as OkObjectResult;
+          (result!.Value as UserDto)!.Username.Should().Be("alice");
+      }
+
+      [Fact]
+      public void GetById_NotFound_Returns404()
+      {
+          var result = MakeController().GetById(999);
+          result.Should().BeOfType<NotFoundResult>();
+      }
+
+      [Fact]
+      public void Post_AddsUser_Returns201()
+      {
+          var controller = MakeController();
+          var newUser = new UserDto(3, "carol", "c@x.com");
+          var result = controller.Post(newUser) as CreatedAtActionResult;
+          result!.StatusCode.Should().Be(201);
+          (result.Value as UserDto)!.Username.Should().Be("carol");
+      }
+  }

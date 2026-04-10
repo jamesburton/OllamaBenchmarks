@@ -1,0 +1,119 @@
+name: hard_masstransit_007
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit consumer pipeline with middleware (consume filters):
+  Messages:
+    record AuditableCommand(Guid CommandId, string CommandType, string IssuedBy, object Payload);
+    record CommandAuditLog(Guid CommandId, string CommandType, string IssuedBy, DateTime ReceivedAt);
+    record ExecuteTask(Guid TaskId, string TaskType, string Parameters);
+    record TaskCompleted(Guid TaskId, string Result);
+    record TaskFailed(Guid TaskId, string Error);
+
+  Consume filter: AuditLoggingFilter<T> where T : class —
+    before consuming, publishes CommandAuditLog.
+
+  Class TaskExecutorConsumer : IConsumer<ExecuteTask>:
+    If TaskType == "reverse": publishes TaskCompleted with Parameters reversed.
+    If TaskType == "fail": publishes TaskFailed.
+    Otherwise: publishes TaskCompleted with result "ok".
+
+  Class AuditConsumer : IConsumer<CommandAuditLog>:
+    Stores logs in static ConcurrentBag<CommandAuditLog>.
+
+  Use MassTransit in-memory test harness.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ConsumerPipelineTests
+  {
+      [Fact]
+      public async Task TaskExecutor_ReverseTask_PublishesReversedResult()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<TaskExecutorConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ExecuteTask(NewId.NextGuid(), "reverse", "hello"));
+              var completed = await harness.Published.SelectAsync<TaskCompleted>().FirstOrDefault();
+              completed.Should().NotBeNull();
+              completed!.Context.Message.Result.Should().Be("olleh");
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task TaskExecutor_FailTask_PublishesFailed()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<TaskExecutorConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ExecuteTask(NewId.NextGuid(), "fail", ""));
+              (await harness.Published.Any<TaskFailed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task TaskExecutor_UnknownTask_PublishesOk()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<TaskExecutorConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ExecuteTask(NewId.NextGuid(), "unknown", "data"));
+              var completed = await harness.Published.SelectAsync<TaskCompleted>().FirstOrDefault();
+              completed!.Context.Message.Result.Should().Be("ok");
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task TaskExecutor_ConsumerConsumedMessage()
+      {
+          var harness = new InMemoryTestHarness();
+          var consumer = harness.Consumer<TaskExecutorConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ExecuteTask(NewId.NextGuid(), "noop", "x"));
+              consumer.Consumed.Select<ExecuteTask>().Should().NotBeEmpty();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task MultipleMessages_AllProcessed()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<TaskExecutorConsumer>();
+          await harness.Start();
+          try
+          {
+              for (int i = 0; i < 3; i++)
+                  await harness.InputQueueSendEndpoint.Send(
+                      new ExecuteTask(NewId.NextGuid(), "reverse", $"msg{i}"));
+              await Task.Delay(300);
+              harness.Published.Select<TaskCompleted>().Should().HaveCountGreaterThanOrEqualTo(3);
+          }
+          finally { await harness.Stop(); }
+      }
+  }

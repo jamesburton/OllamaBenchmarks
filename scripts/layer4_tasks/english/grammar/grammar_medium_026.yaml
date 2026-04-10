@@ -1,0 +1,15 @@
+name: grammar_medium_026
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Give this to whoever wants it.
+  B) Give this to whomever wants it.
+  C) Give this to whosoever wants it.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

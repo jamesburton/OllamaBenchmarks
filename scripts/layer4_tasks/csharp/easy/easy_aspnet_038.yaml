@@ -1,0 +1,31 @@
+name: easy_aspnet_038
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ProblemDetailsFactory with a static method:
+    ProblemDetails CreateUnauthorized(string detail)
+  that creates a ProblemDetails with:
+    Status = 401
+    Title = "Unauthorized"
+    Detail = detail
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProblemDetailsFactoryTests
+  {
+      [Fact]
+      public void CreateUnauthorized_SetsAllProperties()
+      {
+          var result = ProblemDetailsFactory.CreateUnauthorized("Invalid token");
+          result.Status.Should().Be(401);
+          result.Title.Should().Be("Unauthorized");
+          result.Detail.Should().Be("Invalid token");
+      }
+  }

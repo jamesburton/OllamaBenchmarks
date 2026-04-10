@@ -1,0 +1,14 @@
+name: number_theory_medium_001
+category: maths
+subcategory: number_theory
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  What is the GCD of 84 and 126?
+  Reply with only the number.
+expected_answer: "42"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

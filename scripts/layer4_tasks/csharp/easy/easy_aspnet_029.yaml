@@ -1,0 +1,42 @@
+name: easy_aspnet_029
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CorsOptions with:
+    string[] AllowedOrigins { get; set; } = Array.Empty<string>()
+    string[] AllowedMethods { get; set; } = new[] { "GET", "POST" }
+    bool AllowCredentials { get; set; } = false
+  and a static class CorsHelper with:
+    bool IsOriginAllowed(CorsOptions options, string origin)
+  that returns true if AllowedOrigins is empty (allow all) or contains origin (case-insensitive).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CorsHelperTests
+  {
+      [Fact]
+      public void IsOriginAllowed_EmptyList_AllowsAll()
+      {
+          var opts = new CorsOptions();
+          CorsHelper.IsOriginAllowed(opts, "https://example.com").Should().BeTrue();
+      }
+      [Fact]
+      public void IsOriginAllowed_InList_ReturnsTrue()
+      {
+          var opts = new CorsOptions { AllowedOrigins = new[]{"https://example.com"} };
+          CorsHelper.IsOriginAllowed(opts, "https://example.com").Should().BeTrue();
+      }
+      [Fact]
+      public void IsOriginAllowed_NotInList_ReturnsFalse()
+      {
+          var opts = new CorsOptions { AllowedOrigins = new[]{"https://example.com"} };
+          CorsHelper.IsOriginAllowed(opts, "https://other.com").Should().BeFalse();
+      }
+  }

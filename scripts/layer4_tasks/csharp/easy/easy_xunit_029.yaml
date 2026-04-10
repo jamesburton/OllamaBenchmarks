@@ -1,0 +1,39 @@
+name: easy_xunit_029
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IMetricsService with method:
+    void Increment(string metricName)
+  A class RequestTracker with constructor taking IMetricsService, and method:
+    void TrackRequest(string endpoint) calls metrics.Increment($"request.{endpoint}")
+  Return only valid C# code in a single file.
+test_code: |
+  public class RequestTrackerTests
+  {
+      [Fact]
+      public void TrackRequest_IncrementsMetric()
+      {
+          var metrics = Substitute.For<IMetricsService>();
+          var tracker = new RequestTracker(metrics);
+          tracker.TrackRequest("api/users");
+          metrics.Received(1).Increment("request.api/users");
+      }
+      [Fact]
+      public void TrackRequest_MultipleEndpoints_IncrementsSeparately()
+      {
+          var metrics = Substitute.For<IMetricsService>();
+          var tracker = new RequestTracker(metrics);
+          tracker.TrackRequest("home");
+          tracker.TrackRequest("about");
+          metrics.Received(1).Increment("request.home");
+          metrics.Received(1).Increment("request.about");
+      }
+  }

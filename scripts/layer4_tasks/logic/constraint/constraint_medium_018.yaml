@@ -1,0 +1,15 @@
+name: constraint_medium_018
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three books on a shelf: red, blue, and green. The shelf has positions 1 (left), 2 (middle), 3 (right).
+  Clues:
+  1. The red book is to the left of the blue book.
+  2. The green book is not in the middle.
+  What position is the green book? Reply with only the number.
+expected_answer: "3"
+validator_config: {}

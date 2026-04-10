@@ -1,0 +1,17 @@
+name: constraint_hard_006
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three men and three women sit alternately around a round table (M W M W M W).
+  Men: Adam, Brian, Carl. Women: Diana, Eve, Faye.
+  Clues:
+  1. Adam sits directly opposite Diana.
+  2. Brian does not sit next to Diana.
+  3. Carl sits next to Eve.
+  Who sits next to Adam? Reply with only the names separated by a comma.
+expected_answer: "Eve, Faye"
+validator_config: {}

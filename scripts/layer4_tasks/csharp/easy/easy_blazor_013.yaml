@@ -1,0 +1,40 @@
+name: easy_blazor_013
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class FilterListComponent that extends ComponentBase with:
+    [Parameter] List<string> AllItems { get; set; } = new()
+    string FilterText { get; set; } = ""
+    List<string> FilteredItems => AllItems.Where(x => x.Contains(FilterText, StringComparison.OrdinalIgnoreCase)).ToList()
+  Return only valid C# code in a single file.
+test_code: |
+  public class FilterListComponentTests
+  {
+      [Fact]
+      public void FilteredItems_ReturnsMatchingItems()
+      {
+          var c = new FilterListComponent
+          {
+              AllItems = new List<string>{"Apple","Banana","Avocado","Cherry"},
+              FilterText = "a"
+          };
+          c.FilteredItems.Should().BeEquivalentTo(new[]{"Apple","Banana","Avocado"});
+      }
+      [Fact]
+      public void FilteredItems_EmptyFilter_ReturnsAll()
+      {
+          var c = new FilterListComponent
+          {
+              AllItems = new List<string>{"a","b","c"}
+          };
+          c.FilteredItems.Should().HaveCount(3);
+      }
+  }

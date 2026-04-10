@@ -1,0 +1,57 @@
+name: medium_linq_039
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Commit with: string Hash, string Author, DateTime Date, IReadOnlyList<string> Files.
+  A class GitHistory with a constructor accepting IEnumerable<Commit> commits.
+  Expose:
+    IEnumerable<AuthorActivity> AuthorStats()
+      — per author: CommitCount, FilesChanged (distinct files across all their commits)
+      ordered by CommitCount desc
+    IEnumerable<string> HotFiles(int minCommits)
+      — files that appear in at least minCommits commits, ordered by frequency desc
+  AuthorActivity is a record with: string Author, int CommitCount, int FilesChanged.
+  Return only valid C# code in a single file.
+test_code: |
+  public class GitHistoryTests
+  {
+      private readonly Commit[] _commits = {
+          new("a1","Alice", new DateTime(2024,1,1), new[]{"foo.cs","bar.cs"}),
+          new("a2","Alice", new DateTime(2024,1,2), new[]{"foo.cs","baz.cs"}),
+          new("b1","Bob",   new DateTime(2024,1,1), new[]{"qux.cs"}),
+      };
+
+      [Fact]
+      public void AuthorStats_AliceFirst()
+      {
+          new GitHistory(_commits).AuthorStats().First().Author.Should().Be("Alice");
+      }
+
+      [Fact]
+      public void AuthorStats_AliceFilesChanged3()
+      {
+          var alice = new GitHistory(_commits).AuthorStats().First(a => a.Author == "Alice");
+          alice.FilesChanged.Should().Be(3);
+          alice.CommitCount.Should().Be(2);
+      }
+
+      [Fact]
+      public void HotFiles_Min2_ReturnsFooCs()
+      {
+          new GitHistory(_commits).HotFiles(2).Should().ContainSingle(f => f == "foo.cs");
+      }
+
+      [Fact]
+      public void HotFiles_Min3_ReturnsEmpty()
+      {
+          new GitHistory(_commits).HotFiles(3).Should().BeEmpty();
+      }
+  }

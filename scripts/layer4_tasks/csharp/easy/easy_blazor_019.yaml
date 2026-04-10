@@ -1,0 +1,35 @@
+name: easy_blazor_019
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class StarRatingComponent that extends ComponentBase with:
+    [Parameter] int MaxStars { get; set; } = 5
+    int SelectedStars { get; set; } = 0
+    void Rate(int stars) sets SelectedStars = stars clamped between 0 and MaxStars
+  Return only valid C# code in a single file.
+test_code: |
+  public class StarRatingComponentTests
+  {
+      [Fact]
+      public void Rate_SetsSelectedStars()
+      {
+          var c = new StarRatingComponent { MaxStars = 5 };
+          c.Rate(3);
+          c.SelectedStars.Should().Be(3);
+      }
+      [Fact]
+      public void Rate_ClampsToMaxStars()
+      {
+          var c = new StarRatingComponent { MaxStars = 5 };
+          c.Rate(10);
+          c.SelectedStars.Should().Be(5);
+      }
+  }

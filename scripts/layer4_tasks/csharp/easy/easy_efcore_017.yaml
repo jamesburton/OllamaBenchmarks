@@ -1,0 +1,39 @@
+name: easy_efcore_017
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Transaction with properties: int Id, string Type, decimal Amount, DateTime Date
+  A DbContext class FinanceContext with:
+    DbSet<Transaction> Transactions { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class TransactionRepository with:
+    (decimal Credits, decimal Debits) GetSummary(FinanceContext context)
+  that returns total credits (Type == "credit") and debits (Type == "debit").
+  Return only valid C# code in a single file.
+test_code: |
+  public class TransactionRepositoryTests
+  {
+      [Fact]
+      public void GetSummary_CalculatesCreditsAndDebits()
+      {
+          using var context = new FinanceContext();
+          context.Database.EnsureCreated();
+          context.Transactions.AddRange(
+              new Transaction { Type = "credit", Amount = 100m, Date = DateTime.UtcNow },
+              new Transaction { Type = "credit", Amount = 50m, Date = DateTime.UtcNow },
+              new Transaction { Type = "debit", Amount = 30m, Date = DateTime.UtcNow });
+          context.SaveChanges();
+          var (credits, debits) = TransactionRepository.GetSummary(context);
+          credits.Should().Be(150m);
+          debits.Should().Be(30m);
+      }
+  }

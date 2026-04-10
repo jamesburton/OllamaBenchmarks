@@ -1,0 +1,55 @@
+name: medium_linq_036
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CsvParser with a constructor accepting string csvContent (header row + data rows).
+  Expose:
+    IEnumerable<Dictionary<string, string>> Parse() — each row as header->value dictionary
+    IEnumerable<string> Column(string header) — all values for a given header column
+    int RowCount() — number of data rows (excluding header)
+  Return only valid C# code in a single file.
+test_code: |
+  public class CsvParserTests
+  {
+      private const string Csv = "Name,Age,City\nAlice,30,London\nBob,25,Paris\nCarol,35,Berlin";
+
+      [Fact]
+      public void Parse_ReturnsThreeRows()
+      {
+          new CsvParser(Csv).Parse().Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void Parse_FirstRowCorrect()
+      {
+          var first = new CsvParser(Csv).Parse().First();
+          first["Name"].Should().Be("Alice");
+          first["City"].Should().Be("London");
+      }
+
+      [Fact]
+      public void Column_NameColumn()
+      {
+          new CsvParser(Csv).Column("Name").Should().BeEquivalentTo(new[]{"Alice","Bob","Carol"});
+      }
+
+      [Fact]
+      public void RowCount_IsThree()
+      {
+          new CsvParser(Csv).RowCount().Should().Be(3);
+      }
+
+      [Fact]
+      public void Column_UnknownHeader_ReturnsEmpty()
+      {
+          new CsvParser(Csv).Column("Salary").Should().BeEmpty();
+      }
+  }

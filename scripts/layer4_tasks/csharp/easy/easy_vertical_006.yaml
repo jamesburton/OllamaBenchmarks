@@ -1,0 +1,39 @@
+name: easy_vertical_006
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Employee(int Id, string Name, string Department, decimal Salary)
+  An interface IEmployeeRepository with methods:
+    void Add(Employee employee)
+    List<Employee> GetByDepartment(string department)
+    List<Employee> GetAll()
+  A class InMemoryEmployeeRepository implementing IEmployeeRepository
+  Return only valid C# code in a single file.
+test_code: |
+  public class InMemoryEmployeeRepositoryTests
+  {
+      [Fact]
+      public void GetByDepartment_FiltersCorrectly()
+      {
+          var repo = new InMemoryEmployeeRepository();
+          repo.Add(new Employee(1, "Alice", "Engineering", 80000m));
+          repo.Add(new Employee(2, "Bob", "HR", 60000m));
+          repo.Add(new Employee(3, "Carol", "Engineering", 90000m));
+          repo.GetByDepartment("Engineering").Should().HaveCount(2);
+      }
+      [Fact]
+      public void GetAll_ReturnsAllEmployees()
+      {
+          var repo = new InMemoryEmployeeRepository();
+          repo.Add(new Employee(1, "Dave", "IT", 70000m));
+          repo.GetAll().Should().HaveCount(1);
+      }
+  }

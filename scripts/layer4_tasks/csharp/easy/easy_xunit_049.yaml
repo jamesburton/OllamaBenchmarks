@@ -1,0 +1,39 @@
+name: easy_xunit_049
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IDataLoader with method:
+    Task<List<int>> LoadAsync()
+  A class DataProcessor with constructor taking IDataLoader, and async method:
+    Task<double> GetAverageAsync() loads data and returns the average, throws InvalidOperationException if list is empty
+  Return only valid C# code in a single file.
+test_code: |
+  public class DataProcessorTests
+  {
+      [Fact]
+      public async Task GetAverageAsync_ReturnsCorrectAverage()
+      {
+          var loader = Substitute.For<IDataLoader>();
+          loader.LoadAsync().Returns(new List<int> { 10, 20, 30 });
+          var processor = new DataProcessor(loader);
+          var avg = await processor.GetAverageAsync();
+          avg.Should().Be(20.0);
+      }
+      [Fact]
+      public async Task GetAverageAsync_EmptyData_ThrowsInvalidOperationException()
+      {
+          var loader = Substitute.For<IDataLoader>();
+          loader.LoadAsync().Returns(new List<int>());
+          var processor = new DataProcessor(loader);
+          var act = async () => await processor.GetAverageAsync();
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+  }

@@ -1,0 +1,69 @@
+name: medium_efcore_026
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Permission with: int Id, string Name, string Resource, string Action.
+  An entity Role with: int Id, string Name, ICollection<Permission> Permissions.
+  A class RbacDbContext : DbContext with DbSets and many-to-many configured.
+  A class RbacRepository with constructor accepting RbacDbContext.
+  Methods:
+    Task<bool> HasPermissionAsync(int roleId, string resource, string action)
+    Task<IEnumerable<Permission>> GetPermissionsForRoleAsync(int roleId)
+    Task AddPermissionToRoleAsync(int roleId, int permissionId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class RbacRepositoryTests : IAsyncLifetime
+  {
+      private RbacDbContext _db = null!;
+      private RbacRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<RbacDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new RbacDbContext(opts);
+          _repo = new RbacRepository(_db);
+          var readPerm = new Permission { Id = 1, Name = "read:products", Resource = "products", Action = "read" };
+          var writePerm = new Permission { Id = 2, Name = "write:products", Resource = "products", Action = "write" };
+          _db.Set<Permission>().AddRange(readPerm, writePerm);
+          _db.Set<Role>().Add(new Role { Id = 1, Name = "Editor", Permissions = new List<Permission> { readPerm, writePerm } });
+          _db.Set<Role>().Add(new Role { Id = 2, Name = "Viewer", Permissions = new List<Permission> { readPerm } });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task HasPermission_WithPermission_ReturnsTrue()
+      {
+          (await _repo.HasPermissionAsync(1, "products", "write")).Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task HasPermission_WithoutPermission_ReturnsFalse()
+      {
+          (await _repo.HasPermissionAsync(2, "products", "write")).Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task GetPermissionsForRole_ReturnsAll()
+      {
+          (await _repo.GetPermissionsForRoleAsync(1)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task AddPermissionToRole_AddsIt()
+      {
+          await _repo.AddPermissionToRoleAsync(2, 2);
+          _db.ChangeTracker.Clear();
+          (await _repo.HasPermissionAsync(2, "products", "write")).Should().BeTrue();
+      }
+  }

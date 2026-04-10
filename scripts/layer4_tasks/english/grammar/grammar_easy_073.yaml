@@ -1,0 +1,15 @@
+name: grammar_easy_073
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which sentence is a run-on?
+  A) He loves coffee he drinks three cups a day.
+  B) He loves coffee, drinking three cups a day.
+  C) He loves coffee and drinks three cups a day.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

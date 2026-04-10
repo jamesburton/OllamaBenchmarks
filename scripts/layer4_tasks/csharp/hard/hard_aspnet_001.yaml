@@ -1,0 +1,102 @@
+name: hard_aspnet_001
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A minimal API endpoint for product management using ASP.NET Core:
+  Records: CreateProductRequest(string Name, string Category, decimal Price, int Stock),
+           ProductDto(int Id, string Name, string Category, decimal Price, int Stock).
+  Interface IProductService:
+    Task<ProductDto> CreateAsync(CreateProductRequest req, CancellationToken ct)
+    Task<ProductDto?> GetByIdAsync(int id, CancellationToken ct)
+    Task<IReadOnlyList<ProductDto>> GetAllAsync(CancellationToken ct)
+    Task<bool> DeleteAsync(int id, CancellationToken ct)
+  Class InMemoryProductService : IProductService — thread-safe in-memory implementation.
+  Static class ProductEndpoints:
+    static void MapProductEndpoints(this WebApplication app) — maps:
+      POST /products — validates Name not empty and Price > 0; returns 400 with error on fail.
+      GET /products/{id} — returns 404 if not found.
+      GET /products — returns all.
+      DELETE /products/{id} — returns 204 on success, 404 if not found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductEndpointsTests
+  {
+      private static WebApplication BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddSingleton<IProductService, InMemoryProductService>();
+          var app = builder.Build();
+          app.MapProductEndpoints();
+          return app;
+      }
+
+      [Fact]
+      public async Task Post_ValidProduct_Returns201()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var resp = await client.PostAsJsonAsync("/products",
+              new CreateProductRequest("Widget", "Tools", 9.99m, 100));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+      }
+
+      [Fact]
+      public async Task Post_EmptyName_Returns400()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var resp = await client.PostAsJsonAsync("/products",
+              new CreateProductRequest("", "Tools", 9.99m, 100));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+      }
+
+      [Fact]
+      public async Task Post_NegativePrice_Returns400()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var resp = await client.PostAsJsonAsync("/products",
+              new CreateProductRequest("Widget", "Tools", -1m, 100));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+      }
+
+      [Fact]
+      public async Task Get_ExistingProduct_Returns200()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var created = await (await client.PostAsJsonAsync("/products",
+              new CreateProductRequest("Widget", "Tools", 9.99m, 10)))
+              .Content.ReadFromJsonAsync<ProductDto>();
+          var resp = await client.GetAsync($"/products/{created!.Id}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+
+      [Fact]
+      public async Task Get_NonExistentProduct_Returns404()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/products/9999");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+      }
+
+      [Fact]
+      public async Task Delete_ExistingProduct_Returns204()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var dto = await (await client.PostAsJsonAsync("/products",
+              new CreateProductRequest("Del", "X", 1m, 1)))
+              .Content.ReadFromJsonAsync<ProductDto>();
+          var resp = await client.DeleteAsync($"/products/{dto!.Id}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
+      }
+  }

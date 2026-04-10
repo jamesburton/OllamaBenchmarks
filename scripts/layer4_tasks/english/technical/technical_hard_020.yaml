@@ -1,0 +1,23 @@
+name: technical_hard_020
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Contributing' section for a large open-source project with a formal review process.
+  Mention coding standards, tests, and review timelines.
+  Keep it under 120 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "pull request"
+    - "review"
+    - "tests"
+    - "coding standards"
+    - "branch"
+    - "CI"
+    - "timeline"
+  min_words: 12
+  max_words: 120

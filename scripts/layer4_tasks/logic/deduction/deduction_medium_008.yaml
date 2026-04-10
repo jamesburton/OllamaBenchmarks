@@ -1,0 +1,14 @@
+name: deduction_medium_008
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If a number is prime, it has no divisors other than 1 and itself.
+  2. 15 has divisors other than 1 and itself.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "15 is not prime."
+validator_config: {}

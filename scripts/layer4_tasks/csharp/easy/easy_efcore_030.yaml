@@ -1,0 +1,45 @@
+name: easy_efcore_030
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class ApiKey with properties: int Id, string Key, string OwnerId, int RequestCount, bool IsActive
+  A DbContext class ApiKeyContext with:
+    DbSet<ApiKey> ApiKeys { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class ApiKeyRepository with:
+    ApiKey? IncrementAndGet(ApiKeyContext context, string key)
+  that increments RequestCount using ExecuteUpdate, then returns the updated active ApiKey, or null if not found/inactive.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApiKeyRepositoryTests
+  {
+      [Fact]
+      public void IncrementAndGet_ActiveKey_IncrementsAndReturns()
+      {
+          using var context = new ApiKeyContext();
+          context.Database.EnsureCreated();
+          context.ApiKeys.Add(new ApiKey { Key = "key-abc", OwnerId = "user1", RequestCount = 10, IsActive = true });
+          context.SaveChanges();
+          var result = ApiKeyRepository.IncrementAndGet(context, "key-abc");
+          result.Should().NotBeNull();
+          result!.RequestCount.Should().Be(11);
+      }
+      [Fact]
+      public void IncrementAndGet_InactiveKey_ReturnsNull()
+      {
+          using var context = new ApiKeyContext();
+          context.Database.EnsureCreated();
+          context.ApiKeys.Add(new ApiKey { Key = "inactive", OwnerId = "u2", RequestCount = 0, IsActive = false });
+          context.SaveChanges();
+          ApiKeyRepository.IncrementAndGet(context, "inactive").Should().BeNull();
+      }
+  }

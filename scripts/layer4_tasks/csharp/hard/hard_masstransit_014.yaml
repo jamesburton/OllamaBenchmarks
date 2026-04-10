@@ -1,0 +1,115 @@
+name: hard_masstransit_014
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit publish/subscribe with multiple subscribers:
+  Messages:
+    record UserRegistered(Guid UserId, string Email, string Name, DateTime RegisteredAt);
+    record WelcomeEmailQueued(Guid UserId, string Email);
+    record UserAnalyticsTracked(Guid UserId, DateTime RegisteredAt);
+    record UserProfileCreated(Guid UserId, string Name);
+
+  Class WelcomeEmailConsumer : IConsumer<UserRegistered>:
+    Publishes WelcomeEmailQueued.
+
+  Class AnalyticsConsumer : IConsumer<UserRegistered>:
+    Publishes UserAnalyticsTracked.
+
+  Class ProfileConsumer : IConsumer<UserRegistered>:
+    Publishes UserProfileCreated.
+
+  Each consumer is independent; all subscribe to UserRegistered.
+  Return only valid C# code in a single file.
+test_code: |
+  public class UserRegisteredFanOutTests
+  {
+      [Fact]
+      public async Task UserRegistered_TriggersWelcomeEmail()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<WelcomeEmailConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.Bus.Publish(new UserRegistered(Guid.NewGuid(), "a@b.com", "Alice", DateTime.UtcNow));
+              await Task.Delay(300);
+              (await harness.Published.Any<WelcomeEmailQueued>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task UserRegistered_TriggersAnalytics()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<AnalyticsConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.Bus.Publish(new UserRegistered(Guid.NewGuid(), "b@c.com", "Bob", DateTime.UtcNow));
+              await Task.Delay(300);
+              (await harness.Published.Any<UserAnalyticsTracked>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task UserRegistered_TriggersProfileCreation()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<ProfileConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.Bus.Publish(new UserRegistered(Guid.NewGuid(), "c@d.com", "Carol", DateTime.UtcNow));
+              await Task.Delay(300);
+              (await harness.Published.Any<UserProfileCreated>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task WelcomeEmail_ContainsCorrectEmail()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<WelcomeEmailConsumer>();
+          await harness.Start();
+          try
+          {
+              var email = "test@example.com";
+              await harness.Bus.Publish(new UserRegistered(Guid.NewGuid(), email, "Tester", DateTime.UtcNow));
+              await Task.Delay(300);
+              var msg = harness.Published.Select<WelcomeEmailQueued>().First().Context.Message;
+              msg.Email.Should().Be(email);
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task Analytics_ContainsRegisteredAt()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<AnalyticsConsumer>();
+          await harness.Start();
+          try
+          {
+              var ts = DateTime.UtcNow;
+              await harness.Bus.Publish(new UserRegistered(Guid.NewGuid(), "x@y.com", "X", ts));
+              await Task.Delay(300);
+              var msg = harness.Published.Select<UserAnalyticsTracked>().First().Context.Message;
+              msg.RegisteredAt.Should().BeCloseTo(ts, TimeSpan.FromSeconds(1));
+          }
+          finally { await harness.Stop(); }
+      }
+  }

@@ -1,0 +1,16 @@
+name: deduction_medium_016
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If inflation rises, interest rates increase.
+  2. If interest rates increase, borrowing costs more.
+  3. If borrowing costs more, consumer spending falls.
+  4. Inflation has risen.
+  What can you ultimately conclude? Reply with only the conclusion.
+expected_answer: "Consumer spending falls."
+validator_config: {}

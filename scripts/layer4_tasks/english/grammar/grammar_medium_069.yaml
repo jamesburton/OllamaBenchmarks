@@ -1,0 +1,15 @@
+name: grammar_medium_069
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Rain is forecast, nevertheless the event will proceed outdoors.
+  B) Rain is forecast; nevertheless, the event will proceed outdoors.
+  C) Rain is forecast, nevertheless, the event will proceed outdoors.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

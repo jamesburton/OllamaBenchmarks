@@ -1,0 +1,95 @@
+name: hard_blazor_003
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor streaming render service with IAsyncEnumerable:
+  Records:
+    StreamItem(int Index, string Data, DateTime Timestamp)
+    StreamConfig(int DelayMs, int MaxItems, string Prefix)
+
+  Interface IDataStreamService:
+    IAsyncEnumerable<StreamItem> StreamAsync(StreamConfig config, CancellationToken ct)
+
+  Class DataStreamService : IDataStreamService:
+    Yields StreamItems with Index 0..MaxItems-1.
+    Each item has Data = "{Prefix}-{Index}", Timestamp = UtcNow.
+    Delays DelayMs between items.
+    Respects cancellation.
+
+  Class StreamAggregator:
+    Task<IReadOnlyList<StreamItem>> CollectAsync(IAsyncEnumerable<StreamItem> stream, int maxItems, CancellationToken ct)
+      — collects up to maxItems from stream, stops early if maxItems reached.
+    Task<StreamItem?> GetFirstMatchingAsync(IAsyncEnumerable<StreamItem> stream, Func<StreamItem, bool> predicate, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class DataStreamServiceTests
+  {
+      private readonly IDataStreamService _svc = new DataStreamService();
+      private readonly StreamAggregator _agg = new();
+
+      [Fact]
+      public async Task Stream_YieldsCorrectCount()
+      {
+          var config = new StreamConfig(0, 5, "test");
+          var items = new List<StreamItem>();
+          await foreach (var item in _svc.StreamAsync(config, CancellationToken.None))
+              items.Add(item);
+          items.Should().HaveCount(5);
+      }
+
+      [Fact]
+      public async Task Stream_ItemsHaveCorrectPrefix()
+      {
+          var config = new StreamConfig(0, 3, "prefix");
+          var items = new List<StreamItem>();
+          await foreach (var item in _svc.StreamAsync(config, CancellationToken.None))
+              items.Add(item);
+          items.Should().AllSatisfy(i => i.Data.Should().StartWith("prefix-"));
+      }
+
+      [Fact]
+      public async Task Stream_ItemsAreIndexed()
+      {
+          var config = new StreamConfig(0, 4, "x");
+          var items = new List<StreamItem>();
+          await foreach (var item in _svc.StreamAsync(config, CancellationToken.None))
+              items.Add(item);
+          items.Select(i => i.Index).Should().BeEquivalentTo(new[] { 0, 1, 2, 3 });
+      }
+
+      [Fact]
+      public async Task Aggregator_CollectsUpToMaxItems()
+      {
+          var config = new StreamConfig(0, 10, "a");
+          var stream = _svc.StreamAsync(config, CancellationToken.None);
+          var collected = await _agg.CollectAsync(stream, 3, CancellationToken.None);
+          collected.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task Aggregator_GetFirstMatching_ReturnsCorrectItem()
+      {
+          var config = new StreamConfig(0, 5, "find");
+          var stream = _svc.StreamAsync(config, CancellationToken.None);
+          var item = await _agg.GetFirstMatchingAsync(stream, i => i.Index == 3, CancellationToken.None);
+          item.Should().NotBeNull();
+          item!.Index.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task Aggregator_NoMatch_ReturnsNull()
+      {
+          var config = new StreamConfig(0, 3, "z");
+          var stream = _svc.StreamAsync(config, CancellationToken.None);
+          var item = await _agg.GetFirstMatchingAsync(stream, i => i.Index == 99, CancellationToken.None);
+          item.Should().BeNull();
+      }
+  }

@@ -1,0 +1,95 @@
+name: hard_blazor_002
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor form validation service layer:
+  Records:
+    RegistrationForm(string FirstName, string LastName, string Email, string Password,
+      string ConfirmPassword, DateTime DateOfBirth, string PhoneNumber)
+    ValidationResult(bool IsValid, IReadOnlyList<FieldError> Errors)
+    FieldError(string Field, string Message)
+
+  Class RegistrationValidator:
+    ValidationResult Validate(RegistrationForm form):
+      FirstName/LastName: required, 2-50 chars, letters only.
+      Email: required, valid format.
+      Password: required, min 8 chars, must have uppercase, lowercase, digit, special char.
+      ConfirmPassword: must match Password.
+      DateOfBirth: must be 18+ years old.
+      PhoneNumber: optional, if provided must match ^\+?[\d\s\-\(\)]{7,15}$.
+    Returns all errors, not just first.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RegistrationValidatorTests
+  {
+      private readonly RegistrationValidator _validator = new();
+
+      private RegistrationForm Valid() => new(
+          "John", "Doe", "john@example.com", "P@ssw0rd!", "P@ssw0rd!",
+          DateTime.UtcNow.AddYears(-25), "+1 555-0100");
+
+      [Fact]
+      public void ValidForm_ReturnsNoErrors()
+      {
+          var result = _validator.Validate(Valid());
+          result.IsValid.Should().BeTrue();
+          result.Errors.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void EmptyFirstName_ReturnsError()
+      {
+          var form = Valid() with { FirstName = "" };
+          var result = _validator.Validate(form);
+          result.IsValid.Should().BeFalse();
+          result.Errors.Should().Contain(e => e.Field == "FirstName");
+      }
+
+      [Fact]
+      public void WeakPassword_ReturnsError()
+      {
+          var form = Valid() with { Password = "weakpass", ConfirmPassword = "weakpass" };
+          var result = _validator.Validate(form);
+          result.Errors.Should().Contain(e => e.Field == "Password");
+      }
+
+      [Fact]
+      public void PasswordMismatch_ReturnsError()
+      {
+          var form = Valid() with { ConfirmPassword = "DifferentPass1!" };
+          var result = _validator.Validate(form);
+          result.Errors.Should().Contain(e => e.Field == "ConfirmPassword");
+      }
+
+      [Fact]
+      public void Under18_ReturnsError()
+      {
+          var form = Valid() with { DateOfBirth = DateTime.UtcNow.AddYears(-10) };
+          var result = _validator.Validate(form);
+          result.Errors.Should().Contain(e => e.Field == "DateOfBirth");
+      }
+
+      [Fact]
+      public void InvalidEmail_ReturnsError()
+      {
+          var form = Valid() with { Email = "notanemail" };
+          var result = _validator.Validate(form);
+          result.Errors.Should().Contain(e => e.Field == "Email");
+      }
+
+      [Fact]
+      public void MultipleErrors_AllReturned()
+      {
+          var form = Valid() with { FirstName = "", Email = "bad", Password = "x", ConfirmPassword = "y" };
+          var result = _validator.Validate(form);
+          result.Errors.Count.Should().BeGreaterThan(2);
+      }
+  }

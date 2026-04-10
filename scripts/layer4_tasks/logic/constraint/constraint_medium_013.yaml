@@ -1,0 +1,15 @@
+name: constraint_medium_013
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Alice, Bob, Carol take tests on Monday, Wednesday, Friday (one each day).
+  Clues:
+  1. Alice does not test on Friday.
+  2. Bob tests the day after Alice.
+  On which day does Carol test? Reply with only the day.
+expected_answer: "Friday"
+validator_config: {}

@@ -1,0 +1,15 @@
+name: syllogisms_medium_006
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. Some politicians are honest.
+  2. All honest people are trustworthy.
+  3. No trustworthy person is corrupt.
+  Are all politicians not corrupt? Reply with only: Yes, No, or Cannot be determined.
+expected_answer: "Cannot be determined."
+validator_config: {}

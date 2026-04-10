@@ -1,0 +1,15 @@
+name: syllogisms_hard_006
+category: logic
+subcategory: syllogisms
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. No consistent system can prove its own consistency (Goedel).
+  2. System T is consistent.
+  3. System T attempts to prove its own consistency.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "System T cannot succeed in proving its own consistency."
+validator_config: {}

@@ -1,0 +1,83 @@
+name: hard_async_002
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncRetryPolicy that provides retry-with-backoff behaviour:
+    Task<T> ExecuteAsync<T>(Func<CancellationToken, Task<T>> operation,
+      int maxAttempts, TimeSpan initialDelay, CancellationToken ct) —
+      retries on exception up to maxAttempts times with exponential backoff
+      (delay doubles each attempt). Throws the last exception if all attempts fail.
+      Does NOT retry if CancellationToken is already cancelled.
+    Task ExecuteAsync(Func<CancellationToken, Task> operation,
+      int maxAttempts, TimeSpan initialDelay, CancellationToken ct) — void overload.
+  A record RetryContext(int Attempt, Exception LastException) that is passed to an optional
+  Func<RetryContext, Task> onRetry callback in an overload of ExecuteAsync<T>.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncRetryPolicyTests
+  {
+      private readonly AsyncRetryPolicy _policy = new();
+
+      [Fact]
+      public async Task ExecuteAsync_SucceedsFirstAttempt()
+      {
+          var result = await _policy.ExecuteAsync(_ => Task.FromResult(42), 3,
+              TimeSpan.FromMilliseconds(1), CancellationToken.None);
+          result.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_RetriesAndSucceeds()
+      {
+          int attempts = 0;
+          var result = await _policy.ExecuteAsync(_ =>
+          {
+              if (++attempts < 3) throw new InvalidOperationException();
+              return Task.FromResult(99);
+          }, 5, TimeSpan.FromMilliseconds(1), CancellationToken.None);
+          result.Should().Be(99);
+          attempts.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_ExceedsMaxAttempts_ThrowsLast()
+      {
+          var act = async () => await _policy.ExecuteAsync<int>(
+              _ => throw new InvalidOperationException("fail"),
+              3, TimeSpan.FromMilliseconds(1), CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("fail");
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_CancelledBeforeStart_ThrowsOperationCancelled()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var act = async () => await _policy.ExecuteAsync(
+              _ => Task.FromResult(1), 3, TimeSpan.FromMilliseconds(1), cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+
+      [Fact]
+      public async Task ExecuteAsync_WithOnRetryCallback_CallbackInvoked()
+      {
+          var contexts = new List<RetryContext>();
+          int calls = 0;
+          await _policy.ExecuteAsync(_ =>
+          {
+              if (++calls < 3) throw new Exception("e");
+              return Task.FromResult(0);
+          }, 5, TimeSpan.FromMilliseconds(1), CancellationToken.None,
+          ctx => { contexts.Add(ctx); return Task.CompletedTask; });
+          contexts.Should().HaveCount(2);
+          contexts[0].Attempt.Should().Be(1);
+      }
+  }

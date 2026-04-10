@@ -1,0 +1,15 @@
+name: syllogisms_easy_017
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All lawyers passed the bar exam.
+  2. Sarah is a lawyer.
+  3. All who passed the bar are licensed.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "Sarah is licensed."
+validator_config: {}

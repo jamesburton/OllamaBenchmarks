@@ -1,0 +1,58 @@
+name: medium_linq_013
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Item with: int Id, string Name, decimal Price, bool InStock.
+  A class Basket with a constructor accepting IEnumerable<Item> catalogue.
+  Expose:
+    Basket Add(int itemId)               — returns new Basket instance with item added to basket items
+    Basket Remove(int itemId)            — returns new Basket instance with item removed
+    decimal Total()                      — sum of prices of basket items
+    IEnumerable<Item> OutOfStockItems()  — basket items that are not in stock
+  (Basket is immutable — Add/Remove return new instances.)
+  Return only valid C# code in a single file.
+test_code: |
+  public class BasketTests
+  {
+      private readonly Item[] _catalogue = {
+          new(1, "Apple",  0.50m, true),
+          new(2, "Banana", 0.30m, true),
+          new(3, "Mango",  1.20m, false),
+      };
+
+      [Fact]
+      public void Add_ThenTotal_IsCorrect()
+      {
+          var basket = new Basket(_catalogue).Add(1).Add(2);
+          basket.Total().Should().Be(0.80m);
+      }
+
+      [Fact]
+      public void Add_Remove_ReducesTotal()
+      {
+          var basket = new Basket(_catalogue).Add(1).Add(2).Remove(1);
+          basket.Total().Should().Be(0.30m);
+      }
+
+      [Fact]
+      public void OutOfStockItems_ReturnsOutOfStockOnly()
+      {
+          var basket = new Basket(_catalogue).Add(1).Add(3);
+          basket.OutOfStockItems().Should().ContainSingle(i => i.Id == 3);
+      }
+
+      [Fact]
+      public void Remove_NonExistentItem_NoChange()
+      {
+          var basket = new Basket(_catalogue).Add(1).Remove(99);
+          basket.Total().Should().Be(0.50m);
+      }
+  }

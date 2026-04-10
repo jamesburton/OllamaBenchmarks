@@ -1,0 +1,31 @@
+name: easy_linq_003
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Sorter with a static method:
+    List<int> OrderAscending(IEnumerable<int> numbers)
+  that returns the numbers sorted in ascending order using LINQ OrderBy + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SorterTests
+  {
+      [Fact]
+      public void OrderAscending_BasicCase()
+      {
+          var result = Sorter.OrderAscending(new[]{3,1,4,1,5,9,2,6});
+          result.Should().BeEquivalentTo(new[]{1,1,2,3,4,5,6,9}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void OrderAscending_EmptySource_ReturnsEmpty()
+      {
+          Sorter.OrderAscending(Array.Empty<int>()).Should().BeEmpty();
+      }
+  }

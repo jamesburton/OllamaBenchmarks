@@ -1,0 +1,15 @@
+name: syllogisms_medium_010
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All whales are mammals.
+  2. All mammals need oxygen.
+  3. No creature that needs oxygen can live underwater indefinitely.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "No whale can live underwater indefinitely."
+validator_config: {}

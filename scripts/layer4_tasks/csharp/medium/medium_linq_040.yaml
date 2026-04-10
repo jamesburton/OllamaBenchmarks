@@ -1,0 +1,57 @@
+name: medium_linq_040
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class IntervalMerger with a static method:
+    IEnumerable<(int Start, int End)> Merge(IEnumerable<(int Start, int End)> intervals)
+  that merges overlapping or adjacent intervals into the minimum set of non-overlapping intervals,
+  sorted by Start ascending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class IntervalMergerTests
+  {
+      [Fact]
+      public void Merge_OverlappingIntervals()
+      {
+          var result = IntervalMerger.Merge(new[]{(1,3),(2,6),(8,10),(15,18)}).ToList();
+          result.Should().HaveCount(3);
+          result[0].Should().Be((1,6));
+          result[1].Should().Be((8,10));
+      }
+
+      [Fact]
+      public void Merge_AdjacentIntervals()
+      {
+          var result = IntervalMerger.Merge(new[]{(1,4),(4,6)}).ToList();
+          result.Should().ContainSingle();
+          result[0].Should().Be((1,6));
+      }
+
+      [Fact]
+      public void Merge_NoOverlap_ReturnsSame()
+      {
+          var result = IntervalMerger.Merge(new[]{(1,2),(5,6)}).ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Merge_UnsortedInput_CorrectResult()
+      {
+          var result = IntervalMerger.Merge(new[]{(8,10),(1,3),(2,6)}).ToList();
+          result[0].Should().Be((1,6));
+      }
+
+      [Fact]
+      public void Merge_Empty_ReturnsEmpty()
+      {
+          IntervalMerger.Merge(Array.Empty<(int,int)>()).Should().BeEmpty();
+      }
+  }

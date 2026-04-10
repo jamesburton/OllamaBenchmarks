@@ -1,0 +1,15 @@
+name: syllogisms_easy_014
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All birds have feathers.
+  2. A penguin is a bird.
+  3. All feathered animals are vertebrates.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "A penguin is a vertebrate."
+validator_config: {}

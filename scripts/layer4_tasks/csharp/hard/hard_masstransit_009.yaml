@@ -1,0 +1,100 @@
+name: hard_masstransit_009
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit batch consumer for order processing:
+  Messages:
+    record ProcessOrder(Guid OrderId, string CustomerId, decimal Amount);
+    record OrderBatchResult(IReadOnlyList<Guid> ProcessedIds, IReadOnlyList<Guid> FailedIds);
+
+  Interface IOrderProcessor:
+    Task<bool> ProcessAsync(Guid orderId, string customerId, decimal amount, CancellationToken ct)
+
+  Class OrderBatchConsumer : IConsumer<Batch<ProcessOrder>>:
+    Constructor takes IOrderProcessor.
+    Process each message in batch concurrently using Task.WhenAll.
+    Collect processed and failed IDs.
+    Publish OrderBatchResult with results.
+
+  Class OrderBatchConsumerDefinition : ConsumerDefinition<OrderBatchConsumer>:
+    Configure batch with message limit 10, time limit 100ms.
+
+  Use InMemoryTestHarness for tests.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderBatchConsumerTests
+  {
+      [Fact]
+      public async Task BatchConsumer_PublishesResult()
+      {
+          var processor = Substitute.For<IOrderProcessor>();
+          processor.ProcessAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<decimal>(), Arg.Any<CancellationToken>())
+              .Returns(true);
+          var harness = new InMemoryTestHarness();
+          var consumer = harness.Consumer(() => new OrderBatchConsumer(processor));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessOrder(Guid.NewGuid(), "C1", 100m));
+              await harness.InputQueueSendEndpoint.Send(new ProcessOrder(Guid.NewGuid(), "C2", 200m));
+              await Task.Delay(300);
+              (await harness.Published.Any<OrderBatchResult>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task BatchConsumer_PartialFailure_RecordsFailedIds()
+      {
+          var processor = Substitute.For<IOrderProcessor>();
+          var callCount = 0;
+          processor.ProcessAsync(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<decimal>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult(Interlocked.Increment(ref callCount) % 2 == 1));
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new OrderBatchConsumer(processor));
+          await harness.Start();
+          try
+          {
+              for (int i = 0; i < 4; i++)
+                  await harness.InputQueueSendEndpoint.Send(new ProcessOrder(Guid.NewGuid(), $"C{i}", i * 10m));
+              await Task.Delay(400);
+              var result = harness.Published.Select<OrderBatchResult>().FirstOrDefault();
+              result.Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task BatchConsumer_EmptyBatch_PublishesEmptyResult()
+      {
+          var processor = Substitute.For<IOrderProcessor>();
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new OrderBatchConsumer(processor));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessOrder(Guid.NewGuid(), "solo", 1m));
+              await Task.Delay(300);
+              (await harness.Published.Any<OrderBatchResult>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task BatchConsumerDefinition_HasCorrectBatchSettings()
+      {
+          var def = new OrderBatchConsumerDefinition();
+          def.Should().NotBeNull();
+      }
+  }

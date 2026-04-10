@@ -1,0 +1,65 @@
+name: medium_aspnet_012
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record SearchQuery(string Term, string? Category, int MinPrice, int MaxPrice).
+  A record SearchResult(string Name, string Category, int Price).
+  A static class SearchEndpoints:
+    void MapSearchEndpoints(WebApplication app)
+  Register GET /search accepting query params: term, category (optional), minPrice (default 0), maxPrice (default int.MaxValue).
+  Filter a hardcoded list of 10+ products and return matching SearchResults.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SearchEndpointTests
+  {
+      private async Task<WebApplication> BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          SearchEndpoints.MapSearchEndpoints(app);
+          await app.StartAsync();
+          return app;
+      }
+
+      [Fact]
+      public async Task Search_ByTerm_FiltersResults()
+      {
+          var app = await BuildApp();
+          var client = app.GetTestClient();
+          var response = await client.GetAsync("/search?term=a");
+          response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          var results = await response.Content.ReadFromJsonAsync<List<SearchResult>>();
+          results.Should().NotBeNull();
+          results!.All(r => r.Name.Contains("a", StringComparison.OrdinalIgnoreCase) ||
+                            r.Category.Contains("a", StringComparison.OrdinalIgnoreCase)).Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task Search_ByPriceRange_FiltersResults()
+      {
+          var app = await BuildApp();
+          var client = app.GetTestClient();
+          var response = await client.GetAsync("/search?term=&minPrice=5&maxPrice=20");
+          var results = await response.Content.ReadFromJsonAsync<List<SearchResult>>();
+          results!.All(r => r.Price >= 5 && r.Price <= 20).Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task Search_NoResults_ReturnsEmpty()
+      {
+          var app = await BuildApp();
+          var client = app.GetTestClient();
+          var response = await client.GetAsync("/search?term=xyznonexistent");
+          var results = await response.Content.ReadFromJsonAsync<List<SearchResult>>();
+          results.Should().BeEmpty();
+      }
+  }

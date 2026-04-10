@@ -1,0 +1,36 @@
+name: easy_xunit_024
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Person(string FirstName, string LastName) with computed property:
+    string FullName => $"{FirstName} {LastName}"
+  A class PersonService with method:
+    Person CreatePerson(string firstName, string lastName) returns new Person
+    string GetDisplayName(Person person) returns person.FullName in uppercase
+  Return only valid C# code in a single file.
+test_code: |
+  public class PersonServiceTests
+  {
+      private readonly PersonService _service = new();
+
+      [Fact]
+      public void CreatePerson_ReturnsPersonWithCorrectNames()
+      {
+          var person = _service.CreatePerson("John", "Doe");
+          person.FullName.Should().Be("John Doe");
+      }
+      [Fact]
+      public void GetDisplayName_ReturnsUpperCase()
+      {
+          var person = new Person("Jane", "Smith");
+          _service.GetDisplayName(person).Should().Be("JANE SMITH");
+      }
+  }

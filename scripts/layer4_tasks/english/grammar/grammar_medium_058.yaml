@@ -1,0 +1,15 @@
+name: grammar_medium_058
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The 1990's were a decade of change.
+  B) The 1990s were a decade of change.
+  C) The 1990s' were a decade of change.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

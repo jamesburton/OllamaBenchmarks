@@ -1,0 +1,16 @@
+name: vocabulary_easy_069
+category: english
+subcategory: vocabulary
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word is MORE FORMAL?
+  A) Show
+  B) Exhibit
+  C) Display
+  D) Both B and C
+  Reply with only the letter.
+expected_answer: "D"
+validator_config: {}

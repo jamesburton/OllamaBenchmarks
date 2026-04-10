@@ -1,0 +1,38 @@
+name: easy_async_009
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Retrier with a static method:
+    async Task<T> RetryAsync<T>(Func<Task<T>> operation, int maxAttempts)
+  that retries the operation up to maxAttempts times if it throws. Returns result on success.
+  If all attempts fail, rethrows the last exception.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RetrierTests
+  {
+      [Fact]
+      public async Task RetryAsync_SucceedsFirstAttempt()
+      {
+          var result = await Retrier.RetryAsync(() => Task.FromResult(42), 3);
+          result.Should().Be(42);
+      }
+      [Fact]
+      public async Task RetryAsync_AllFail_Throws()
+      {
+          int attempts = 0;
+          await Assert.ThrowsAsync<InvalidOperationException>(() =>
+              Retrier.RetryAsync<int>(() => {
+                  attempts++;
+                  return Task.FromException<int>(new InvalidOperationException("fail"));
+              }, 3));
+          attempts.Should().Be(3);
+      }
+  }

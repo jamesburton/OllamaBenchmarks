@@ -1,0 +1,107 @@
+name: hard_efcore_024
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with seeded reference data and complex query involving multiple navigations:
+  Entities: Country(int Id, string Code, string Name), City(int Id, int CountryId, string Name, int Population),
+  Airport(int Id, int CityId, string IataCode, string Name, bool IsInternational),
+  Flight(int Id, int DepartureAirportId, int ArrivalAirportId, string Carrier,
+    DateTime DepartureTime, int DurationMinutes, decimal Price).
+  DbContext: TravelDbContext with seeded country/city/airport data.
+  Class FlightSearchService(TravelDbContext db):
+    Task<IReadOnlyList<FlightResult>> SearchAsync(FlightSearchQuery query, CancellationToken ct) —
+      filters by origin IATA, destination IATA, date (day), carrier (optional).
+      Includes city and country of each airport. Orders by Price ascending.
+    Task<IReadOnlyList<string>> GetAvailableDestinationsAsync(string fromIata, CancellationToken ct) —
+      distinct destination IATA codes reachable from given origin.
+    Task<RouteStats> GetRouteStatsAsync(string fromIata, string toIata, CancellationToken ct)
+  Records: FlightSearchQuery(string FromIata, string ToIata, DateOnly Date, string? Carrier),
+           FlightResult(string Carrier, DateTime Departure, int DurationMinutes, decimal Price, string FromCity, string ToCity),
+           RouteStats(int FlightCount, decimal MinPrice, decimal MaxPrice, double AverageDurationMinutes).
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FlightSearchServiceTests : IDisposable
+  {
+      private readonly TravelDbContext _db;
+      private readonly FlightSearchService _svc;
+
+      public FlightSearchServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<TravelDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new TravelDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData();
+          _svc = new FlightSearchService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          var uk = new Country { Code = "GB", Name = "United Kingdom" };
+          var fr = new Country { Code = "FR", Name = "France" };
+          _db.Countries.AddRange(uk, fr);
+          _db.SaveChanges();
+          var lon = new City { CountryId = uk.Id, Name = "London",    Population = 9000000 };
+          var par = new City { CountryId = fr.Id, Name = "Paris",     Population = 2100000 };
+          _db.Cities.AddRange(lon, par);
+          _db.SaveChanges();
+          var lhr = new Airport { CityId = lon.Id, IataCode = "LHR", Name = "Heathrow",    IsInternational = true };
+          var cdg = new Airport { CityId = par.Id, IataCode = "CDG", Name = "Charles de Gaulle", IsInternational = true };
+          _db.Airports.AddRange(lhr, cdg);
+          _db.SaveChanges();
+          _db.Flights.AddRange(
+              new Flight { DepartureAirportId = lhr.Id, ArrivalAirportId = cdg.Id, Carrier = "BA", DepartureTime = new DateTime(2024,6,1,10,0,0), DurationMinutes = 80,  Price = 120m },
+              new Flight { DepartureAirportId = lhr.Id, ArrivalAirportId = cdg.Id, Carrier = "AF", DepartureTime = new DateTime(2024,6,1,14,0,0), DurationMinutes = 85,  Price = 99m  },
+              new Flight { DepartureAirportId = cdg.Id, ArrivalAirportId = lhr.Id, Carrier = "BA", DepartureTime = new DateTime(2024,6,1,16,0,0), DurationMinutes = 80,  Price = 110m }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task Search_FindsFlightsOnDate()
+      {
+          var result = await _svc.SearchAsync(new FlightSearchQuery("LHR", "CDG", new DateOnly(2024,6,1), null), CancellationToken.None);
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task Search_FiltersByCarrier()
+      {
+          var result = await _svc.SearchAsync(new FlightSearchQuery("LHR", "CDG", new DateOnly(2024,6,1), "BA"), CancellationToken.None);
+          result.Should().ContainSingle();
+          result[0].Carrier.Should().Be("BA");
+      }
+
+      [Fact]
+      public async Task Search_OrdersByPrice()
+      {
+          var result = await _svc.SearchAsync(new FlightSearchQuery("LHR", "CDG", new DateOnly(2024,6,1), null), CancellationToken.None);
+          result.Select(f => f.Price).Should().BeInAscendingOrder();
+      }
+
+      [Fact]
+      public async Task GetAvailableDestinations_FromLHR()
+      {
+          var result = await _svc.GetAvailableDestinationsAsync("LHR", CancellationToken.None);
+          result.Should().Contain("CDG");
+      }
+
+      [Fact]
+      public async Task GetRouteStats_CorrectStats()
+      {
+          var stats = await _svc.GetRouteStatsAsync("LHR", "CDG", CancellationToken.None);
+          stats.FlightCount.Should().Be(2);
+          stats.MinPrice.Should().Be(99m);
+          stats.MaxPrice.Should().Be(120m);
+      }
+  }

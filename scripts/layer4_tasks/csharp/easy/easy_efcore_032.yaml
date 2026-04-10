@@ -1,0 +1,40 @@
+name: easy_efcore_032
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Setting with properties: int Id, string Key, string Value, string Category
+  A DbContext class SettingsContext with:
+    DbSet<Setting> Settings { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class SettingsRepository with:
+    Dictionary<string, string> GetByCategory(SettingsContext context, string category)
+  that returns a Key->Value dictionary for all settings in the given category.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SettingsRepositoryTests
+  {
+      [Fact]
+      public void GetByCategory_ReturnsCategorySettings()
+      {
+          using var context = new SettingsContext();
+          context.Database.EnsureCreated();
+          context.Settings.AddRange(
+              new Setting { Key = "timeout", Value = "30", Category = "network" },
+              new Setting { Key = "retries", Value = "3", Category = "network" },
+              new Setting { Key = "theme", Value = "dark", Category = "ui" });
+          context.SaveChanges();
+          var result = SettingsRepository.GetByCategory(context, "network");
+          result["timeout"].Should().Be("30");
+          result["retries"].Should().Be("3");
+          result.ContainsKey("theme").Should().BeFalse();
+      }
+  }

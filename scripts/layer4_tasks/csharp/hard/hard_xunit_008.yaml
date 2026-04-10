@@ -1,0 +1,84 @@
+name: hard_xunit_008
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit parameterized tests with [ClassData]:
+  Records:
+    TaxCalculationInput(decimal Income, string FilingStatus, int TaxYear)
+    TaxCalculationResult(decimal TaxOwed, decimal EffectiveRate, string Bracket)
+
+  Class TaxCalculator:
+    TaxCalculationResult Calculate(TaxCalculationInput input):
+      For TaxYear 2024, FilingStatus "Single":
+        0-11600: 10%, "10%"
+        11601-47150: 12%, "12%"
+        47151-100525: 22%, "22%"
+        100526-191950: 24%, "24%"
+        191951+: 32%, "32%"
+      For "MarriedJoint" use doubled thresholds.
+      EffectiveRate = TaxOwed / Income.
+      Throws ArgumentException for unknown FilingStatus or year != 2024.
+
+  Class TaxCalculatorTestData : IEnumerable<object[]>:
+    Provides at least 6 test cases for [ClassData].
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaxCalculatorTests
+  {
+      private readonly TaxCalculator _calc = new();
+
+      [Theory]
+      [ClassData(typeof(TaxCalculatorTestData))]
+      public void Calculate_CorrectBracket(TaxCalculationInput input, TaxCalculationResult expected)
+      {
+          var result = _calc.Calculate(input);
+          result.Bracket.Should().Be(expected.Bracket);
+          result.TaxOwed.Should().BeApproximately(expected.TaxOwed, 1m);
+      }
+
+      [Fact]
+      public void Calculate_SingleLowIncome_Uses10Percent()
+      {
+          var result = _calc.Calculate(new TaxCalculationInput(5000m, "Single", 2024));
+          result.Bracket.Should().Be("10%");
+          result.TaxOwed.Should().BeApproximately(500m, 1m);
+      }
+
+      [Fact]
+      public void Calculate_UnknownFilingStatus_ThrowsArgumentException()
+      {
+          var act = () => _calc.Calculate(new TaxCalculationInput(50000m, "Unknown", 2024));
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Calculate_UnknownYear_ThrowsArgumentException()
+      {
+          var act = () => _calc.Calculate(new TaxCalculationInput(50000m, "Single", 2020));
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Calculate_MarriedJoint_DoubleSingleThresholds()
+      {
+          var single = _calc.Calculate(new TaxCalculationInput(20000m, "Single", 2024));
+          var married = _calc.Calculate(new TaxCalculationInput(20000m, "MarriedJoint", 2024));
+          married.Bracket.Should().Be("10%");
+          single.Bracket.Should().Be("12%");
+      }
+
+      [Fact]
+      public void Calculate_EffectiveRate_IsCorrect()
+      {
+          var result = _calc.Calculate(new TaxCalculationInput(100000m, "Single", 2024));
+          result.EffectiveRate.Should().BeApproximately(result.TaxOwed / 100000m, 0.001m);
+      }
+  }

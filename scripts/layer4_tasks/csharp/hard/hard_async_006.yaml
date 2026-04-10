@@ -1,0 +1,78 @@
+name: hard_async_006
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncThrottler that limits concurrency and rate of async operations:
+    Constructor: AsyncThrottler(int maxConcurrent, int maxPerSecond) — creates a throttler
+      that allows at most maxConcurrent simultaneous operations and at most maxPerSecond per second.
+    Task<T> RunAsync<T>(Func<CancellationToken, Task<T>> work, CancellationToken ct) —
+      respects both limits. Throws OperationCanceledException if ct is cancelled.
+    Task RunAsync(Func<CancellationToken, Task> work, CancellationToken ct) — void overload.
+    int PendingCount — number of operations waiting for a slot.
+  Use SemaphoreSlim for concurrency control. Use a sliding window or token bucket for rate limiting.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncThrottlerTests
+  {
+      [Fact]
+      public async Task RunAsync_ExecutesWork()
+      {
+          var throttler = new AsyncThrottler(2, 100);
+          var result = await throttler.RunAsync(_ => Task.FromResult(99), CancellationToken.None);
+          result.Should().Be(99);
+      }
+
+      [Fact]
+      public async Task RunAsync_LimitsConcurrency()
+      {
+          var throttler = new AsyncThrottler(2, 1000);
+          int concurrent = 0, maxConcurrent = 0;
+          var tasks = Enumerable.Range(0, 10).Select(_ => throttler.RunAsync(async ct =>
+          {
+              Interlocked.Increment(ref concurrent);
+              maxConcurrent = Math.Max(maxConcurrent, concurrent);
+              await Task.Delay(20, ct);
+              Interlocked.Decrement(ref concurrent);
+          }, CancellationToken.None));
+          await Task.WhenAll(tasks);
+          maxConcurrent.Should().BeLessThanOrEqualTo(2);
+      }
+
+      [Fact]
+      public async Task RunAsync_Cancellation_StopsWaiting()
+      {
+          var throttler = new AsyncThrottler(1, 100);
+          var cts = new CancellationTokenSource();
+          var blocker = throttler.RunAsync(async ct => await Task.Delay(500, ct), CancellationToken.None);
+          cts.CancelAfter(50);
+          var act = async () => await throttler.RunAsync(_ => Task.CompletedTask, cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+
+      [Fact]
+      public async Task RunAsync_WorkThrows_PropagatesException()
+      {
+          var throttler = new AsyncThrottler(2, 100);
+          var act = async () => await throttler.RunAsync<int>(
+              _ => throw new InvalidOperationException("boom"), CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task RunAsync_MultipleItems_AllComplete()
+      {
+          var throttler = new AsyncThrottler(3, 100);
+          var results = await Task.WhenAll(
+              Enumerable.Range(1, 5).Select(i =>
+                  throttler.RunAsync(_ => Task.FromResult(i), CancellationToken.None)));
+          results.Should().BeEquivalentTo(new[] { 1, 2, 3, 4, 5 });
+      }
+  }

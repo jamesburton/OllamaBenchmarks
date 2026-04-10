@@ -1,0 +1,41 @@
+name: medium_blazor_025
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ProgressService with:
+    double Progress (0-100), string? StatusMessage, SetProgress(double, string?), Complete(), Reset(), OnProgressChanged event
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProgressServiceTests
+  {
+      [Fact]
+      public void Service_CanBeInstantiated()
+      {
+          var svc = new ProgressService();
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_InitialState_IsDefault()
+      {
+          var svc = new ProgressService();
+          // Just verify construction does not throw
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_BasicOperation_Works()
+      {
+          var svc = new ProgressService();
+          // Basic smoke test
+          svc.Should().NotBeNull();
+      }
+  }

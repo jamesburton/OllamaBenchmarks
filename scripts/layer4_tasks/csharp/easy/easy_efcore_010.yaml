@@ -1,0 +1,45 @@
+name: easy_efcore_010
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Comment with properties: int Id, string Text, int PostId, bool IsApproved
+  A DbContext class CommentContext with:
+    DbSet<Comment> Comments { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class CommentRepository with:
+    int CountApproved(CommentContext context, int postId)
+  that returns the count of approved comments for the given postId.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CommentRepositoryTests
+  {
+      [Fact]
+      public void CountApproved_ReturnsApprovedCount()
+      {
+          using var context = new CommentContext();
+          context.Database.EnsureCreated();
+          context.Comments.AddRange(
+              new Comment { Text = "Good", PostId = 1, IsApproved = true },
+              new Comment { Text = "Bad", PostId = 1, IsApproved = false },
+              new Comment { Text = "Also Good", PostId = 1, IsApproved = true },
+              new Comment { Text = "Other Post", PostId = 2, IsApproved = true });
+          context.SaveChanges();
+          CommentRepository.CountApproved(context, 1).Should().Be(2);
+      }
+      [Fact]
+      public void CountApproved_NoneForPost_ReturnsZero()
+      {
+          using var context = new CommentContext();
+          context.Database.EnsureCreated();
+          CommentRepository.CountApproved(context, 99).Should().Be(0);
+      }
+  }

@@ -1,0 +1,22 @@
+name: creative_medium_042
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a wolf howling at the moon on a winter night.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "wolf"
+    - "howling"
+    - "moon"
+    - "winter"
+    - "cold"
+    - "distant"
+    - "night"
+    - "wild"
+  min_words: 15
+  max_words: 60

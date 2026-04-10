@@ -1,0 +1,14 @@
+name: algebra_medium_010
+category: maths
+subcategory: algebra
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Solve for x: (2x + 1)/3 = (x + 5)/2
+  Reply with only the number.
+expected_answer: "13"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

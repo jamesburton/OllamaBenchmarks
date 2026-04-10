@@ -1,0 +1,62 @@
+name: medium_masstransit_007
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record ReviewSubmitted(Guid ReviewId, string ProductId, string UserId, int Rating, string Comment).
+  A consumer ReviewModerationConsumer implementing IConsumer<ReviewSubmitted>.
+  Constructor accepts IModerationService moderationService.
+  Interface IModerationService with: Task<bool> IsApprovedAsync(string text) and Task StoreReviewAsync(Guid reviewId, bool approved).
+  In Consume: checks comment moderation, stores review with result.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record ReviewSubmitted(Guid ReviewId, string ProductId, string UserId, int Rating, string Comment); }
+  global using Contracts;
+
+  public class ReviewModerationConsumerTests
+  {
+      [Fact]
+      public async Task Consume_ChecksModerationAndStores()
+      {
+          var modSvc = Substitute.For<IModerationService>();
+          modSvc.IsApprovedAsync(Arg.Any<string>()).Returns(true);
+          var consumer = new ReviewModerationConsumer(modSvc);
+          var ctx = Substitute.For<ConsumeContext<ReviewSubmitted>>();
+          var reviewId = Guid.NewGuid();
+          ctx.Message.Returns(new ReviewSubmitted(reviewId, "p1", "u1", 5, "Great!"));
+          await consumer.Consume(ctx);
+          await modSvc.Received(1).IsApprovedAsync("Great!");
+          await modSvc.Received(1).StoreReviewAsync(reviewId, true);
+      }
+
+      [Fact]
+      public async Task Consume_RejectedComment_StoredAsRejected()
+      {
+          var modSvc = Substitute.For<IModerationService>();
+          modSvc.IsApprovedAsync(Arg.Any<string>()).Returns(false);
+          var consumer = new ReviewModerationConsumer(modSvc);
+          var ctx = Substitute.For<ConsumeContext<ReviewSubmitted>>();
+          var reviewId = Guid.NewGuid();
+          ctx.Message.Returns(new ReviewSubmitted(reviewId, "p2", "u2", 1, "Bad words here"));
+          await consumer.Consume(ctx);
+          await modSvc.Received(1).StoreReviewAsync(reviewId, false);
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var modSvc = Substitute.For<IModerationService>();
+          modSvc.IsApprovedAsync(Arg.Any<string>()).Returns(true);
+          var consumer = new ReviewModerationConsumer(modSvc);
+          var ctx = Substitute.For<ConsumeContext<ReviewSubmitted>>();
+          ctx.Message.Returns(new ReviewSubmitted(Guid.NewGuid(), "p3", "u3", 4, "Nice"));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+  }

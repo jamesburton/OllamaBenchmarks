@@ -1,0 +1,18 @@
+name: summarisation_hard_037
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Long COVID, a syndrome characterised by persistent symptoms following acute SARS-CoV-2 infection, is now recognised as a significant public health burden affecting millions worldwide. Proposed mechanisms include chronic immune dysregulation, viral reservoir persistence, and mitochondrial dysfunction. The heterogeneity of presentations complicates both clinical management and trial design for therapeutic interventions.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "long COVID"
+    - "immune"
+    - "symptoms"
+    - "viral"
+  max_words: 25

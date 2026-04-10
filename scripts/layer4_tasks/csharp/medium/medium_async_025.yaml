@@ -1,0 +1,54 @@
+name: medium_async_025
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncLazy<T> that wraps lazy async initialization.
+  Constructor accepts Func<CancellationToken, Task<T>> factory.
+  Expose:
+    Task<T> GetValueAsync(CancellationToken ct = default)
+  Initializes the value exactly once on first access. Thread-safe.
+  If the factory throws, the exception is stored and rethrown on every subsequent call.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncLazyTests
+  {
+      [Fact]
+      public async Task GetValueAsync_InitializesOnce()
+      {
+          int calls = 0;
+          var lazy = new AsyncLazy<int>(async ct => { calls++; await Task.Yield(); return 99; });
+          var a = await lazy.GetValueAsync();
+          var b = await lazy.GetValueAsync();
+          calls.Should().Be(1);
+          a.Should().Be(99);
+          b.Should().Be(99);
+      }
+
+      [Fact]
+      public async Task GetValueAsync_FactoryThrows_RethrowsEveryTime()
+      {
+          int calls = 0;
+          var lazy = new AsyncLazy<int>(ct => { calls++; return Task.FromException<int>(new InvalidOperationException("err")); });
+          await Assert.ThrowsAsync<InvalidOperationException>(() => lazy.GetValueAsync());
+          await Assert.ThrowsAsync<InvalidOperationException>(() => lazy.GetValueAsync());
+      }
+
+      [Fact]
+      public async Task GetValueAsync_ConcurrentAccess_FactoryOnce()
+      {
+          int calls = 0;
+          var lazy = new AsyncLazy<string>(async ct => { calls++; await Task.Delay(30); return "hello"; });
+          var tasks = Enumerable.Range(0,5).Select(_ => lazy.GetValueAsync()).ToArray();
+          var results = await Task.WhenAll(tasks);
+          calls.Should().Be(1);
+          results.Should().AllBeEquivalentTo("hello");
+      }
+  }

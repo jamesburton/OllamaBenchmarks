@@ -1,0 +1,30 @@
+name: easy_async_030
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class TaskRacer with a static method:
+    async Task<T> FirstCompleted<T>(IEnumerable<Task<T>> tasks)
+  that returns the result of whichever task completes first using Task.WhenAny.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaskRacerTests
+  {
+      [Fact]
+      public async Task FirstCompleted_ReturnsFirstResult()
+      {
+          var tasks = new[]{
+              Task.FromResult(1),
+              Task.Delay(100).ContinueWith(_ => 2)
+          };
+          var result = await TaskRacer.FirstCompleted(tasks);
+          result.Should().Be(1);
+      }
+  }

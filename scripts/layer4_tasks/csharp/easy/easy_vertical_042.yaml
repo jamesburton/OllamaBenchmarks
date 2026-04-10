@@ -1,0 +1,43 @@
+name: easy_vertical_042
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Document(string Id, string Title, string Content, string AuthorId)
+  An interface IDocumentStore with methods:
+    Task SaveAsync(Document document)
+    Task<Document?> GetAsync(string id)
+    Task DeleteAsync(string id)
+  A class DocumentEditor with constructor taking IDocumentStore, and async method:
+    Task<bool> UpdateTitleAsync(string id, string newTitle) loads document, updates Title using 'with', saves, returns true; returns false if not found
+  Return only valid C# code in a single file.
+test_code: |
+  public class DocumentEditorTests
+  {
+      [Fact]
+      public async Task UpdateTitleAsync_ExistingDoc_UpdatesAndReturnsTrue()
+      {
+          var store = Substitute.For<IDocumentStore>();
+          store.GetAsync("doc1").Returns(new Document("doc1", "Old Title", "content", "author1"));
+          var editor = new DocumentEditor(store);
+          var result = await editor.UpdateTitleAsync("doc1", "New Title");
+          result.Should().BeTrue();
+          await store.Received(1).SaveAsync(Arg.Is<Document>(d => d.Title == "New Title"));
+      }
+      [Fact]
+      public async Task UpdateTitleAsync_NotFound_ReturnsFalse()
+      {
+          var store = Substitute.For<IDocumentStore>();
+          store.GetAsync("missing").Returns((Document?)null);
+          var editor = new DocumentEditor(store);
+          var result = await editor.UpdateTitleAsync("missing", "Title");
+          result.Should().BeFalse();
+      }
+  }

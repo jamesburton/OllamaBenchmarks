@@ -1,0 +1,15 @@
+name: syllogisms_hard_005
+category: logic
+subcategory: syllogisms
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. Every set has a power set.
+  2. The power set of a set with n elements has 2^n elements.
+  3. Set S has 3 elements.
+  How many elements does the power set of S have? Reply with only the number.
+expected_answer: "8"
+validator_config: {}

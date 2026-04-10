@@ -1,0 +1,54 @@
+name: medium_aspnet_043
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record LanguagePreference(string UserId, string LanguageCode).
+  A class LocalizationMiddleware with constructor accepting RequestDelegate next and List<LanguagePreference> preferences.
+  In InvokeAsync: check Accept-Language header or look up user preference from X-User-Id header.
+  Store language code in HttpContext.Items["Language"].
+  Default to "en" if no preference found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LocalizationMiddlewareTests
+  {
+      [Fact]
+      public async Task AcceptLanguageHeader_SetsLanguage()
+      {
+          var mw = new LocalizationMiddleware(_ => Task.CompletedTask, new List<LanguagePreference>());
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          ctx.Request.Headers["Accept-Language"] = "fr";
+          await mw.InvokeAsync(ctx);
+          ctx.Items["Language"].Should().Be("fr");
+      }
+
+      [Fact]
+      public async Task UserPreference_OverridesDefault()
+      {
+          var prefs = new List<LanguagePreference> { new("user1", "de") };
+          var mw = new LocalizationMiddleware(_ => Task.CompletedTask, prefs);
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          ctx.Request.Headers["X-User-Id"] = "user1";
+          await mw.InvokeAsync(ctx);
+          ctx.Items["Language"].Should().Be("de");
+      }
+
+      [Fact]
+      public async Task NoPreference_DefaultsToEn()
+      {
+          var mw = new LocalizationMiddleware(_ => Task.CompletedTask, new List<LanguagePreference>());
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          await mw.InvokeAsync(ctx);
+          ctx.Items["Language"].Should().Be("en");
+      }
+  }

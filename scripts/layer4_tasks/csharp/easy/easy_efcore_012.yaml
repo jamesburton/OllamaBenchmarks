@@ -1,0 +1,40 @@
+name: easy_efcore_012
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Article with properties: int Id, string Title, int ViewCount, DateTime PublishedAt
+  A DbContext class ArticleContext with:
+    DbSet<Article> Articles { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class ArticleRepository with:
+    List<Article> GetTopByViews(ArticleContext context, int count)
+  that returns the top N articles by ViewCount descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ArticleRepositoryTests
+  {
+      [Fact]
+      public void GetTopByViews_ReturnsTopN()
+      {
+          using var context = new ArticleContext();
+          context.Database.EnsureCreated();
+          context.Articles.AddRange(
+              new Article { Title = "A", ViewCount = 100, PublishedAt = DateTime.UtcNow },
+              new Article { Title = "B", ViewCount = 500, PublishedAt = DateTime.UtcNow },
+              new Article { Title = "C", ViewCount = 200, PublishedAt = DateTime.UtcNow });
+          context.SaveChanges();
+          var result = ArticleRepository.GetTopByViews(context, 2);
+          result.Should().HaveCount(2);
+          result[0].Title.Should().Be("B");
+          result[1].Title.Should().Be("C");
+      }
+  }

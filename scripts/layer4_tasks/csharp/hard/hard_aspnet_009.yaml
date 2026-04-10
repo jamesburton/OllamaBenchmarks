@@ -1,0 +1,91 @@
+name: hard_aspnet_009
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A request/response pipeline using MediatR-style pattern with FluentValidation-style validators:
+  Interface IValidator<T>: ValidationResult Validate(T instance).
+  Record: ValidationResult(bool IsValid, IReadOnlyList<string> Errors).
+  Class CreateProductCommand(string Name, string Category, decimal Price) with validator:
+    CreateProductCommandValidator — Name not empty, Category not empty, Price > 0.
+  Class GetProductQuery(int Id) with validator: Id > 0.
+  Interface ICommandHandler<TCommand, TResult>:
+    Task<TResult> HandleAsync(TCommand command, CancellationToken ct)
+  Class InMemoryProductStore — singleton in-memory store.
+  Class CreateProductHandler : ICommandHandler<CreateProductCommand, OneOf<ProductDto, ValidationError>>
+    — validates, then creates product.
+  Class GetProductHandler : ICommandHandler<GetProductQuery, OneOf<ProductDto, NotFoundError>>
+    — validates, returns product or not-found.
+  Records: ProductDto(int Id, string Name, string Category, decimal Price),
+           ValidationError(IReadOnlyList<string> Errors), NotFoundError(int Id).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CommandHandlerTests
+  {
+      private readonly InMemoryProductStore _store = new();
+
+      [Fact]
+      public async Task CreateProduct_ValidCommand_ReturnsProductDto()
+      {
+          var handler = new CreateProductHandler(_store);
+          var result = await handler.HandleAsync(
+              new CreateProductCommand("Widget", "Tools", 9.99m), CancellationToken.None);
+          result.IsT0.Should().BeTrue();
+          result.AsT0.Name.Should().Be("Widget");
+      }
+
+      [Fact]
+      public async Task CreateProduct_EmptyName_ReturnsValidationError()
+      {
+          var handler = new CreateProductHandler(_store);
+          var result = await handler.HandleAsync(
+              new CreateProductCommand("", "Tools", 9.99m), CancellationToken.None);
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Errors.Should().NotBeEmpty();
+      }
+
+      [Fact]
+      public async Task CreateProduct_NegativePrice_ReturnsValidationError()
+      {
+          var handler = new CreateProductHandler(_store);
+          var result = await handler.HandleAsync(
+              new CreateProductCommand("Widget", "Tools", -5m), CancellationToken.None);
+          result.IsT1.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task GetProduct_ExistingId_ReturnsProductDto()
+      {
+          var handler = new CreateProductHandler(_store);
+          var created = (await handler.HandleAsync(
+              new CreateProductCommand("Item", "Cat", 5m), CancellationToken.None)).AsT0;
+          var getHandler = new GetProductHandler(_store);
+          var result = await getHandler.HandleAsync(new GetProductQuery(created.Id), CancellationToken.None);
+          result.IsT0.Should().BeTrue();
+          result.AsT0.Id.Should().Be(created.Id);
+      }
+
+      [Fact]
+      public async Task GetProduct_NonExistentId_ReturnsNotFoundError()
+      {
+          var handler = new GetProductHandler(_store);
+          var result = await handler.HandleAsync(new GetProductQuery(9999), CancellationToken.None);
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Id.Should().Be(9999);
+      }
+
+      [Fact]
+      public async Task GetProduct_InvalidId_ReturnsValidationError()
+      {
+          var handler = new GetProductHandler(_store);
+          var result = await handler.HandleAsync(new GetProductQuery(-1), CancellationToken.None);
+          result.IsT1.Should().BeTrue();
+      }
+  }

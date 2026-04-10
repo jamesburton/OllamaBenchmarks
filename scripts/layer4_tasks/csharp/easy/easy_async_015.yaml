@@ -1,0 +1,32 @@
+name: easy_async_015
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ValueTaskHelper with a static method:
+    ValueTask<int> GetCachedOrComputeAsync(bool cached, int value)
+  that returns ValueTask.FromResult(value) if cached is true, otherwise wraps Task.FromResult(value * 2) in a ValueTask.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ValueTaskHelperTests
+  {
+      [Fact]
+      public async Task GetCachedOrComputeAsync_Cached_ReturnsValue()
+      {
+          var result = await ValueTaskHelper.GetCachedOrComputeAsync(true, 5);
+          result.Should().Be(5);
+      }
+      [Fact]
+      public async Task GetCachedOrComputeAsync_NotCached_ReturnsDoubled()
+      {
+          var result = await ValueTaskHelper.GetCachedOrComputeAsync(false, 5);
+          result.Should().Be(10);
+      }
+  }

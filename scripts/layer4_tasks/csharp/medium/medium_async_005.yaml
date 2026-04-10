@@ -1,0 +1,61 @@
+name: medium_async_005
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncCache<TKey, TValue> where TKey : notnull.
+  Constructor accepts Func<TKey, CancellationToken, Task<TValue>> factory.
+  Expose:
+    Task<TValue> GetOrAddAsync(TKey key, CancellationToken ct = default)
+  Uses SemaphoreSlim per key to prevent stampede (concurrent calls for same key only invoke factory once).
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncCacheTests
+  {
+      [Fact]
+      public async Task GetOrAddAsync_CallsFactoryOnce()
+      {
+          int callCount = 0;
+          var cache = new AsyncCache<string, int>(async (k, ct) => { callCount++; await Task.Yield(); return 42; });
+          var r1 = await cache.GetOrAddAsync("key");
+          var r2 = await cache.GetOrAddAsync("key");
+          callCount.Should().Be(1);
+          r1.Should().Be(42);
+          r2.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task GetOrAddAsync_DifferentKeys_BothCached()
+      {
+          var cache = new AsyncCache<string, string>(async (k, ct) => { await Task.Yield(); return k.ToUpper(); });
+          var a = await cache.GetOrAddAsync("a");
+          var b = await cache.GetOrAddAsync("b");
+          a.Should().Be("A");
+          b.Should().Be("B");
+      }
+
+      [Fact]
+      public async Task GetOrAddAsync_ConcurrentSameKey_FactoryCalledOnce()
+      {
+          int callCount = 0;
+          var cache = new AsyncCache<string, int>(async (k, ct) => { callCount++; await Task.Delay(50, ct); return 1; });
+          var tasks = Enumerable.Range(0, 5).Select(_ => cache.GetOrAddAsync("x")).ToArray();
+          var results = await Task.WhenAll(tasks);
+          callCount.Should().Be(1);
+          results.Should().AllBeEquivalentTo(1);
+      }
+
+      [Fact]
+      public async Task GetOrAddAsync_FactoryThrows_PropagatesException()
+      {
+          var cache = new AsyncCache<string, int>((k, ct) => Task.FromException<int>(new InvalidOperationException("fail")));
+          await Assert.ThrowsAsync<InvalidOperationException>(() => cache.GetOrAddAsync("key"));
+      }
+  }

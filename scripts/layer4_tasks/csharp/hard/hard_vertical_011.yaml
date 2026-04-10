@@ -1,0 +1,99 @@
+name: hard_vertical_011
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Result monad + CQRS for coupon/discount system:
+  Record Result<T>(T? Value, bool IsSuccess, string? Error):
+    static Result<T> Ok(T value)
+    static Result<T> Fail(string error)
+    Result<TOut> Map<TOut>(Func<T, TOut> mapper)
+    Task<Result<TOut>> BindAsync<TOut>(Func<T, Task<Result<TOut>>> binder)
+
+  Records:
+    ApplyCouponCommand(string CouponCode, string CustomerId, decimal OrderTotal)
+    CouponDto(string Code, decimal DiscountPercent, decimal MaxDiscountAmount, DateTime ExpiresAt, int UsageLimit, int UsedCount)
+    DiscountResult(string CouponCode, decimal OriginalTotal, decimal DiscountAmount, decimal FinalTotal)
+
+  Interface ICouponRepository:
+    Task<CouponDto?> GetByCodeAsync(string code, CancellationToken ct)
+    Task<bool> IncrementUsageAsync(string code, CancellationToken ct)
+
+  Class ApplyCouponCommandHandler(ICouponRepository repo):
+    Task<Result<DiscountResult>> HandleAsync(ApplyCouponCommand cmd, CancellationToken ct):
+      Fails if coupon not found, expired, usage exceeded.
+      Calculates discount (min of percent-based and MaxDiscountAmount).
+      Increments usage; returns DiscountResult.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApplyCouponCommandHandlerTests
+  {
+      private CouponDto ValidCoupon(int usedCount = 0) => new(
+          "SAVE10", 10m, 50m, DateTime.UtcNow.AddDays(30), 100, usedCount);
+
+      [Fact]
+      public async Task ValidCoupon_ReturnsDiscountResult()
+      {
+          var repo = Substitute.For<ICouponRepository>();
+          repo.GetByCodeAsync("SAVE10", Arg.Any<CancellationToken>()).Returns(ValidCoupon());
+          repo.IncrementUsageAsync("SAVE10", Arg.Any<CancellationToken>()).Returns(true);
+          var handler = new ApplyCouponCommandHandler(repo);
+          var result = await handler.HandleAsync(new ApplyCouponCommand("SAVE10", "u1", 100m), CancellationToken.None);
+          result.IsSuccess.Should().BeTrue();
+          result.Value!.DiscountAmount.Should().Be(10m);
+          result.Value.FinalTotal.Should().Be(90m);
+      }
+
+      [Fact]
+      public async Task NotFoundCoupon_ReturnsFail()
+      {
+          var repo = Substitute.For<ICouponRepository>();
+          repo.GetByCodeAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((CouponDto?)null);
+          var handler = new ApplyCouponCommandHandler(repo);
+          var result = await handler.HandleAsync(new ApplyCouponCommand("NOPE", "u1", 100m), CancellationToken.None);
+          result.IsSuccess.Should().BeFalse();
+          result.Error.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public async Task ExpiredCoupon_ReturnsFail()
+      {
+          var repo = Substitute.For<ICouponRepository>();
+          var expired = new CouponDto("OLD", 10m, 50m, DateTime.UtcNow.AddDays(-1), 100, 0);
+          repo.GetByCodeAsync("OLD", Arg.Any<CancellationToken>()).Returns(expired);
+          var handler = new ApplyCouponCommandHandler(repo);
+          var result = await handler.HandleAsync(new ApplyCouponCommand("OLD", "u1", 100m), CancellationToken.None);
+          result.IsSuccess.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task UsageLimitReached_ReturnsFail()
+      {
+          var repo = Substitute.For<ICouponRepository>();
+          repo.GetByCodeAsync("FULL", Arg.Any<CancellationToken>())
+              .Returns(new CouponDto("FULL", 10m, 50m, DateTime.UtcNow.AddDays(10), 5, 5));
+          var handler = new ApplyCouponCommandHandler(repo);
+          var result = await handler.HandleAsync(new ApplyCouponCommand("FULL", "u1", 100m), CancellationToken.None);
+          result.IsSuccess.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task MaxDiscountCapped_AtMaxDiscountAmount()
+      {
+          var repo = Substitute.For<ICouponRepository>();
+          repo.GetByCodeAsync("BIG", Arg.Any<CancellationToken>())
+              .Returns(new CouponDto("BIG", 50m, 20m, DateTime.UtcNow.AddDays(10), 100, 0));
+          repo.IncrementUsageAsync("BIG", Arg.Any<CancellationToken>()).Returns(true);
+          var handler = new ApplyCouponCommandHandler(repo);
+          var result = await handler.HandleAsync(new ApplyCouponCommand("BIG", "u1", 200m), CancellationToken.None);
+          result.IsSuccess.Should().BeTrue();
+          result.Value!.DiscountAmount.Should().Be(20m);
+      }
+  }

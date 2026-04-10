@@ -1,0 +1,99 @@
+name: hard_vertical_025
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  CQRS + event sourcing lite + NSubstitute for ledger system:
+  Records:
+    LedgerEntry(Guid Id, string AccountId, string Type, decimal Amount, string Currency,
+      string Reference, string Description, DateTime OccurredAt)
+    AccountBalance(string AccountId, string Currency, decimal Balance, int TransactionCount, DateTime LastUpdated)
+    CreditAccountCommand(string AccountId, decimal Amount, string Currency, string Reference, string Description)
+    DebitAccountCommand(string AccountId, decimal Amount, string Currency, string Reference, string Description)
+    GetBalanceQuery(string AccountId, string Currency)
+    GetTransactionsQuery(string AccountId, DateTime? From, DateTime? To, int Page, int PageSize)
+    TransactionPage(IReadOnlyList<LedgerEntry> Entries, int Total, int Page, int TotalPages)
+
+  Interface ILedgerRepository:
+    Task AppendAsync(LedgerEntry entry, CancellationToken ct)
+    Task<IReadOnlyList<LedgerEntry>> GetEntriesAsync(string accountId, DateTime? from, DateTime? to, CancellationToken ct)
+
+  Class LedgerService(ILedgerRepository repo):
+    Task<AccountBalance> CreditAsync(CreditAccountCommand cmd, CancellationToken ct)
+    Task<AccountBalance> DebitAsync(DebitAccountCommand cmd, CancellationToken ct):
+      Throws InsufficientFundsException if balance < amount.
+    Task<AccountBalance> GetBalanceAsync(GetBalanceQuery query, CancellationToken ct)
+    Task<TransactionPage> GetTransactionsAsync(GetTransactionsQuery query, CancellationToken ct)
+  Class InsufficientFundsException : Exception { }
+  Return only valid C# code in a single file.
+test_code: |
+  public class LedgerServiceTests
+  {
+      private ILedgerRepository CreateRepo()
+      {
+          var entries = new List<LedgerEntry>();
+          var repo = Substitute.For<ILedgerRepository>();
+          repo.AppendAsync(Arg.Do<LedgerEntry>(e => entries.Add(e)), Arg.Any<CancellationToken>())
+              .Returns(Task.CompletedTask);
+          repo.GetEntriesAsync(Arg.Any<string>(), Arg.Any<DateTime?>(), Arg.Any<DateTime?>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult<IReadOnlyList<LedgerEntry>>(
+                  entries.Where(e => e.AccountId == ci.Arg<string>()).ToList()));
+          return repo;
+      }
+
+      [Fact]
+      public async Task Credit_IncreasesBalance()
+      {
+          var svc = new LedgerService(CreateRepo());
+          await svc.CreditAsync(new CreditAccountCommand("acc-1", 100m, "USD", "R1", "Initial deposit"), CancellationToken.None);
+          var balance = await svc.GetBalanceAsync(new GetBalanceQuery("acc-1", "USD"), CancellationToken.None);
+          balance.Balance.Should().Be(100m);
+      }
+
+      [Fact]
+      public async Task Debit_DecreasesBalance()
+      {
+          var svc = new LedgerService(CreateRepo());
+          await svc.CreditAsync(new CreditAccountCommand("acc-2", 200m, "USD", "R1", "Dep"), CancellationToken.None);
+          await svc.DebitAsync(new DebitAccountCommand("acc-2", 50m, "USD", "R2", "Purchase"), CancellationToken.None);
+          var balance = await svc.GetBalanceAsync(new GetBalanceQuery("acc-2", "USD"), CancellationToken.None);
+          balance.Balance.Should().Be(150m);
+      }
+
+      [Fact]
+      public async Task Debit_InsufficientFunds_ThrowsException()
+      {
+          var svc = new LedgerService(CreateRepo());
+          await svc.CreditAsync(new CreditAccountCommand("acc-3", 10m, "USD", "R1", "Dep"), CancellationToken.None);
+          var act = async () => await svc.DebitAsync(new DebitAccountCommand("acc-3", 100m, "USD", "R2", "Buy"), CancellationToken.None);
+          await act.Should().ThrowAsync<InsufficientFundsException>();
+      }
+
+      [Fact]
+      public async Task GetTransactions_Paginated()
+      {
+          var svc = new LedgerService(CreateRepo());
+          for (int i = 0; i < 5; i++)
+              await svc.CreditAsync(new CreditAccountCommand("acc-4", 10m, "USD", $"R{i}", $"D{i}"), CancellationToken.None);
+          var page = await svc.GetTransactionsAsync(new GetTransactionsQuery("acc-4", null, null, 1, 2), CancellationToken.None);
+          page.Total.Should().Be(5);
+          page.Entries.Should().HaveCount(2);
+          page.TotalPages.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task GetBalance_EmptyAccount_ReturnsZero()
+      {
+          var svc = new LedgerService(CreateRepo());
+          var balance = await svc.GetBalanceAsync(new GetBalanceQuery("new-acc", "USD"), CancellationToken.None);
+          balance.Balance.Should().Be(0m);
+          balance.TransactionCount.Should().Be(0);
+      }
+  }

@@ -1,0 +1,20 @@
+name: rewriting_hard_026
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in the passive voice, preserving the exact tense:
+  'By the time the auditors arrived, the accountant had destroyed all the evidence.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "had been destroyed"
+    - "been destroyed"
+    - "evidence"
+    - "destroyed"
+  min_words: 8
+  max_words: 30

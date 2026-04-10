@@ -1,0 +1,14 @@
+name: word_problems_hard_004
+category: maths
+subcategory: word_problems
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  A train passes a stationary pole in 10 seconds and a 200-meter platform in 20 seconds. What is the length of the train in meters?
+  Reply with only the number.
+expected_answer: "200"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

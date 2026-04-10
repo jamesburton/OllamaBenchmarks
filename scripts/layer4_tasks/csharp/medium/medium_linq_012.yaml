@@ -1,0 +1,57 @@
+name: medium_linq_012
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record BlogPost with: int Id, string Author, DateTime Published, IReadOnlyList<string> Categories.
+  A class BlogAnalytics with a constructor accepting IEnumerable<BlogPost> posts.
+  Expose using query syntax (from ... in ... where ... group ... select ...):
+    IEnumerable<AuthorStats> GetAuthorStats()
+  returning AuthorStats records with: string Author, int PostCount, IReadOnlyList<string> UniqueCategories.
+  AuthorStats ordered by PostCount descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BlogAnalyticsTests
+  {
+      private readonly BlogPost[] _posts = {
+          new(1, "Alice", new DateTime(2024,1,1), new[]{"Tech","AI"}),
+          new(2, "Alice", new DateTime(2024,2,1), new[]{"Tech"}),
+          new(3, "Bob",   new DateTime(2024,1,15), new[]{"Business","Tech"}),
+          new(4, "Bob",   new DateTime(2024,3,1), new[]{"Business"}),
+          new(5, "Carol", new DateTime(2024,4,1), new[]{"AI"}),
+      };
+
+      [Fact]
+      public void GetAuthorStats_ReturnsThreeAuthors()
+      {
+          new BlogAnalytics(_posts).GetAuthorStats().Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetAuthorStats_AliceHasTwoPosts()
+      {
+          var alice = new BlogAnalytics(_posts).GetAuthorStats().First(a => a.Author == "Alice");
+          alice.PostCount.Should().Be(2);
+      }
+
+      [Fact]
+      public void GetAuthorStats_AliceUniqueCategoriesTwoItems()
+      {
+          var alice = new BlogAnalytics(_posts).GetAuthorStats().First(a => a.Author == "Alice");
+          alice.UniqueCategories.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetAuthorStats_OrderedByPostCountDesc()
+      {
+          var result = new BlogAnalytics(_posts).GetAuthorStats().ToList();
+          result.Select(a => a.PostCount).Should().BeInDescendingOrder();
+      }
+  }

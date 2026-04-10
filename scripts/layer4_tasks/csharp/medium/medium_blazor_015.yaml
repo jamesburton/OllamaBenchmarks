@@ -1,0 +1,59 @@
+name: medium_blazor_015
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class FormValidationService with:
+    IDictionary<string,string> Errors, bool IsValid, AddError(field, msg), ClearError(field), ClearAll()
+  Return only valid C# code in a single file.
+test_code: |
+  public class FormValidationServiceTests
+  {
+      [Fact]
+      public void AddError_StoresError()
+      {
+          var svc = new FormValidationService();
+          svc.AddError("Email", "Required");
+          svc.Errors.Should().ContainKey("Email");
+      }
+
+      [Fact]
+      public void IsValid_FalseWhenErrors()
+      {
+          var svc = new FormValidationService();
+          svc.AddError("Name", "Required");
+          svc.IsValid.Should().BeFalse();
+      }
+
+      [Fact]
+      public void IsValid_TrueWhenNoErrors()
+      {
+          new FormValidationService().IsValid.Should().BeTrue();
+      }
+
+      [Fact]
+      public void ClearError_RemovesField()
+      {
+          var svc = new FormValidationService();
+          svc.AddError("Email", "Invalid");
+          svc.ClearError("Email");
+          svc.Errors.Should().NotContainKey("Email");
+      }
+
+      [Fact]
+      public void ClearAll_RemovesAllErrors()
+      {
+          var svc = new FormValidationService();
+          svc.AddError("A", "e1");
+          svc.AddError("B", "e2");
+          svc.ClearAll();
+          svc.Errors.Should().BeEmpty();
+      }
+  }

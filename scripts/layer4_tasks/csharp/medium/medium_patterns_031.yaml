@@ -1,0 +1,54 @@
+name: medium_patterns_031
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class MinHeap<T> where T : IComparable<T> implementing a min-heap priority queue.
+  Expose: void Enqueue(T item), T Dequeue(), T Peek(), int Count.
+  Dequeue/Peek throw InvalidOperationException if empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MinHeapTests
+  {
+      [Fact]
+      public void Dequeue_MinFirst()
+      {
+          var h = new MinHeap<int>();
+          h.Enqueue(5); h.Enqueue(1); h.Enqueue(3);
+          h.Dequeue().Should().Be(1);
+          h.Dequeue().Should().Be(3);
+      }
+
+      [Fact]
+      public void Peek_DoesNotRemove()
+      {
+          var h = new MinHeap<int>();
+          h.Enqueue(42);
+          h.Peek().Should().Be(42);
+          h.Count.Should().Be(1);
+      }
+
+      [Fact]
+      public void Dequeue_Empty_Throws()
+      {
+          Action act = () => new MinHeap<int>().Dequeue();
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Count_Tracks()
+      {
+          var h = new MinHeap<int>();
+          h.Enqueue(1); h.Enqueue(2);
+          h.Count.Should().Be(2);
+          h.Dequeue();
+          h.Count.Should().Be(1);
+      }
+  }

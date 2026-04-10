@@ -1,0 +1,48 @@
+name: medium_patterns_016
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Guard with precondition methods:
+    T NotNull<T>(T? value, string paramName) where T : class
+    string NotEmpty(string? value, string paramName)
+    int InRange(int value, int min, int max, string paramName)
+    IReadOnlyList<T> NotEmpty<T>(IEnumerable<T> source, string paramName)
+  Return only valid C# code in a single file.
+test_code: |
+  public class GuardTests
+  {
+      [Fact]
+      public void NotNull_NonNull_ReturnsValue() { Guard.NotNull("hello","p").Should().Be("hello"); }
+
+      [Fact]
+      public void NotNull_Null_Throws()
+      {
+          Action act = () => Guard.NotNull<string>(null,"p");
+          act.Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("p");
+      }
+
+      [Fact]
+      public void NotEmpty_Whitespace_Throws()
+      {
+          Action act = () => Guard.NotEmpty("  ","p");
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void InRange_WithinBounds() { Guard.InRange(5,1,10,"x").Should().Be(5); }
+
+      [Fact]
+      public void InRange_OutOfBounds_Throws()
+      {
+          Action act = () => Guard.InRange(15,1,10,"x");
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+  }

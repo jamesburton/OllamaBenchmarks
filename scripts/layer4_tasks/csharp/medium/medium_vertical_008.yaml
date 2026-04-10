@@ -1,0 +1,61 @@
+name: medium_vertical_008
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for inventory reservation.
+  Include:
+    record ReserveInventoryCommand(string ProductId, int Quantity, string OrderId)
+    record ReserveInventoryResult(bool Success, int ReservedQuantity, int RemainingStock)
+    class ReserveInventoryHandler with constructor accepting Dictionary<string, int> stock.
+    Method: ReserveInventoryResult Handle(ReserveInventoryCommand command)
+    Validates: ProductId not empty, Quantity > 0.
+    If stock >= Quantity, reserves it (reduces stock) and returns Success=true.
+    If insufficient, returns Success=false with ReservedQuantity=0.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReserveInventoryHandlerTests
+  {
+      [Fact]
+      public void Handle_SufficientStock_ReturnsSuccess()
+      {
+          var stock = new Dictionary<string, int> { ["p1"] = 10 };
+          var handler = new ReserveInventoryHandler(stock);
+          var result = handler.Handle(new ReserveInventoryCommand("p1", 3, "order1"));
+          result.Success.Should().BeTrue();
+          result.ReservedQuantity.Should().Be(3);
+          result.RemainingStock.Should().Be(7);
+      }
+
+      [Fact]
+      public void Handle_InsufficientStock_ReturnsFailure()
+      {
+          var stock = new Dictionary<string, int> { ["p1"] = 2 };
+          var handler = new ReserveInventoryHandler(stock);
+          var result = handler.Handle(new ReserveInventoryCommand("p1", 5, "order1"));
+          result.Success.Should().BeFalse();
+          result.ReservedQuantity.Should().Be(0);
+      }
+
+      [Fact]
+      public void Handle_UnknownProduct_ReturnsFailure()
+      {
+          var handler = new ReserveInventoryHandler(new Dictionary<string, int>());
+          var result = handler.Handle(new ReserveInventoryCommand("unknown", 1, "order1"));
+          result.Success.Should().BeFalse();
+      }
+
+      [Fact]
+      public void Handle_ZeroQuantity_Throws()
+      {
+          var handler = new ReserveInventoryHandler(new Dictionary<string, int> { ["p1"] = 10 });
+          handler.Invoking(h => h.Handle(new ReserveInventoryCommand("p1", 0, "o1")))
+              .Should().Throw<ArgumentException>();
+      }
+  }

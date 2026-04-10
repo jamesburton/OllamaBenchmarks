@@ -1,0 +1,70 @@
+name: medium_efcore_040
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Shipment with: int Id, string Name, string Status, DateTime CreatedAt, string OwnerId.
+  A class WarehouseDbContext : DbContext with DbSet<Shipment> Items.
+  A class WarehouseRepository with constructor accepting WarehouseDbContext.
+  Methods:
+    Task<IEnumerable<Shipment>> GetByOwnerAsync(string ownerId)
+    Task<IEnumerable<Shipment>> GetByStatusAsync(string status)
+    Task<Shipment?> GetByIdAsync(int id)
+    Task UpdateStatusAsync(int id, string newStatus)
+  Return only valid C# code in a single file.
+test_code: |
+  public class WarehouseRepositoryTests : IAsyncLifetime
+  {
+      private WarehouseDbContext _db = null!;
+      private WarehouseRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<WarehouseDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new WarehouseDbContext(opts);
+          _repo = new WarehouseRepository(_db);
+          _db.Items.AddRange(
+              new Shipment { Name = "Item1", Status = "Active", CreatedAt = DateTime.UtcNow, OwnerId = "u1" },
+              new Shipment { Name = "Item2", Status = "Inactive", CreatedAt = DateTime.UtcNow, OwnerId = "u1" },
+              new Shipment { Name = "Item3", Status = "Active", CreatedAt = DateTime.UtcNow, OwnerId = "u2" });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByOwner_ReturnsCorrect()
+      {
+          (await _repo.GetByOwnerAsync("u1")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetByStatus_FiltersCorrectly()
+      {
+          (await _repo.GetByStatusAsync("Active")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetById_ReturnsItem()
+      {
+          var id = _db.Items.First().Id;
+          (await _repo.GetByIdAsync(id)).Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task UpdateStatus_ChangesStatus()
+      {
+          var id = _db.Items.First().Id;
+          await _repo.UpdateStatusAsync(id, "Archived");
+          _db.ChangeTracker.Clear();
+          (await _repo.GetByIdAsync(id))!.Status.Should().Be("Archived");
+      }
+  }

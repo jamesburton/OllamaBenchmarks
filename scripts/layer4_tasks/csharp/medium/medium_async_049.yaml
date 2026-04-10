@@ -1,0 +1,55 @@
+name: medium_async_049
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncPolling<T> with constructor accepting:
+    Func<CancellationToken, Task<T>> poll
+    Func<T, bool> condition
+    TimeSpan interval
+  Exposes Task<T> WaitUntilAsync(TimeSpan timeout, CancellationToken ct = default).
+  Polls until condition is true. Throws TimeoutException or OperationCanceledException.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncPollingTests
+  {
+      [Fact]
+      public async Task ConditionImmediate_ReturnsValue()
+      {
+          (await new AsyncPolling<int>(ct => Task.FromResult(42), v => v == 42, TimeSpan.FromMilliseconds(10))
+              .WaitUntilAsync(TimeSpan.FromSeconds(5))).Should().Be(42);
+      }
+
+      [Fact]
+      public async Task ConditionAfterRetries_ReturnsValue()
+      {
+          int count = 0;
+          var result = await new AsyncPolling<int>(ct => Task.FromResult(++count), v => v >= 3, TimeSpan.FromMilliseconds(10))
+              .WaitUntilAsync(TimeSpan.FromSeconds(5));
+          result.Should().BeGreaterThanOrEqualTo(3);
+      }
+
+      [Fact]
+      public async Task Timeout_ThrowsTimeoutException()
+      {
+          await Assert.ThrowsAsync<TimeoutException>(() =>
+              new AsyncPolling<int>(ct => Task.FromResult(0), v => false, TimeSpan.FromMilliseconds(10))
+                  .WaitUntilAsync(TimeSpan.FromMilliseconds(50)));
+      }
+
+      [Fact]
+      public async Task Cancelled_ThrowsOperationCancelled()
+      {
+          var cts = new CancellationTokenSource(50);
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+              new AsyncPolling<int>(ct => Task.FromResult(0), v => false, TimeSpan.FromMilliseconds(10))
+                  .WaitUntilAsync(TimeSpan.FromSeconds(30), cts.Token));
+      }
+  }

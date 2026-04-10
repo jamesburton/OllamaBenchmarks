@@ -1,0 +1,21 @@
+name: rewriting_hard_118
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'In view of the foregoing considerations, it would appear that a definitive conclusion cannot be reached at this juncture without the acquisition of additional empirical data.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "cannot"
+    - "conclude"
+    - "more data"
+    - "needed"
+    - "definitive"
+  min_words: 5
+  max_words: 20

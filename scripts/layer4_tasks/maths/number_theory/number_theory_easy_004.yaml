@@ -1,0 +1,14 @@
+name: number_theory_easy_004
+category: maths
+subcategory: number_theory
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  How many prime numbers are there between 1 and 20?
+  Reply with only the number.
+expected_answer: "8"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

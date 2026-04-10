@@ -1,0 +1,51 @@
+name: medium_patterns_014
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Cache<TKey, TValue> with constructor accepting int capacity.
+  Implements LRU (Least Recently Used) eviction.
+  Expose: void Put(TKey key, TValue value), TValue? Get(TKey key), bool ContainsKey(TKey key), int Count.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LruCacheTests
+  {
+      [Fact]
+      public void Get_ExistingKey_ReturnsValue()
+      {
+          var c = new Cache<string,int>(3);
+          c.Put("a",1);
+          c.Get("a").Should().Be(1);
+      }
+
+      [Fact]
+      public void Get_Missing_ReturnsDefault()
+      {
+          new Cache<string,int>(3).Get("x").Should().Be(0);
+      }
+
+      [Fact]
+      public void Eviction_OldestEvicted()
+      {
+          var c = new Cache<int,int>(2);
+          c.Put(1,1); c.Put(2,2); c.Put(3,3);
+          c.ContainsKey(1).Should().BeFalse();
+          c.ContainsKey(2).Should().BeTrue();
+          c.ContainsKey(3).Should().BeTrue();
+      }
+
+      [Fact]
+      public void Count_ReflectsSize()
+      {
+          var c = new Cache<int,int>(5);
+          c.Put(1,1); c.Put(2,2);
+          c.Count.Should().Be(2);
+      }
+  }

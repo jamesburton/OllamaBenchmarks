@@ -1,0 +1,33 @@
+name: easy_async_023
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class TaskHelper with a static method:
+    Task<T> AsTask<T>(T value)
+  that wraps a synchronous value in a completed task using Task.FromResult.
+  (This is a non-async method that returns a Task.)
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaskHelperTests
+  {
+      [Fact]
+      public async Task AsTask_ReturnsValue()
+      {
+          var result = await TaskHelper.AsTask(42);
+          result.Should().Be(42);
+      }
+      [Fact]
+      public async Task AsTask_StringValue()
+      {
+          var result = await TaskHelper.AsTask("hello");
+          result.Should().Be("hello");
+      }
+  }

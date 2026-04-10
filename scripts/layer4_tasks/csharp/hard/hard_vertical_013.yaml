@@ -1,0 +1,91 @@
+name: hard_vertical_013
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Strategy + decorator + CQRS for payment processing:
+  Interface IPaymentStrategy:
+    Task<PaymentResult> ProcessAsync(PaymentRequest request, CancellationToken ct)
+    string SupportedMethod { get; }
+
+  Records:
+    PaymentRequest(Guid PaymentId, string Method, decimal Amount, string Currency, Dictionary<string, string> Metadata)
+    PaymentResult(Guid PaymentId, bool Success, string? TransactionId, string? Error, DateTime ProcessedAt)
+
+  Implementations:
+    CardPaymentStrategy: handles "card". Validates Amount > 0; returns success with fake TransactionId.
+    BankTransferStrategy: handles "bank_transfer". Validates Amount >= 10.
+    CryptoPaymentStrategy: handles "crypto". Validates Currency in ["BTC","ETH"].
+
+  Class LoggingPaymentDecorator(IPaymentStrategy inner):
+    Wraps strategy, logs payment attempts by tracking PaymentId+Method in internal list.
+    IReadOnlyList<string> GetLog()
+
+  Class PaymentDispatcher(IEnumerable<IPaymentStrategy> strategies):
+    Task<PaymentResult> ProcessAsync(PaymentRequest request, CancellationToken ct):
+      Throws NotSupportedException if no strategy found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaymentDispatcherTests
+  {
+      private PaymentDispatcher CreateDispatcher() => new(new IPaymentStrategy[]
+      {
+          new CardPaymentStrategy(),
+          new BankTransferStrategy(),
+          new CryptoPaymentStrategy()
+      });
+
+      [Fact]
+      public async Task CardPayment_Success()
+      {
+          var dispatcher = CreateDispatcher();
+          var req = new PaymentRequest(Guid.NewGuid(), "card", 100m, "USD", new());
+          var result = await dispatcher.ProcessAsync(req, CancellationToken.None);
+          result.Success.Should().BeTrue();
+          result.TransactionId.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public async Task BankTransfer_BelowMinimum_Fails()
+      {
+          var dispatcher = CreateDispatcher();
+          var req = new PaymentRequest(Guid.NewGuid(), "bank_transfer", 5m, "USD", new());
+          var result = await dispatcher.ProcessAsync(req, CancellationToken.None);
+          result.Success.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task Crypto_InvalidCurrency_Fails()
+      {
+          var dispatcher = CreateDispatcher();
+          var req = new PaymentRequest(Guid.NewGuid(), "crypto", 0.1m, "DOGE", new());
+          var result = await dispatcher.ProcessAsync(req, CancellationToken.None);
+          result.Success.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task UnknownMethod_ThrowsNotSupportedException()
+      {
+          var dispatcher = CreateDispatcher();
+          var req = new PaymentRequest(Guid.NewGuid(), "paypal", 50m, "USD", new());
+          var act = async () => await dispatcher.ProcessAsync(req, CancellationToken.None);
+          await act.Should().ThrowAsync<NotSupportedException>();
+      }
+
+      [Fact]
+      public async Task LoggingDecorator_TracksPayments()
+      {
+          var inner = new CardPaymentStrategy();
+          var decorated = new LoggingPaymentDecorator(inner);
+          var req = new PaymentRequest(Guid.NewGuid(), "card", 50m, "USD", new());
+          await decorated.ProcessAsync(req, CancellationToken.None);
+          decorated.GetLog().Should().ContainSingle(l => l.Contains("card"));
+      }
+  }

@@ -1,0 +1,21 @@
+name: technical_easy_023
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a JSDoc comment for a function that checks whether a string is a valid email address.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "@param"
+    - "@returns"
+    - "string"
+    - "email"
+    - "boolean"
+    - "valid"
+    - "function"
+  min_words: 8
+  max_words: 60

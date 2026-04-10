@@ -1,0 +1,23 @@
+name: technical_hard_074
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a notice to enterprise customers explaining a service-level agreement (SLA) breach and remediation steps.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "SLA"
+    - "breach"
+    - "downtime"
+    - "remediation"
+    - "credit"
+    - "apologise"
+    - "steps"
+    - "availability"
+  min_words: 10
+  max_words: 80

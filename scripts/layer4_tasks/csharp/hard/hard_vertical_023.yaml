@@ -1,0 +1,89 @@
+name: hard_vertical_023
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Async + circuit breaker + NSubstitute for external service integration:
+  Enum CircuitState { Closed, Open, HalfOpen }
+  Records:
+    CircuitBreakerConfig(int FailureThreshold, TimeSpan OpenDuration, int HalfOpenMaxCalls)
+    CircuitBreakerStats(CircuitState State, int SuccessCount, int FailureCount, int RejectedCount, DateTime? OpenedAt)
+
+  Class CircuitBreaker(CircuitBreakerConfig config):
+    Task<T> ExecuteAsync<T>(Func<CancellationToken, Task<T>> operation, CancellationToken ct):
+      Closed: pass through; on N failures -> Open.
+      Open: throw CircuitOpenException until OpenDuration elapsed -> HalfOpen.
+      HalfOpen: allow limited calls; on success -> Closed; on failure -> Open.
+    CircuitBreakerStats GetStats()
+    CircuitState State { get; }
+
+  Class CircuitOpenException : Exception { }
+
+  Interface IExternalPaymentService:
+    Task<bool> ChargeAsync(string customerId, decimal amount, CancellationToken ct)
+
+  Class ResiliencePaymentService(IExternalPaymentService inner, CircuitBreaker breaker):
+    Task<bool> ChargeAsync(string customerId, decimal amount, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class CircuitBreakerTests
+  {
+      [Fact]
+      public async Task Closed_SuccessfulCalls_StayClosed()
+      {
+          var cb = new CircuitBreaker(new CircuitBreakerConfig(3, TimeSpan.FromSeconds(30), 1));
+          for (int i = 0; i < 5; i++)
+              await cb.ExecuteAsync(_ => Task.FromResult(i), CancellationToken.None);
+          cb.State.Should().Be(CircuitState.Closed);
+      }
+
+      [Fact]
+      public async Task Closed_FailuresReachThreshold_OpensCircuit()
+      {
+          var cb = new CircuitBreaker(new CircuitBreakerConfig(3, TimeSpan.FromSeconds(30), 1));
+          for (int i = 0; i < 3; i++)
+          {
+              try { await cb.ExecuteAsync<int>(_ => throw new Exception("fail"), CancellationToken.None); }
+              catch { }
+          }
+          cb.State.Should().Be(CircuitState.Open);
+      }
+
+      [Fact]
+      public async Task Open_ThrowsCircuitOpenException()
+      {
+          var cb = new CircuitBreaker(new CircuitBreakerConfig(1, TimeSpan.FromSeconds(30), 1));
+          try { await cb.ExecuteAsync<int>(_ => throw new Exception("fail"), CancellationToken.None); } catch { }
+          var act = async () => await cb.ExecuteAsync(_ => Task.FromResult(1), CancellationToken.None);
+          await act.Should().ThrowAsync<CircuitOpenException>();
+      }
+
+      [Fact]
+      public async Task Stats_TracksFailureCount()
+      {
+          var cb = new CircuitBreaker(new CircuitBreakerConfig(5, TimeSpan.FromSeconds(30), 1));
+          try { await cb.ExecuteAsync<int>(_ => throw new Exception(), CancellationToken.None); } catch { }
+          try { await cb.ExecuteAsync<int>(_ => throw new Exception(), CancellationToken.None); } catch { }
+          cb.GetStats().FailureCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task ResiliencePaymentService_Open_ThrowsCircuitOpen()
+      {
+          var inner = Substitute.For<IExternalPaymentService>();
+          inner.ChargeAsync(Arg.Any<string>(), Arg.Any<decimal>(), Arg.Any<CancellationToken>())
+              .ThrowsAsync(new Exception("service down"));
+          var cb = new CircuitBreaker(new CircuitBreakerConfig(1, TimeSpan.FromSeconds(30), 1));
+          var svc = new ResiliencePaymentService(inner, cb);
+          try { await svc.ChargeAsync("c1", 10m, CancellationToken.None); } catch { }
+          var act = async () => await svc.ChargeAsync("c1", 10m, CancellationToken.None);
+          await act.Should().ThrowAsync<CircuitOpenException>();
+      }
+  }

@@ -1,0 +1,16 @@
+name: constraint_easy_010
+category: logic
+subcategory: constraint
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three students got grades A, B, C. Students are Pat, Quinn, Robin.
+  Clues:
+  1. Pat did not get A.
+  2. Quinn got B.
+  3. Robin did not get C.
+  What grade did Pat get? Reply with only the grade.
+expected_answer: "C"
+validator_config: {}

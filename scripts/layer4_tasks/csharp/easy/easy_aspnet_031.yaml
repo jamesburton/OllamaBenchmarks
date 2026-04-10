@@ -1,0 +1,39 @@
+name: easy_aspnet_031
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class FileUploadRequest with:
+    [Required] string FileName { get; set; }
+    [Range(1, 10485760)] long FileSizeBytes { get; set; }
+    [Required] string ContentType { get; set; }
+  Return only valid C# code in a single file.
+test_code: |
+  public class FileUploadRequestTests
+  {
+      private static IList<ValidationResult> Validate(object obj)
+      {
+          var results = new List<ValidationResult>();
+          Validator.TryValidateObject(obj, new ValidationContext(obj), results, true);
+          return results;
+      }
+      [Fact]
+      public void ValidRequest_PassesValidation()
+      {
+          var req = new FileUploadRequest { FileName = "test.txt", FileSizeBytes = 1024, ContentType = "text/plain" };
+          Validate(req).Should().BeEmpty();
+      }
+      [Fact]
+      public void FileTooLarge_FailsValidation()
+      {
+          var req = new FileUploadRequest { FileName = "big.zip", FileSizeBytes = 20000000, ContentType = "application/zip" };
+          Validate(req).Should().NotBeEmpty();
+      }
+  }

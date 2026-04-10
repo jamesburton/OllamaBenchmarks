@@ -1,0 +1,39 @@
+name: easy_efcore_025
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Notification with properties: int Id, string UserId, string Message, bool IsSent
+  A DbContext class NotifContext with:
+    DbSet<Notification> Notifications { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class NotifRepository with:
+    int DeleteSent(NotifContext context)
+  that deletes all sent notifications using ExecuteDelete and returns count deleted.
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotifRepositoryTests
+  {
+      [Fact]
+      public void DeleteSent_DeletesSentNotifications()
+      {
+          using var context = new NotifContext();
+          context.Database.EnsureCreated();
+          context.Notifications.AddRange(
+              new Notification { UserId = "u1", Message = "A", IsSent = true },
+              new Notification { UserId = "u1", Message = "B", IsSent = false },
+              new Notification { UserId = "u2", Message = "C", IsSent = true });
+          context.SaveChanges();
+          var count = NotifRepository.DeleteSent(context);
+          count.Should().Be(2);
+          context.Notifications.Should().HaveCount(1);
+      }
+  }

@@ -1,0 +1,35 @@
+name: easy_async_021
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class CancellationHelper with a static method:
+    async Task<bool> IsCancelledAsync(CancellationToken token)
+  that checks token.IsCancellationRequested and returns true if cancelled, false if not.
+  Do NOT throw; just return a bool.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CancellationHelperTests
+  {
+      [Fact]
+      public async Task IsCancelledAsync_NotCancelled_ReturnsFalse()
+      {
+          var result = await CancellationHelper.IsCancelledAsync(CancellationToken.None);
+          result.Should().BeFalse();
+      }
+      [Fact]
+      public async Task IsCancelledAsync_Cancelled_ReturnsTrue()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var result = await CancellationHelper.IsCancelledAsync(cts.Token);
+          result.Should().BeTrue();
+      }
+  }

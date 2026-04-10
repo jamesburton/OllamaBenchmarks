@@ -1,0 +1,14 @@
+name: sequences_hard_002
+category: logic
+subcategory: sequences
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  What is the sum of the first 20 terms of the arithmetic sequence: 1, 3, 5, 7, ...?
+  Reply with only the number.
+expected_answer: "400"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

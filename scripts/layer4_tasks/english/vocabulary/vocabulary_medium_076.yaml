@@ -1,0 +1,16 @@
+name: vocabulary_medium_076
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word is MORE FORMAL for 'enough'?
+  A) Plenty
+  B) Loads
+  C) Sufficient
+  D) Heaps
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

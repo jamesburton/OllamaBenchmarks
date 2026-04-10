@@ -1,0 +1,97 @@
+name: hard_vertical_014
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + LINQ aggregations for subscription billing:
+  Entities:
+    Subscription(int Id, string CustomerId, string PlanId, string Status, DateTime StartDate,
+      DateTime? EndDate, decimal MonthlyAmount)
+    Invoice(int Id, int SubscriptionId, string CustomerId, decimal Amount, string Status,
+      DateTime IssuedAt, DateTime? PaidAt)
+  DbContext: BillingDbContext (SQLite in-memory), seeds 10 subscriptions and 30 invoices.
+
+  Records:
+    CustomerBillingSummary(string CustomerId, decimal TotalBilled, decimal TotalPaid, decimal Outstanding,
+      int InvoiceCount, int OverdueCount)
+    MrrReport(decimal Mrr, decimal Arr, int ActiveSubscriptions, decimal ChurnRate)
+
+  Class BillingAnalyticsService(BillingDbContext db):
+    Task<CustomerBillingSummary> GetCustomerSummaryAsync(string customerId, CancellationToken ct)
+    Task<MrrReport> GetMrrReportAsync(CancellationToken ct):
+      MRR = sum of active subscription monthly amounts.
+      ARR = MRR * 12.
+      ChurnRate = cancelled subscriptions / total subscriptions.
+    Task<IReadOnlyList<Invoice>> GetOverdueInvoicesAsync(int daysOverdue, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class BillingAnalyticsServiceTests : IDisposable
+  {
+      private readonly BillingDbContext _db;
+      private readonly BillingAnalyticsService _svc;
+
+      public BillingAnalyticsServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<BillingDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new BillingDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new BillingAnalyticsService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task GetCustomerSummary_CalculatesTotalBilled()
+      {
+          var sub = _db.Subscriptions.First();
+          var summary = await _svc.GetCustomerSummaryAsync(sub.CustomerId, CancellationToken.None);
+          summary.TotalBilled.Should().BeGreaterThanOrEqualTo(0);
+          summary.CustomerId.Should().Be(sub.CustomerId);
+      }
+
+      [Fact]
+      public async Task GetCustomerSummary_OutstandingIsCorrect()
+      {
+          var sub = _db.Subscriptions.First();
+          var summary = await _svc.GetCustomerSummaryAsync(sub.CustomerId, CancellationToken.None);
+          summary.Outstanding.Should().Be(summary.TotalBilled - summary.TotalPaid);
+      }
+
+      [Fact]
+      public async Task GetMrrReport_MrrIsPositive()
+      {
+          var report = await _svc.GetMrrReportAsync(CancellationToken.None);
+          report.Mrr.Should().BeGreaterThanOrEqualTo(0);
+      }
+
+      [Fact]
+      public async Task GetMrrReport_ArrIs12TimesMrr()
+      {
+          var report = await _svc.GetMrrReportAsync(CancellationToken.None);
+          report.Arr.Should().Be(report.Mrr * 12);
+      }
+
+      [Fact]
+      public async Task GetMrrReport_ChurnRateBetween0And1()
+      {
+          var report = await _svc.GetMrrReportAsync(CancellationToken.None);
+          report.ChurnRate.Should().BeInRange(0, 1);
+      }
+
+      [Fact]
+      public async Task GetOverdueInvoices_ReturnsUnpaidOldInvoices()
+      {
+          var overdue = await _svc.GetOverdueInvoicesAsync(30, CancellationToken.None);
+          overdue.Should().AllSatisfy(i => {
+              i.Status.Should().NotBe("Paid");
+              i.IssuedAt.Should().BeBefore(DateTime.UtcNow.AddDays(-30));
+          });
+      }
+  }

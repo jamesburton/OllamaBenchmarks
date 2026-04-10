@@ -1,0 +1,97 @@
+name: hard_vertical_021
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Async + rate limiting + NSubstitute for API gateway client:
+  Records:
+    ApiRequest(string Method, string Endpoint, string? Body, Dictionary<string, string>? Headers)
+    ApiResponse(int StatusCode, string Body, Dictionary<string, string> Headers, TimeSpan Elapsed)
+    GatewayConfig(int MaxRequestsPerSecond, int TimeoutMs, int MaxRetries, string BaseUrl)
+
+  Interface IHttpBackend:
+    Task<ApiResponse> SendAsync(ApiRequest request, CancellationToken ct)
+
+  Class TokenBucketRateLimiter(int maxPerSecond):
+    Task<bool> TryAcquireAsync(CancellationToken ct): returns true if token available, false if throttled.
+    void Release()
+    int AvailableTokens { get; }
+
+  Class ApiGatewayClient(IHttpBackend backend, GatewayConfig config):
+    Task<ApiResponse> SendAsync(ApiRequest request, CancellationToken ct):
+      Applies rate limiting (throws RateLimitExceededException if throttled after brief wait).
+      Applies timeout from config.
+      Retries on 5xx up to MaxRetries.
+  Class RateLimitExceededException : Exception { }
+  Return only valid C# code in a single file.
+test_code: |
+  public class TokenBucketRateLimiterTests
+  {
+      [Fact]
+      public async Task TryAcquire_WithinLimit_ReturnsTrue()
+      {
+          var limiter = new TokenBucketRateLimiter(10);
+          var result = await limiter.TryAcquireAsync(CancellationToken.None);
+          result.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task TryAcquire_ExceedsLimit_ReturnsFalse()
+      {
+          var limiter = new TokenBucketRateLimiter(2);
+          await limiter.TryAcquireAsync(CancellationToken.None);
+          await limiter.TryAcquireAsync(CancellationToken.None);
+          var result = await limiter.TryAcquireAsync(CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task Release_RestoresToken()
+      {
+          var limiter = new TokenBucketRateLimiter(1);
+          await limiter.TryAcquireAsync(CancellationToken.None);
+          limiter.Release();
+          var result = await limiter.TryAcquireAsync(CancellationToken.None);
+          result.Should().BeTrue();
+      }
+  }
+
+  public class ApiGatewayClientTests
+  {
+      private GatewayConfig DefaultConfig => new(100, 5000, 3, "https://api.example.com");
+
+      [Fact]
+      public async Task Send_Success_ReturnsResponse()
+      {
+          var backend = Substitute.For<IHttpBackend>();
+          backend.SendAsync(Arg.Any<ApiRequest>(), Arg.Any<CancellationToken>())
+              .Returns(new ApiResponse(200, "ok", new(), TimeSpan.FromMilliseconds(10)));
+          var client = new ApiGatewayClient(backend, DefaultConfig);
+          var response = await client.SendAsync(new ApiRequest("GET", "/health", null, null), CancellationToken.None);
+          response.StatusCode.Should().Be(200);
+      }
+
+      [Fact]
+      public async Task Send_5xx_Retries()
+      {
+          var backend = Substitute.For<IHttpBackend>();
+          var calls = 0;
+          backend.SendAsync(Arg.Any<ApiRequest>(), Arg.Any<CancellationToken>())
+              .Returns(ci => {
+                  calls++;
+                  if (calls < 3) return Task.FromResult(new ApiResponse(503, "error", new(), TimeSpan.Zero));
+                  return Task.FromResult(new ApiResponse(200, "ok", new(), TimeSpan.Zero));
+              });
+          var client = new ApiGatewayClient(backend, DefaultConfig);
+          var response = await client.SendAsync(new ApiRequest("GET", "/api", null, null), CancellationToken.None);
+          response.StatusCode.Should().Be(200);
+          calls.Should().Be(3);
+      }
+  }

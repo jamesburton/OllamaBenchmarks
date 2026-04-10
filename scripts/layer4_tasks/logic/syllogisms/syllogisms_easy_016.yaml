@@ -1,0 +1,15 @@
+name: syllogisms_easy_016
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. No fish are mammals.
+  2. A dolphin is a mammal.
+  3. All mammals breathe air.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "A dolphin is not a fish."
+validator_config: {}

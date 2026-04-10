@@ -1,0 +1,95 @@
+name: hard_linq_019
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Warehouse(string Id, string Location), InventoryItem(string Sku, string WarehouseId,
+  int Quantity, decimal UnitCost).
+  A class InventoryOptimiser with constructor accepting IEnumerable<Warehouse> warehouses and
+  IEnumerable<InventoryItem> items.
+  Methods:
+    IEnumerable<WarehouseStock> StockByWarehouse() — joins items to warehouses,
+      groups by warehouse, computes SkuCount (distinct), TotalUnits, TotalValue (Qty*UnitCost).
+      Orders by TotalValue descending.
+    IEnumerable<InventoryItem> LowStock(int threshold) — items where Quantity <= threshold.
+      Orders by Quantity ascending.
+    IEnumerable<SkuDistribution> SkuDistribution() — per Sku: list of warehouses holding it,
+      TotalQuantity, MinCost, MaxCost. Orders by TotalQuantity descending.
+    decimal TotalInventoryValue() — sum of Qty*UnitCost across all items.
+  Records: WarehouseStock(string WarehouseId, string Location, int SkuCount, int TotalUnits, decimal TotalValue),
+           SkuDistribution(string Sku, IReadOnlyList<string> WarehouseIds, int TotalQuantity, decimal MinCost, decimal MaxCost).
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryOptimiserTests
+  {
+      private static readonly List<Warehouse> Whs = new()
+      {
+          new("WH1", "London"),
+          new("WH2", "Berlin"),
+      };
+      private static readonly List<InventoryItem> Items = new()
+      {
+          new("SKU-A", "WH1", 100, 5.00m),
+          new("SKU-A", "WH2",  50, 4.50m),
+          new("SKU-B", "WH1",   5, 20.00m),
+          new("SKU-C", "WH2", 200, 1.00m),
+      };
+
+      [Fact]
+      public void StockByWarehouse_WH1TotalValueIsCorrect()
+      {
+          var result = new InventoryOptimiser(Whs, Items).StockByWarehouse().ToList();
+          var wh1 = result.First(w => w.WarehouseId == "WH1");
+          wh1.TotalValue.Should().Be(100*5m + 5*20m);
+      }
+
+      [Fact]
+      public void StockByWarehouse_WH1SkuCountIsTwo()
+      {
+          var result = new InventoryOptimiser(Whs, Items).StockByWarehouse().ToList();
+          result.First(w => w.WarehouseId == "WH1").SkuCount.Should().Be(2);
+      }
+
+      [Fact]
+      public void LowStock_FindsBelowThreshold()
+      {
+          var result = new InventoryOptimiser(Whs, Items).LowStock(10).ToList();
+          result.Should().ContainSingle(i => i.Sku == "SKU-B");
+      }
+
+      [Fact]
+      public void SkuDistribution_SkuAInTwoWarehouses()
+      {
+          var result = new InventoryOptimiser(Whs, Items).SkuDistribution().ToList();
+          result.First(s => s.Sku == "SKU-A").WarehouseIds.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void SkuDistribution_SkuAMinMaxCostCorrect()
+      {
+          var result = new InventoryOptimiser(Whs, Items).SkuDistribution().ToList();
+          var skuA = result.First(s => s.Sku == "SKU-A");
+          skuA.MinCost.Should().Be(4.50m);
+          skuA.MaxCost.Should().Be(5.00m);
+      }
+
+      [Fact]
+      public void TotalInventoryValue_IsCorrect()
+      {
+          new InventoryOptimiser(Whs, Items).TotalInventoryValue()
+              .Should().Be(500m + 225m + 100m + 200m);
+      }
+
+      [Fact]
+      public void LowStock_NoneBelow_ReturnsEmpty()
+      {
+          new InventoryOptimiser(Whs, Items).LowStock(0).Should().BeEmpty();
+      }
+  }

@@ -1,0 +1,21 @@
+name: rewriting_medium_140
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'The policy changes, which were announced last week and which are expected to come into force next month, will affect all employees whose contracts were signed before 2020.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "policy"
+    - "announced"
+    - "come into force"
+    - "employees"
+    - "before 2020"
+  min_words: 7
+  max_words: 30

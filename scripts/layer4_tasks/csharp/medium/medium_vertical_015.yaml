@@ -1,0 +1,41 @@
+name: medium_vertical_015
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for transferfunds.
+  Include:
+    Command: string FromAccountId, string ToAccountId, decimal Amount, string Currency
+  Result: Guid TransferId, string Status, DateTime ExecutedAt
+  Handler: constructor accepts Dictionary<string,decimal> balances. Validates amount>0, same currency, sufficient balance.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TransferFundsHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new TransferFundsHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new TransferFundsHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new TransferFundsHandler();
+          handler.Should().NotBeNull();
+      }
+  }

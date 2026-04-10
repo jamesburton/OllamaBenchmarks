@@ -1,0 +1,23 @@
+name: technical_medium_033
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for a function that parses a log file and returns structured data.
+  Include Args, Returns, and Raises.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Returns:"
+    - "Raises:"
+    - "parse"
+    - "log"
+    - "structured"
+    - "file"
+    - "returns"
+  min_words: 10
+  max_words: 80

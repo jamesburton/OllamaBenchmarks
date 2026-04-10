@@ -1,0 +1,13 @@
+name: statistics_easy_009
+category: maths
+subcategory: statistics
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Find the mean of: 0, 10, 20. Reply with only the number.
+expected_answer: "10"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

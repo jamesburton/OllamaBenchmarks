@@ -1,0 +1,20 @@
+name: rewriting_medium_017
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in the passive voice:
+  'Scientists at the university have identified a new strain of the virus.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "has been identified"
+    - "been identified"
+    - "strain"
+    - "identified"
+  min_words: 6
+  max_words: 25

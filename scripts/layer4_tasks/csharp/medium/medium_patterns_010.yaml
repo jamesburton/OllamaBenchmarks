@@ -1,0 +1,51 @@
+name: medium_patterns_010
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A generic class ObservableValue<T> with:
+    T Value { get; set; } — raises Changed event when value differs
+    event EventHandler<ValueChangedArgs<T>> Changed
+  ValueChangedArgs<T> has T OldValue, T NewValue.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ObservableValueTests
+  {
+      [Fact]
+      public void Set_DifferentValue_RaisesChanged()
+      {
+          var obs = new ObservableValue<int>(0);
+          ValueChangedArgs<int>? args = null;
+          obs.Changed += (_, e) => args = e;
+          obs.Value = 42;
+          args.Should().NotBeNull();
+          args!.OldValue.Should().Be(0);
+          args.NewValue.Should().Be(42);
+      }
+
+      [Fact]
+      public void Set_SameValue_NoEvent()
+      {
+          var obs = new ObservableValue<string>("hello");
+          int count = 0;
+          obs.Changed += (_, _) => count++;
+          obs.Value = "hello";
+          count.Should().Be(0);
+      }
+
+      [Fact]
+      public void Get_ReturnsCurrentValue()
+      {
+          var obs = new ObservableValue<int>(7);
+          obs.Value.Should().Be(7);
+          obs.Value = 99;
+          obs.Value.Should().Be(99);
+      }
+  }

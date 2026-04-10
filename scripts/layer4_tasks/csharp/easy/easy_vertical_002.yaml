@@ -1,0 +1,39 @@
+name: easy_vertical_002
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record TodoItem(int Id, string Title, bool IsCompleted)
+  A class TodoService with:
+    void Add(TodoItem item)
+    void Complete(int id) marks item with given id as completed (use 'with' expression)
+    List<TodoItem> GetPending() returns items where IsCompleted is false
+    List<TodoItem> GetAll()
+  Return only valid C# code in a single file.
+test_code: |
+  public class TodoServiceTests
+  {
+      [Fact]
+      public void Complete_MarksItemAsCompleted()
+      {
+          var service = new TodoService();
+          service.Add(new TodoItem(1, "Buy milk", false));
+          service.Complete(1);
+          service.GetAll().Single(x => x.Id == 1).IsCompleted.Should().BeTrue();
+      }
+      [Fact]
+      public void GetPending_ReturnsOnlyIncompleteItems()
+      {
+          var service = new TodoService();
+          service.Add(new TodoItem(1, "Task 1", false));
+          service.Add(new TodoItem(2, "Task 2", true));
+          service.GetPending().Should().HaveCount(1);
+      }
+  }

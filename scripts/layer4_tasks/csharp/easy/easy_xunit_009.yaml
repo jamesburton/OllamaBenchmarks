@@ -1,0 +1,36 @@
+name: easy_xunit_009
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface ICalculator with methods:
+    double Add(double a, double b)
+    double Multiply(double a, double b)
+  A class Calculator implementing ICalculator
+  Return only valid C# code in a single file.
+test_code: |
+  public class CalculatorTests
+  {
+      private readonly ICalculator _calc = new Calculator();
+
+      [Theory]
+      [InlineData(1.0, 2.0, 3.0)]
+      [InlineData(-1.0, 1.0, 0.0)]
+      [InlineData(0.5, 0.5, 1.0)]
+      public void Add_ReturnsCorrectSum(double a, double b, double expected)
+      {
+          _calc.Add(a, b).Should().Be(expected);
+      }
+      [Fact]
+      public void Multiply_ReturnsProduct()
+      {
+          _calc.Multiply(3, 4).Should().Be(12);
+      }
+  }

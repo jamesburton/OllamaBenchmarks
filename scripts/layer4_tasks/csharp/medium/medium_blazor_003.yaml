@@ -1,0 +1,72 @@
+name: medium_blazor_003
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record CartItem(string ProductId, string Name, decimal Price, int Quantity).
+  A class ShoppingCartService with:
+    IReadOnlyList<CartItem> Items { get; }
+    decimal Total { get; }
+    event Action? OnCartChanged
+    void AddItem(CartItem item)
+    void RemoveItem(string productId)
+    void UpdateQuantity(string productId, int quantity)
+    void Clear()
+  Adding existing product increments quantity. Total = sum of Price * Quantity.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShoppingCartServiceTests
+  {
+      [Fact]
+      public void AddItem_AddsNewItem()
+      {
+          var svc = new ShoppingCartService();
+          svc.AddItem(new CartItem("p1", "Widget", 9.99m, 1));
+          svc.Items.Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void AddItem_ExistingProduct_IncrementsQuantity()
+      {
+          var svc = new ShoppingCartService();
+          svc.AddItem(new CartItem("p1", "Widget", 9.99m, 1));
+          svc.AddItem(new CartItem("p1", "Widget", 9.99m, 2));
+          svc.Items.Should().HaveCount(1);
+          svc.Items[0].Quantity.Should().Be(3);
+      }
+
+      [Fact]
+      public void RemoveItem_RemovesProduct()
+      {
+          var svc = new ShoppingCartService();
+          svc.AddItem(new CartItem("p1", "Widget", 9.99m, 1));
+          svc.RemoveItem("p1");
+          svc.Items.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void Total_CalculatesCorrectly()
+      {
+          var svc = new ShoppingCartService();
+          svc.AddItem(new CartItem("p1", "A", 10m, 2));
+          svc.AddItem(new CartItem("p2", "B", 5m, 3));
+          svc.Total.Should().Be(35m);
+      }
+
+      [Fact]
+      public void Clear_EmptiesCart()
+      {
+          var svc = new ShoppingCartService();
+          svc.AddItem(new CartItem("p1", "A", 10m, 1));
+          svc.Clear();
+          svc.Items.Should().BeEmpty();
+          svc.Total.Should().Be(0m);
+      }
+  }

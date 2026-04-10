@@ -1,0 +1,15 @@
+name: grammar_medium_046
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Covered in mud, the washing machine was the dog first stop.
+  B) Covered in mud, the dog went straight to the washing machine.
+  C) Covered in mud, a washing was needed by the dog.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

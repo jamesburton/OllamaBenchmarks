@@ -1,0 +1,55 @@
+name: medium_linq_042
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record BusRoute with: string RouteId, string Start, string End, IReadOnlyList<string> Stops.
+  A class TransitNetwork with a constructor accepting IEnumerable<BusRoute> routes.
+  Expose:
+    IEnumerable<BusRoute> RoutesThrough(string stop) — routes containing the given stop
+    IEnumerable<string> ReachableFrom(string origin)
+      — all distinct stops reachable from 'origin' via a single route (excluding origin itself), ordered ascending
+    int TotalUniqueStops() — count of distinct stops across all routes
+  Return only valid C# code in a single file.
+test_code: |
+  public class TransitNetworkTests
+  {
+      private readonly BusRoute[] _routes = {
+          new("R1","Central","Airport", new[]{"Central","Park","Museum","Airport"}),
+          new("R2","Central","Harbor",  new[]{"Central","Station","Harbor"}),
+          new("R3","Park",   "Zoo",     new[]{"Park","Zoo"}),
+      };
+
+      [Fact]
+      public void RoutesThrough_Central_TwoRoutes()
+      {
+          new TransitNetwork(_routes).RoutesThrough("Central").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void ReachableFrom_Central_FourStops()
+      {
+          var result = new TransitNetwork(_routes).ReachableFrom("Central").ToList();
+          result.Should().HaveCount(5);
+          result.Should().Contain("Airport");
+      }
+
+      [Fact]
+      public void TotalUniqueStops_IsCorrect()
+      {
+          new TransitNetwork(_routes).TotalUniqueStops().Should().Be(7);
+      }
+
+      [Fact]
+      public void RoutesThrough_UnknownStop_ReturnsEmpty()
+      {
+          new TransitNetwork(_routes).RoutesThrough("Moon").Should().BeEmpty();
+      }
+  }

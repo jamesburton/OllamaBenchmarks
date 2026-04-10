@@ -1,0 +1,66 @@
+name: medium_vertical_004
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for sending notifications.
+  Include:
+    enum NotificationChannel { Email, Sms, Push }
+    record SendNotificationCommand(string RecipientId, string Message, NotificationChannel Channel)
+    record SendNotificationResult(Guid NotificationId, bool Sent, DateTime SentAt)
+    interface IChannelSender with: Task<bool> SendAsync(string recipientId, string message)
+    class SendNotificationHandler with constructor accepting IDictionary<NotificationChannel, IChannelSender>.
+    Method: Task<SendNotificationResult> HandleAsync(SendNotificationCommand command)
+    Validates: RecipientId and Message not empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SendNotificationHandlerTests
+  {
+      [Fact]
+      public async Task HandleAsync_ValidCommand_CallsSender()
+      {
+          var sender = Substitute.For<IChannelSender>();
+          sender.SendAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+          var senders = new Dictionary<NotificationChannel, IChannelSender>
+          {
+              [NotificationChannel.Email] = sender
+          };
+          var handler = new SendNotificationHandler(senders);
+          var result = await handler.HandleAsync(new SendNotificationCommand("u1", "Hello", NotificationChannel.Email));
+          result.Sent.Should().BeTrue();
+          await sender.Received(1).SendAsync("u1", "Hello");
+      }
+
+      [Fact]
+      public async Task HandleAsync_EmptyRecipient_Throws()
+      {
+          var handler = new SendNotificationHandler(new Dictionary<NotificationChannel, IChannelSender>());
+          await handler.Invoking(h => h.HandleAsync(new SendNotificationCommand("", "msg", NotificationChannel.Email)))
+              .Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_EmptyMessage_Throws()
+      {
+          var handler = new SendNotificationHandler(new Dictionary<NotificationChannel, IChannelSender>());
+          await handler.Invoking(h => h.HandleAsync(new SendNotificationCommand("u1", "", NotificationChannel.Sms)))
+              .Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_SenderFails_ResultNotSent()
+      {
+          var sender = Substitute.For<IChannelSender>();
+          sender.SendAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
+          var senders = new Dictionary<NotificationChannel, IChannelSender> { [NotificationChannel.Push] = sender };
+          var handler = new SendNotificationHandler(senders);
+          var result = await handler.HandleAsync(new SendNotificationCommand("u1", "test", NotificationChannel.Push));
+          result.Sent.Should().BeFalse();
+      }
+  }

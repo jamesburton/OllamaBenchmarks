@@ -1,0 +1,97 @@
+name: hard_patterns_009
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A command pattern with undo support:
+  Interface ICommand with methods Execute() and Undo().
+  Class CommandHistory:
+    void Execute(ICommand command) — executes and records.
+    bool Undo() — undoes last command. Returns false if nothing to undo.
+    bool Redo() — redoes last undone command. Returns false if nothing to redo.
+    int UndoStackSize { get; }
+    int RedoStackSize { get; }
+  Concrete commands on a class TextDocument(string Content):
+    AppendTextCommand(TextDocument doc, string text) — appends text, undo removes it.
+    DeleteLastNCharsCommand(TextDocument doc, int n) — removes n chars from end, undo restores.
+    ReplaceCommand(TextDocument doc, string oldText, string newText) — replaces first occurrence.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CommandPatternTests
+  {
+      [Fact]
+      public void Execute_Append_ModifiesDocument()
+      {
+          var doc = new TextDocument("Hello");
+          var history = new CommandHistory();
+          history.Execute(new AppendTextCommand(doc, " World"));
+          doc.Content.Should().Be("Hello World");
+      }
+
+      [Fact]
+      public void Undo_Append_RestoresOriginal()
+      {
+          var doc = new TextDocument("Hello");
+          var history = new CommandHistory();
+          history.Execute(new AppendTextCommand(doc, " World"));
+          history.Undo();
+          doc.Content.Should().Be("Hello");
+      }
+
+      [Fact]
+      public void Redo_AfterUndo_Reapplies()
+      {
+          var doc = new TextDocument("Hi");
+          var history = new CommandHistory();
+          history.Execute(new AppendTextCommand(doc, "!"));
+          history.Undo();
+          history.Redo();
+          doc.Content.Should().Be("Hi!");
+      }
+
+      [Fact]
+      public void Undo_EmptyHistory_ReturnsFalse()
+      {
+          new CommandHistory().Undo().Should().BeFalse();
+      }
+
+      [Fact]
+      public void Execute_After_Undo_ClearsRedoStack()
+      {
+          var doc = new TextDocument("A");
+          var history = new CommandHistory();
+          history.Execute(new AppendTextCommand(doc, "B"));
+          history.Undo();
+          history.Execute(new AppendTextCommand(doc, "C"));
+          history.RedoStackSize.Should().Be(0);
+      }
+
+      [Fact]
+      public void DeleteLastN_UndoRestores()
+      {
+          var doc = new TextDocument("Hello World");
+          var history = new CommandHistory();
+          history.Execute(new DeleteLastNCharsCommand(doc, 5));
+          doc.Content.Should().Be("Hello ");
+          history.Undo();
+          doc.Content.Should().Be("Hello World");
+      }
+
+      [Fact]
+      public void Replace_UndoRestores()
+      {
+          var doc = new TextDocument("foo bar foo");
+          var history = new CommandHistory();
+          history.Execute(new ReplaceCommand(doc, "foo", "baz"));
+          doc.Content.Should().Contain("baz");
+          history.Undo();
+          doc.Content.Should().Be("foo bar foo");
+      }
+  }

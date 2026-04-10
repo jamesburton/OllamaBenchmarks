@@ -1,0 +1,16 @@
+name: vocabulary_easy_068
+category: english
+subcategory: vocabulary
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word is MORE INFORMAL?
+  A) Terminate
+  B) Cease
+  C) Quit
+  D) Conclude
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

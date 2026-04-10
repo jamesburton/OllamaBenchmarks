@@ -1,0 +1,15 @@
+name: grammar_hard_015
+category: english
+subcategory: grammar
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) More than one student were absent.
+  B) More than one student was absent.
+  C) More than one student are absent.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

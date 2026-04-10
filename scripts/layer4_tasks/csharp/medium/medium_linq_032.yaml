@@ -1,0 +1,58 @@
+name: medium_linq_032
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Vehicle with: string Plate, string Type, int Year, decimal MilesDriven.
+  A class FleetAnalytics with a constructor accepting IEnumerable<Vehicle> vehicles.
+  Expose:
+    IEnumerable<Vehicle> OlderThan(int year) — vehicles with Year < year, ordered by Year asc
+    IEnumerable<TypeStats> StatsByType()
+      — for each Type: Count, AverageMiles, TotalMiles; ordered by TotalMiles desc
+  TypeStats is a record with: string Type, int Count, decimal AverageMiles, decimal TotalMiles.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FleetAnalyticsTests
+  {
+      private readonly Vehicle[] _fleet = {
+          new("AB1","Van",  2015, 120000m),
+          new("CD2","Car",  2020, 30000m),
+          new("EF3","Van",  2018, 80000m),
+          new("GH4","Truck",2010, 250000m),
+          new("IJ5","Car",  2022, 5000m),
+      };
+
+      [Fact]
+      public void OlderThan2019_ReturnsTwoVehicles()
+      {
+          new FleetAnalytics(_fleet).OlderThan(2019).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void OlderThan_OrderedByYear()
+      {
+          var result = new FleetAnalytics(_fleet).OlderThan(2021).ToList();
+          result.Select(v => v.Year).Should().BeInAscendingOrder();
+      }
+
+      [Fact]
+      public void StatsByType_ThreeTypes()
+      {
+          new FleetAnalytics(_fleet).StatsByType().Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void StatsByType_VanTotalMiles200000()
+      {
+          var vans = new FleetAnalytics(_fleet).StatsByType().First(t => t.Type == "Van");
+          vans.TotalMiles.Should().Be(200000m);
+          vans.Count.Should().Be(2);
+      }
+  }

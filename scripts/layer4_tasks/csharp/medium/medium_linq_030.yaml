@@ -1,0 +1,52 @@
+name: medium_linq_030
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Histogram with a constructor accepting IEnumerable<double> values.
+  Expose:
+    IEnumerable<Bucket> Build(int bucketCount)
+  where Bucket is a record with: double Min, double Max, int Count.
+  Divides the range [min, max] evenly into bucketCount buckets and counts values in each.
+  Throws ArgumentOutOfRangeException if bucketCount < 1.
+  Throws InvalidOperationException if the sequence is empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class HistogramTests
+  {
+      [Fact]
+      public void Build_FiveBuckets_CorrectStructure()
+      {
+          var result = new Histogram(Enumerable.Range(0,10).Select(i => (double)i)).Build(5).ToList();
+          result.Should().HaveCount(5);
+      }
+
+      [Fact]
+      public void Build_TotalCountEqualsInput()
+      {
+          var data = Enumerable.Range(1,20).Select(i => (double)i);
+          var total = new Histogram(data).Build(4).Sum(b => b.Count);
+          total.Should().Be(20);
+      }
+
+      [Fact]
+      public void Build_InvalidBucketCount_Throws()
+      {
+          Action act = () => new Histogram(new double[]{1.0}).Build(0).ToList();
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void Build_EmptySequence_Throws()
+      {
+          Action act = () => new Histogram(Array.Empty<double>()).Build(5).ToList();
+          act.Should().Throw<InvalidOperationException>();
+      }
+  }

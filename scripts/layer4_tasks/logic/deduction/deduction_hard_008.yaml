@@ -1,0 +1,16 @@
+name: deduction_hard_008
+category: logic
+subcategory: deduction
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If P then Q.
+  2. If P then R.
+  3. If Q and R then S.
+  4. P is true.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "S is true."
+validator_config: {}

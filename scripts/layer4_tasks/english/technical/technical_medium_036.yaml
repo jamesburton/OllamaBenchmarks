@@ -1,0 +1,23 @@
+name: technical_medium_036
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a JSDoc comment for a utility function that deep-clones a JavaScript object.
+  Note the limitation with functions and circular references.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "@param"
+    - "@returns"
+    - "clone"
+    - "object"
+    - "deep"
+    - "circular"
+    - "reference"
+    - "limitation"
+  min_words: 10
+  max_words: 80

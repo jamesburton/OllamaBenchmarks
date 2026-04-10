@@ -1,0 +1,55 @@
+name: medium_patterns_025
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ObjectPool<T> with constructor accepting Func<T> factory and int maxSize.
+  Expose: T Rent(), void Return(T item), int Available.
+  Empty pool calls factory. Full pool on Return discards the item.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ObjectPoolTests
+  {
+      [Fact]
+      public void Rent_Empty_CallsFactory()
+      {
+          int calls = 0;
+          var pool = new ObjectPool<List<int>>(() => { calls++; return new List<int>(); }, 5);
+          pool.Rent();
+          calls.Should().Be(1);
+      }
+
+      [Fact]
+      public void Return_ThenRent_Reuses()
+      {
+          var pool = new ObjectPool<object>(() => new object(), 5);
+          var o = pool.Rent();
+          pool.Return(o);
+          pool.Rent().Should().BeSameAs(o);
+      }
+
+      [Fact]
+      public void Available_Reflects()
+      {
+          var pool = new ObjectPool<object>(() => new object(), 5);
+          var o = pool.Rent();
+          pool.Return(o);
+          pool.Available.Should().Be(1);
+      }
+
+      [Fact]
+      public void Return_Full_Discards()
+      {
+          var pool = new ObjectPool<object>(() => new object(), 1);
+          var o1 = pool.Rent(); var o2 = pool.Rent();
+          pool.Return(o1); pool.Return(o2);
+          pool.Available.Should().Be(1);
+      }
+  }

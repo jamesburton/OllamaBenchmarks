@@ -1,0 +1,92 @@
+name: hard_blazor_006
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor interactive shopping cart state management:
+  Records:
+    CartItem(int ProductId, string Name, decimal UnitPrice, int Quantity)
+    CartSummary(IReadOnlyList<CartItem> Items, int TotalItems, decimal Subtotal, decimal Tax, decimal Total)
+
+  Class ShoppingCartService:
+    void AddItem(int productId, string name, decimal unitPrice, int quantity = 1):
+      If product already in cart, increments quantity.
+    void RemoveItem(int productId): removes item entirely.
+    void UpdateQuantity(int productId, int quantity): throws if quantity < 1.
+    void Clear()
+    CartSummary GetSummary(): computes TotalItems (sum of quantities), Subtotal, Tax (10%), Total.
+    IReadOnlyList<CartItem> GetItems()
+    event Action? OnCartChanged: fired on any mutation.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShoppingCartServiceTests
+  {
+      private readonly ShoppingCartService _cart = new();
+
+      [Fact]
+      public void AddItem_NewProduct_AddsToCart()
+      {
+          _cart.AddItem(1, "Widget", 9.99m, 2);
+          _cart.GetItems().Should().ContainSingle(i => i.ProductId == 1);
+      }
+
+      [Fact]
+      public void AddItem_ExistingProduct_IncrementsQuantity()
+      {
+          _cart.AddItem(1, "Widget", 9.99m, 2);
+          _cart.AddItem(1, "Widget", 9.99m, 3);
+          _cart.GetItems().Single(i => i.ProductId == 1).Quantity.Should().Be(5);
+      }
+
+      [Fact]
+      public void RemoveItem_RemovesFromCart()
+      {
+          _cart.AddItem(1, "Widget", 9.99m);
+          _cart.RemoveItem(1);
+          _cart.GetItems().Should().BeEmpty();
+      }
+
+      [Fact]
+      public void UpdateQuantity_BelowOne_Throws()
+      {
+          _cart.AddItem(1, "Widget", 9.99m);
+          var act = () => _cart.UpdateQuantity(1, 0);
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void GetSummary_CalculatesCorrectly()
+      {
+          _cart.AddItem(1, "A", 10m, 2);
+          _cart.AddItem(2, "B", 5m, 1);
+          var summary = _cart.GetSummary();
+          summary.Subtotal.Should().Be(25m);
+          summary.Tax.Should().Be(2.5m);
+          summary.Total.Should().Be(27.5m);
+          summary.TotalItems.Should().Be(3);
+      }
+
+      [Fact]
+      public void Clear_EmptiesCart()
+      {
+          _cart.AddItem(1, "A", 5m);
+          _cart.Clear();
+          _cart.GetItems().Should().BeEmpty();
+      }
+
+      [Fact]
+      public void AddItem_FiresOnCartChanged()
+      {
+          var fired = false;
+          _cart.OnCartChanged += () => fired = true;
+          _cart.AddItem(1, "Widget", 5m);
+          fired.Should().BeTrue();
+      }
+  }

@@ -1,0 +1,14 @@
+name: deduction_medium_012
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All soluble substances dissolve in water.
+  2. Substance X does not dissolve in water.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "Substance X is not soluble."
+validator_config: {}

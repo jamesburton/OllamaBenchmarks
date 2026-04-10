@@ -1,0 +1,19 @@
+name: rewriting_medium_019
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in the passive voice:
+  'The company will launch the product next month.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "will be launched"
+    - "launched"
+    - "product"
+  min_words: 5
+  max_words: 20

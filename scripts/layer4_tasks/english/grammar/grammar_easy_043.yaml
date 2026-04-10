@@ -1,0 +1,15 @@
+name: grammar_easy_043
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) To improve your writing, daily practice is recommended.
+  B) To improve your writing, you should practise daily.
+  C) To improve your writing, it is recommended daily practice.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

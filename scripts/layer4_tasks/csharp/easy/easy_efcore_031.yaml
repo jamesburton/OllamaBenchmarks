@@ -1,0 +1,39 @@
+name: easy_efcore_031
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Report with properties: int Id, string Name, string CreatedBy, DateTime CreatedAt
+  A DbContext class ReportContext with:
+    DbSet<Report> Reports { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class ReportRepository with:
+    List<Report> GetByUser(ReportContext context, string userId)
+  that returns all reports created by the given user (case-sensitive) ordered by CreatedAt descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReportRepositoryTests
+  {
+      [Fact]
+      public void GetByUser_ReturnsUserReports()
+      {
+          using var context = new ReportContext();
+          context.Database.EnsureCreated();
+          context.Reports.AddRange(
+              new Report { Name = "R1", CreatedBy = "alice", CreatedAt = new DateTime(2024,1,1) },
+              new Report { Name = "R2", CreatedBy = "alice", CreatedAt = new DateTime(2024,2,1) },
+              new Report { Name = "R3", CreatedBy = "bob", CreatedAt = new DateTime(2024,3,1) });
+          context.SaveChanges();
+          var result = ReportRepository.GetByUser(context, "alice");
+          result.Should().HaveCount(2);
+          result[0].Name.Should().Be("R2");
+      }
+  }

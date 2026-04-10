@@ -1,0 +1,18 @@
+name: constraint_medium_008
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three children each like different sports and different foods.
+  Sports: football, tennis, swimming. Foods: pizza, salad, soup.
+  Clues:
+  1. The football player likes pizza.
+  2. Emma plays tennis.
+  3. Frank does not like salad.
+  4. Grace does not play football.
+  What does Frank eat? Reply with only the food.
+expected_answer: "Pizza"
+validator_config: {}

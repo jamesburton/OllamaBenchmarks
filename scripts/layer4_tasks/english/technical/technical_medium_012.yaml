@@ -1,0 +1,23 @@
+name: technical_medium_012
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Testing' section for a Python project using pytest.
+  Explain how to run the tests.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "pytest"
+    - "test"
+    - "run"
+    - "coverage"
+    - "command"
+    - "```"
+    - "install"
+  min_words: 10
+  max_words: 80

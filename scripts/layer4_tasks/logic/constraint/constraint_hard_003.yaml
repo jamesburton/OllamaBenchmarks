@@ -1,0 +1,18 @@
+name: constraint_hard_003
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Five suspects: Ann, Ben, Cal, Dan, Eva. One committed the crime.
+  Clues:
+  1. If Ann is guilty, Ben is innocent.
+  2. If Ben is innocent, Cal is guilty.
+  3. If Cal is guilty, Dan is innocent.
+  4. If Dan is innocent, Eva is innocent.
+  5. Exactly one person is guilty.
+  Who is guilty? Reply with only the name.
+expected_answer: "Cal"
+validator_config: {}

@@ -1,0 +1,17 @@
+name: riddles_hard_005
+category: logic
+subcategory: riddles
+difficulty: hard
+weight: 3
+validator_type: logic
+max_tokens: 64
+prompt: |
+  What has 13 hearts but no other organs?
+  Reply with only the answer.
+expected_answer: "A deck of cards"
+validator_config:
+  accepted_answers:
+  - "A deck of cards"
+  - "deck of cards"
+  - "a deck of playing cards"
+  - "playing cards"

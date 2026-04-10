@@ -1,0 +1,12 @@
+name: truth_tables_easy_013
+category: logic
+subcategory: truth_tables
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Evaluate: False IMPLIES True
+  Reply with only True or False.
+expected_answer: "True"
+validator_config: {}

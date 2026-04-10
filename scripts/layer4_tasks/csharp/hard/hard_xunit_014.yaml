@@ -1,0 +1,95 @@
+name: hard_xunit_014
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing fake time and clock abstraction:
+  Interface IClock:
+    DateTime UtcNow { get; }
+    DateTimeOffset UtcNowOffset { get; }
+
+  Class SystemClock : IClock: uses DateTime.UtcNow.
+  Class FakeClock : IClock:
+    FakeClock(DateTime initialTime)
+    void Advance(TimeSpan duration)
+    void Set(DateTime time)
+    DateTime UtcNow { get; }
+
+  Class TokenManager(IClock clock):
+    string GenerateToken(string userId, TimeSpan expiry):
+      Creates token: "{userId}:{expiry.TotalSeconds}:{issuedAt.Ticks}"
+    bool ValidateToken(string token):
+      Parses token, checks expiry against clock.UtcNow.
+    (string UserId, DateTime IssuedAt, DateTime ExpiresAt)? ParseToken(string token)
+
+  Tests use FakeClock to verify token expiry behavior precisely.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TokenManagerTests
+  {
+      [Fact]
+      public void GenerateToken_CanBeParsed()
+      {
+          var clock = new FakeClock(DateTime.UtcNow);
+          var mgr = new TokenManager(clock);
+          var token = mgr.GenerateToken("user1", TimeSpan.FromHours(1));
+          var parsed = mgr.ParseToken(token);
+          parsed.Should().NotBeNull();
+          parsed!.Value.UserId.Should().Be("user1");
+      }
+
+      [Fact]
+      public void ValidToken_IsValid()
+      {
+          var clock = new FakeClock(DateTime.UtcNow);
+          var mgr = new TokenManager(clock);
+          var token = mgr.GenerateToken("user2", TimeSpan.FromHours(1));
+          mgr.ValidateToken(token).Should().BeTrue();
+      }
+
+      [Fact]
+      public void ExpiredToken_IsInvalid()
+      {
+          var clock = new FakeClock(DateTime.UtcNow);
+          var mgr = new TokenManager(clock);
+          var token = mgr.GenerateToken("user3", TimeSpan.FromMinutes(5));
+          clock.Advance(TimeSpan.FromMinutes(10));
+          mgr.ValidateToken(token).Should().BeFalse();
+      }
+
+      [Fact]
+      public void JustBeforeExpiry_IsValid()
+      {
+          var start = DateTime.UtcNow;
+          var clock = new FakeClock(start);
+          var mgr = new TokenManager(clock);
+          var token = mgr.GenerateToken("user4", TimeSpan.FromMinutes(60));
+          clock.Advance(TimeSpan.FromMinutes(59));
+          mgr.ValidateToken(token).Should().BeTrue();
+      }
+
+      [Fact]
+      public void FakeClock_Set_ChangesTime()
+      {
+          var clock = new FakeClock(DateTime.UtcNow);
+          var newTime = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+          clock.Set(newTime);
+          clock.UtcNow.Should().Be(newTime);
+      }
+
+      [Fact]
+      public void ParseToken_InvalidFormat_ReturnsNull()
+      {
+          var clock = new FakeClock(DateTime.UtcNow);
+          var mgr = new TokenManager(clock);
+          var result = mgr.ParseToken("invalid-token-format");
+          result.Should().BeNull();
+      }
+  }

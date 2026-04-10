@@ -1,0 +1,90 @@
+name: hard_efcore_012
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with audit trail pattern using shadow properties:
+  Entities: Project(int Id, string Name, string Status, string OwnerId) and
+  ProjectTask(int Id, int ProjectId, string Title, string Assignee, string Status).
+  Shadow properties on both entities: CreatedAt (DateTime), UpdatedAt (DateTime),
+    CreatedBy (string), UpdatedBy (string).
+  DbContext: ProjectDbContext — override SaveChangesAsync to auto-populate shadow properties.
+    ICurrentUserService used to get current user.
+  Interface ICurrentUserService: string GetCurrentUserId()
+  Class ProjectRepository(ProjectDbContext db):
+    Task<Project> CreateAsync(Project project, CancellationToken ct)
+    Task<Project?> GetAsync(int id, CancellationToken ct)
+    Task UpdateStatusAsync(int id, string status, CancellationToken ct)
+    Task<DateTime> GetCreatedAtAsync(int id, CancellationToken ct)
+    Task<string> GetCreatedByAsync(int id, CancellationToken ct)
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProjectAuditTests : IDisposable
+  {
+      private readonly ProjectDbContext _db;
+      private readonly ProjectRepository _repo;
+      private readonly TestCurrentUserService _userSvc;
+
+      public ProjectAuditTests()
+      {
+          _userSvc = new TestCurrentUserService("user-1");
+          var opts = new DbContextOptionsBuilder<ProjectDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new ProjectDbContext(opts, _userSvc);
+          _db.Database.EnsureCreated();
+          _repo = new ProjectRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task Create_SetsCreatedAt()
+      {
+          var p = await _repo.CreateAsync(new Project { Name = "Alpha", Status = "Active", OwnerId = "u1" }, CancellationToken.None);
+          var createdAt = await _repo.GetCreatedAtAsync(p.Id, CancellationToken.None);
+          createdAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+      }
+
+      [Fact]
+      public async Task Create_SetsCreatedBy()
+      {
+          var p = await _repo.CreateAsync(new Project { Name = "Beta", Status = "Active", OwnerId = "u1" }, CancellationToken.None);
+          var createdBy = await _repo.GetCreatedByAsync(p.Id, CancellationToken.None);
+          createdBy.Should().Be("user-1");
+      }
+
+      [Fact]
+      public async Task Update_SetsUpdatedByDifferentUser()
+      {
+          var p = await _repo.CreateAsync(new Project { Name = "Gamma", Status = "Active", OwnerId = "u1" }, CancellationToken.None);
+          _userSvc.SetUserId("user-2");
+          await _repo.UpdateStatusAsync(p.Id, "Completed", CancellationToken.None);
+          var updatedBy = await _db.Projects
+              .Where(x => x.Id == p.Id)
+              .Select(x => EF.Property<string>(x, "UpdatedBy"))
+              .FirstAsync();
+          updatedBy.Should().Be("user-2");
+      }
+
+      [Fact]
+      public async Task Get_UnknownId_ReturnsNull()
+      {
+          (await _repo.GetAsync(9999, CancellationToken.None)).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task UpdateStatus_Persists()
+      {
+          var p = await _repo.CreateAsync(new Project { Name = "Delta", Status = "Draft", OwnerId = "u1" }, CancellationToken.None);
+          await _repo.UpdateStatusAsync(p.Id, "Active", CancellationToken.None);
+          var found = await _repo.GetAsync(p.Id, CancellationToken.None);
+          found!.Status.Should().Be("Active");
+      }
+  }

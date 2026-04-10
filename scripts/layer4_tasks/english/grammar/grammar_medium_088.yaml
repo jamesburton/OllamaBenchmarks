@@ -1,0 +1,15 @@
+name: grammar_medium_088
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) If he studies harder, he would pass.
+  B) If he studies harder, he will pass.
+  C) If he studied harder, he will pass.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

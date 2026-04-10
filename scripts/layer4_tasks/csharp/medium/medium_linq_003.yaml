@@ -1,0 +1,64 @@
+name: medium_linq_003
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Product with: int Id, string Name, string Tag, decimal Price.
+  A class ProductCatalogue with a constructor accepting IEnumerable<Product> products.
+  Expose:
+    Dictionary<string, List<Product>> GroupByTag()  — groups products by Tag
+    IEnumerable<Product> TopN(string tag, int n)    — top n most expensive products for a tag
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductCatalogueTests
+  {
+      private readonly Product[] _products = {
+          new(1, "Hammer",    "Tools",    9.99m),
+          new(2, "Drill",     "Tools",   49.99m),
+          new(3, "Saw",       "Tools",   29.99m),
+          new(4, "Shirt",     "Clothing", 15.00m),
+          new(5, "Jeans",     "Clothing", 45.00m),
+      };
+
+      [Fact]
+      public void GroupByTag_ReturnsTwoGroups()
+      {
+          var result = new ProductCatalogue(_products).GroupByTag();
+          result.Keys.Should().BeEquivalentTo(new[] { "Tools", "Clothing" });
+      }
+
+      [Fact]
+      public void GroupByTag_ToolsHasThreeProducts()
+      {
+          var result = new ProductCatalogue(_products).GroupByTag();
+          result["Tools"].Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void TopN_ReturnsCorrectOrder()
+      {
+          var result = new ProductCatalogue(_products).TopN("Tools", 2).ToList();
+          result.Should().HaveCount(2);
+          result[0].Price.Should().Be(49.99m);
+          result[1].Price.Should().Be(29.99m);
+      }
+
+      [Fact]
+      public void TopN_UnknownTag_ReturnsEmpty()
+      {
+          new ProductCatalogue(_products).TopN("Food", 5).Should().BeEmpty();
+      }
+
+      [Fact]
+      public void TopN_NGreaterThanCount_ReturnsAll()
+      {
+          new ProductCatalogue(_products).TopN("Clothing", 100).Should().HaveCount(2);
+      }
+  }

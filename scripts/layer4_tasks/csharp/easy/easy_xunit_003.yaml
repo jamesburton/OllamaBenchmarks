@@ -1,0 +1,34 @@
+name: easy_xunit_003
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IGreeter with method:
+    string Greet(string name)
+  A class FormalGreeter implementing IGreeter that returns "Good day, {name}."
+  Return only valid C# code in a single file.
+test_code: |
+  public class FormalGreeterTests
+  {
+      [Fact]
+      public void Greet_ReturnsFormalGreeting()
+      {
+          IGreeter greeter = new FormalGreeter();
+          greeter.Greet("Alice").Should().Be("Good day, Alice.");
+      }
+      [Fact]
+      public void Greet_WithMock_VerifiesCall()
+      {
+          var mock = Substitute.For<IGreeter>();
+          mock.Greet("Bob").Returns("mocked");
+          mock.Greet("Bob").Should().Be("mocked");
+          mock.Received(1).Greet("Bob");
+      }
+  }

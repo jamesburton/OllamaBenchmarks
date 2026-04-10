@@ -1,0 +1,14 @@
+name: sequences_hard_001
+category: logic
+subcategory: sequences
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  In the arithmetic sequence with first term 7 and last term 127, there are 13 terms. What is the common difference?
+  Reply with only the number.
+expected_answer: "10"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

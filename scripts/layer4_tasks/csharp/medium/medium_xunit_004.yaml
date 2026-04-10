@@ -1,0 +1,63 @@
+name: medium_xunit_004
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class PasswordValidator with:
+    record ValidationResult(bool IsValid, IEnumerable<string> Errors)
+    ValidationResult Validate(string password)
+  Rules:
+    Minimum 8 characters.
+    At least one uppercase letter.
+    At least one lowercase letter.
+    At least one digit.
+    At least one special character (!@#$%^&*).
+  Returns all violations in Errors.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PasswordValidatorTests
+  {
+      private readonly PasswordValidator _validator = new();
+
+      [Fact]
+      public void ValidPassword_ReturnsIsValidTrue()
+      {
+          _validator.Validate("Abcd1234!").IsValid.Should().BeTrue();
+      }
+
+      [Fact]
+      public void TooShort_ReturnsError()
+      {
+          var result = _validator.Validate("Ab1!");
+          result.IsValid.Should().BeFalse();
+          result.Errors.Should().Contain(e => e.ToLower().Contains("8") || e.ToLower().Contains("short"));
+      }
+
+      [Fact]
+      public void NoUppercase_ReturnsError()
+      {
+          var result = _validator.Validate("abcd1234!");
+          result.Errors.Should().Contain(e => e.ToLower().Contains("upper"));
+      }
+
+      [Fact]
+      public void NoSpecialChar_ReturnsError()
+      {
+          var result = _validator.Validate("Abcd1234");
+          result.Errors.Should().Contain(e => e.ToLower().Contains("special"));
+      }
+
+      [Fact]
+      public void MultipleViolations_ReturnsAllErrors()
+      {
+          var result = _validator.Validate("abc");
+          result.Errors.Should().HaveCountGreaterThan(1);
+      }
+  }

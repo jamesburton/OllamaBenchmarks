@@ -1,0 +1,56 @@
+name: medium_aspnet_004
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ApiKeyMiddleware with constructor accepting RequestDelegate next and string apiKey.
+  In InvokeAsync: if request has header X-Api-Key matching apiKey, call next; else return 401.
+  Extension method: UseApiKey(this IApplicationBuilder app, string apiKey).
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApiKeyMiddlewareTests
+  {
+      private HttpContext MakeContext(string? headerValue = null)
+      {
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          if (headerValue != null)
+              ctx.Request.Headers["X-Api-Key"] = headerValue;
+          return ctx;
+      }
+
+      [Fact]
+      public async Task ValidKey_CallsNext()
+      {
+          var called = false;
+          var mw = new ApiKeyMiddleware(_ => { called = true; return Task.CompletedTask; }, "secret");
+          var ctx = MakeContext("secret");
+          await mw.InvokeAsync(ctx);
+          called.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task InvalidKey_Returns401()
+      {
+          var mw = new ApiKeyMiddleware(_ => Task.CompletedTask, "secret");
+          var ctx = MakeContext("wrong");
+          await mw.InvokeAsync(ctx);
+          ctx.Response.StatusCode.Should().Be(401);
+      }
+
+      [Fact]
+      public async Task MissingKey_Returns401()
+      {
+          var mw = new ApiKeyMiddleware(_ => Task.CompletedTask, "secret");
+          var ctx = MakeContext();
+          await mw.InvokeAsync(ctx);
+          ctx.Response.StatusCode.Should().Be(401);
+      }
+  }

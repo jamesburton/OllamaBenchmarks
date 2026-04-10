@@ -1,0 +1,63 @@
+name: medium_aspnet_035
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record QueuedJob(Guid Id, string JobType, string Payload, DateTime QueuedAt, string Status).
+  A class JobQueueController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<QueuedJob> (for testability).
+  Actions:
+    POST api/jobs — enqueue a new job (Status = "Queued"), returns 201
+    GET api/jobs — all jobs ordered by QueuedAt asc
+    PUT api/jobs/{id}/process — change Status to "Processing" (404 if not found)
+    PUT api/jobs/{id}/complete — change Status to "Completed" (404 if not found)
+  Return only valid C# code in a single file.
+test_code: |
+  public class JobQueueControllerTests
+  {
+      [Fact]
+      public void Enqueue_AddsJob_Returns201()
+      {
+          var ctrl = new JobQueueController(new List<QueuedJob>());
+          var result = ctrl.Enqueue("email", "{"to":"test@test.com"}") as CreatedAtActionResult;
+          result!.StatusCode.Should().Be(201);
+          (result.Value as QueuedJob)!.Status.Should().Be("Queued");
+      }
+
+      [Fact]
+      public void GetAll_OrderedByQueuedAt()
+      {
+          var jobs = new List<QueuedJob>
+          {
+              new(Guid.NewGuid(), "t1", "{}", DateTime.UtcNow.AddMinutes(-5), "Queued"),
+              new(Guid.NewGuid(), "t2", "{}", DateTime.UtcNow, "Queued")
+          };
+          var ctrl = new JobQueueController(jobs);
+          var result = ctrl.GetAll() as OkObjectResult;
+          (result!.Value as IEnumerable<QueuedJob>).Should().BeInAscendingOrder(j => j.QueuedAt);
+      }
+
+      [Fact]
+      public void Process_ChangesStatus()
+      {
+          var id = Guid.NewGuid();
+          var ctrl = new JobQueueController(new List<QueuedJob> { new(id, "t", "{}", DateTime.UtcNow, "Queued") });
+          ctrl.Process(id);
+          var job = ((ctrl.GetAll() as OkObjectResult)!.Value as IEnumerable<QueuedJob>)!.First();
+          job.Status.Should().Be("Processing");
+      }
+
+      [Fact]
+      public void Process_NotFound_Returns404()
+      {
+          var ctrl = new JobQueueController(new List<QueuedJob>());
+          ctrl.Process(Guid.NewGuid()).Should().BeOfType<NotFoundResult>();
+      }
+  }

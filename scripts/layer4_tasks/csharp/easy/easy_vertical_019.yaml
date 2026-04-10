@@ -1,0 +1,41 @@
+name: easy_vertical_019
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Review(int Id, string ProductId, string Author, int Rating, string Comment)
+  A class ReviewAggregator with:
+    void AddReview(Review review)
+    double AverageRating(string productId) returns average rating for product, 0 if none
+    List<Review> GetTopReviews(string productId, int count) returns top 'count' reviews by rating descending
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReviewAggregatorTests
+  {
+      [Fact]
+      public void AverageRating_ReturnsCorrectAverage()
+      {
+          var agg = new ReviewAggregator();
+          agg.AddReview(new Review(1, "p1", "Alice", 5, "Great!"));
+          agg.AddReview(new Review(2, "p1", "Bob", 3, "OK"));
+          agg.AverageRating("p1").Should().Be(4.0);
+      }
+      [Fact]
+      public void GetTopReviews_ReturnsInDescendingOrder()
+      {
+          var agg = new ReviewAggregator();
+          agg.AddReview(new Review(1, "p1", "A", 3, ""));
+          agg.AddReview(new Review(2, "p1", "B", 5, ""));
+          agg.AddReview(new Review(3, "p1", "C", 4, ""));
+          var top = agg.GetTopReviews("p1", 2);
+          top.First().Rating.Should().Be(5);
+          top.Should().HaveCount(2);
+      }
+  }

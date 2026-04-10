@@ -1,0 +1,17 @@
+name: constraint_medium_015
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Four teams - Eagles, Bears, Wolves, Lions - finish in positions 1-4.
+  Clues:
+  1. Eagles finish ahead of Bears.
+  2. Wolves finish last.
+  3. Lions finish 2nd.
+  4. Bears do not finish 3rd.
+  What position do the Eagles finish? Reply with only the number.
+expected_answer: "1"
+validator_config: {}

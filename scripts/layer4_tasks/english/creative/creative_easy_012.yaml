@@ -1,0 +1,22 @@
+name: creative_easy_012
+category: english
+subcategory: creative
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a mountain lake at sunrise.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "lake"
+    - "mountain"
+    - "sunrise"
+    - "calm"
+    - "reflection"
+    - "blue"
+    - "still"
+    - "mist"
+  min_words: 15
+  max_words: 60

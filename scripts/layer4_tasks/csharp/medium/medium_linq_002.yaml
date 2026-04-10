@@ -1,0 +1,64 @@
+name: medium_linq_002
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Employee with properties: int Id, string Name, int DepartmentId, decimal Salary.
+  A record Department with properties: int Id, string Name.
+  A class HrReports with a constructor accepting IEnumerable<Employee> employees and IEnumerable<Department> departments.
+  Expose a method:
+    IEnumerable<DeptPayroll> GetDepartmentPayroll()
+  that joins employees to departments by DepartmentId and returns DeptPayroll records
+  with: string DepartmentName, int HeadCount, decimal TotalSalary.
+  Results ordered by DepartmentName ascending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class HrReportsTests
+  {
+      private readonly Department[] _depts = {
+          new(1, "Engineering"), new(2, "Sales"), new(3, "HR")
+      };
+      private readonly Employee[] _emps = {
+          new(1, "Alice", 1, 90000m),
+          new(2, "Bob", 1, 85000m),
+          new(3, "Carol", 2, 60000m),
+          new(4, "Dave", 3, 55000m),
+      };
+
+      [Fact]
+      public void GetDepartmentPayroll_ReturnsAllDepartments()
+      {
+          var result = new HrReports(_emps, _depts).GetDepartmentPayroll().ToList();
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetDepartmentPayroll_EngineeringIsCorrect()
+      {
+          var result = new HrReports(_emps, _depts).GetDepartmentPayroll().ToList();
+          var eng = result.First(d => d.DepartmentName == "Engineering");
+          eng.HeadCount.Should().Be(2);
+          eng.TotalSalary.Should().Be(175000m);
+      }
+
+      [Fact]
+      public void GetDepartmentPayroll_OrderedByName()
+      {
+          var result = new HrReports(_emps, _depts).GetDepartmentPayroll().ToList();
+          result.Select(d => d.DepartmentName).Should().BeInAscendingOrder();
+      }
+
+      [Fact]
+      public void GetDepartmentPayroll_EmptyEmployees_ZeroSalaries()
+      {
+          var result = new HrReports(Array.Empty<Employee>(), _depts).GetDepartmentPayroll().ToList();
+          result.Should().AllSatisfy(d => d.TotalSalary.Should().Be(0m));
+      }
+  }

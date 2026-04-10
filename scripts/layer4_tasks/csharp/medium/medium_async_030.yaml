@@ -1,0 +1,60 @@
+name: medium_async_030
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IMetricsCollector with methods:
+    Task IncrementAsync(string metric, CancellationToken ct = default)
+    Task<long> GetCountAsync(string metric, CancellationToken ct = default)
+  A class MetricsMiddleware with constructor accepting IMetricsCollector collector.
+  Expose:
+    Task<T> MeasureAsync<T>(string operationName, Func<Task<T>> operation, CancellationToken ct = default)
+  Records a call to "{operationName}.calls" before executing and "{operationName}.errors" on failure.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MetricsMiddlewareTests
+  {
+      [Fact]
+      public async Task MeasureAsync_IncrementsCallMetric()
+      {
+          var collector = Substitute.For<IMetricsCollector>();
+          collector.IncrementAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          await new MetricsMiddleware(collector).MeasureAsync("op", () => Task.FromResult(1));
+          await collector.Received(1).IncrementAsync("op.calls", Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task MeasureAsync_OnError_IncrementsErrorMetric()
+      {
+          var collector = Substitute.For<IMetricsCollector>();
+          collector.IncrementAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          await Assert.ThrowsAsync<Exception>(() =>
+              new MetricsMiddleware(collector).MeasureAsync<int>("op", () => Task.FromException<int>(new Exception())));
+          await collector.Received(1).IncrementAsync("op.errors", Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task MeasureAsync_ReturnsOperationResult()
+      {
+          var collector = Substitute.For<IMetricsCollector>();
+          collector.IncrementAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var result = await new MetricsMiddleware(collector).MeasureAsync("x", () => Task.FromResult(42));
+          result.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task MeasureAsync_NoErrorOnSuccess_NoErrorIncrement()
+      {
+          var collector = Substitute.For<IMetricsCollector>();
+          collector.IncrementAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          await new MetricsMiddleware(collector).MeasureAsync("op", () => Task.FromResult(1));
+          await collector.DidNotReceive().IncrementAsync("op.errors", Arg.Any<CancellationToken>());
+      }
+  }

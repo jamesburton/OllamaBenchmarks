@@ -1,0 +1,21 @@
+name: constraint_hard_001
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Five houses in a row (1-5) each have different owners, colors, pets, drinks, and nationalities (classic Einstein riddle subset).
+  Owners: Alice, Bob, Carol, Dave, Eve.
+  Colors: red, blue, green, yellow, white.
+  Clues:
+  1. Alice owns the red house.
+  2. Bob's house is directly left of Carol's house.
+  3. The green house is immediately to the right of the white house.
+  4. Dave lives in house 1.
+  5. Eve lives in house 5.
+  6. Bob lives in house 3.
+  What color is Dave's house? Reply with only the colour.
+expected_answer: "Yellow"
+validator_config: {}

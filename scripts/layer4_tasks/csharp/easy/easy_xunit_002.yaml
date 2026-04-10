@@ -1,0 +1,32 @@
+name: easy_xunit_002
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class StringHelper with a static method:
+    bool IsPalindrome(string s) returns true if s is the same forwards and backwards (case-insensitive)
+  Return only valid C# code in a single file.
+test_code: |
+  public class StringHelperTests
+  {
+      [Theory]
+      [InlineData("racecar", true)]
+      [InlineData("hello", false)]
+      [InlineData("Racecar", true)]
+      public void IsPalindrome_ReturnsCorrectResult(string input, bool expected)
+      {
+          StringHelper.IsPalindrome(input).Should().Be(expected);
+      }
+      [Fact]
+      public void IsPalindrome_SingleChar_ReturnsTrue()
+      {
+          StringHelper.IsPalindrome("a").Should().BeTrue();
+      }
+  }

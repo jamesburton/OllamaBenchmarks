@@ -1,0 +1,84 @@
+name: hard_linq_017
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Event(int Id, string Type, string Source, DateTime OccurredAt, Dictionary<string, string> Metadata).
+  A class EventCorrelator with constructor accepting IEnumerable<Event> events.
+  Methods:
+    IEnumerable<EventChain> CorrelateBySource(TimeSpan window) — for each Source,
+      groups consecutive events within the time window into chains.
+      A chain breaks when the gap between events exceeds the window.
+      EventChain has Source, IReadOnlyList<Event> Events, TimeSpan Duration.
+    IEnumerable<Event> WithMetadata(string key, string value) — filters events having
+      the given metadata key with the given value (case-insensitive value comparison).
+    IEnumerable<TypeFrequency> TypeFrequencies() — groups by Type, counts frequency,
+      orders by Count descending.
+  Records: EventChain(string Source, IReadOnlyList<Event> Events, TimeSpan Duration),
+           TypeFrequency(string Type, int Count).
+  Return only valid C# code in a single file.
+test_code: |
+  public class EventCorrelatorTests
+  {
+      private static readonly DateTime T0 = new(2024,1,1,12,0,0);
+      private static readonly List<Event> Events = new()
+      {
+          new(1, "Login",  "SvcA", T0,              new(){ {"user","alice"} }),
+          new(2, "Error",  "SvcA", T0.AddMinutes(2),new(){ {"user","alice"} }),
+          new(3, "Logout", "SvcA", T0.AddMinutes(4),new(){ {"user","alice"} }),
+          new(4, "Login",  "SvcA", T0.AddMinutes(20),new(){ {"user","bob"} }),
+          new(5, "Error",  "SvcB", T0.AddMinutes(1), new(){ {"user","ALICE"} }),
+          new(6, "Info",   "SvcB", T0.AddMinutes(3), new(){ {"code","200"} }),
+      };
+
+      [Fact]
+      public void CorrelateBySource_SvcAProducesTwoChains()
+      {
+          var result = new EventCorrelator(Events)
+              .CorrelateBySource(TimeSpan.FromMinutes(5)).ToList();
+          var svcA = result.Where(c => c.Source == "SvcA").ToList();
+          svcA.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void CorrelateBySource_FirstChainHasThreeEvents()
+      {
+          var result = new EventCorrelator(Events)
+              .CorrelateBySource(TimeSpan.FromMinutes(5)).ToList();
+          result.First(c => c.Source == "SvcA").Events.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void WithMetadata_FindsCaseInsensitiveValue()
+      {
+          var result = new EventCorrelator(Events).WithMetadata("user", "alice").ToList();
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void WithMetadata_MissingKey_ReturnsEmpty()
+      {
+          new EventCorrelator(Events).WithMetadata("nonexistent", "x").Should().BeEmpty();
+      }
+
+      [Fact]
+      public void TypeFrequencies_ErrorCountIsTwo()
+      {
+          var result = new EventCorrelator(Events).TypeFrequencies().ToList();
+          result.First(t => t.Type == "Error").Count.Should().Be(2);
+      }
+
+      [Fact]
+      public void TypeFrequencies_OrderedByCountDescending()
+      {
+          var result = new EventCorrelator(Events).TypeFrequencies().ToList();
+          result.Select(t => t.Count).Should().BeInDescendingOrder();
+      }
+  }

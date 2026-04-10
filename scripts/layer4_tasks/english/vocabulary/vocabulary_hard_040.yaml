@@ -1,0 +1,16 @@
+name: vocabulary_hard_040
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The law was seen as inimical to free speech', which word best replaces 'inimical'?
+  A) Beneficial
+  B) Neutral
+  C) Hostile
+  D) Related
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

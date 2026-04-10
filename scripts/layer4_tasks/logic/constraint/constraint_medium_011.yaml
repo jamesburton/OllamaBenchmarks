@@ -1,0 +1,17 @@
+name: constraint_medium_011
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three rooms contain different things. Rooms: left, center, right.
+  Items: gold, silver, bronze.
+  Clues:
+  1. Gold is not in the left room.
+  2. Silver is in the center room.
+  3. Bronze is not in the center room.
+  Where is the gold? Reply with only the room position.
+expected_answer: "Right"
+validator_config: {}

@@ -1,0 +1,88 @@
+name: hard_linq_004
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A custom IEqualityComparer<string> called CaseInsensitiveTrimComparer that compares
+  strings case-insensitively after trimming whitespace.
+  A record Tag(string Name, string Category).
+  A class TagDeduplicator with constructor accepting IEnumerable<Tag> tags.
+  Methods:
+    IEnumerable<Tag> Deduplicate() — returns distinct tags using CaseInsensitiveTrimComparer
+      on Name (keep first occurrence). Orders result by Category then Name.
+    IEnumerable<IGrouping<string, Tag>> GroupByCategory() — groups deduplicated tags by
+      Category using CaseInsensitiveTrimComparer.
+    int CountUnique() — returns count of unique tag names ignoring case/whitespace.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TagDeduplicatorTests
+  {
+      private static readonly List<Tag> Tags = new()
+      {
+          new(" Widget ", "UI"),
+          new("widget",   "UI"),
+          new("WIDGET",   "UI"),
+          new("Button",   "UI"),
+          new("button ",  "UI"),
+          new("Service",  "Backend"),
+          new(" service", "Backend"),
+      };
+
+      [Fact]
+      public void Deduplicate_RemovesDuplicates()
+      {
+          var result = new TagDeduplicator(Tags).Deduplicate().ToList();
+          result.Select(t => t.Name.Trim().ToLower()).Distinct().Should().HaveCount(result.Count);
+      }
+
+      [Fact]
+      public void Deduplicate_KeepsFirstOccurrence()
+      {
+          var result = new TagDeduplicator(Tags).Deduplicate().ToList();
+          result.Should().Contain(t => t.Name == " Widget ");
+          result.Should().NotContain(t => t.Name == "WIDGET");
+      }
+
+      [Fact]
+      public void Deduplicate_OrderedByCategoryThenName()
+      {
+          var result = new TagDeduplicator(Tags).Deduplicate().ToList();
+          var backendFirst = result.First(t => t.Category == "Backend");
+          var uiFirst = result.First(t => t.Category == "UI");
+          result.IndexOf(backendFirst).Should().BeLessThan(result.IndexOf(uiFirst));
+      }
+
+      [Fact]
+      public void CountUnique_ReturnsCorrectCount()
+      {
+          new TagDeduplicator(Tags).CountUnique().Should().Be(3);
+      }
+
+      [Fact]
+      public void GroupByCategory_GroupsCorrectly()
+      {
+          var groups = new TagDeduplicator(Tags).GroupByCategory().ToList();
+          groups.Should().HaveCount(2);
+          groups.First(g => g.Key.Equals("Backend", StringComparison.OrdinalIgnoreCase))
+                .Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void Deduplicate_EmptyInput_ReturnsEmpty()
+      {
+          new TagDeduplicator(Array.Empty<Tag>()).Deduplicate().Should().BeEmpty();
+      }
+
+      [Fact]
+      public void CountUnique_EmptyInput_ReturnsZero()
+      {
+          new TagDeduplicator(Array.Empty<Tag>()).CountUnique().Should().Be(0);
+      }
+  }

@@ -1,0 +1,14 @@
+name: arithmetic_medium_015
+category: maths
+subcategory: arithmetic
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Calculate: (4 + 6) * (3 + 7) - (2 * 5)
+  Reply with only the number.
+expected_answer: "90"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

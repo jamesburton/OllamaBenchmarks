@@ -1,0 +1,16 @@
+name: riddles_medium_007
+category: logic
+subcategory: riddles
+difficulty: medium
+weight: 2
+validator_type: logic
+max_tokens: 64
+prompt: |
+  What goes up when rain comes down?
+  Reply with only the answer.
+expected_answer: "An umbrella"
+validator_config:
+  accepted_answers:
+  - "An umbrella"
+  - "umbrella"
+  - "an umbrella"

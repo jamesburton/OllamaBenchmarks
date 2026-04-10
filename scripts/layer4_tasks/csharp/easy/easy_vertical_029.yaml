@@ -1,0 +1,40 @@
+name: easy_vertical_029
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Notification(string Id, string UserId, string Message, bool IsRead)
+  A class NotificationCenter with:
+    void Send(Notification notification)
+    void MarkAsRead(string notificationId) marks notification as read using 'with' expression
+    List<Notification> GetUnread(string userId) returns unread notifications for user
+    int UnreadCount(string userId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationCenterTests
+  {
+      [Fact]
+      public void MarkAsRead_SetsIsReadTrue()
+      {
+          var center = new NotificationCenter();
+          center.Send(new Notification("n1", "u1", "Hello", false));
+          center.MarkAsRead("n1");
+          center.GetUnread("u1").Should().BeEmpty();
+      }
+      [Fact]
+      public void UnreadCount_ReturnsCorrectCount()
+      {
+          var center = new NotificationCenter();
+          center.Send(new Notification("n1", "u1", "Msg1", false));
+          center.Send(new Notification("n2", "u1", "Msg2", false));
+          center.MarkAsRead("n1");
+          center.UnreadCount("u1").Should().Be(1);
+      }
+  }

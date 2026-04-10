@@ -1,0 +1,42 @@
+name: easy_efcore_001
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class BlogPost with properties: int Id, string Title, string Content, DateTime CreatedAt
+  A DbContext class BlogContext with:
+    DbSet<BlogPost> BlogPosts { get; set; }
+  Configure using InMemory database in OnConfiguring.
+  Also create a static class BlogRepository with:
+    BlogPost Add(BlogContext context, string title, string content)
+  that adds a BlogPost with the given title/content (CreatedAt = DateTime.UtcNow), saves changes, and returns the post.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BlogRepositoryTests
+  {
+      [Fact]
+      public void Add_CreatesPost()
+      {
+          using var context = new BlogContext();
+          context.Database.EnsureCreated();
+          var post = BlogRepository.Add(context, "Hello World", "Content here");
+          post.Id.Should().BeGreaterThan(0);
+          post.Title.Should().Be("Hello World");
+      }
+      [Fact]
+      public void Add_PersistedInContext()
+      {
+          using var context = new BlogContext();
+          context.Database.EnsureCreated();
+          BlogRepository.Add(context, "First Post", "Body");
+          context.BlogPosts.Should().HaveCount(1);
+      }
+  }

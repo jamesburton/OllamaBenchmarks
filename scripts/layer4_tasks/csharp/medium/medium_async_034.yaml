@@ -1,0 +1,51 @@
+name: medium_async_034
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class SequentialIdGenerator with constructor accepting string prefix.
+  Exposes ValueTask<string> NextIdAsync(CancellationToken ct = default) generating IDs like "{prefix}-001" in order.
+  Thread-safe using Interlocked. Also exposes int CurrentCount.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SequentialIdGeneratorTests
+  {
+      [Fact]
+      public async Task FirstId_CorrectFormat()
+      {
+          (await new SequentialIdGenerator("TKT").NextIdAsync()).Should().Be("TKT-001");
+      }
+
+      [Fact]
+      public async Task Sequential_InOrder()
+      {
+          var gen = new SequentialIdGenerator("ORD");
+          var ids = new List<string>();
+          for (int i = 0; i < 3; i++) ids.Add(await gen.NextIdAsync());
+          ids.Should().BeEquivalentTo(new[]{"ORD-001","ORD-002","ORD-003"}, o => o.WithStrictOrdering());
+      }
+
+      [Fact]
+      public async Task CurrentCount_Tracks()
+      {
+          var gen = new SequentialIdGenerator("X");
+          await gen.NextIdAsync();
+          await gen.NextIdAsync();
+          gen.CurrentCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task Concurrent_AllUnique()
+      {
+          var gen = new SequentialIdGenerator("C");
+          var ids = await Task.WhenAll(Enumerable.Range(0, 10).Select(_ => gen.NextIdAsync().AsTask()));
+          ids.Distinct().Should().HaveCount(10);
+      }
+  }

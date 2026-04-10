@@ -1,0 +1,50 @@
+name: easy_efcore_005
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  Entity classes:
+    class Author with properties: int Id, string Name, ICollection<Book> Books
+    class Book with properties: int Id, string Title, int AuthorId, Author Author
+  A DbContext class LibraryContext with:
+    DbSet<Author> Authors { get; set; }
+    DbSet<Book> Books { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class LibraryRepository with:
+    List<Book> GetBooksByAuthor(LibraryContext context, int authorId)
+  that returns all books for a given author including the author, ordered by Title.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LibraryRepositoryTests
+  {
+      [Fact]
+      public void GetBooksByAuthor_ReturnsAuthorBooks()
+      {
+          using var context = new LibraryContext();
+          context.Database.EnsureCreated();
+          var author = new Author { Name = "Alice" };
+          context.Authors.Add(author);
+          context.SaveChanges();
+          context.Books.AddRange(
+              new Book { Title = "Book B", AuthorId = author.Id },
+              new Book { Title = "Book A", AuthorId = author.Id });
+          context.SaveChanges();
+          var result = LibraryRepository.GetBooksByAuthor(context, author.Id);
+          result.Should().HaveCount(2);
+          result[0].Title.Should().Be("Book A");
+      }
+      [Fact]
+      public void GetBooksByAuthor_WrongAuthor_ReturnsEmpty()
+      {
+          using var context = new LibraryContext();
+          context.Database.EnsureCreated();
+          LibraryRepository.GetBooksByAuthor(context, 999).Should().BeEmpty();
+      }
+  }

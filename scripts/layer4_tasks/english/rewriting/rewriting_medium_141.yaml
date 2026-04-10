@@ -1,0 +1,22 @@
+name: rewriting_medium_141
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'There are some people who believe that it is possible that the data may not be entirely accurate.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "data"
+    - "inaccurate"
+    - "may not"
+    - "some"
+    - "accurate"
+    - "question"
+  min_words: 4
+  max_words: 15

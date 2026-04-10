@@ -1,0 +1,98 @@
+name: hard_vertical_019
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  CQRS + chain of responsibility for approval workflow:
+  Records:
+    ApprovalRequest(Guid Id, string RequestType, decimal Amount, string RequesterId, string? DepartmentId, Dictionary<string, object> Data)
+    ApprovalDecision(Guid RequestId, bool Approved, string ApproverId, string? Reason, DateTime DecidedAt)
+    ApprovalResult(bool Approved, string ApproverId, int ApprovalLevel, string? Reason)
+
+  Abstract class ApprovalHandler:
+    ApprovalHandler? SetNext(ApprovalHandler next)
+    abstract Task<ApprovalResult?> HandleAsync(ApprovalRequest request, CancellationToken ct)
+
+  Concrete handlers:
+    AutoApprovalHandler: approves if Amount <= 100.
+    ManagerApprovalHandler: handles if Amount <= 1000 (returns approved with managerId).
+    DirectorApprovalHandler: handles if Amount <= 10000.
+    ExecutiveApprovalHandler: handles any remaining amount.
+    Each has a configurable approverId.
+
+  Class ApprovalPipelineBuilder:
+    ApprovalPipelineBuilder Add(ApprovalHandler handler)
+    ApprovalHandler Build(): chains all handlers.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApprovalWorkflowTests
+  {
+      private ApprovalHandler BuildChain() =>
+          new ApprovalPipelineBuilder()
+              .Add(new AutoApprovalHandler())
+              .Add(new ManagerApprovalHandler("manager-1"))
+              .Add(new DirectorApprovalHandler("director-1"))
+              .Add(new ExecutiveApprovalHandler("exec-1"))
+              .Build();
+
+      [Fact]
+      public async Task SmallAmount_AutoApproved()
+      {
+          var chain = BuildChain();
+          var request = new ApprovalRequest(Guid.NewGuid(), "expense", 50m, "user1", null, new());
+          var result = await chain.HandleAsync(request, CancellationToken.None);
+          result.Should().NotBeNull();
+          result!.Approved.Should().BeTrue();
+          result.ApprovalLevel.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task MediumAmount_GoesToManager()
+      {
+          var chain = BuildChain();
+          var request = new ApprovalRequest(Guid.NewGuid(), "expense", 500m, "user1", null, new());
+          var result = await chain.HandleAsync(request, CancellationToken.None);
+          result!.ApproverId.Should().Be("manager-1");
+      }
+
+      [Fact]
+      public async Task LargeAmount_GoesToDirector()
+      {
+          var chain = BuildChain();
+          var request = new ApprovalRequest(Guid.NewGuid(), "expense", 5000m, "user1", null, new());
+          var result = await chain.HandleAsync(request, CancellationToken.None);
+          result!.ApproverId.Should().Be("director-1");
+      }
+
+      [Fact]
+      public async Task VeryLargeAmount_GoesToExecutive()
+      {
+          var chain = BuildChain();
+          var request = new ApprovalRequest(Guid.NewGuid(), "capex", 50000m, "user1", null, new());
+          var result = await chain.HandleAsync(request, CancellationToken.None);
+          result!.ApproverId.Should().Be("exec-1");
+      }
+
+      [Fact]
+      public async Task PipelineBuilder_BuildsCorrectChain()
+      {
+          var chain = BuildChain();
+          chain.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task AutoApproval_ExactBoundary_AutoApproved()
+      {
+          var chain = BuildChain();
+          var request = new ApprovalRequest(Guid.NewGuid(), "expense", 100m, "user1", null, new());
+          var result = await chain.HandleAsync(request, CancellationToken.None);
+          result!.Approved.Should().BeTrue();
+      }
+  }

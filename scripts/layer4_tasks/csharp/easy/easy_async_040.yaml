@@ -1,0 +1,37 @@
+name: easy_async_040
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncStringBuilder with a static method:
+    async Task<string> BuildAsync(IEnumerable<Func<Task<string>>> parts)
+  that awaits each part sequentially and concatenates the strings.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncStringBuilderTests
+  {
+      [Fact]
+      public async Task BuildAsync_ConcatenateParts()
+      {
+          var parts = new Func<Task<string>>[]{
+              () => Task.FromResult("Hello"),
+              () => Task.FromResult(", "),
+              () => Task.FromResult("World!")
+          };
+          var result = await AsyncStringBuilder.BuildAsync(parts);
+          result.Should().Be("Hello, World!");
+      }
+      [Fact]
+      public async Task BuildAsync_EmptyParts_ReturnsEmpty()
+      {
+          var result = await AsyncStringBuilder.BuildAsync(Array.Empty<Func<Task<string>>>());
+          result.Should().Be("");
+      }
+  }

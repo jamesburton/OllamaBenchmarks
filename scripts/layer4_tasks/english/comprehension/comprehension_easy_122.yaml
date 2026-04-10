@@ -1,0 +1,22 @@
+name: comprehension_easy_122
+category: english
+subcategory: comprehension
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  Jane Austen's novels, written in the early nineteenth century, are deceptively light in tone while containing incisive social commentary. Her works expose the constraints placed upon women by a patriarchal society in which marriage was often the only route to financial security. In novels such as Pride and Prejudice and Sense and Sensibility, Austen explores the tension between social convention and individual desire. Her heroines must navigate a world where a woman's intelligence and moral worth are systematically undervalued in favour of her beauty and family connections. Austen employs irony with great skill, allowing readers to perceive the gap between what characters say and what they mean. This technique invites readers to question social norms rather than simply accept them. Although her plots centre on domestic life and romance, their implications reach beyond the drawing room. Scholars increasingly read Austen as a proto-feminist author whose social critique remains relevant to contemporary debates about gender and power.
+  
+  Answer in one sentence:
+  What was often the only route to financial security for women in Austen's time?
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "marriage"
+    - "financial security"
+    - "only route"
+  min_words: 8
+  max_words: 40

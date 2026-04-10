@@ -1,0 +1,23 @@
+name: technical_easy_061
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a brief notice confirming that a user's order has been shipped.
+  Keep it under 40 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "order"
+    - "shipped"
+    - "tracking"
+    - "delivery"
+    - "dispatched"
+    - "estimated"
+    - "arrive"
+    - "link"
+  min_words: 8
+  max_words: 40

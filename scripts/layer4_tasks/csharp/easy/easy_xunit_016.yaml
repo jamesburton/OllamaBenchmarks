@@ -1,0 +1,37 @@
+name: easy_xunit_016
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IEventPublisher with method:
+    void Publish(string eventName)
+  A class OrderService with constructor taking IEventPublisher, and method:
+    void PlaceOrder(string orderId) publishes event "OrderPlaced:{orderId}"
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderServiceTests
+  {
+      [Fact]
+      public void PlaceOrder_PublishesEvent()
+      {
+          var publisher = Substitute.For<IEventPublisher>();
+          var service = new OrderService(publisher);
+          service.PlaceOrder("ABC123");
+          publisher.Received(1).Publish("OrderPlaced:ABC123");
+      }
+      [Fact]
+      public void PlaceOrder_DifferentId_PublishesCorrectEvent()
+      {
+          var publisher = Substitute.For<IEventPublisher>();
+          var service = new OrderService(publisher);
+          service.PlaceOrder("XYZ");
+          publisher.Received(1).Publish("OrderPlaced:XYZ");
+      }
+  }

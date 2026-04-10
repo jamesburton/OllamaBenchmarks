@@ -1,0 +1,48 @@
+name: medium_patterns_034
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IRule<T> with bool IsSatisfied(T input) and string ErrorMessage { get; }.
+  A class RuleEngine<T> with constructor accepting IEnumerable<IRule<T>> rules.
+  Expose RuleResult Validate(T input).
+  RuleResult is a record with bool IsValid and IReadOnlyList<string> Errors.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RuleEngineTests
+  {
+      private static IRule<int> Rule(bool pass, string msg)
+      {
+          var r = Substitute.For<IRule<int>>();
+          r.IsSatisfied(Arg.Any<int>()).Returns(pass);
+          r.ErrorMessage.Returns(msg);
+          return r;
+      }
+
+      [Fact]
+      public void AllPass_IsValid()
+      {
+          new RuleEngine<int>(new[]{Rule(true,"ok1"),Rule(true,"ok2")}).Validate(5).IsValid.Should().BeTrue();
+      }
+
+      [Fact]
+      public void OneFail_CollectsError()
+      {
+          var result = new RuleEngine<int>(new[]{Rule(true,"ok"),Rule(false,"bad")}).Validate(5);
+          result.IsValid.Should().BeFalse();
+          result.Errors.Should().Contain("bad");
+      }
+
+      [Fact]
+      public void MultipleFails_AllErrors()
+      {
+          new RuleEngine<int>(new[]{Rule(false,"e1"),Rule(false,"e2")}).Validate(0).Errors.Should().HaveCount(2);
+      }
+  }

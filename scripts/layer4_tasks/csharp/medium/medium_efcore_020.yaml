@@ -1,0 +1,66 @@
+name: medium_efcore_020
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity StockLevel with: int Id, string Symbol, decimal Price, long Volume, DateTime RecordedAt.
+  A class StockDbContext : DbContext with DbSet<StockLevel> StockLevels.
+  A class StockRepository with constructor accepting StockDbContext.
+  Methods:
+    Task<StockLevel?> GetLatestAsync(string symbol)
+    Task<IEnumerable<StockLevel>> GetHistoryAsync(string symbol, DateTime from, DateTime to)
+    Task<IDictionary<string, decimal>> GetLatestPricesAsync()
+    Task AddReadingAsync(StockLevel level)
+  Return only valid C# code in a single file.
+test_code: |
+  public class StockRepositoryTests : IAsyncLifetime
+  {
+      private StockDbContext _db = null!;
+      private StockRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<StockDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new StockDbContext(opts);
+          _repo = new StockRepository(_db);
+          var base_dt = new DateTime(2024, 1, 1, 9, 0, 0, DateTimeKind.Utc);
+          _db.StockLevels.AddRange(
+              new StockLevel { Symbol = "AAPL", Price = 150m, Volume = 1000, RecordedAt = base_dt },
+              new StockLevel { Symbol = "AAPL", Price = 155m, Volume = 1200, RecordedAt = base_dt.AddHours(1) },
+              new StockLevel { Symbol = "GOOG", Price = 2800m, Volume = 500, RecordedAt = base_dt });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetLatest_ReturnsMostRecent()
+      {
+          (await _repo.GetLatestAsync("AAPL"))!.Price.Should().Be(155m);
+      }
+
+      [Fact]
+      public async Task GetHistory_FiltersCorrectly()
+      {
+          var from = new DateTime(2024, 1, 1, 8, 0, 0, DateTimeKind.Utc);
+          var to = new DateTime(2024, 1, 1, 10, 0, 0, DateTimeKind.Utc);
+          (await _repo.GetHistoryAsync("AAPL", from, to)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetLatestPrices_ReturnsAllSymbols()
+      {
+          var prices = await _repo.GetLatestPricesAsync();
+          prices.Should().ContainKey("AAPL");
+          prices.Should().ContainKey("GOOG");
+          prices["AAPL"].Should().Be(155m);
+      }
+  }

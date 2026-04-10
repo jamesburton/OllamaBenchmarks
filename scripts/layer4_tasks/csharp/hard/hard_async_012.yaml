@@ -1,0 +1,80 @@
+name: hard_async_012
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncPipeline<TIn, TOut> implementing a multi-stage async transformation:
+    Constructor: AsyncPipeline(IEnumerable<Func<object, CancellationToken, Task<object>>> stages)
+    Task<TOut> ExecuteAsync(TIn input, CancellationToken ct) — passes input through all stages in sequence.
+    static AsyncPipeline<TIn, TOut> Build<TIn, TOut>(params object[] stages) — factory.
+  A static class PipelineBuilder providing fluent API:
+    PipelineBuilder<TIn, TOut> Start<TIn, TOut>(Func<TIn, CancellationToken, Task<TOut>> first)
+    PipelineBuilder<TIn, TNext> Then<TNext>(Func<TOut, CancellationToken, Task<TNext>> next)
+    AsyncPipeline<TIn, TFinal> Build()
+  Stages run sequentially. If any stage throws, the exception propagates immediately.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncPipelineTests
+  {
+      [Fact]
+      public async Task Pipeline_ExecutesTwoStages()
+      {
+          var pipeline = PipelineBuilder
+              .Start<int, string>(async (x, _) => { await Task.Yield(); return x.ToString(); })
+              .Then<int>(async (s, _)          => { await Task.Yield(); return int.Parse(s) * 2; })
+              .Build();
+          var result = await pipeline.ExecuteAsync(21, CancellationToken.None);
+          result.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task Pipeline_SingleStage_ReturnsTransformedValue()
+      {
+          var pipeline = PipelineBuilder
+              .Start<string, int>((s, _) => Task.FromResult(s.Length))
+              .Build();
+          var result = await pipeline.ExecuteAsync("hello", CancellationToken.None);
+          result.Should().Be(5);
+      }
+
+      [Fact]
+      public async Task Pipeline_StageThrows_PropagatesImmediately()
+      {
+          var pipeline = PipelineBuilder
+              .Start<int, int>(_ => throw new InvalidOperationException("stage fail"))
+              .Build();
+          var act = async () => await pipeline.ExecuteAsync(1, CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("stage fail");
+      }
+
+      [Fact]
+      public async Task Pipeline_CancellationToken_PropagatedToStages()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var pipeline = PipelineBuilder
+              .Start<int, int>(async (x, ct) => { await Task.Delay(1000, ct); return x; })
+              .Build();
+          var act = async () => await pipeline.ExecuteAsync(1, cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+
+      [Fact]
+      public async Task Pipeline_ThreeStages_ComposesCorrectly()
+      {
+          var pipeline = PipelineBuilder
+              .Start<int, int>((x, _)    => Task.FromResult(x + 1))
+              .Then<int>((x, _)          => Task.FromResult(x * 3))
+              .Then<string>((x, _)       => Task.FromResult($"val={x}"))
+              .Build();
+          var result = await pipeline.ExecuteAsync(2, CancellationToken.None);
+          result.Should().Be("val=9");
+      }
+  }

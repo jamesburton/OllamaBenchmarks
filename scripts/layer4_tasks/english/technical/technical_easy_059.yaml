@@ -1,0 +1,22 @@
+name: technical_easy_059
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a brief notice informing users that a feature is temporarily unavailable.
+  Keep it under 30 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "feature"
+    - "temporarily"
+    - "unavailable"
+    - "working"
+    - "restore"
+    - "soon"
+    - "inconvenience"
+  min_words: 6
+  max_words: 30

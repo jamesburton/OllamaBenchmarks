@@ -1,0 +1,21 @@
+name: rewriting_hard_116
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely without losing any key meaning:
+  'The implementation of this policy is contingent upon the successful completion of a comprehensive review process that will assess its potential impact across all relevant stakeholder groups.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "policy"
+    - "depends"
+    - "review"
+    - "stakeholders"
+    - "impact"
+  min_words: 6
+  max_words: 25

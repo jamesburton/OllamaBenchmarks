@@ -1,0 +1,70 @@
+name: medium_async_032
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncPolling<T> with constructor accepting:
+    Func<CancellationToken, Task<T>> poll
+    Func<T, bool> condition
+    TimeSpan interval
+  Expose:
+    Task<T> WaitUntilAsync(TimeSpan timeout, CancellationToken ct = default)
+  Polls until condition returns true or timeout expires.
+  Throws TimeoutException on timeout. Throws OperationCanceledException on cancellation.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncPollingTests
+  {
+      [Fact]
+      public async Task WaitUntilAsync_ConditionMetImmediately_ReturnsValue()
+      {
+          var polling = new AsyncPolling<int>(
+              ct => Task.FromResult(42),
+              v => v == 42,
+              TimeSpan.FromMilliseconds(10));
+          var result = await polling.WaitUntilAsync(TimeSpan.FromSeconds(5));
+          result.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task WaitUntilAsync_ConditionMetAfterDelay_ReturnsValue()
+      {
+          int count = 0;
+          var polling = new AsyncPolling<int>(
+              ct => Task.FromResult(++count),
+              v => v >= 3,
+              TimeSpan.FromMilliseconds(20));
+          var result = await polling.WaitUntilAsync(TimeSpan.FromSeconds(5));
+          result.Should().BeGreaterThanOrEqualTo(3);
+      }
+
+      [Fact]
+      public async Task WaitUntilAsync_Timeout_ThrowsTimeoutException()
+      {
+          var polling = new AsyncPolling<int>(
+              ct => Task.FromResult(0),
+              v => v == 99,
+              TimeSpan.FromMilliseconds(10));
+          await Assert.ThrowsAsync<TimeoutException>(() =>
+              polling.WaitUntilAsync(TimeSpan.FromMilliseconds(50)));
+      }
+
+      [Fact]
+      public async Task WaitUntilAsync_Cancelled_ThrowsOperationCancelled()
+      {
+          var cts = new CancellationTokenSource(50);
+          var polling = new AsyncPolling<int>(
+              ct => Task.FromResult(0),
+              v => v == 99,
+              TimeSpan.FromMilliseconds(10));
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+              polling.WaitUntilAsync(TimeSpan.FromSeconds(30), cts.Token));
+      }
+  }

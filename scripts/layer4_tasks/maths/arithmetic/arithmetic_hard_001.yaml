@@ -1,0 +1,14 @@
+name: arithmetic_hard_001
+category: maths
+subcategory: arithmetic
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Calculate: 2^10 - 3^5 + 4^3
+  Reply with only the number.
+expected_answer: "857"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

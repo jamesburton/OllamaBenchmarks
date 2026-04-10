@@ -1,0 +1,65 @@
+name: medium_aspnet_026
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record GeoPoint(double Latitude, double Longitude).
+  A record LocationRequest(GeoPoint Point, double RadiusKm).
+  A record LocationResult(string Name, GeoPoint Location, double DistanceKm).
+  A static class LocationEndpoints with:
+    void MapLocationEndpoints(WebApplication app)
+  Register POST /locations/nearby accepting LocationRequest, returning locations within radius from a hardcoded list.
+  Use Haversine formula for distance calculation.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LocationEndpointTests
+  {
+      private async Task<WebApplication> BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          LocationEndpoints.MapLocationEndpoints(app);
+          await app.StartAsync();
+          return app;
+      }
+
+      [Fact]
+      public async Task Nearby_ReturnsResultsWithinRadius()
+      {
+          var client = (await BuildApp()).GetTestClient();
+          var req = new LocationRequest(new GeoPoint(51.5, -0.1), 100.0);
+          var response = await client.PostAsJsonAsync("/locations/nearby", req);
+          response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          var results = await response.Content.ReadFromJsonAsync<List<LocationResult>>();
+          results.Should().NotBeNull();
+          results!.All(r => r.DistanceKm <= 100.0).Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task Nearby_VerySmallRadius_ReturnsEmpty()
+      {
+          var client = (await BuildApp()).GetTestClient();
+          var req = new LocationRequest(new GeoPoint(0.0, 0.0), 0.001);
+          var response = await client.PostAsJsonAsync("/locations/nearby", req);
+          var results = await response.Content.ReadFromJsonAsync<List<LocationResult>>();
+          results.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task Nearby_DistancesAreCalculated()
+      {
+          var client = (await BuildApp()).GetTestClient();
+          var req = new LocationRequest(new GeoPoint(51.5, -0.1), 10000.0);
+          var response = await client.PostAsJsonAsync("/locations/nearby", req);
+          var results = await response.Content.ReadFromJsonAsync<List<LocationResult>>();
+          results!.All(r => r.DistanceKm >= 0).Should().BeTrue();
+      }
+  }

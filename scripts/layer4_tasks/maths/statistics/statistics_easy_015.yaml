@@ -1,0 +1,13 @@
+name: statistics_easy_015
+category: maths
+subcategory: statistics
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  A bag has 4 red, 3 blue, and 3 green marbles. What is the probability of drawing a blue marble? Reply with only the decimal.
+expected_answer: "0.3"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

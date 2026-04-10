@@ -1,0 +1,15 @@
+name: grammar_easy_005
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The news are surprising.
+  B) The news is surprising.
+  C) The news were surprising.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

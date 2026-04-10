@@ -1,0 +1,38 @@
+name: easy_vertical_044
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record EventRegistration(string EventId, string UserId, DateTime RegisteredAt)
+  A class EventRegistrar with:
+    int Capacity { get; }
+    EventRegistrar(string eventId, int capacity)
+    bool Register(string userId) returns false if already registered or at capacity; adds registration and returns true
+    List<EventRegistration> GetRegistrations()
+    int AvailableSpots => Capacity - registered count
+  Return only valid C# code in a single file.
+test_code: |
+  public class EventRegistrarTests
+  {
+      [Fact]
+      public void Register_AddsRegistration()
+      {
+          var registrar = new EventRegistrar("evt1", 10);
+          registrar.Register("user1").Should().BeTrue();
+          registrar.AvailableSpots.Should().Be(9);
+      }
+      [Fact]
+      public void Register_AtCapacity_ReturnsFalse()
+      {
+          var registrar = new EventRegistrar("evt2", 1);
+          registrar.Register("user1");
+          registrar.Register("user2").Should().BeFalse();
+      }
+  }

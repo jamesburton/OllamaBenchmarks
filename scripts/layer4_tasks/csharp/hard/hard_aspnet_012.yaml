@@ -1,0 +1,116 @@
+name: hard_aspnet_012
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A minimal API for file upload and download with validation:
+  Static class FileEndpoints with MapFileEndpoints(this WebApplication app):
+    POST /files — accepts multipart form with file upload.
+      Validates: file present, content-type is image/*, max size 5MB.
+      Returns 400 on validation failure, 201 with FileMetadata on success.
+    GET /files/{id} — returns file content with correct content-type, 404 if not found.
+    DELETE /files/{id} — returns 204 on success, 404 if not found.
+    GET /files — returns list of all stored FileMetadata.
+  Record: FileMetadata(Guid Id, string FileName, string ContentType, long SizeBytes, DateTime UploadedAt).
+  Interface IFileStorage:
+    Task<FileMetadata> StoreAsync(string fileName, string contentType, Stream content, CancellationToken ct)
+    Task<(FileMetadata Meta, Stream Content)?> GetAsync(Guid id, CancellationToken ct)
+    Task<bool> DeleteAsync(Guid id, CancellationToken ct)
+    Task<IReadOnlyList<FileMetadata>> ListAsync(CancellationToken ct)
+  Class InMemoryFileStorage : IFileStorage.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FileEndpointsTests
+  {
+      private static WebApplication BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddSingleton<IFileStorage, InMemoryFileStorage>();
+          var app = builder.Build();
+          app.MapFileEndpoints();
+          return app;
+      }
+
+      private static MultipartFormDataContent BuildImageUpload(string fileName = "test.png", int sizeBytes = 1024)
+      {
+          var content = new MultipartFormDataContent();
+          var bytes = new byte[sizeBytes];
+          var file = new ByteArrayContent(bytes);
+          file.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+          content.Add(file, "file", fileName);
+          return content;
+      }
+
+      [Fact]
+      public async Task Upload_ValidImage_Returns201()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().PostAsync("/files", BuildImageUpload());
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+      }
+
+      [Fact]
+      public async Task Upload_NoFile_Returns400()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().PostAsync("/files", new MultipartFormDataContent());
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+      }
+
+      [Fact]
+      public async Task Upload_TooLarge_Returns400()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().PostAsync("/files", BuildImageUpload(sizeBytes: 6 * 1024 * 1024));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+      }
+
+      [Fact]
+      public async Task Get_ExistingFile_Returns200WithContent()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var meta = await (await client.PostAsync("/files", BuildImageUpload()))
+              .Content.ReadFromJsonAsync<FileMetadata>();
+          var resp = await client.GetAsync($"/files/{meta!.Id}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          resp.Content.Headers.ContentType!.MediaType.Should().Be("image/png");
+      }
+
+      [Fact]
+      public async Task Get_NonExistentFile_Returns404()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync($"/files/{Guid.NewGuid()}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+      }
+
+      [Fact]
+      public async Task Delete_ExistingFile_Returns204()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var meta = await (await client.PostAsync("/files", BuildImageUpload()))
+              .Content.ReadFromJsonAsync<FileMetadata>();
+          var resp = await client.DeleteAsync($"/files/{meta!.Id}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
+      }
+
+      [Fact]
+      public async Task List_ReturnsAllFiles()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          await client.PostAsync("/files", BuildImageUpload("a.png"));
+          await client.PostAsync("/files", BuildImageUpload("b.png"));
+          var list = await (await client.GetAsync("/files")).Content.ReadFromJsonAsync<IReadOnlyList<FileMetadata>>();
+          list.Should().HaveCount(2);
+      }
+  }

@@ -1,0 +1,22 @@
+name: rewriting_easy_128
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'The professor saw the student in his office.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "professor"
+    - "student"
+    - "office"
+    - "met"
+    - "in the professor"
+    - "in the student"
+  min_words: 4
+  max_words: 15

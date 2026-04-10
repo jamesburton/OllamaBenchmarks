@@ -1,0 +1,39 @@
+name: medium_xunit_039
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class UrlBuilder with:
+    UrlBuilder Host(string host), UrlBuilder Path(string path), UrlBuilder QueryParam(string key, string value), UrlBuilder Scheme(string scheme), string Build()
+  Return only valid C# code in a single file.
+test_code: |
+  public class UrlBuilderTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new UrlBuilder();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new UrlBuilder();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new UrlBuilder();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

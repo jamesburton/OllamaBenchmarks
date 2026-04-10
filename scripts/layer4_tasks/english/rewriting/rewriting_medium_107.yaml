@@ -1,0 +1,22 @@
+name: rewriting_medium_107
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'Despite the fact that the evidence was overwhelming, the committee failed to reach a consensus.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "despite"
+    - "evidence"
+    - "overwhelming"
+    - "consensus"
+    - "committee"
+    - "reach"
+  min_words: 5
+  max_words: 18

@@ -1,0 +1,61 @@
+name: medium_aspnet_002
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IWeatherService with method:
+    Task<IEnumerable<string>> GetForecastsAsync()
+  A class WeatherController : ControllerBase with constructor accepting IWeatherService.
+  Add [ApiController], [Route("api/[controller]")] attributes.
+  Add action: GET api/weather returning Ok with forecasts.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FakeWeatherService : IWeatherService
+  {
+      public Task<IEnumerable<string>> GetForecastsAsync() =>
+          Task.FromResult<IEnumerable<string>>(new[] { "Sunny", "Cloudy", "Rainy" });
+  }
+
+  public class WeatherControllerTests
+  {
+      [Fact]
+      public async Task Get_ReturnsForecasts()
+      {
+          var svc = new FakeWeatherService();
+          var controller = new WeatherController(svc);
+          var result = await controller.Get() as OkObjectResult;
+          result.Should().NotBeNull();
+          result!.StatusCode.Should().Be(200);
+          var items = result.Value as IEnumerable<string>;
+          items.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task Get_UsesService()
+      {
+          var svc = Substitute.For<IWeatherService>();
+          svc.GetForecastsAsync().Returns(Task.FromResult<IEnumerable<string>>(new[] { "Hot" }));
+          var controller = new WeatherController(svc);
+          await controller.Get();
+          await svc.Received(1).GetForecastsAsync();
+      }
+
+      [Fact]
+      public async Task Get_EmptyService_ReturnsOkEmpty()
+      {
+          var svc = Substitute.For<IWeatherService>();
+          svc.GetForecastsAsync().Returns(Task.FromResult<IEnumerable<string>>(Array.Empty<string>()));
+          var controller = new WeatherController(svc);
+          var result = await controller.Get() as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+          var items = result.Value as IEnumerable<string>;
+          items.Should().BeEmpty();
+      }
+  }

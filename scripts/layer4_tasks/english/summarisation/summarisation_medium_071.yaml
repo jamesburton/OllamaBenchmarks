@@ -1,0 +1,18 @@
+name: summarisation_medium_071
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Campaign finance regulations in many democracies have failed to keep pace with the rise of digital advertising, dark money, and political action committees. Wealthy donors can effectively circumvent contribution limits through indirect channels. Reformers argue that only public funding of elections can restore competitive democracy.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "campaign finance"
+    - "donors"
+    - "democracy"
+    - "advertising"
+  max_words: 25

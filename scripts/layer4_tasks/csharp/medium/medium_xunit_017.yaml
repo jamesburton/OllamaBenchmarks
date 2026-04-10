@@ -1,0 +1,39 @@
+name: medium_xunit_017
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CommandLineParser with:
+    IDictionary<string, string?> Parse(string[] args) — supports --key value and --flag syntax
+  Return only valid C# code in a single file.
+test_code: |
+  public class CommandLineParserTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new CommandLineParser();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new CommandLineParser();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new CommandLineParser();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

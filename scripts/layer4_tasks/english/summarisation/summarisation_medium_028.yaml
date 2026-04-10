@@ -1,0 +1,18 @@
+name: summarisation_medium_028
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Antibiotic resistance is projected to cause ten million deaths annually by 2050 if current trends continue. Overuse of antibiotics in medicine and agriculture has accelerated the evolution of resistant bacteria. International health organisations are urging governments to restrict antibiotic use and invest in new drug development.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "antibiotic"
+    - "resistance"
+    - "bacteria"
+    - "deaths"
+  max_words: 25

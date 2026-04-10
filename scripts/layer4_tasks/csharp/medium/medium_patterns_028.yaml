@@ -1,0 +1,40 @@
+name: medium_patterns_028
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A sealed class Percentage with decimal Value (0-100).
+    static Percentage Of(decimal value) — throws ArgumentOutOfRangeException if invalid
+    static Percentage FromFraction(double fraction) — 0.0-1.0 converted to percentage
+    decimal Apply(decimal amount)
+    Percentage Add(Percentage other) — clamps at 100
+  Return only valid C# code in a single file.
+test_code: |
+  public class PercentageTests
+  {
+      [Fact]
+      public void Of_Valid() { Percentage.Of(25m).Value.Should().Be(25m); }
+
+      [Fact]
+      public void Of_OutOfRange_Throws()
+      {
+          Action act = () => Percentage.Of(101m);
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void FromFraction_Converts() { Percentage.FromFraction(0.5).Value.Should().Be(50m); }
+
+      [Fact]
+      public void Apply_Correct() { Percentage.Of(20m).Apply(200m).Should().Be(40m); }
+
+      [Fact]
+      public void Add_ClampsAt100() { Percentage.Of(70m).Add(Percentage.Of(50m)).Value.Should().Be(100m); }
+  }

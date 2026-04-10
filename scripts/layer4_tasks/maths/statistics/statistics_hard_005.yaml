@@ -1,0 +1,13 @@
+name: statistics_hard_005
+category: maths
+subcategory: statistics
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  In a group of 30 students, 12 like math and 18 like science. 6 like both. How many like at least one? Reply with only the number.
+expected_answer: "24"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

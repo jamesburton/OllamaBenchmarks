@@ -1,0 +1,129 @@
+name: hard_masstransit_022
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit consumer with enrichment pipeline:
+  Messages:
+    record ProcessEvent(Guid EventId, string Type, string RawData);
+    record EventEnriched(Guid EventId, string Type, string EnrichedData, string Source, DateTime ProcessedAt);
+    record EventEnrichmentFailed(Guid EventId, string Type, string Error);
+
+  Interface IDataEnricher:
+    Task<string> EnrichAsync(string type, string rawData, CancellationToken ct)
+
+  Interface ISourceResolver:
+    string Resolve(string type)
+
+  Class EventEnrichmentConsumer : IConsumer<ProcessEvent>:
+    Constructor takes IDataEnricher and ISourceResolver.
+    Call Resolve to get source name.
+    Call EnrichAsync; on success publish EventEnriched.
+    On exception from EnrichAsync publish EventEnrichmentFailed.
+
+  Class EventEnrichmentConsumerDefinition : ConsumerDefinition<EventEnrichmentConsumer>:
+    Set concurrency limit to 5.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EventEnrichmentConsumerTests
+  {
+      [Fact]
+      public async Task ValidEvent_PublishesEnriched()
+      {
+          var enricher = Substitute.For<IDataEnricher>();
+          enricher.EnrichAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns("enriched-data");
+          var resolver = Substitute.For<ISourceResolver>();
+          resolver.Resolve(Arg.Any<string>()).Returns("system-a");
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new EventEnrichmentConsumer(enricher, resolver));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessEvent(Guid.NewGuid(), "click", "raw"));
+              await Task.Delay(200);
+              (await harness.Published.Any<EventEnriched>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EnricherFailure_PublishesEnrichmentFailed()
+      {
+          var enricher = Substitute.For<IDataEnricher>();
+          enricher.EnrichAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .ThrowsAsync(new InvalidOperationException("enrichment error"));
+          var resolver = Substitute.For<ISourceResolver>();
+          resolver.Resolve(Arg.Any<string>()).Returns("system-b");
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new EventEnrichmentConsumer(enricher, resolver));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessEvent(Guid.NewGuid(), "view", "bad"));
+              await Task.Delay(200);
+              (await harness.Published.Any<EventEnrichmentFailed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EventEnriched_ContainsSource()
+      {
+          var enricher = Substitute.For<IDataEnricher>();
+          enricher.EnrichAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns("ok");
+          var resolver = Substitute.For<ISourceResolver>();
+          resolver.Resolve(Arg.Any<string>()).Returns("my-source");
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new EventEnrichmentConsumer(enricher, resolver));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessEvent(Guid.NewGuid(), "t", "d"));
+              await Task.Delay(200);
+              var msg = harness.Published.Select<EventEnriched>().First().Context.Message;
+              msg.Source.Should().Be("my-source");
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EventEnriched_ContainsProcessedAt()
+      {
+          var enricher = Substitute.For<IDataEnricher>();
+          enricher.EnrichAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns("enriched");
+          var resolver = Substitute.For<ISourceResolver>();
+          resolver.Resolve(Arg.Any<string>()).Returns("src");
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new EventEnrichmentConsumer(enricher, resolver));
+          await harness.Start();
+          try
+          {
+              var before = DateTime.UtcNow;
+              await harness.InputQueueSendEndpoint.Send(new ProcessEvent(Guid.NewGuid(), "e", "r"));
+              await Task.Delay(200);
+              var msg = harness.Published.Select<EventEnriched>().First().Context.Message;
+              msg.ProcessedAt.Should().BeOnOrAfter(before);
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ConsumerDefinition_CanBeInstantiated()
+      {
+          var def = new EventEnrichmentConsumerDefinition();
+          def.Should().NotBeNull();
+      }
+  }

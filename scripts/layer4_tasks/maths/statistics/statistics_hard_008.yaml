@@ -1,0 +1,13 @@
+name: statistics_hard_008
+category: maths
+subcategory: statistics
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  In a class of 20 students, what is the probability that at least two share a birthday in a year? Use approximation: 1 - (365/365)*(364/365)*...*(346/365). Round to 2 decimal places. Reply with only the decimal.
+expected_answer: "0.41"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

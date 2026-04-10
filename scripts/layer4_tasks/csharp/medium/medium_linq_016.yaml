@@ -1,0 +1,61 @@
+name: medium_linq_016
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Sensor with: string Id, string Location, IReadOnlyList<double> Readings.
+  A class SensorNetwork with a constructor accepting IEnumerable<Sensor> sensors.
+  Expose:
+    IEnumerable<double> AllReadings() — flattened list of all readings from all sensors (SelectMany)
+    IEnumerable<SensorAlert> Alerts(double threshold)
+      — sensors whose average reading exceeds threshold
+  SensorAlert is a record with: string SensorId, string Location, double Average.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SensorNetworkTests
+  {
+      private readonly Sensor[] _sensors = {
+          new("S1", "Lab A",  new[]{10.0,12.0,11.0}),
+          new("S2", "Lab B",  new[]{80.0,90.0,95.0}),
+          new("S3", "Lab C",  new[]{5.0,6.0,5.5}),
+      };
+
+      [Fact]
+      public void AllReadings_CountIsNine()
+      {
+          new SensorNetwork(_sensors).AllReadings().Should().HaveCount(9);
+      }
+
+      [Fact]
+      public void AllReadings_ContainsExpectedValues()
+      {
+          new SensorNetwork(_sensors).AllReadings().Should().Contain(80.0);
+      }
+
+      [Fact]
+      public void Alerts_AboveThreshold50_ReturnsS2Only()
+      {
+          var result = new SensorNetwork(_sensors).Alerts(50.0).ToList();
+          result.Should().ContainSingle(a => a.SensorId == "S2");
+      }
+
+      [Fact]
+      public void Alerts_AverageIsCorrect()
+      {
+          var alert = new SensorNetwork(_sensors).Alerts(50.0).Single();
+          alert.Average.Should().BeApproximately(88.33, 0.01);
+      }
+
+      [Fact]
+      public void Alerts_NoAlerts_ReturnsEmpty()
+      {
+          new SensorNetwork(_sensors).Alerts(200.0).Should().BeEmpty();
+      }
+  }

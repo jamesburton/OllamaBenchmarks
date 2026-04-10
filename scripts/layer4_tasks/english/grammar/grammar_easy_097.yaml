@@ -1,0 +1,15 @@
+name: grammar_easy_097
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The medication had no affect on his symptoms.
+  B) The medication had no effect on his symptoms.
+  C) The medication had no effection on his symptoms.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

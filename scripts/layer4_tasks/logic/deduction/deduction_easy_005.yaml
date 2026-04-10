@@ -1,0 +1,14 @@
+name: deduction_easy_005
+category: logic
+subcategory: deduction
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All squares are rectangles.
+  2. Shape X is a square.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "Shape X is a rectangle."
+validator_config: {}

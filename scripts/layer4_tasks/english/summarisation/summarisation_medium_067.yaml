@@ -1,0 +1,18 @@
+name: summarisation_medium_067
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Populist movements have gained electoral traction across multiple democracies, exploiting public disillusionment with mainstream parties and technocratic governance. Their programmatic coherence is often low, but their communication of anti-establishment sentiment resonates in communities experiencing economic and cultural displacement. Political scientists debate whether populism is a corrective to democratic deficits or a threat to liberal institutions.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "populism"
+    - "democracy"
+    - "anti-establishment"
+    - "institutions"
+  max_words: 25

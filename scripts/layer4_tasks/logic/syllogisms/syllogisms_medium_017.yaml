@@ -1,0 +1,15 @@
+name: syllogisms_medium_017
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All noble gases are stable.
+  2. All stable elements rarely react.
+  3. Argon is a noble gas.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "Argon rarely reacts."
+validator_config: {}

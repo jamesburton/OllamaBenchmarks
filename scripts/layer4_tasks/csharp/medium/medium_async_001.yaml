@@ -1,0 +1,62 @@
+name: medium_async_001
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IDataLoader with method: Task<string[]> LoadAsync(string key, CancellationToken ct = default)
+  A class ParallelLoader with a constructor accepting IDataLoader loader.
+  Expose:
+    Task<Dictionary<string, string[]>> LoadAllAsync(IEnumerable<string> keys, CancellationToken ct = default)
+  that loads all keys in parallel using Task.WhenAll and returns a dictionary of key -> result.
+  Cancellation should propagate to each load call.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ParallelLoaderTests
+  {
+      [Fact]
+      public async Task LoadAllAsync_ReturnsAllKeys()
+      {
+          var loader = Substitute.For<IDataLoader>();
+          loader.LoadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult(new[]{ ci.Arg<string>() }));
+          var result = await new ParallelLoader(loader).LoadAllAsync(new[]{"a","b","c"});
+          result.Keys.Should().BeEquivalentTo(new[]{"a","b","c"});
+      }
+
+      [Fact]
+      public async Task LoadAllAsync_CallsLoaderForEachKey()
+      {
+          var loader = Substitute.For<IDataLoader>();
+          loader.LoadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(Task.FromResult(Array.Empty<string>()));
+          await new ParallelLoader(loader).LoadAllAsync(new[]{"x","y"});
+          await loader.Received(2).LoadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task LoadAllAsync_EmptyKeys_ReturnsEmptyDict()
+      {
+          var loader = Substitute.For<IDataLoader>();
+          var result = await new ParallelLoader(loader).LoadAllAsync(Array.Empty<string>());
+          result.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task LoadAllAsync_CancelledToken_Throws()
+      {
+          var loader = Substitute.For<IDataLoader>();
+          loader.LoadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(async ci => { ci.Arg<CancellationToken>().ThrowIfCancellationRequested(); return Array.Empty<string>(); });
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+              new ParallelLoader(loader).LoadAllAsync(new[]{"k"}, cts.Token));
+      }
+  }

@@ -1,0 +1,18 @@
+name: summarisation_easy_082
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A new app allows users to translate spoken language in real time using their phone's microphone. The app supports 50 languages and does not require an internet connection. It is available for free on both iOS and Android.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "translation"
+    - "app"
+    - "language"
+    - "real time"
+  max_words: 25

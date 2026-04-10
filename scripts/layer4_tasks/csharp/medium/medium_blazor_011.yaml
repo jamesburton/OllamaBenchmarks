@@ -1,0 +1,50 @@
+name: medium_blazor_011
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class NotificationQueueService with:
+    Queue<string> notifications, Enqueue(string msg), Dequeue() -> string?, Count property, OnQueueChanged event
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationQueueServiceTests
+  {
+      [Fact]
+      public void Enqueue_AddsMessage()
+      {
+          var svc = new NotificationQueueService();
+          svc.Enqueue("Hello");
+          svc.Count.Should().Be(1);
+      }
+
+      [Fact]
+      public void Dequeue_ReturnsMessage()
+      {
+          var svc = new NotificationQueueService();
+          svc.Enqueue("msg1");
+          svc.Dequeue().Should().Be("msg1");
+      }
+
+      [Fact]
+      public void Dequeue_Empty_ReturnsNull()
+      {
+          new NotificationQueueService().Dequeue().Should().BeNull();
+      }
+
+      [Fact]
+      public void Enqueue_FiresEvent()
+      {
+          var svc = new NotificationQueueService();
+          var fired = false;
+          svc.OnQueueChanged += () => fired = true;
+          svc.Enqueue("test");
+          fired.Should().BeTrue();
+      }
+  }

@@ -1,0 +1,37 @@
+name: easy_patterns_050
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Rgb(byte R, byte G, byte B)
+  and a static class ColorHelper with:
+    bool IsDark(Rgb color)
+  that returns true if the perceived luminance ((R*299 + G*587 + B*114) / 1000) is less than 128.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ColorHelperTests
+  {
+      [Fact]
+      public void IsDark_DarkColor_ReturnsTrue()
+      {
+          ColorHelper.IsDark(new Rgb(0, 0, 0)).Should().BeTrue();
+      }
+      [Fact]
+      public void IsDark_LightColor_ReturnsFalse()
+      {
+          ColorHelper.IsDark(new Rgb(255, 255, 255)).Should().BeFalse();
+      }
+      [Fact]
+      public void IsDark_MidGray()
+      {
+          ColorHelper.IsDark(new Rgb(100, 100, 100)).Should().BeTrue();
+      }
+  }

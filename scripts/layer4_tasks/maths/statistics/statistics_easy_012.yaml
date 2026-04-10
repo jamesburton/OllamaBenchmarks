@@ -1,0 +1,13 @@
+name: statistics_easy_012
+category: maths
+subcategory: statistics
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  A fair coin is flipped. What is the probability of getting heads? Reply with only the decimal.
+expected_answer: "0.5"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

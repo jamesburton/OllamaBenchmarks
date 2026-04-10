@@ -1,0 +1,28 @@
+name: easy_async_027
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Runner with a static method:
+    async Task<(T1 First, T2 Second)> RunBothAsync<T1, T2>(Task<T1> task1, Task<T2> task2)
+  that runs both tasks concurrently and returns both results as a named tuple.
+  Use await with both tasks (you may use Task.WhenAll or sequential await).
+  Return only valid C# code in a single file.
+test_code: |
+  public class RunnerTests
+  {
+      [Fact]
+      public async Task RunBothAsync_ReturnsBothResults()
+      {
+          var (first, second) = await Runner.RunBothAsync(Task.FromResult(1), Task.FromResult("hello"));
+          first.Should().Be(1);
+          second.Should().Be("hello");
+      }
+  }

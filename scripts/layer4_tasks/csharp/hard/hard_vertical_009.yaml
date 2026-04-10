@@ -1,0 +1,105 @@
+name: hard_vertical_009
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Channel-based async pipeline for log processing:
+  Records:
+    LogEntry(Guid Id, string Source, string Level, string Message, DateTime Timestamp, Dictionary<string, string>? Properties)
+    ProcessedLog(Guid Id, string Source, string Level, string Message, DateTime Timestamp,
+      bool IsError, string? StructuredData, DateTime ProcessedAt)
+
+  Interface ILogSink:
+    Task WriteAsync(ProcessedLog log, CancellationToken ct)
+
+  Class LogEnricher:
+    ProcessedLog Enrich(LogEntry entry):
+      IsError = Level is "Error" or "Critical".
+      StructuredData = JSON serialization of Properties if any.
+
+  Class LogProcessingPipeline(ILogSink sink):
+    Uses Channel<LogEntry>(bounded 1000) internally.
+    Task StartAsync(CancellationToken ct): starts consumer task.
+    Task StopAsync(): signals completion, drains channel.
+    void Submit(LogEntry entry): writes to channel (non-blocking, drops if full).
+    Task<int> GetProcessedCountAsync()
+
+  Tests use NSubstitute for ILogSink.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LogEnricherTests
+  {
+      private readonly LogEnricher _enricher = new();
+
+      [Fact]
+      public void ErrorLevel_SetsIsErrorTrue()
+      {
+          var entry = new LogEntry(Guid.NewGuid(), "App", "Error", "Oops", DateTime.UtcNow, null);
+          var result = _enricher.Enrich(entry);
+          result.IsError.Should().BeTrue();
+      }
+
+      [Fact]
+      public void InfoLevel_SetsIsErrorFalse()
+      {
+          var entry = new LogEntry(Guid.NewGuid(), "App", "Information", "OK", DateTime.UtcNow, null);
+          var result = _enricher.Enrich(entry);
+          result.IsError.Should().BeFalse();
+      }
+
+      [Fact]
+      public void Properties_SerializedToStructuredData()
+      {
+          var entry = new LogEntry(Guid.NewGuid(), "App", "Info", "Msg", DateTime.UtcNow,
+              new Dictionary<string, string> { ["key"] = "val" });
+          var result = _enricher.Enrich(entry);
+          result.StructuredData.Should().Contain("key");
+      }
+
+      [Fact]
+      public void NullProperties_StructuredDataIsNull()
+      {
+          var entry = new LogEntry(Guid.NewGuid(), "App", "Info", "Msg", DateTime.UtcNow, null);
+          var result = _enricher.Enrich(entry);
+          result.StructuredData.Should().BeNull();
+      }
+  }
+
+  public class LogProcessingPipelineTests
+  {
+      [Fact]
+      public async Task Submit_ProcessesLogs()
+      {
+          var sink = Substitute.For<ILogSink>();
+          sink.WriteAsync(Arg.Any<ProcessedLog>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          using var cts = new CancellationTokenSource();
+          var pipeline = new LogProcessingPipeline(sink);
+          await pipeline.StartAsync(cts.Token);
+          pipeline.Submit(new LogEntry(Guid.NewGuid(), "svc", "Info", "test", DateTime.UtcNow, null));
+          await Task.Delay(200);
+          await pipeline.StopAsync();
+          await sink.Received().WriteAsync(Arg.Any<ProcessedLog>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Submit_MultipleEntries_AllProcessed()
+      {
+          var sink = Substitute.For<ILogSink>();
+          sink.WriteAsync(Arg.Any<ProcessedLog>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          using var cts = new CancellationTokenSource();
+          var pipeline = new LogProcessingPipeline(sink);
+          await pipeline.StartAsync(cts.Token);
+          for (int i = 0; i < 5; i++)
+              pipeline.Submit(new LogEntry(Guid.NewGuid(), "svc", "Info", $"msg{i}", DateTime.UtcNow, null));
+          await Task.Delay(300);
+          await pipeline.StopAsync();
+          await sink.Received(5).WriteAsync(Arg.Any<ProcessedLog>(), Arg.Any<CancellationToken>());
+      }
+  }

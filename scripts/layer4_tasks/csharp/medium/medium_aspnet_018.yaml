@@ -1,0 +1,63 @@
+name: medium_aspnet_018
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IEmailService with:
+    Task SendAsync(string to, string subject, string body)
+  A record ContactRequest(string Name, string Email, string Message).
+  A class ContactController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IEmailService.
+  Action: POST api/contact — validates request (Name/Email/Message required, Email must contain @), sends email, returns 200 or 400.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ContactControllerTests
+  {
+      [Fact]
+      public async Task ValidRequest_SendsEmailAndReturns200()
+      {
+          var emailSvc = Substitute.For<IEmailService>();
+          var ctrl = new ContactController(emailSvc);
+          var req = new ContactRequest("Alice", "alice@example.com", "Hello!");
+          var result = await ctrl.Contact(req);
+          result.Should().BeOfType<OkResult>();
+          await emailSvc.Received(1).SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
+      }
+
+      [Fact]
+      public async Task MissingName_Returns400()
+      {
+          var emailSvc = Substitute.For<IEmailService>();
+          var ctrl = new ContactController(emailSvc);
+          var req = new ContactRequest("", "alice@example.com", "Hello!");
+          var result = await ctrl.Contact(req);
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public async Task InvalidEmail_Returns400()
+      {
+          var emailSvc = Substitute.For<IEmailService>();
+          var ctrl = new ContactController(emailSvc);
+          var req = new ContactRequest("Alice", "notanemail", "Hello!");
+          var result = await ctrl.Contact(req);
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public async Task MissingMessage_Returns400()
+      {
+          var emailSvc = Substitute.For<IEmailService>();
+          var ctrl = new ContactController(emailSvc);
+          var req = new ContactRequest("Alice", "alice@example.com", "");
+          var result = await ctrl.Contact(req);
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

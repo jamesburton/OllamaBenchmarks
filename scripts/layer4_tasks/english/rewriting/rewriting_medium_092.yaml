@@ -1,0 +1,21 @@
+name: rewriting_medium_092
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'The vaccine was developed rapidly. It was rigorously tested. It received regulatory approval.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "vaccine"
+    - "tested"
+    - "approval"
+    - "developed"
+    - "regulatory"
+  min_words: 8
+  max_words: 30

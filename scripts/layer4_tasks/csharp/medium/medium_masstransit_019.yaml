@@ -1,0 +1,56 @@
+name: medium_masstransit_019
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record DataExported(Guid ExportId, string UserId, string Format, int RecordCount).
+  A consumer DataExportedConsumer implementing IConsumer<DataExported>.
+  Constructor accepts IAuditLogger service.
+  Interface IAuditLogger with: Task LogExportAsync(Guid exportId, string userId, int recordCount).
+  In Consume: calls service.LogExportAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record DataExported(Guid ExportId, string UserId, string Format, int RecordCount); }
+  global using Contracts;
+
+  public class DataExportedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IAuditLogger>();
+          var consumer = new DataExportedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DataExported>>();
+          ctx.Message.Returns(new DataExported(Guid.NewGuid(), "Use", "For", 1));
+          await consumer.Consume(ctx);
+          await svc.Received(1).LogExportAsync(Arg.Any<Guid exportId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IAuditLogger>();
+          var consumer = new DataExportedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DataExported>>();
+          ctx.Message.Returns(new DataExported(Guid.NewGuid(), "Use", "For", 1));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IAuditLogger>();
+          var consumer = new DataExportedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DataExported>>();
+          ctx.Message.Returns(new DataExported(Guid.NewGuid(), "User", "Form", 2));
+          await consumer.Consume(ctx);
+          await svc.Received(1).LogExportAsync(Arg.Any<Guid exportId>(), Arg.Any<object>());
+      }
+  }

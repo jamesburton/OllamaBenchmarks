@@ -1,0 +1,86 @@
+name: hard_async_008
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncValueCache<TKey, TValue> implementing a thread-safe async cache:
+    Task<TValue> GetOrAddAsync(TKey key, Func<TKey, CancellationToken, Task<TValue>> factory,
+      CancellationToken ct) — returns cached value or calls factory once (no stampede).
+    bool TryRemove(TKey key) — evicts a single entry. Returns true if evicted.
+    void Clear() — removes all entries.
+    int Count — number of cached entries.
+    Task<TValue> GetOrAddWithTtlAsync(TKey key, Func<TKey, CancellationToken, Task<TValue>> factory,
+      TimeSpan ttl, CancellationToken ct) — same but evicts entries older than ttl on read.
+  Avoid cache stampede: concurrent calls for the same key must only invoke factory once.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncValueCacheTests
+  {
+      [Fact]
+      public async Task GetOrAddAsync_ReturnsCachedValue()
+      {
+          var cache = new AsyncValueCache<string, int>();
+          int calls = 0;
+          var v1 = await cache.GetOrAddAsync("k", async (_, _) => { calls++; return 42; }, CancellationToken.None);
+          var v2 = await cache.GetOrAddAsync("k", async (_, _) => { calls++; return 99; }, CancellationToken.None);
+          v1.Should().Be(42);
+          v2.Should().Be(42);
+          calls.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task GetOrAddAsync_NoStampede()
+      {
+          var cache = new AsyncValueCache<string, int>();
+          int factoryCalls = 0;
+          var tasks = Enumerable.Range(0, 20).Select(_ =>
+              cache.GetOrAddAsync("key", async (_, _) =>
+              {
+                  Interlocked.Increment(ref factoryCalls);
+                  await Task.Delay(20);
+                  return 7;
+              }, CancellationToken.None));
+          var results = await Task.WhenAll(tasks);
+          factoryCalls.Should().Be(1);
+          results.Should().AllBeEquivalentTo(7);
+      }
+
+      [Fact]
+      public async Task TryRemove_EvictsEntry()
+      {
+          var cache = new AsyncValueCache<int, string>();
+          await cache.GetOrAddAsync(1, (_, _) => Task.FromResult("v"), CancellationToken.None);
+          cache.TryRemove(1).Should().BeTrue();
+          cache.Count.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task GetOrAddWithTtlAsync_ExpiredEntry_RefetchesValue()
+      {
+          var cache = new AsyncValueCache<string, int>();
+          int calls = 0;
+          await cache.GetOrAddWithTtlAsync("k", (_, _) => Task.FromResult(++calls),
+              TimeSpan.FromMilliseconds(50), CancellationToken.None);
+          await Task.Delay(100);
+          await cache.GetOrAddWithTtlAsync("k", (_, _) => Task.FromResult(++calls),
+              TimeSpan.FromMilliseconds(50), CancellationToken.None);
+          calls.Should().Be(2);
+      }
+
+      [Fact]
+      public void Clear_RemovesAllEntries()
+      {
+          var cache = new AsyncValueCache<int, int>();
+          cache.GetOrAddAsync(1, (_, _) => Task.FromResult(1), CancellationToken.None).Wait();
+          cache.GetOrAddAsync(2, (_, _) => Task.FromResult(2), CancellationToken.None).Wait();
+          cache.Clear();
+          cache.Count.Should().Be(0);
+      }
+  }

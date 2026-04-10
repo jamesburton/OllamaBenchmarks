@@ -1,0 +1,100 @@
+name: hard_efcore_005
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core owned entities for address modelling:
+  Owned entity: Address(string Street, string City, string PostalCode, string Country).
+  Entity: Supplier(int Id, string Name, Address ShippingAddress, Address BillingAddress,
+    List<SupplierContact> Contacts).
+  Entity: SupplierContact(int Id, int SupplierId, string Name, string Email, string Role).
+  DbContext: SupplierDbContext — configure Address as owned entity (separate columns).
+  Class SupplierRepository(SupplierDbContext db):
+    Task<Supplier> CreateAsync(Supplier supplier, CancellationToken ct)
+    Task<Supplier?> GetAsync(int id, CancellationToken ct) — includes Contacts.
+    Task<IReadOnlyList<Supplier>> GetByCountryAsync(string country, CancellationToken ct)
+    Task UpdateShippingAddressAsync(int id, Address newAddress, CancellationToken ct)
+    Task<bool> AddContactAsync(int supplierId, SupplierContact contact, CancellationToken ct)
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SupplierRepositoryTests : IDisposable
+  {
+      private readonly SupplierDbContext _db;
+      private readonly SupplierRepository _repo;
+
+      public SupplierRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<SupplierDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new SupplierDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new SupplierRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private static Supplier MakeSupplier(string name = "Acme", string country = "UK") =>
+          new()
+          {
+              Name = name,
+              ShippingAddress = new("123 Main St", "London", "W1A 1AA", country),
+              BillingAddress  = new("456 Billing Rd", "London", "EC1A 1BB", country),
+              Contacts = new()
+          };
+
+      [Fact]
+      public async Task Create_And_Get_AddressRoundtrips()
+      {
+          var s = await _repo.CreateAsync(MakeSupplier(), CancellationToken.None);
+          var found = await _repo.GetAsync(s.Id, CancellationToken.None);
+          found!.ShippingAddress.City.Should().Be("London");
+          found.BillingAddress.PostalCode.Should().Be("EC1A 1BB");
+      }
+
+      [Fact]
+      public async Task GetByCountry_FiltersCorrectly()
+      {
+          await _repo.CreateAsync(MakeSupplier("A", "UK"),  CancellationToken.None);
+          await _repo.CreateAsync(MakeSupplier("B", "DE"),  CancellationToken.None);
+          var result = await _repo.GetByCountryAsync("UK", CancellationToken.None);
+          result.Should().ContainSingle(s => s.Name == "A");
+      }
+
+      [Fact]
+      public async Task UpdateShippingAddress_Persists()
+      {
+          var s = await _repo.CreateAsync(MakeSupplier(), CancellationToken.None);
+          await _repo.UpdateShippingAddressAsync(s.Id, new("99 New St", "Manchester", "M1 1AA", "UK"), CancellationToken.None);
+          var found = await _repo.GetAsync(s.Id, CancellationToken.None);
+          found!.ShippingAddress.City.Should().Be("Manchester");
+      }
+
+      [Fact]
+      public async Task AddContact_AddsToSupplier()
+      {
+          var s = await _repo.CreateAsync(MakeSupplier(), CancellationToken.None);
+          await _repo.AddContactAsync(s.Id, new() { Name = "Bob", Email = "bob@acme.com", Role = "Buyer" }, CancellationToken.None);
+          var found = await _repo.GetAsync(s.Id, CancellationToken.None);
+          found!.Contacts.Should().ContainSingle(c => c.Name == "Bob");
+      }
+
+      [Fact]
+      public async Task AddContact_UnknownSupplier_ReturnsFalse()
+      {
+          var result = await _repo.AddContactAsync(9999, new() { Name = "X", Email = "x@y.com", Role = "Z" }, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task Get_UnknownId_ReturnsNull()
+      {
+          (await _repo.GetAsync(9999, CancellationToken.None)).Should().BeNull();
+      }
+  }

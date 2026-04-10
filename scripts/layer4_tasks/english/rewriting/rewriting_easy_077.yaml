@@ -1,0 +1,21 @@
+name: rewriting_easy_077
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'He was tired. He went to bed early.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "tired"
+    - "bed"
+    - "early"
+    - "so"
+    - "therefore"
+  min_words: 5
+  max_words: 15

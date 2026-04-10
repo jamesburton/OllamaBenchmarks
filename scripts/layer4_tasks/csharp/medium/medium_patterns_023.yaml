@@ -1,0 +1,39 @@
+name: medium_patterns_023
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ExpressionEvaluator that evaluates arithmetic string expressions.
+  Supports: integers, +, -, *, /, parentheses, correct operator precedence.
+  Expose: int Evaluate(string expression).
+  Throws FormatException for malformed input.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExpressionEvaluatorTests
+  {
+      [Fact]
+      public void SimpleAddition() { new ExpressionEvaluator().Evaluate("2+3").Should().Be(5); }
+
+      [Fact]
+      public void PrecedenceCorrect() { new ExpressionEvaluator().Evaluate("2+3*4").Should().Be(14); }
+
+      [Fact]
+      public void Parentheses() { new ExpressionEvaluator().Evaluate("(2+3)*4").Should().Be(20); }
+
+      [Fact]
+      public void Subtraction() { new ExpressionEvaluator().Evaluate("10-3-2").Should().Be(5); }
+
+      [Fact]
+      public void InvalidExpression_ThrowsFormat()
+      {
+          Action act = () => new ExpressionEvaluator().Evaluate("2++3");
+          act.Should().Throw<FormatException>();
+      }
+  }

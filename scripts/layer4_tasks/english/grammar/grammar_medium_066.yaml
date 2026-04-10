@@ -1,0 +1,16 @@
+name: grammar_medium_066
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The merger was approved, it will take effect next quarter.
+  B) The merger was approved; it will take effect next quarter.
+  C) The merger was approved: it will take effect next quarter.
+  D) Both B and C are correct.
+  Reply with only the letter.
+expected_answer: "D"
+validator_config: {}

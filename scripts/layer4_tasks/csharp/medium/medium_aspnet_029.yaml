@@ -1,0 +1,61 @@
+name: medium_aspnet_029
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record EventDto(Guid Id, string Name, DateTime StartTime, int MaxAttendees, int CurrentAttendees).
+  A class EventsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<EventDto> (for testability).
+  Actions:
+    GET api/events — all events
+    GET api/events/available — events with CurrentAttendees < MaxAttendees
+    POST api/events/{id}/register — increments CurrentAttendees (400 if full, 404 if not found)
+  Return only valid C# code in a single file.
+test_code: |
+  public class EventsControllerTests
+  {
+      private EventsController MakeController() => new(new List<EventDto>
+      {
+          new(Guid.Parse("00000000-0000-0000-0000-000000000001"), "Conf", DateTime.UtcNow, 2, 1),
+          new(Guid.Parse("00000000-0000-0000-0000-000000000002"), "Full Event", DateTime.UtcNow, 1, 1)
+      });
+
+      [Fact]
+      public void GetAll_ReturnsAll()
+      {
+          (MakeController().GetAll() as OkObjectResult)!
+              .Value.Should().BeAssignableTo<IEnumerable<EventDto>>()
+              .Which.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetAvailable_ReturnsOnlyAvailable()
+      {
+          var result = MakeController().GetAvailable() as OkObjectResult;
+          (result!.Value as IEnumerable<EventDto>).Should().OnlyContain(e => e.CurrentAttendees < e.MaxAttendees);
+      }
+
+      [Fact]
+      public void Register_IncrementsAttendees()
+      {
+          var ctrl = MakeController();
+          ctrl.Register(Guid.Parse("00000000-0000-0000-0000-000000000001"));
+          var events = (ctrl.GetAll() as OkObjectResult)!.Value as IEnumerable<EventDto>;
+          events!.First(e => e.Id == Guid.Parse("00000000-0000-0000-0000-000000000001")).CurrentAttendees.Should().Be(2);
+      }
+
+      [Fact]
+      public void Register_FullEvent_Returns400()
+      {
+          var ctrl = MakeController();
+          ctrl.Register(Guid.Parse("00000000-0000-0000-0000-000000000002"))
+              .Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

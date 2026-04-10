@@ -1,0 +1,16 @@
+name: vocabulary_easy_085
+category: english
+subcategory: vocabulary
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The prefix 'un-' (as in 'unhappy') means:
+  A) Very
+  B) Before
+  C) Not
+  D) Again
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

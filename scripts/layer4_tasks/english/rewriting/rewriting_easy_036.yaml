@@ -1,0 +1,21 @@
+name: rewriting_easy_036
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'Please ensure that all documents are submitted by Friday.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "documents"
+    - "Friday"
+    - "send"
+    - "hand in"
+    - "by"
+  min_words: 4
+  max_words: 15

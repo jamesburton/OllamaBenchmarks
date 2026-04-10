@@ -1,0 +1,89 @@
+name: hard_linq_011
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: LogEntry(int Id, string Level, string Service, DateTime Timestamp, string Message).
+  A class LogAnalyser with constructor accepting IEnumerable<LogEntry> entries.
+  Methods:
+    IEnumerable<ServiceErrorRate> ErrorRates() — per Service: TotalCount, ErrorCount
+      (Level=="Error"), ErrorRate as double. Orders by ErrorRate descending.
+    IEnumerable<LogEntry> SearchByKeyword(string keyword) — case-insensitive search in Message.
+      Throws ArgumentNullException if keyword is null.
+    IEnumerable<TimeSlotCount> HourlyDistribution(string service) — groups by hour-of-day (0-23),
+      counts entries per hour for the given service. Only includes hours with at least one entry.
+      Orders by Hour ascending.
+    IEnumerable<LogEntry> MostRecent(int n) — last N entries by Timestamp descending.
+  Records: ServiceErrorRate(string Service, int TotalCount, int ErrorCount, double ErrorRate),
+           TimeSlotCount(int Hour, int Count).
+  Return only valid C# code in a single file.
+test_code: |
+  public class LogAnalyserTests
+  {
+      private static readonly List<LogEntry> Entries = new()
+      {
+          new(1, "Info",  "Auth",    new DateTime(2024,1,1,10,0,0), "User logged in"),
+          new(2, "Error", "Auth",    new DateTime(2024,1,1,10,5,0), "Token invalid"),
+          new(3, "Error", "Auth",    new DateTime(2024,1,1,14,0,0), "Auth failed"),
+          new(4, "Info",  "Orders",  new DateTime(2024,1,1,9,0,0),  "Order placed"),
+          new(5, "Error", "Orders",  new DateTime(2024,1,1,9,30,0), "DB error"),
+          new(6, "Debug", "Orders",  new DateTime(2024,1,1,9,45,0), "Query slow"),
+      };
+
+      [Fact]
+      public void ErrorRates_AuthRateIsCorrect()
+      {
+          var result = new LogAnalyser(Entries).ErrorRates().ToList();
+          var auth = result.First(s => s.Service == "Auth");
+          auth.ErrorRate.Should().BeApproximately(2.0/3.0, 0.01);
+      }
+
+      [Fact]
+      public void ErrorRates_OrderedByErrorRateDescending()
+      {
+          var result = new LogAnalyser(Entries).ErrorRates().ToList();
+          result.Select(s => s.ErrorRate).Should().BeInDescendingOrder();
+      }
+
+      [Fact]
+      public void SearchByKeyword_FindsCaseInsensitive()
+      {
+          var result = new LogAnalyser(Entries).SearchByKeyword("error").ToList();
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void SearchByKeyword_NullKeyword_ThrowsArgumentNullException()
+      {
+          var act = () => new LogAnalyser(Entries).SearchByKeyword(null!).ToList();
+          act.Should().Throw<ArgumentNullException>();
+      }
+
+      [Fact]
+      public void HourlyDistribution_AuthHasTwoHours()
+      {
+          var result = new LogAnalyser(Entries).HourlyDistribution("Auth").ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void MostRecent_ReturnsCorrectCount()
+      {
+          var result = new LogAnalyser(Entries).MostRecent(3).ToList();
+          result.Should().HaveCount(3);
+          result[0].Id.Should().Be(3);
+      }
+
+      [Fact]
+      public void ErrorRates_EmptyInput_ReturnsEmpty()
+      {
+          new LogAnalyser(Array.Empty<LogEntry>()).ErrorRates().Should().BeEmpty();
+      }
+  }

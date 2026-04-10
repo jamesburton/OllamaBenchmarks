@@ -1,0 +1,39 @@
+name: easy_patterns_027
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Version(int Major, int Minor, int Patch)
+  with:
+    override string ToString() => $"{Major}.{Minor}.{Patch}"
+  and a static class VersionHelper with:
+    bool IsCompatible(Version required, Version actual)
+  that returns true if actual.Major == required.Major && actual >= required (compared component by component).
+  Return only valid C# code in a single file.
+test_code: |
+  public class VersionHelperTests
+  {
+      [Fact]
+      public void IsCompatible_SameVersion_ReturnsTrue()
+      {
+          VersionHelper.IsCompatible(new Version(1, 2, 0), new Version(1, 2, 0)).Should().BeTrue();
+      }
+      [Fact]
+      public void IsCompatible_HigherMinor_ReturnsTrue()
+      {
+          VersionHelper.IsCompatible(new Version(1, 2, 0), new Version(1, 3, 0)).Should().BeTrue();
+      }
+      [Fact]
+      public void IsCompatible_DifferentMajor_ReturnsFalse()
+      {
+          VersionHelper.IsCompatible(new Version(1, 0, 0), new Version(2, 0, 0)).Should().BeFalse();
+      }
+  }

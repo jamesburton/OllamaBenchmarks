@@ -1,0 +1,16 @@
+name: vocabulary_medium_051
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word pair shows a shift from NEGATIVE to POSITIVE connotation?
+  A) Stingy to frugal
+  B) Generous to extravagant
+  C) Confident to arrogant
+  D) Bold to reckless
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

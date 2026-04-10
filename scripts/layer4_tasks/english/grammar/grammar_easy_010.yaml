@@ -1,0 +1,15 @@
+name: grammar_easy_010
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) None of the students was ready.
+  B) None of the students were ready.
+  C) Both A and B are acceptable.
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

@@ -1,0 +1,70 @@
+name: medium_blazor_001
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CounterService with:
+    int Count { get; private set; }
+    event Action? OnChange
+    void Increment()
+    void Decrement()
+    void Reset()
+  Increment adds 1, Decrement subtracts 1 (min 0), Reset sets to 0.
+  Each method fires OnChange.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CounterServiceTests
+  {
+      [Fact]
+      public void Increment_IncreasesCount()
+      {
+          var svc = new CounterService();
+          svc.Increment();
+          svc.Count.Should().Be(1);
+      }
+
+      [Fact]
+      public void Decrement_DecreasesCount()
+      {
+          var svc = new CounterService();
+          svc.Increment();
+          svc.Increment();
+          svc.Decrement();
+          svc.Count.Should().Be(1);
+      }
+
+      [Fact]
+      public void Decrement_DoesNotGoBelowZero()
+      {
+          var svc = new CounterService();
+          svc.Decrement();
+          svc.Count.Should().Be(0);
+      }
+
+      [Fact]
+      public void Reset_SetsToZero()
+      {
+          var svc = new CounterService();
+          svc.Increment();
+          svc.Increment();
+          svc.Reset();
+          svc.Count.Should().Be(0);
+      }
+
+      [Fact]
+      public void Increment_FiresOnChange()
+      {
+          var svc = new CounterService();
+          var fired = false;
+          svc.OnChange += () => fired = true;
+          svc.Increment();
+          fired.Should().BeTrue();
+      }
+  }

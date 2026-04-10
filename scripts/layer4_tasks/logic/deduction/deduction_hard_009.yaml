@@ -1,0 +1,15 @@
+name: deduction_hard_009
+category: logic
+subcategory: deduction
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. Some A are B.
+  2. All B are C.
+  3. No C are D.
+  Can any A be D? Reply with only: Yes or No.
+expected_answer: "No."
+validator_config: {}

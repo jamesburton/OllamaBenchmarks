@@ -1,0 +1,92 @@
+name: hard_aspnet_016
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  An API key authentication handler for ASP.NET Core:
+  Class ApiKeyAuthOptions : AuthenticationSchemeOptions: string HeaderName (default "X-Api-Key").
+  Class ApiKeyAuthHandler : AuthenticationHandler<ApiKeyAuthOptions>:
+    Reads API key from header. Validates against IApiKeyStore.
+    On success: creates ClaimsPrincipal with claim "client-id" = the registered client ID.
+    On failure: returns 401 with JSON body { "error": "Invalid API key" }.
+  Interface IApiKeyStore:
+    Task<string?> GetClientIdAsync(string apiKey, CancellationToken ct) — returns client ID or null.
+  Class InMemoryApiKeyStore : IApiKeyStore — stores key -> clientId mappings.
+  Static: AddApiKeyAuthentication(this IServiceCollection svc, Action<ApiKeyAuthOptions>? configure = null)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApiKeyAuthHandlerTests
+  {
+      private static WebApplication BuildApp(Action<InMemoryApiKeyStore>? configureStore = null)
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddApiKeyAuthentication();
+          builder.Services.AddAuthorization();
+          builder.Services.AddSingleton<IApiKeyStore>(sp =>
+          {
+              var store = new InMemoryApiKeyStore();
+              configureStore?.Invoke(store);
+              return store;
+          });
+          var app = builder.Build();
+          app.UseAuthentication();
+          app.UseAuthorization();
+          app.MapGet("/secure", (System.Security.Claims.ClaimsPrincipal user) =>
+              user.FindFirst("client-id")?.Value ?? "anonymous").RequireAuthorization();
+          return app;
+      }
+
+      [Fact]
+      public async Task ValidApiKey_Returns200WithClientId()
+      {
+          await using var app = BuildApp(s => s.Add("valid-key-123", "client-abc"));
+          var req = new HttpRequestMessage(HttpMethod.Get, "/secure");
+          req.Headers.Add("X-Api-Key", "valid-key-123");
+          var resp = await app.GetTestClient().SendAsync(req);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          var body = await resp.Content.ReadAsStringAsync();
+          body.Should().Contain("client-abc");
+      }
+
+      [Fact]
+      public async Task InvalidApiKey_Returns401()
+      {
+          await using var app = BuildApp();
+          var req = new HttpRequestMessage(HttpMethod.Get, "/secure");
+          req.Headers.Add("X-Api-Key", "wrong-key");
+          var resp = await app.GetTestClient().SendAsync(req);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+      }
+
+      [Fact]
+      public async Task MissingApiKey_Returns401()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/secure");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+      }
+
+      [Fact]
+      public async Task InMemoryStore_ReturnsClientIdForValidKey()
+      {
+          var store = new InMemoryApiKeyStore();
+          store.Add("key1", "clientX");
+          var result = await store.GetClientIdAsync("key1", CancellationToken.None);
+          result.Should().Be("clientX");
+      }
+
+      [Fact]
+      public async Task InMemoryStore_ReturnsNullForUnknownKey()
+      {
+          var store = new InMemoryApiKeyStore();
+          var result = await store.GetClientIdAsync("unknown", CancellationToken.None);
+          result.Should().BeNull();
+      }
+  }

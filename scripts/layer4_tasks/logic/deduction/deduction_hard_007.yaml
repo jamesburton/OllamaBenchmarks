@@ -1,0 +1,15 @@
+name: deduction_hard_007
+category: logic
+subcategory: deduction
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All X are Y.
+  2. No Y are Z.
+  3. All W are Z.
+  Can any X be W? Reply with only: Yes or No.
+expected_answer: "No."
+validator_config: {}

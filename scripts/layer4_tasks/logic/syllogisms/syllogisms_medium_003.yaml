@@ -1,0 +1,15 @@
+name: syllogisms_medium_003
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All physicians are educated.
+  2. Some educated people are wealthy.
+  3. No wealthy people are unhappy.
+  Are all physicians happy? Reply with only: Yes, No, or Cannot be determined.
+expected_answer: "Cannot be determined."
+validator_config: {}

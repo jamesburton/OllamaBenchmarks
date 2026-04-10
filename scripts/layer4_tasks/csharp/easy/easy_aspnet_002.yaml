@@ -1,0 +1,45 @@
+name: easy_aspnet_002
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CreateUserRequest with validation attributes:
+    [Required] string Name { get; set; }
+    [Required][EmailAddress] string Email { get; set; }
+    [Range(1, 120)] int Age { get; set; }
+  Return only valid C# code in a single file.
+test_code: |
+  public class CreateUserRequestTests
+  {
+      private static IList<ValidationResult> Validate(object obj)
+      {
+          var results = new List<ValidationResult>();
+          Validator.TryValidateObject(obj, new ValidationContext(obj), results, true);
+          return results;
+      }
+      [Fact]
+      public void Valid_Request_PassesValidation()
+      {
+          var req = new CreateUserRequest { Name = "Alice", Email = "alice@example.com", Age = 30 };
+          Validate(req).Should().BeEmpty();
+      }
+      [Fact]
+      public void MissingName_FailsValidation()
+      {
+          var req = new CreateUserRequest { Name = null!, Email = "a@b.com", Age = 25 };
+          Validate(req).Should().NotBeEmpty();
+      }
+      [Fact]
+      public void InvalidEmail_FailsValidation()
+      {
+          var req = new CreateUserRequest { Name = "Bob", Email = "not-an-email", Age = 25 };
+          Validate(req).Should().NotBeEmpty();
+      }
+  }

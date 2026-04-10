@@ -1,0 +1,72 @@
+name: medium_async_003
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncMessageBus that uses Channel<string> internally.
+  Expose:
+    ValueTask PublishAsync(string message, CancellationToken ct = default)
+    IAsyncEnumerable<string> ConsumeAsync(CancellationToken ct = default)
+    void Complete() — signals no more messages will be published
+  The channel should be bounded with capacity 100.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncMessageBusTests
+  {
+      [Fact]
+      public async Task Publish_ThenConsume_ReceivesMessage()
+      {
+          var bus = new AsyncMessageBus();
+          await bus.PublishAsync("hello");
+          bus.Complete();
+          var messages = new List<string>();
+          await foreach (var msg in bus.ConsumeAsync())
+              messages.Add(msg);
+          messages.Should().ContainSingle("hello");
+      }
+
+      [Fact]
+      public async Task Publish_Multiple_AllReceived()
+      {
+          var bus = new AsyncMessageBus();
+          foreach (var m in new[]{"a","b","c"})
+              await bus.PublishAsync(m);
+          bus.Complete();
+          var messages = new List<string>();
+          await foreach (var msg in bus.ConsumeAsync())
+              messages.Add(msg);
+          messages.Should().BeEquivalentTo(new[]{"a","b","c"});
+      }
+
+      [Fact]
+      public async Task ConsumeAsync_CancelledToken_StopsIteration()
+      {
+          var bus = new AsyncMessageBus();
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var messages = new List<string>();
+          await foreach (var msg in bus.ConsumeAsync(cts.Token).WithCancellation(cts.Token)
+                         .ConfigureAwait(false))
+              messages.Add(msg);
+          // Should complete without throwing (OperationCancelled exits the loop)
+          messages.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task Complete_AfterComplete_ConsumeFinishes()
+      {
+          var bus = new AsyncMessageBus();
+          bus.Complete();
+          var count = 0;
+          await foreach (var _ in bus.ConsumeAsync())
+              count++;
+          count.Should().Be(0);
+      }
+  }

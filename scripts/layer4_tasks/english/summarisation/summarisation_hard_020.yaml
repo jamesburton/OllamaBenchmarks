@@ -1,0 +1,18 @@
+name: summarisation_hard_020
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The rise of shareholder activism has transformed corporate governance, with activist funds increasingly leveraging minority stakes to demand strategic changes, board seats, and capital returns. While activists claim to unlock value, long-term institutional investors often resist campaigns that prioritise short-term share price appreciation over sustained investment.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "activism"
+    - "shareholders"
+    - "governance"
+    - "investment"
+  max_words: 25

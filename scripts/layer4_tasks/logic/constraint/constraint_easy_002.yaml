@@ -1,0 +1,16 @@
+name: constraint_easy_002
+category: logic
+subcategory: constraint
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three people - Ann, Ben, Carl - each have a different favourite colour: red, blue, green.
+  Clues:
+  1. Ann does not like red.
+  2. Ben likes blue.
+  3. Carl does not like blue.
+  What colour does Ann like? Reply with only the colour.
+expected_answer: "Green"
+validator_config: {}

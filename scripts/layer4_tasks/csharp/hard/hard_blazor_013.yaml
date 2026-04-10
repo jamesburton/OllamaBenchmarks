@@ -1,0 +1,94 @@
+name: hard_blazor_013
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor breadcrumb and page metadata service:
+  Records:
+    BreadcrumbItem(string Label, string? Href, bool IsActive)
+    PageMetadata(string Title, string? Description, string? CanonicalUrl, IReadOnlyList<string> Keywords)
+    PageConfig(string Route, PageMetadata Metadata, IReadOnlyList<BreadcrumbItem> Breadcrumbs)
+
+  Class PageMetadataService:
+    void Register(PageConfig config): registers route config.
+    PageMetadata GetMetadata(string route): returns registered or default metadata.
+    IReadOnlyList<BreadcrumbItem> GetBreadcrumbs(string route): returns registered or empty.
+    void SetDynamicTitle(string route, string title): overrides title for current session.
+    string BuildCanonicalUrl(string baseUrl, string route): concatenates correctly.
+    PageMetadata GetDefault(): Title="App", Description=null, empty Keywords.
+
+  Class BreadcrumbBuilder:
+    BreadcrumbBuilder Add(string label, string? href = null)
+    BreadcrumbBuilder AddHome(string href = "/")
+    IReadOnlyList<BreadcrumbItem> Build(): last item is active (IsActive=true), others false.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PageMetadataServiceTests
+  {
+      private readonly PageMetadataService _svc = new();
+
+      [Fact]
+      public void Register_Then_GetMetadata_ReturnsCorrect()
+      {
+          var meta = new PageMetadata("Products", "All products", null, new[] { "shop" });
+          _svc.Register(new PageConfig("/products", meta, Array.Empty<BreadcrumbItem>()));
+          _svc.GetMetadata("/products").Title.Should().Be("Products");
+      }
+
+      [Fact]
+      public void GetMetadata_UnknownRoute_ReturnsDefault()
+      {
+          var meta = _svc.GetMetadata("/unknown");
+          meta.Title.Should().Be("App");
+      }
+
+      [Fact]
+      public void SetDynamicTitle_OverridesTitle()
+      {
+          var meta = new PageMetadata("Orders", null, null, Array.Empty<string>());
+          _svc.Register(new PageConfig("/orders", meta, Array.Empty<BreadcrumbItem>()));
+          _svc.SetDynamicTitle("/orders", "My Orders");
+          _svc.GetMetadata("/orders").Title.Should().Be("My Orders");
+      }
+
+      [Fact]
+      public void GetBreadcrumbs_ReturnsRegistered()
+      {
+          var crumbs = new[] { new BreadcrumbItem("Home", "/", false), new BreadcrumbItem("Products", null, true) };
+          _svc.Register(new PageConfig("/products", _svc.GetDefault(), crumbs));
+          _svc.GetBreadcrumbs("/products").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void BuildCanonicalUrl_ConcatenatesCorrectly()
+      {
+          var url = _svc.BuildCanonicalUrl("https://app.com", "/products");
+          url.Should().Be("https://app.com/products");
+      }
+
+      [Fact]
+      public void BreadcrumbBuilder_LastItemIsActive()
+      {
+          var crumbs = new BreadcrumbBuilder()
+              .AddHome()
+              .Add("Products", "/products")
+              .Add("Widget")
+              .Build();
+          crumbs.Last().IsActive.Should().BeTrue();
+          crumbs.Take(crumbs.Count - 1).Should().AllSatisfy(c => c.IsActive.Should().BeFalse());
+      }
+
+      [Fact]
+      public void BreadcrumbBuilder_HomeHasCorrectHref()
+      {
+          var crumbs = new BreadcrumbBuilder().AddHome("/").Add("About").Build();
+          crumbs.First().Href.Should().Be("/");
+      }
+  }

@@ -1,0 +1,39 @@
+name: easy_xunit_043
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Queue<T> with methods:
+    void Enqueue(T item)
+    T Dequeue() throws InvalidOperationException if empty
+    T Peek() throws InvalidOperationException if empty
+    int Count { get; }
+    bool IsEmpty { get; }
+  Return only valid C# code in a single file.
+test_code: |
+  public class QueueTests
+  {
+      [Fact]
+      public void Enqueue_And_Dequeue_FIFO()
+      {
+          var q = new Queue<string>();
+          q.Enqueue("first");
+          q.Enqueue("second");
+          q.Dequeue().Should().Be("first");
+          q.Count.Should().Be(1);
+      }
+      [Fact]
+      public void Dequeue_EmptyQueue_ThrowsInvalidOperationException()
+      {
+          var q = new Queue<int>();
+          var act = () => q.Dequeue();
+          act.Should().Throw<InvalidOperationException>();
+      }
+  }

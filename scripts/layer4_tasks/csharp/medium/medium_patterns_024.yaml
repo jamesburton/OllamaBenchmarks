@@ -1,0 +1,57 @@
+name: medium_patterns_024
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A generic class FiniteStateMachine<TState, TTrigger> with constructor accepting TState initialState.
+  Expose:
+    void AddTransition(TState from, TTrigger trigger, TState to)
+    void AddTransition(TState from, TTrigger trigger, TState to, Action onTransition)
+    TState Fire(TTrigger trigger) — throws InvalidOperationException if no transition
+    TState CurrentState
+  Return only valid C# code in a single file.
+test_code: |
+  public enum Light { Red, Yellow, Green }
+  public enum Sig { Go, Slow, Stop }
+
+  public class FiniteStateMachineTests
+  {
+      private static FiniteStateMachine<Light, Sig> Fsm()
+      {
+          var f = new FiniteStateMachine<Light,Sig>(Light.Red);
+          f.AddTransition(Light.Red, Sig.Go, Light.Green);
+          f.AddTransition(Light.Green, Sig.Slow, Light.Yellow);
+          f.AddTransition(Light.Yellow, Sig.Stop, Light.Red);
+          return f;
+      }
+
+      [Fact]
+      public void Fire_ValidTransition_ChangesState() { var f=Fsm(); f.Fire(Sig.Go); f.CurrentState.Should().Be(Light.Green); }
+
+      [Fact]
+      public void Fire_Chain() { var f=Fsm(); f.Fire(Sig.Go); f.Fire(Sig.Slow); f.CurrentState.Should().Be(Light.Yellow); }
+
+      [Fact]
+      public void Fire_Invalid_Throws()
+      {
+          Action act = () => Fsm().Fire(Sig.Stop);
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Callback_Invoked()
+      {
+          bool called = false;
+          var f = new FiniteStateMachine<Light,Sig>(Light.Red);
+          f.AddTransition(Light.Red, Sig.Go, Light.Green, () => called = true);
+          f.Fire(Sig.Go);
+          called.Should().BeTrue();
+      }
+  }

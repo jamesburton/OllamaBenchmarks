@@ -1,0 +1,16 @@
+name: vocabulary_medium_071
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which phrase is appropriate for a FORMAL business email?
+  A) 'Just wanted to touch base'
+  B) 'I am writing to enquire'
+  C) 'Heads up'
+  D) 'FYI'
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

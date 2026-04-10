@@ -1,0 +1,39 @@
+name: easy_patterns_010
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ShapeDescriber with a static method:
+    string Describe(object shape)
+  that uses a switch expression with type patterns:
+    Circle c -> "circle with radius {c.Radius}"
+    Rectangle r -> "rectangle {r.Width}x{r.Height}"
+    _ -> "unknown shape"
+  Also define classes Circle with double Radius property and Rectangle with double Width and double Height properties.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShapeDescriberTests
+  {
+      [Fact]
+      public void Describe_Circle()
+      {
+          ShapeDescriber.Describe(new Circle { Radius = 5 }).Should().Be("circle with radius 5");
+      }
+      [Fact]
+      public void Describe_Rectangle()
+      {
+          ShapeDescriber.Describe(new Rectangle { Width = 3, Height = 4 }).Should().Be("rectangle 3x4");
+      }
+      [Fact]
+      public void Describe_Unknown()
+      {
+          ShapeDescriber.Describe("blob").Should().Be("unknown shape");
+      }
+  }

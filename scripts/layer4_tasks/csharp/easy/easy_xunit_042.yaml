@@ -1,0 +1,37 @@
+name: easy_xunit_042
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IFeatureFlags with method:
+    bool IsEnabled(string featureName)
+  A class FeatureService with constructor taking IFeatureFlags, and method:
+    string GetWelcomeMessage() returns "Welcome to Beta!" if "beta-ui" is enabled, else "Welcome!"
+  Return only valid C# code in a single file.
+test_code: |
+  public class FeatureServiceTests
+  {
+      [Fact]
+      public void GetWelcomeMessage_BetaEnabled_ReturnsBetaMessage()
+      {
+          var flags = Substitute.For<IFeatureFlags>();
+          flags.IsEnabled("beta-ui").Returns(true);
+          var service = new FeatureService(flags);
+          service.GetWelcomeMessage().Should().Be("Welcome to Beta!");
+      }
+      [Fact]
+      public void GetWelcomeMessage_BetaDisabled_ReturnsStandardMessage()
+      {
+          var flags = Substitute.For<IFeatureFlags>();
+          flags.IsEnabled("beta-ui").Returns(false);
+          var service = new FeatureService(flags);
+          service.GetWelcomeMessage().Should().Be("Welcome!");
+      }
+  }

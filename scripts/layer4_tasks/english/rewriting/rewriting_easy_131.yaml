@@ -1,0 +1,22 @@
+name: rewriting_easy_131
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'He told the client he was late.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "told"
+    - "client"
+    - "late"
+    - "he was"
+    - "the client was"
+    - "he admitted"
+  min_words: 4
+  max_words: 15

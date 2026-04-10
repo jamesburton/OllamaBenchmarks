@@ -1,0 +1,18 @@
+name: summarisation_easy_006
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Supply chain disruptions have caused delays and price increases across multiple industries. Manufacturers are struggling to source key components, and shipping costs remain elevated. Many companies are now exploring domestic sourcing to reduce dependency on overseas suppliers.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "supply chain"
+    - "delays"
+    - "prices"
+    - "sourcing"
+  max_words: 25

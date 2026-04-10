@@ -1,0 +1,55 @@
+name: medium_async_007
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CancellableTimer implementing IAsyncDisposable.
+  Constructor accepts TimeSpan interval and Func<CancellationToken, Task> callback.
+  Expose:
+    Task StartAsync() — begins invoking callback on each interval tick
+    ValueTask DisposeAsync() — cancels and awaits current callback, suppresses exceptions
+  The timer should stop ticking after DisposeAsync is called.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CancellableTimerTests
+  {
+      [Fact]
+      public async Task StartAsync_CallbackInvoked()
+      {
+          int count = 0;
+          await using var timer = new CancellableTimer(TimeSpan.FromMilliseconds(20), async ct => { count++; await Task.Yield(); });
+          await timer.StartAsync();
+          await Task.Delay(80);
+          count.Should().BeGreaterThan(1);
+      }
+
+      [Fact]
+      public async Task DisposeAsync_StopsCallbacks()
+      {
+          int count = 0;
+          var timer = new CancellableTimer(TimeSpan.FromMilliseconds(20), async ct => { count++; await Task.Yield(); });
+          await timer.StartAsync();
+          await Task.Delay(60);
+          await timer.DisposeAsync();
+          int snapshot = count;
+          await Task.Delay(60);
+          count.Should().Be(snapshot);
+      }
+
+      [Fact]
+      public async Task DisposeAsync_CallbackThrows_NoException()
+      {
+          var timer = new CancellableTimer(TimeSpan.FromMilliseconds(10), async ct => { await Task.Yield(); throw new Exception("boom"); });
+          await timer.StartAsync();
+          await Task.Delay(30);
+          Func<Task> act = () => timer.DisposeAsync().AsTask();
+          await act.Should().NotThrowAsync();
+      }
+  }

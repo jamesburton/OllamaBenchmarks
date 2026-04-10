@@ -1,0 +1,47 @@
+name: medium_patterns_017
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  Records: Coordinate(double Lat, double Lon), BoundingBox(Coordinate TopLeft, Coordinate BottomRight).
+  A static class GeoUtils with:
+    bool Contains(BoundingBox box, Coordinate point)
+    double Distance(Coordinate a, Coordinate b) — Euclidean distance
+    Coordinate Midpoint(Coordinate a, Coordinate b)
+  Return only valid C# code in a single file.
+test_code: |
+  public class GeoUtilsTests
+  {
+      [Fact]
+      public void Contains_Inside_True()
+      {
+          GeoUtils.Contains(new BoundingBox(new(0,0),new(10,10)), new(5,5)).Should().BeTrue();
+      }
+
+      [Fact]
+      public void Contains_Outside_False()
+      {
+          GeoUtils.Contains(new BoundingBox(new(0,0),new(10,10)), new(15,5)).Should().BeFalse();
+      }
+
+      [Fact]
+      public void Distance_3_4_5_Triangle()
+      {
+          GeoUtils.Distance(new(0,0), new(3,4)).Should().BeApproximately(5.0, 0.001);
+      }
+
+      [Fact]
+      public void Midpoint_Correct()
+      {
+          var mid = GeoUtils.Midpoint(new(0,0), new(4,6));
+          mid.Lat.Should().Be(2.0);
+          mid.Lon.Should().Be(3.0);
+      }
+  }

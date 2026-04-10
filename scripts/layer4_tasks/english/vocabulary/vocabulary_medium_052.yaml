@@ -1,0 +1,16 @@
+name: vocabulary_medium_052
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word has the most NEGATIVE connotation in a professional context?
+  A) Assertive
+  B) Pushy
+  C) Confident
+  D) Direct
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

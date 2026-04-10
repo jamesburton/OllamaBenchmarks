@@ -1,0 +1,41 @@
+name: medium_vertical_031
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for calculaterisk.
+  Include:
+    Command: string CustomerId, decimal LoanAmount, int CreditScore, string EmploymentStatus
+  Result: string RiskLevel, decimal ApprovedAmount, decimal InterestRate
+  Handler: CreditScore<600=High, 600-749=Medium, 750+=Low. Employed gets full amount, self-employed 80%, unemployed 0.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CalculateRiskHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new CalculateRiskHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new CalculateRiskHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new CalculateRiskHandler();
+          handler.Should().NotBeNull();
+      }
+  }

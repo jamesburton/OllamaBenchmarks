@@ -1,0 +1,40 @@
+name: easy_blazor_023
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class ChecklistComponent that extends ComponentBase with:
+    [Parameter] List<string> Items { get; set; } = new()
+    HashSet<string> Checked { get; set; } = new()
+    void ToggleItem(string item) adds item to Checked if not present, removes it if present
+    bool IsChecked(string item) returns true if item is in Checked
+    int CheckedCount => Checked.Count
+  Return only valid C# code in a single file.
+test_code: |
+  public class ChecklistComponentTests
+  {
+      [Fact]
+      public void ToggleItem_AddsAndRemoves()
+      {
+          var c = new ChecklistComponent { Items = new List<string> { "Task1", "Task2" } };
+          c.ToggleItem("Task1");
+          c.IsChecked("Task1").Should().BeTrue();
+          c.ToggleItem("Task1");
+          c.IsChecked("Task1").Should().BeFalse();
+      }
+      [Fact]
+      public void CheckedCount_ReflectsCheckedItems()
+      {
+          var c = new ChecklistComponent { Items = new List<string> { "A", "B", "C" } };
+          c.ToggleItem("A");
+          c.ToggleItem("C");
+          c.CheckedCount.Should().Be(2);
+      }
+  }

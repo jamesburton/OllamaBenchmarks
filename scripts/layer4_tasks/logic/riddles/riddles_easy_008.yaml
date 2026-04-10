@@ -1,0 +1,16 @@
+name: riddles_easy_008
+category: logic
+subcategory: riddles
+difficulty: easy
+weight: 1
+validator_type: logic
+max_tokens: 64
+prompt: |
+  What has teeth but cannot bite?
+  Reply with only the answer.
+expected_answer: "A comb"
+validator_config:
+  accepted_answers:
+  - "A comb"
+  - "comb"
+  - "a comb"

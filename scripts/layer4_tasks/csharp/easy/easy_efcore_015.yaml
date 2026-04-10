@@ -1,0 +1,46 @@
+name: easy_efcore_015
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Message with properties: int Id, string Content, DateTime SentAt, bool IsRead
+  A DbContext class MessageContext with:
+    DbSet<Message> Messages { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class MessageRepository with:
+    int MarkAllAsRead(MessageContext context)
+  that marks all unread messages as read using ExecuteUpdate and returns the count of updated messages.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MessageRepositoryTests
+  {
+      [Fact]
+      public void MarkAllAsRead_UpdatesUnreadMessages()
+      {
+          using var context = new MessageContext();
+          context.Database.EnsureCreated();
+          context.Messages.AddRange(
+              new Message { Content = "A", SentAt = DateTime.UtcNow, IsRead = false },
+              new Message { Content = "B", SentAt = DateTime.UtcNow, IsRead = false },
+              new Message { Content = "C", SentAt = DateTime.UtcNow, IsRead = true });
+          context.SaveChanges();
+          var count = MessageRepository.MarkAllAsRead(context);
+          count.Should().Be(2);
+          context.Messages.All(m => m.IsRead).Should().BeTrue();
+      }
+      [Fact]
+      public void MarkAllAsRead_NoUnread_ReturnsZero()
+      {
+          using var context = new MessageContext();
+          context.Database.EnsureCreated();
+          MessageRepository.MarkAllAsRead(context).Should().Be(0);
+      }
+  }

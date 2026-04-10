@@ -1,0 +1,34 @@
+name: easy_xunit_039
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class CollectionUtils with static methods:
+    Dictionary<TKey, List<TValue>> GroupBy<TKey, TValue>(IEnumerable<TValue> items, Func<TValue, TKey> keySelector) groups items by key
+    List<T> Flatten<T>(IEnumerable<IEnumerable<T>> nested) flattens nested enumerable into a single list
+  Return only valid C# code in a single file.
+test_code: |
+  public class CollectionUtilsTests
+  {
+      [Fact]
+      public void GroupBy_GroupsByKey()
+      {
+          var items = new[] { "apple", "avocado", "banana", "blueberry" };
+          var groups = CollectionUtils.GroupBy(items, s => s[0]);
+          groups['a'].Should().HaveCount(2);
+          groups['b'].Should().HaveCount(2);
+      }
+      [Fact]
+      public void Flatten_FlattensNestedLists()
+      {
+          var nested = new[] { new[] { 1, 2 }, new[] { 3, 4 }, new[] { 5 } };
+          CollectionUtils.Flatten(nested).Should().Equal(1, 2, 3, 4, 5);
+      }
+  }

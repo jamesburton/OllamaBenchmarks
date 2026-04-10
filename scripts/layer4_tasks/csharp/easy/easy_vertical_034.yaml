@@ -1,0 +1,40 @@
+name: easy_vertical_034
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Expense(string Id, string Category, decimal Amount, string PaidBy)
+  A class ExpenseTracker with:
+    void AddExpense(Expense expense)
+    decimal TotalByCategory(string category) returns total amount for category
+    Dictionary<string, decimal> TotalByPerson() returns total spent per person
+    List<Expense> GetAll()
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExpenseTrackerTests
+  {
+      [Fact]
+      public void TotalByCategory_ReturnsCorrectSum()
+      {
+          var tracker = new ExpenseTracker();
+          tracker.AddExpense(new Expense("e1", "Food", 25m, "Alice"));
+          tracker.AddExpense(new Expense("e2", "Food", 15m, "Bob"));
+          tracker.AddExpense(new Expense("e3", "Travel", 100m, "Alice"));
+          tracker.TotalByCategory("Food").Should().Be(40m);
+      }
+      [Fact]
+      public void TotalByPerson_ReturnsCorrectTotals()
+      {
+          var tracker = new ExpenseTracker();
+          tracker.AddExpense(new Expense("e1", "Food", 30m, "Alice"));
+          tracker.AddExpense(new Expense("e2", "Travel", 50m, "Alice"));
+          tracker.TotalByPerson()["Alice"].Should().Be(80m);
+      }
+  }

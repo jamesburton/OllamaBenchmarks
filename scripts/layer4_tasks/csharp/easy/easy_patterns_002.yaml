@@ -1,0 +1,37 @@
+name: easy_patterns_002
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Person(string Name, int Age)
+  Demonstrate the "with" expression by implementing a static class PersonHelper with:
+    Person WithName(Person person, string newName)
+  that returns a copy of the person with a new name using a with expression.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PersonHelperTests
+  {
+      [Fact]
+      public void WithName_ReturnsNewPersonWithNewName()
+      {
+          var original = new Person("Alice", 30);
+          var result = PersonHelper.WithName(original, "Bob");
+          result.Name.Should().Be("Bob");
+          result.Age.Should().Be(30);
+      }
+      [Fact]
+      public void WithName_OriginalIsUnchanged()
+      {
+          var original = new Person("Alice", 30);
+          PersonHelper.WithName(original, "Bob");
+          original.Name.Should().Be("Alice");
+      }
+  }

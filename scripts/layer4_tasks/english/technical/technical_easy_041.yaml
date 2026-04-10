@@ -1,0 +1,21 @@
+name: technical_easy_041
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a clear, user-friendly error message for when a user enters an invalid email address in a form.
+  Keep it under 20 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "email"
+    - "valid"
+    - "address"
+    - "enter"
+    - "please"
+    - "invalid"
+  min_words: 5
+  max_words: 20

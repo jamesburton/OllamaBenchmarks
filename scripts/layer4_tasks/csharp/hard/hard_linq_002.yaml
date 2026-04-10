@@ -1,0 +1,97 @@
+name: hard_linq_002
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A record Employee(int Id, string Department, string Name, decimal Salary, int YearsExperience).
+  A class SalaryAnalyser with constructor accepting IEnumerable<Employee> employees.
+  Methods:
+    IEnumerable<DeptStats> ComputeDeptStats() — per Department: Count, TotalSalary,
+      MedianSalary (middle value when sorted), HighestPaid employee name.
+      Orders by TotalSalary descending.
+    IEnumerable<Employee> GetTopEarnersByExperience(int minYears, int take) —
+      filters by minYears experience, orders by Salary descending, takes top N.
+    ILookup<string, Employee> BuildDeptLookup() — returns ILookup keyed by Department.
+  Record: DeptStats(string Department, int Count, decimal TotalSalary, decimal MedianSalary, string HighestPaid).
+  Return only valid C# code in a single file.
+test_code: |
+  public class SalaryAnalyserTests
+  {
+      private static readonly List<Employee> Employees = new()
+      {
+          new(1, "Eng",  "Alice",   95000m, 8),
+          new(2, "Eng",  "Bob",     72000m, 3),
+          new(3, "Eng",  "Charlie", 88000m, 6),
+          new(4, "HR",   "Diana",   60000m, 5),
+          new(5, "HR",   "Eve",     65000m, 7),
+          new(6, "Sales","Frank",   55000m, 2),
+      };
+
+      [Fact]
+      public void ComputeDeptStats_ReturnsThreeDepts()
+      {
+          var result = new SalaryAnalyser(Employees).ComputeDeptStats().ToList();
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void ComputeDeptStats_EngTotalSalaryCorrect()
+      {
+          var result = new SalaryAnalyser(Employees).ComputeDeptStats().ToList();
+          var eng = result.First(d => d.Department == "Eng");
+          eng.TotalSalary.Should().Be(255000m);
+          eng.Count.Should().Be(3);
+      }
+
+      [Fact]
+      public void ComputeDeptStats_EngMedianSalaryIsMiddleValue()
+      {
+          var result = new SalaryAnalyser(Employees).ComputeDeptStats().ToList();
+          var eng = result.First(d => d.Department == "Eng");
+          eng.MedianSalary.Should().Be(88000m);
+      }
+
+      [Fact]
+      public void ComputeDeptStats_HighestPaidIsCorrect()
+      {
+          var result = new SalaryAnalyser(Employees).ComputeDeptStats().ToList();
+          var eng = result.First(d => d.Department == "Eng");
+          eng.HighestPaid.Should().Be("Alice");
+      }
+
+      [Fact]
+      public void GetTopEarnersByExperience_FiltersAndRanks()
+      {
+          var result = new SalaryAnalyser(Employees).GetTopEarnersByExperience(5, 3).ToList();
+          result.Should().HaveCount(3);
+          result[0].Name.Should().Be("Alice");
+      }
+
+      [Fact]
+      public void GetTopEarnersByExperience_NoMatchReturnsEmpty()
+      {
+          var result = new SalaryAnalyser(Employees).GetTopEarnersByExperience(99, 5).ToList();
+          result.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void BuildDeptLookup_GroupsCorrectly()
+      {
+          var lookup = new SalaryAnalyser(Employees).BuildDeptLookup();
+          lookup["Eng"].Should().HaveCount(3);
+          lookup["HR"].Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void ComputeDeptStats_EmptyInput_ReturnsEmpty()
+      {
+          new SalaryAnalyser(Array.Empty<Employee>()).ComputeDeptStats().Should().BeEmpty();
+      }
+  }

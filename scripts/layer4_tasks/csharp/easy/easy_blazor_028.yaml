@@ -1,0 +1,38 @@
+name: easy_blazor_028
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class MultiSelectComponent that extends ComponentBase with:
+    [Parameter] List<string> Options { get; set; } = new()
+    List<string> Selected { get; set; } = new()
+    void Select(string option) adds option to Selected if not already present
+    void Deselect(string option) removes option from Selected
+    bool IsSelected(string option) returns true if option is in Selected
+  Return only valid C# code in a single file.
+test_code: |
+  public class MultiSelectComponentTests
+  {
+      [Fact]
+      public void Select_AddsOption()
+      {
+          var c = new MultiSelectComponent { Options = new List<string> { "A", "B", "C" } };
+          c.Select("A");
+          c.IsSelected("A").Should().BeTrue();
+      }
+      [Fact]
+      public void Deselect_RemovesOption()
+      {
+          var c = new MultiSelectComponent { Options = new List<string> { "A", "B" } };
+          c.Select("B");
+          c.Deselect("B");
+          c.IsSelected("B").Should().BeFalse();
+      }
+  }

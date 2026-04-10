@@ -1,0 +1,18 @@
+name: summarisation_medium_009
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The gig economy has created flexibility for millions of workers but has also raised questions about job security and benefits. Platform companies classify workers as independent contractors to avoid providing healthcare or retirement plans. Legislators in several countries are debating laws to extend protections to gig workers.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "gig"
+    - "workers"
+    - "benefits"
+    - "protections"
+  max_words: 25

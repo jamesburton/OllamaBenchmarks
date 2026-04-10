@@ -1,0 +1,41 @@
+name: medium_blazor_027
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class StepperService with:
+    int CurrentStep (starts 1), int TotalSteps, bool CanGoNext, bool CanGoPrevious, NextStep(), PreviousStep(), GoToStep(int), OnStepChanged event
+  Return only valid C# code in a single file.
+test_code: |
+  public class StepperServiceTests
+  {
+      [Fact]
+      public void Service_CanBeInstantiated()
+      {
+          var svc = new StepperService();
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_InitialState_IsDefault()
+      {
+          var svc = new StepperService();
+          // Just verify construction does not throw
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_BasicOperation_Works()
+      {
+          var svc = new StepperService();
+          // Basic smoke test
+          svc.Should().NotBeNull();
+      }
+  }

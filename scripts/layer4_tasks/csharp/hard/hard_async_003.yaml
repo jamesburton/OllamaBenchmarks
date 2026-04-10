@@ -1,0 +1,78 @@
+name: hard_async_003
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncSemaphorePool<T> that manages a pool of reusable resources:
+    Constructor: AsyncSemaphorePool(IReadOnlyList<T> resources) — initialises the pool.
+    Task<T> AcquireAsync(CancellationToken ct) — waits for a free resource and returns it.
+    void Release(T resource) — returns a resource to the pool.
+    Task<TResult> UseAsync<TResult>(Func<T, Task<TResult>> action, CancellationToken ct) —
+      acquires a resource, executes action, releases it (even on exception), returns result.
+    int AvailableCount — property returning current available resources.
+  The pool must be thread-safe. Disposing (not required) is optional.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncSemaphorePoolTests
+  {
+      [Fact]
+      public async Task UseAsync_ExecutesActionWithResource()
+      {
+          var pool = new AsyncSemaphorePool<string>(new[] { "conn1", "conn2" });
+          var result = await pool.UseAsync(r => Task.FromResult(r.ToUpper()), CancellationToken.None);
+          result.Should().BeOneOf("CONN1", "CONN2");
+      }
+
+      [Fact]
+      public async Task UseAsync_ReleasesResourceAfterUse()
+      {
+          var pool = new AsyncSemaphorePool<int>(new[] { 1 });
+          await pool.UseAsync(r => Task.CompletedTask, CancellationToken.None);
+          pool.AvailableCount.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task UseAsync_ReleasesResourceOnException()
+      {
+          var pool = new AsyncSemaphorePool<int>(new[] { 1 });
+          var act = async () => await pool.UseAsync<int>(
+              _ => throw new InvalidOperationException("boom"), CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+          pool.AvailableCount.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task ParallelUse_BoundedByPoolSize()
+      {
+          var pool = new AsyncSemaphorePool<int>(new[] { 1, 2 });
+          int concurrentMax = 0, concurrent = 0;
+          var tasks = Enumerable.Range(0, 10).Select(_ =>
+              pool.UseAsync(async _ =>
+              {
+                  Interlocked.Increment(ref concurrent);
+                  concurrentMax = Math.Max(concurrentMax, concurrent);
+                  await Task.Delay(10);
+                  Interlocked.Decrement(ref concurrent);
+              }, CancellationToken.None));
+          await Task.WhenAll(tasks);
+          concurrentMax.Should().BeLessThanOrEqualTo(2);
+      }
+
+      [Fact]
+      public async Task AcquireAsync_Cancelled_ThrowsOperationCancelled()
+      {
+          var pool = new AsyncSemaphorePool<int>(new[] { 1 });
+          var resource = await pool.AcquireAsync(CancellationToken.None);
+          var cts = new CancellationTokenSource(50);
+          var act = async () => await pool.AcquireAsync(cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+          pool.Release(resource);
+      }
+  }

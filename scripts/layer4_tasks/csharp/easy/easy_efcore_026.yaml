@@ -1,0 +1,44 @@
+name: easy_efcore_026
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Poll with properties: int Id, string Question, int Votes
+  A DbContext class PollContext with:
+    DbSet<Poll> Polls { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class PollRepository with:
+    Poll? Vote(PollContext context, int pollId)
+  that increments the Votes count for the given poll using ExecuteUpdate, then returns the updated poll or null if not found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PollRepositoryTests
+  {
+      [Fact]
+      public void Vote_IncrementsVotes()
+      {
+          using var context = new PollContext();
+          context.Database.EnsureCreated();
+          context.Polls.Add(new Poll { Question = "Best language?", Votes = 5 });
+          context.SaveChanges();
+          var id = context.Polls.First().Id;
+          var result = PollRepository.Vote(context, id);
+          result.Should().NotBeNull();
+          result!.Votes.Should().Be(6);
+      }
+      [Fact]
+      public void Vote_NotFound_ReturnsNull()
+      {
+          using var context = new PollContext();
+          context.Database.EnsureCreated();
+          PollRepository.Vote(context, 999).Should().BeNull();
+      }
+  }

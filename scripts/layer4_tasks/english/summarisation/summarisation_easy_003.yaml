@@ -1,0 +1,18 @@
+name: summarisation_easy_003
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The merger between the two retail giants was approved by regulators after a six-month review. The combined company will operate over 500 stores nationwide. Analysts expect significant cost savings through shared logistics and supply chains.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "merger"
+    - "stores"
+    - "savings"
+    - "regulators"
+  max_words: 25

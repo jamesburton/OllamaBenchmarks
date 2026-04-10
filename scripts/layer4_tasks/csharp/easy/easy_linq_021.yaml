@@ -1,0 +1,31 @@
+name: easy_linq_021
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Filter with a static method:
+    List<int> WhereGreaterThan(IEnumerable<int> numbers, int threshold)
+  that returns only numbers greater than the threshold using LINQ Where + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FilterTests
+  {
+      [Fact]
+      public void WhereGreaterThan_BasicCase()
+      {
+          var result = Filter.WhereGreaterThan(new[]{1,5,3,8,2}, 3);
+          result.Should().BeEquivalentTo(new[]{5,8}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void WhereGreaterThan_NoneMatch_ReturnsEmpty()
+      {
+          Filter.WhereGreaterThan(new[]{1,2,3}, 10).Should().BeEmpty();
+      }
+  }

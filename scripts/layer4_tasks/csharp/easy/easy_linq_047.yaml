@@ -1,0 +1,31 @@
+name: easy_linq_047
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Sorter with a static method:
+    List<string> OrderByLengthThenAlpha(IEnumerable<string> items)
+  that sorts strings first by length ascending, then alphabetically ascending using LINQ OrderBy + ThenBy + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SorterTests
+  {
+      [Fact]
+      public void OrderByLengthThenAlpha_BasicCase()
+      {
+          var result = Sorter.OrderByLengthThenAlpha(new[]{"banana","fig","apple","kiwi","pie"});
+          result.Should().BeEquivalentTo(new[]{"fig","pie","kiwi","apple","banana"}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void OrderByLengthThenAlpha_EmptySource_ReturnsEmpty()
+      {
+          Sorter.OrderByLengthThenAlpha(Array.Empty<string>()).Should().BeEmpty();
+      }
+  }

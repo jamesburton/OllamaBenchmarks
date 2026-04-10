@@ -1,0 +1,18 @@
+name: summarisation_easy_043
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The basketball team's star player announced his retirement after 15 seasons in the professional league. He finishes his career with four championship rings and is considered one of the greatest players of his generation. A farewell game is being planned for next month.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "basketball"
+    - "retirement"
+    - "championship"
+    - "career"
+  max_words: 25

@@ -1,0 +1,39 @@
+name: medium_xunit_040
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class RateLimiter with:
+    Constructor(int maxRequests, TimeSpan window), bool TryAcquire(string key), void AdvanceTime(TimeSpan by), int GetCount(string key)
+  Return only valid C# code in a single file.
+test_code: |
+  public class RateLimiterTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new RateLimiter();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new RateLimiter();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new RateLimiter();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

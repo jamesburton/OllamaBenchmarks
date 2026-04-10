@@ -1,0 +1,21 @@
+name: rewriting_medium_143
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'Despite being aware of the risks, the decision to proceed was made by the committee.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "committee"
+    - "decided"
+    - "despite"
+    - "risks"
+    - "proceed"
+  min_words: 5
+  max_words: 18

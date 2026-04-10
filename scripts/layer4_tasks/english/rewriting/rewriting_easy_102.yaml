@@ -1,0 +1,19 @@
+name: rewriting_easy_102
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'They came to the realisation that they had made a mistake.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "realised"
+    - "mistake"
+    - "they"
+  min_words: 3
+  max_words: 10

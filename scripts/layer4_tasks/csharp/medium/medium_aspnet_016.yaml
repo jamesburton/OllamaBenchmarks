@@ -1,0 +1,54 @@
+name: medium_aspnet_016
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CorrelationIdMiddleware with constructor accepting RequestDelegate next.
+  In InvokeAsync: if request has header X-Correlation-Id, use it; otherwise generate a new Guid.
+  Add the correlation id to response headers as X-Correlation-Id.
+  Store in HttpContext.Items["CorrelationId"].
+  Return only valid C# code in a single file.
+test_code: |
+  public class CorrelationIdMiddlewareTests
+  {
+      [Fact]
+      public async Task ExistingHeader_UsedAsCorrelationId()
+      {
+          var mw = new CorrelationIdMiddleware(_ => Task.CompletedTask);
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          ctx.Request.Headers["X-Correlation-Id"] = "my-id-123";
+          await mw.InvokeAsync(ctx);
+          ctx.Response.Headers["X-Correlation-Id"].ToString().Should().Be("my-id-123");
+          ctx.Items["CorrelationId"].Should().Be("my-id-123");
+      }
+
+      [Fact]
+      public async Task NoHeader_GeneratesNewId()
+      {
+          var mw = new CorrelationIdMiddleware(_ => Task.CompletedTask);
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          await mw.InvokeAsync(ctx);
+          var id = ctx.Response.Headers["X-Correlation-Id"].ToString();
+          id.Should().NotBeNullOrEmpty();
+          Guid.TryParse(id, out _).Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task CorrelationId_StoredInItems()
+      {
+          var mw = new CorrelationIdMiddleware(_ => Task.CompletedTask);
+          var ctx = new DefaultHttpContext();
+          ctx.Response.Body = new System.IO.MemoryStream();
+          await mw.InvokeAsync(ctx);
+          ctx.Items["CorrelationId"].Should().NotBeNull();
+      }
+  }

@@ -1,0 +1,79 @@
+name: hard_blazor_017
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor chart data service:
+  Enum ChartType { Line, Bar, Pie, Area }
+  Records:
+    DataPoint(string Label, double Value, string? Color)
+    ChartDataset(string Name, IReadOnlyList<DataPoint> Points, ChartType Type)
+    ChartConfig(string Title, IReadOnlyList<ChartDataset> Datasets, bool ShowLegend, bool ShowGrid)
+
+  Interface ISalesDataService:
+    Task<ChartConfig> GetMonthlySalesChartAsync(int year, CancellationToken ct)
+    Task<ChartConfig> GetCategoryBreakdownChartAsync(CancellationToken ct)
+    Task<ChartConfig> GetTrendComparisonAsync(int year1, int year2, CancellationToken ct)
+
+  Class MockSalesDataService : ISalesDataService:
+    Returns realistic mock data.
+    Monthly chart: 12 months, one dataset per year.
+    Category breakdown: pie chart with 5 categories.
+    Trend comparison: two line datasets for comparison.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MockSalesDataServiceTests
+  {
+      private readonly ISalesDataService _svc = new MockSalesDataService();
+
+      [Fact]
+      public async Task GetMonthlySalesChart_Returns12Points()
+      {
+          var config = await _svc.GetMonthlySalesChartAsync(2024, CancellationToken.None);
+          config.Datasets.Should().NotBeEmpty();
+          config.Datasets.First().Points.Should().HaveCount(12);
+      }
+
+      [Fact]
+      public async Task GetMonthlySalesChart_HasTitle()
+      {
+          var config = await _svc.GetMonthlySalesChartAsync(2024, CancellationToken.None);
+          config.Title.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public async Task GetCategoryBreakdown_IsPieChart()
+      {
+          var config = await _svc.GetCategoryBreakdownChartAsync(CancellationToken.None);
+          config.Datasets.Should().AllSatisfy(d => d.Type.Should().Be(ChartType.Pie));
+      }
+
+      [Fact]
+      public async Task GetCategoryBreakdown_HasFiveCategories()
+      {
+          var config = await _svc.GetCategoryBreakdownChartAsync(CancellationToken.None);
+          var totalPoints = config.Datasets.SelectMany(d => d.Points).DistinctBy(p => p.Label).Count();
+          totalPoints.Should().Be(5);
+      }
+
+      [Fact]
+      public async Task GetTrendComparison_HasTwoDatasets()
+      {
+          var config = await _svc.GetTrendComparisonAsync(2023, 2024, CancellationToken.None);
+          config.Datasets.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetTrendComparison_DatasetsHave12Points()
+      {
+          var config = await _svc.GetTrendComparisonAsync(2023, 2024, CancellationToken.None);
+          config.Datasets.Should().AllSatisfy(d => d.Points.Should().HaveCount(12));
+      }
+  }

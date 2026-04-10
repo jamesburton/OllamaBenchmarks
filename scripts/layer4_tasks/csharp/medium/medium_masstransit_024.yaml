@@ -1,0 +1,56 @@
+name: medium_masstransit_024
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record AlertTriggered(Guid AlertId, string Source, string Severity, string Message, DateTime TriggeredAt).
+  A consumer AlertTriggeredConsumer implementing IConsumer<AlertTriggered>.
+  Constructor accepts IAlertHandler service.
+  Interface IAlertHandler with: Task HandleAsync(Guid alertId, string severity, string message).
+  In Consume: calls service.HandleAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record AlertTriggered(Guid AlertId, string Source, string Severity, string Message, DateTime TriggeredAt); }
+  global using Contracts;
+
+  public class AlertTriggeredConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IAlertHandler>();
+          var consumer = new AlertTriggeredConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<AlertTriggered>>();
+          ctx.Message.Returns(new AlertTriggered(Guid.NewGuid(), "Sou", "Sev", "Mes", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).HandleAsync(Arg.Any<Guid alertId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IAlertHandler>();
+          var consumer = new AlertTriggeredConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<AlertTriggered>>();
+          ctx.Message.Returns(new AlertTriggered(Guid.NewGuid(), "Sou", "Sev", "Mes", DateTime.UtcNow));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IAlertHandler>();
+          var consumer = new AlertTriggeredConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<AlertTriggered>>();
+          ctx.Message.Returns(new AlertTriggered(Guid.NewGuid(), "Sour", "Seve", "Mess", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).HandleAsync(Arg.Any<Guid alertId>(), Arg.Any<object>());
+      }
+  }

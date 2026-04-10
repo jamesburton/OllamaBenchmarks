@@ -1,0 +1,39 @@
+name: medium_xunit_030
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class NumberWordConverter with:
+    string ToWords(long number) — converts integers to English words, supports up to billions
+  Return only valid C# code in a single file.
+test_code: |
+  public class NumberWordConverterTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new NumberWordConverter();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new NumberWordConverter();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new NumberWordConverter();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

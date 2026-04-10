@@ -1,0 +1,33 @@
+name: easy_async_050
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncMax with a static method:
+    async Task<T?> FindMaxAsync<T>(IEnumerable<Task<T>> tasks) where T : struct, IComparable<T>
+  that awaits all tasks and returns the maximum value, or null if no tasks.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncMaxTests
+  {
+      [Fact]
+      public async Task FindMaxAsync_BasicCase()
+      {
+          var tasks = new[]{Task.FromResult(3), Task.FromResult(1), Task.FromResult(4), Task.FromResult(1), Task.FromResult(5)};
+          var result = await AsyncMax.FindMaxAsync(tasks);
+          result.Should().Be(5);
+      }
+      [Fact]
+      public async Task FindMaxAsync_EmptyTasks_ReturnsNull()
+      {
+          var result = await AsyncMax.FindMaxAsync(Array.Empty<Task<int>>());
+          result.Should().BeNull();
+      }
+  }

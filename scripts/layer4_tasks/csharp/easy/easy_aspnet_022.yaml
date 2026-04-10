@@ -1,0 +1,40 @@
+name: easy_aspnet_022
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class JwtOptions with:
+    [Required] string Secret { get; set; }
+    [Required] string Issuer { get; set; }
+    [Required] string Audience { get; set; }
+    [Range(1, 86400)] int ExpirySeconds { get; set; } = 3600
+  Return only valid C# code in a single file.
+test_code: |
+  public class JwtOptionsTests
+  {
+      private static IList<ValidationResult> Validate(object obj)
+      {
+          var results = new List<ValidationResult>();
+          Validator.TryValidateObject(obj, new ValidationContext(obj), results, true);
+          return results;
+      }
+      [Fact]
+      public void ValidOptions_PassValidation()
+      {
+          var opts = new JwtOptions { Secret = "my-secret-key", Issuer = "myapp", Audience = "users" };
+          Validate(opts).Should().BeEmpty();
+      }
+      [Fact]
+      public void MissingSecret_FailsValidation()
+      {
+          var opts = new JwtOptions { Secret = null!, Issuer = "myapp", Audience = "users" };
+          Validate(opts).Should().NotBeEmpty();
+      }
+  }

@@ -1,0 +1,85 @@
+name: hard_vertical_010
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + specification pattern for job board:
+  Entities:
+    Company(int Id, string Name, string Industry, string Location, bool IsVerified)
+    Job(int Id, int CompanyId, Company Company, string Title, string Description,
+      string Type, decimal MinSalary, decimal MaxSalary, bool IsRemote, bool IsActive, DateTime PostedAt)
+  DbContext: JobBoardDbContext (SQLite in-memory), seeds 20 jobs across 5 companies.
+
+  Specifications:
+    RemoteJobsSpec: IsRemote=true, IsActive=true.
+    SalaryRangeSpec(decimal min, decimal max): salary range overlaps.
+    JobsByIndustrySpec(string industry): company industry matches.
+    RecentJobsSpec(int days): posted within last N days.
+
+  Class JobSearchService(JobBoardDbContext db):
+    Task<IReadOnlyList<Job>> SearchAsync(ISpecification<Job> spec, CancellationToken ct)
+    Task<IReadOnlyList<Job>> SearchAsync(IEnumerable<ISpecification<Job>> specs, CancellationToken ct): ANDs all.
+    Task<int> CountAsync(ISpecification<Job> spec, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class JobSearchServiceTests : IDisposable
+  {
+      private readonly JobBoardDbContext _db;
+      private readonly JobSearchService _svc;
+
+      public JobSearchServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<JobBoardDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new JobBoardDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new JobSearchService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task RemoteJobsSpec_ReturnsOnlyRemoteActive()
+      {
+          var jobs = await _svc.SearchAsync(new RemoteJobsSpec(), CancellationToken.None);
+          jobs.Should().AllSatisfy(j => j.IsRemote.Should().BeTrue());
+          jobs.Should().AllSatisfy(j => j.IsActive.Should().BeTrue());
+      }
+
+      [Fact]
+      public async Task SalaryRangeSpec_FiltersCorrectly()
+      {
+          var jobs = await _svc.SearchAsync(new SalaryRangeSpec(50000, 80000), CancellationToken.None);
+          jobs.Should().AllSatisfy(j =>
+              (j.MinSalary <= 80000 && j.MaxSalary >= 50000).Should().BeTrue());
+      }
+
+      [Fact]
+      public async Task RecentJobsSpec_FiltersOldJobs()
+      {
+          var jobs = await _svc.SearchAsync(new RecentJobsSpec(365), CancellationToken.None);
+          jobs.Should().AllSatisfy(j => j.PostedAt.Should().BeAfter(DateTime.UtcNow.AddDays(-366)));
+      }
+
+      [Fact]
+      public async Task CombinedSpecs_ANDsConditions()
+      {
+          var specs = new ISpecification<Job>[] { new RemoteJobsSpec(), new RecentJobsSpec(365) };
+          var jobs = await _svc.SearchAsync(specs, CancellationToken.None);
+          jobs.Should().AllSatisfy(j => j.IsRemote.Should().BeTrue());
+      }
+
+      [Fact]
+      public async Task CountAsync_ReturnsCorrectCount()
+      {
+          var all = await _svc.SearchAsync(new RemoteJobsSpec(), CancellationToken.None);
+          var count = await _svc.CountAsync(new RemoteJobsSpec(), CancellationToken.None);
+          count.Should().Be(all.Count);
+      }
+  }

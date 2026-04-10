@@ -1,0 +1,98 @@
+name: hard_efcore_018
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with a pagination-aware repository using IQueryable:
+  Entities: Post(int Id, string Title, string Content, string Author, List<Tag> Tags,
+    DateTime CreatedAt, int LikeCount), Tag(int Id, string Name, List<Post> Posts).
+  Many-to-many between Post and Tag.
+  DbContext: BlogDbContext.
+  Class BlogRepository(BlogDbContext db):
+    Task<PagedList<Post>> GetPostsAsync(PostQuery query, CancellationToken ct) —
+      filter by Author (if set), TagName (if set, any post with that tag),
+      sort by "newest" (CreatedAt desc) or "popular" (LikeCount desc).
+      Return paginated results.
+    Task<Post> CreatePostAsync(string title, string content, string author, IEnumerable<string> tagNames, CancellationToken ct)
+    Task<bool> LikePostAsync(int id, CancellationToken ct) — increments LikeCount.
+  Record: PostQuery(string? Author, string? TagName, string SortBy, int Page, int PageSize).
+  Class PagedList<T>(IReadOnlyList<T> Items, int TotalCount, int Page, int TotalPages).
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BlogRepositoryTests : IDisposable
+  {
+      private readonly BlogDbContext _db;
+      private readonly BlogRepository _repo;
+
+      public BlogRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<BlogDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new BlogDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new BlogRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task CreatePost_WithTags_CreatesCorrectly()
+      {
+          var post = await _repo.CreatePostAsync("My Post", "Content", "Alice", new[] { "csharp", "dotnet" }, CancellationToken.None);
+          post.Tags.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetPosts_FiltersByAuthor()
+      {
+          await _repo.CreatePostAsync("A", "C", "Alice", Array.Empty<string>(), CancellationToken.None);
+          await _repo.CreatePostAsync("B", "C", "Bob",   Array.Empty<string>(), CancellationToken.None);
+          var result = await _repo.GetPostsAsync(new PostQuery("Alice", null, "newest", 1, 10), CancellationToken.None);
+          result.Items.Should().AllSatisfy(p => p.Author.Should().Be("Alice"));
+      }
+
+      [Fact]
+      public async Task GetPosts_FiltersByTag()
+      {
+          await _repo.CreatePostAsync("Tagged",    "C", "Alice", new[] { "csharp" }, CancellationToken.None);
+          await _repo.CreatePostAsync("Not Tagged","C", "Alice", Array.Empty<string>(), CancellationToken.None);
+          var result = await _repo.GetPostsAsync(new PostQuery(null, "csharp", "newest", 1, 10), CancellationToken.None);
+          result.Items.Should().ContainSingle(p => p.Title == "Tagged");
+      }
+
+      [Fact]
+      public async Task GetPosts_SortsByNewest()
+      {
+          await _repo.CreatePostAsync("Old", "C", "A", Array.Empty<string>(), CancellationToken.None);
+          await Task.Delay(10);
+          await _repo.CreatePostAsync("New", "C", "A", Array.Empty<string>(), CancellationToken.None);
+          var result = await _repo.GetPostsAsync(new PostQuery(null, null, "newest", 1, 10), CancellationToken.None);
+          result.Items[0].Title.Should().Be("New");
+      }
+
+      [Fact]
+      public async Task LikePost_IncrementsLikeCount()
+      {
+          var post = await _repo.CreatePostAsync("Liked", "C", "Alice", Array.Empty<string>(), CancellationToken.None);
+          await _repo.LikePostAsync(post.Id, CancellationToken.None);
+          await _repo.LikePostAsync(post.Id, CancellationToken.None);
+          _db.Posts.Find(post.Id)!.LikeCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task GetPosts_Pagination_CorrectTotalPages()
+      {
+          for (int i = 0; i < 5; i++)
+              await _repo.CreatePostAsync($"Post{i}", "C", "Alice", Array.Empty<string>(), CancellationToken.None);
+          var result = await _repo.GetPostsAsync(new PostQuery(null, null, "newest", 1, 2), CancellationToken.None);
+          result.TotalPages.Should().Be(3);
+          result.Items.Should().HaveCount(2);
+      }
+  }

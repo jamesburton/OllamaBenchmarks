@@ -1,0 +1,50 @@
+name: easy_efcore_014
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  Entity classes:
+    class Student with properties: int Id, string Name, ICollection<Enrollment> Enrollments
+    class Enrollment with properties: int Id, int StudentId, Student Student, string CourseName
+  A DbContext class SchoolContext with:
+    DbSet<Student> Students { get; set; }
+    DbSet<Enrollment> Enrollments { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class SchoolRepository with:
+    Student? GetWithEnrollments(SchoolContext context, int studentId)
+  that returns the student with their enrollments included.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SchoolRepositoryTests
+  {
+      [Fact]
+      public void GetWithEnrollments_IncludesEnrollments()
+      {
+          using var context = new SchoolContext();
+          context.Database.EnsureCreated();
+          var student = new Student { Name = "Alice" };
+          context.Students.Add(student);
+          context.SaveChanges();
+          context.Enrollments.AddRange(
+              new Enrollment { StudentId = student.Id, CourseName = "Math" },
+              new Enrollment { StudentId = student.Id, CourseName = "Science" });
+          context.SaveChanges();
+          var result = SchoolRepository.GetWithEnrollments(context, student.Id);
+          result.Should().NotBeNull();
+          result!.Enrollments.Should().HaveCount(2);
+      }
+      [Fact]
+      public void GetWithEnrollments_NotFound_ReturnsNull()
+      {
+          using var context = new SchoolContext();
+          context.Database.EnsureCreated();
+          SchoolRepository.GetWithEnrollments(context, 999).Should().BeNull();
+      }
+  }

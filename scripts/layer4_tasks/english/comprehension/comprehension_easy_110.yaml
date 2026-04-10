@@ -1,0 +1,23 @@
+name: comprehension_easy_110
+category: english
+subcategory: comprehension
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  Climate change, driven primarily by human-generated greenhouse gas emissions, is altering weather patterns, sea levels, and ecosystems around the world. The Intergovernmental Panel on Climate Change (IPCC) has concluded with high confidence that global average temperatures have already risen by approximately 1.1 degrees Celsius above pre-industrial levels. The impacts are already visible: more frequent and intense heatwaves, rising sea levels threatening coastal communities, and shifts in species distribution. Scientists warn that limiting warming to 1.5 degrees Celsius above pre-industrial levels — the goal of the Paris Agreement — requires rapid and deep reductions in emissions by 2030. Renewable energy, electrification of transport, and changes in agricultural practices are central to decarbonisation strategies. However, the transition faces political, economic, and behavioural obstacles. The concept of climate justice highlights that vulnerable and low-income nations contribute least to emissions but bear the greatest consequences.
+  
+  Answer in one sentence:
+  Name one strategy for reducing emissions mentioned in the passage.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "renewable"
+    - "electrification"
+    - "agriculture"
+    - "decarbonisation"
+  min_words: 8
+  max_words: 40

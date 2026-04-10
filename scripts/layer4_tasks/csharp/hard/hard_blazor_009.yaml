@@ -1,0 +1,81 @@
+name: hard_blazor_009
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor paged data table service:
+  Records:
+    TableColumn(string Name, string PropertyName, bool Sortable, bool Filterable)
+    TableQuery(int Page, int PageSize, string? SortColumn, bool SortDescending, Dictionary<string, string> Filters)
+    TableResult<T>(IReadOnlyList<T> Rows, int TotalRows, int Page, int TotalPages, string? SortColumn, bool SortDescending)
+
+  Class Employee(int Id, string Name, string Department, string Title, decimal Salary, DateTime HireDate)
+
+  Class EmployeeTableService:
+    Constructor seeds 20 employees across 4 departments.
+    Task<TableResult<Employee>> QueryAsync(TableQuery query, CancellationToken ct):
+      Filters: "Name" (contains, case-insensitive), "Department" (exact), "Title" (contains).
+      Sorting: by Name, Department, Salary, HireDate.
+      Pagination: page 1-based.
+    IReadOnlyList<TableColumn> GetColumns()
+  Return only valid C# code in a single file.
+test_code: |
+  public class EmployeeTableServiceTests
+  {
+      private readonly EmployeeTableService _svc = new();
+
+      [Fact]
+      public async Task Query_NoFilters_ReturnsAllWithPagination()
+      {
+          var result = await _svc.QueryAsync(new TableQuery(1, 5, null, false, new()), CancellationToken.None);
+          result.TotalRows.Should().Be(20);
+          result.Rows.Should().HaveCount(5);
+          result.TotalPages.Should().Be(4);
+      }
+
+      [Fact]
+      public async Task Query_FilterByDepartment_ReturnsSubset()
+      {
+          var filters = new Dictionary<string, string> { ["Department"] = "Engineering" };
+          var result = await _svc.QueryAsync(new TableQuery(1, 10, null, false, filters), CancellationToken.None);
+          result.Rows.Should().AllSatisfy(e => e.Department.Should().Be("Engineering"));
+      }
+
+      [Fact]
+      public async Task Query_FilterByName_CaseInsensitive()
+      {
+          var filters = new Dictionary<string, string> { ["Name"] = "alice" };
+          var result = await _svc.QueryAsync(new TableQuery(1, 10, null, false, filters), CancellationToken.None);
+          result.Rows.Should().AllSatisfy(e => e.Name.ToLower().Should().Contain("alice"));
+      }
+
+      [Fact]
+      public async Task Query_SortBySalaryDescending()
+      {
+          var result = await _svc.QueryAsync(new TableQuery(1, 20, "Salary", true, new()), CancellationToken.None);
+          result.Rows.Should().BeInDescendingOrder(e => e.Salary);
+      }
+
+      [Fact]
+      public async Task Query_SecondPage_HasCorrectRows()
+      {
+          var result = await _svc.QueryAsync(new TableQuery(2, 5, null, false, new()), CancellationToken.None);
+          result.Page.Should().Be(2);
+          result.Rows.Should().HaveCount(5);
+      }
+
+      [Fact]
+      public void GetColumns_ReturnsExpectedColumns()
+      {
+          var cols = _svc.GetColumns();
+          cols.Should().Contain(c => c.PropertyName == "Name");
+          cols.Should().Contain(c => c.PropertyName == "Department");
+      }
+  }

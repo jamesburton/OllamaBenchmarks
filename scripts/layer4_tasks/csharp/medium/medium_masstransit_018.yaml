@@ -1,0 +1,56 @@
+name: medium_masstransit_018
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record LoginFailed(string UserId, string IpAddress, int FailureCount, DateTime AttemptedAt).
+  A consumer LoginFailedConsumer implementing IConsumer<LoginFailed>.
+  Constructor accepts ISecurityService service.
+  Interface ISecurityService with: Task HandleFailedLoginAsync(string userId, string ip, int count).
+  In Consume: calls service.HandleFailedLoginAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record LoginFailed(string UserId, string IpAddress, int FailureCount, DateTime AttemptedAt); }
+  global using Contracts;
+
+  public class LoginFailedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<ISecurityService>();
+          var consumer = new LoginFailedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<LoginFailed>>();
+          ctx.Message.Returns(new LoginFailed("Use", "IpA", 1, DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).HandleFailedLoginAsync(Arg.Any<string userId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<ISecurityService>();
+          var consumer = new LoginFailedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<LoginFailed>>();
+          ctx.Message.Returns(new LoginFailed("Use", "IpA", 1, DateTime.UtcNow));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<ISecurityService>();
+          var consumer = new LoginFailedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<LoginFailed>>();
+          ctx.Message.Returns(new LoginFailed("User", "IpAd", 2, DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).HandleFailedLoginAsync(Arg.Any<string userId>(), Arg.Any<object>());
+      }
+  }

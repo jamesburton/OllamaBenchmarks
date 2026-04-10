@@ -1,0 +1,22 @@
+name: creative_hard_071
+category: english
+subcategory: creative
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of the last tree in a deforested landscape.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "alone"
+    - "last"
+    - "tree"
+    - "cleared"
+    - "sky"
+    - "exposed"
+    - "survives"
+    - "landscape"
+  min_words: 15
+  max_words: 60

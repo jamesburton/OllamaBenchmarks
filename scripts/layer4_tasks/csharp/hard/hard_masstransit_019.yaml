@@ -1,0 +1,121 @@
+name: hard_masstransit_019
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit saga for inventory reservation with rollback:
+  Messages:
+    record ReserveInventory(Guid ReservationId, Guid OrderId, IReadOnlyList<(string Sku, int Qty)> Items);
+    record InventoryReserved(Guid ReservationId, Guid OrderId);
+    record ReservationReleased(Guid ReservationId);
+    record ReservationFailed(Guid ReservationId, string Reason);
+    record ConfirmReservation(Guid ReservationId);
+    record ReleaseReservation(Guid ReservationId);
+
+  States: Reserving, Reserved, Confirmed, Released, Failed.
+  InventoryReservationSaga : MassTransitStateMachine<InventoryReservationState>
+  Transitions:
+    Initially + ReserveInventory -> Reserving (publish InventoryReserved or ReservationFailed)
+    Reserving + InventoryReserved -> Reserved
+    Reserving + ReservationFailed -> Failed
+    Reserved + ConfirmReservation -> Confirmed
+    Reserved + ReleaseReservation -> Released (publish ReservationReleased)
+
+  InventoryReservationState: Guid CorrelationId, string CurrentState, Guid OrderId, DateTime CreatedAt.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryReservationSagaTests
+  {
+      [Fact]
+      public async Task ReserveInventory_TransitionsToReserving()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<InventoryReservationState, InventoryReservationSaga>(new InventoryReservationSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new ReserveInventory(id, Guid.NewGuid(), new[] { ("SKU-1", 5) }));
+              await Task.Delay(200);
+              var saga = sagaHarness.Sagas.Contains(id);
+              saga.Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task InventoryReserved_TransitionsToReserved()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<InventoryReservationState, InventoryReservationSaga>(new InventoryReservationSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new ReserveInventory(id, Guid.NewGuid(), new[] { ("SKU-2", 1) }));
+              await harness.InputQueueSendEndpoint.Send(new InventoryReserved(id, Guid.NewGuid()));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Reserved).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ConfirmReservation_TransitionsToConfirmed()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<InventoryReservationState, InventoryReservationSaga>(new InventoryReservationSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new ReserveInventory(id, Guid.NewGuid(), new[] { ("SKU-3", 2) }));
+              await harness.InputQueueSendEndpoint.Send(new InventoryReserved(id, Guid.NewGuid()));
+              await harness.InputQueueSendEndpoint.Send(new ConfirmReservation(id));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Confirmed).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ReleaseReservation_PublishesReservationReleased()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<InventoryReservationState, InventoryReservationSaga>(new InventoryReservationSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new ReserveInventory(id, Guid.NewGuid(), new[] { ("SKU-4", 3) }));
+              await harness.InputQueueSendEndpoint.Send(new InventoryReserved(id, Guid.NewGuid()));
+              await harness.InputQueueSendEndpoint.Send(new ReleaseReservation(id));
+              (await harness.Published.Any<ReservationReleased>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ReservationFailed_TransitionsToFailed()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<InventoryReservationState, InventoryReservationSaga>(new InventoryReservationSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new ReserveInventory(id, Guid.NewGuid(), new[] { ("SKU-5", 99) }));
+              await harness.InputQueueSendEndpoint.Send(new ReservationFailed(id, "Out of stock"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Failed).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+  }

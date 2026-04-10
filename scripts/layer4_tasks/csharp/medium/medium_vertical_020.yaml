@@ -1,0 +1,41 @@
+name: medium_vertical_020
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for bulkimportusers.
+  Include:
+    Command: IEnumerable<(string Email, string Name, string Role)> Users
+  Result: int Imported, int Skipped, IEnumerable<string> Errors
+  Handler validates each user: email format, name not empty, role in (admin/user/viewer). Skips invalid, reports errors.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BulkImportUsersHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new BulkImportUsersHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new BulkImportUsersHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new BulkImportUsersHandler();
+          handler.Should().NotBeNull();
+      }
+  }

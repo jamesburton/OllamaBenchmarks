@@ -1,0 +1,88 @@
+name: hard_aspnet_019
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A dependency injection lifetime demonstration using keyed services:
+  Interface IMessageSender: Task SendAsync(string to, string subject, string body, CancellationToken ct)
+  Class SmtpMessageSender : IMessageSender — tracks sent messages in a list.
+  Class SmsMessageSender : IMessageSender — tracks sent messages in a list.
+  Class SlackMessageSender : IMessageSender — tracks sent messages in a list.
+  Class NotificationService(IEnumerable<IMessageSender> senders):
+    Task NotifyAllAsync(string to, string subject, string body, CancellationToken ct) — sends via all.
+    Task NotifyViaAsync(string channel, string to, string subject, string body, CancellationToken ct) —
+      sends via named keyed sender ("smtp", "sms", "slack"). Throws ArgumentException for unknown channel.
+  Static: AddNotificationServices(this IServiceCollection svc) — registers keyed senders and service.
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationServiceTests
+  {
+      private static NotificationService BuildService(out SmtpMessageSender smtp,
+          out SmsMessageSender sms, out SlackMessageSender slack)
+      {
+          smtp = new SmtpMessageSender();
+          sms = new SmsMessageSender();
+          slack = new SlackMessageSender();
+          return new NotificationService(new IMessageSender[] { smtp, sms, slack });
+      }
+
+      [Fact]
+      public async Task NotifyAll_SendsViaAllChannels()
+      {
+          var svc = BuildService(out var smtp, out var sms, out var slack);
+          await svc.NotifyAllAsync("user@example.com", "Hello", "Body", CancellationToken.None);
+          smtp.SentMessages.Should().HaveCount(1);
+          sms.SentMessages.Should().HaveCount(1);
+          slack.SentMessages.Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task NotifyAll_MessageDetailsCorrect()
+      {
+          var svc = BuildService(out var smtp, out _, out _);
+          await svc.NotifyAllAsync("to@x.com", "Subject", "Body", CancellationToken.None);
+          smtp.SentMessages[0].To.Should().Be("to@x.com");
+          smtp.SentMessages[0].Subject.Should().Be("Subject");
+      }
+
+      [Fact]
+      public async Task NotifyVia_Smtp_SendsOnlyViaSmtp()
+      {
+          var svc = BuildService(out var smtp, out var sms, out _);
+          await svc.NotifyViaAsync("smtp", "u@x.com", "S", "B", CancellationToken.None);
+          smtp.SentMessages.Should().HaveCount(1);
+          sms.SentMessages.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task NotifyVia_UnknownChannel_ThrowsArgumentException()
+      {
+          var svc = BuildService(out _, out _, out _);
+          var act = async () => await svc.NotifyViaAsync("carrier-pigeon", "a@b.com", "S", "B", CancellationToken.None);
+          await act.Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public void AddNotificationServices_RegistersService()
+      {
+          var services = new ServiceCollection();
+          services.AddNotificationServices();
+          var provider = services.BuildServiceProvider();
+          provider.GetService<NotificationService>().Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task NotifyAll_EmptySenders_DoesNotThrow()
+      {
+          var svc = new NotificationService(Array.Empty<IMessageSender>());
+          var act = async () => await svc.NotifyAllAsync("a@b.com", "S", "B", CancellationToken.None);
+          await act.Should().NotThrowAsync();
+      }
+  }

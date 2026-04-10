@@ -1,0 +1,15 @@
+name: syllogisms_medium_002
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All mammals are warm-blooded.
+  2. Some warm-blooded animals fly.
+  3. All flying warm-blooded animals are birds or bats.
+  Is it true that some mammals are birds or bats? Reply with only: Yes, No, or Cannot be determined.
+expected_answer: "Cannot be determined."
+validator_config: {}

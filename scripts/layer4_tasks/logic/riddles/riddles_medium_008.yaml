@@ -1,0 +1,16 @@
+name: riddles_medium_008
+category: logic
+subcategory: riddles
+difficulty: medium
+weight: 2
+validator_type: logic
+max_tokens: 64
+prompt: |
+  I have no life but I can die. What am I?
+  Reply with only the answer.
+expected_answer: "A battery"
+validator_config:
+  accepted_answers:
+  - "A battery"
+  - "battery"
+  - "a battery"

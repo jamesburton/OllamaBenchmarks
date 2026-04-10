@@ -1,0 +1,18 @@
+name: summarisation_medium_034
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Dark matter, which constitutes approximately 27 percent of the universe's mass-energy content, has never been directly observed. Its existence is inferred from gravitational effects on visible matter, including the rotation of galaxies and the bending of light. Multiple detector experiments have so far failed to capture a dark matter particle.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "dark matter"
+    - "gravity"
+    - "universe"
+    - "galaxies"
+  max_words: 25

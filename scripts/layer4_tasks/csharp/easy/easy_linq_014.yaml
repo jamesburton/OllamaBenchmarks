@@ -1,0 +1,37 @@
+name: easy_linq_014
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Pager with a static method:
+    List<T> TakePage<T>(IEnumerable<T> items, int skip, int take)
+  that returns a page of items using LINQ Skip + Take + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PagerTests
+  {
+      [Fact]
+      public void TakePage_FirstPage()
+      {
+          var result = Pager.TakePage(new[]{1,2,3,4,5}, 0, 2);
+          result.Should().BeEquivalentTo(new[]{1,2}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void TakePage_SecondPage()
+      {
+          var result = Pager.TakePage(new[]{1,2,3,4,5}, 2, 2);
+          result.Should().BeEquivalentTo(new[]{3,4}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void TakePage_SkipPastEnd_ReturnsEmpty()
+      {
+          Pager.TakePage(new[]{1,2,3}, 10, 2).Should().BeEmpty();
+      }
+  }

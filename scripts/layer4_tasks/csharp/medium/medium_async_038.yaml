@@ -1,0 +1,50 @@
+name: medium_async_038
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncThrottle<TKey, TResult> where TKey : notnull.
+  Constructor accepts int maxConcurrentPerKey and Func<TKey, CancellationToken, Task<TResult>> handler.
+  Exposes Task<TResult> ExecuteAsync(TKey key, CancellationToken ct = default).
+  Uses per-key SemaphoreSlim to limit concurrent executions per key.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncThrottleTests
+  {
+      [Fact]
+      public async Task ReturnsResult()
+      {
+          var t = new AsyncThrottle<string, int>(2, async (k, ct) => { await Task.Yield(); return k.Length; });
+          (await t.ExecuteAsync("hello")).Should().Be(5);
+      }
+
+      [Fact]
+      public async Task LimitsPerKey()
+      {
+          int concurrent = 0, max = 0;
+          var t = new AsyncThrottle<string, int>(1, async (k, ct) => {
+              Interlocked.Increment(ref concurrent);
+              max = Math.Max(max, concurrent);
+              await Task.Delay(20, ct);
+              Interlocked.Decrement(ref concurrent);
+              return 1;
+          });
+          await Task.WhenAll(Enumerable.Range(0, 3).Select(_ => t.ExecuteAsync("key")));
+          max.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task DifferentKeys_IndependentLimits()
+      {
+          var t = new AsyncThrottle<string, string>(1, async (k, ct) => { await Task.Yield(); return k.ToUpper(); });
+          (await t.ExecuteAsync("a")).Should().Be("A");
+          (await t.ExecuteAsync("b")).Should().Be("B");
+      }
+  }

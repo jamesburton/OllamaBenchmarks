@@ -1,0 +1,14 @@
+name: word_problems_medium_001
+category: maths
+subcategory: word_problems
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  Two trains start from cities 300 miles apart and travel toward each other. Train A travels at 70 mph and Train B at 80 mph. How many hours until they meet?
+  Reply with only the number.
+expected_answer: "2"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

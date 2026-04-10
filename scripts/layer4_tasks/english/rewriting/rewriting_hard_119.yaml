@@ -1,0 +1,21 @@
+name: rewriting_hard_119
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'The organisation has made significant progress in the area of diversity and inclusion, notwithstanding the challenges that have been encountered along the way.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "progress"
+    - "diversity"
+    - "inclusion"
+    - "despite"
+    - "challenges"
+  min_words: 4
+  max_words: 18

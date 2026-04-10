@@ -1,0 +1,64 @@
+name: medium_blazor_013
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class SortService with:
+    string SortColumn, bool Ascending, SetSort(column)->toggles direction if same column, OnSortChanged event
+  Return only valid C# code in a single file.
+test_code: |
+  public class SortServiceTests
+  {
+      [Fact]
+      public void SetSort_SetsColumn()
+      {
+          var svc = new SortService();
+          svc.SetSort("Name");
+          svc.SortColumn.Should().Be("Name");
+      }
+
+      [Fact]
+      public void SetSort_DefaultsToAscending()
+      {
+          var svc = new SortService();
+          svc.SetSort("Price");
+          svc.Ascending.Should().BeTrue();
+      }
+
+      [Fact]
+      public void SetSort_SameColumn_TogglesDirection()
+      {
+          var svc = new SortService();
+          svc.SetSort("Name");
+          svc.SetSort("Name");
+          svc.Ascending.Should().BeFalse();
+      }
+
+      [Fact]
+      public void SetSort_DifferentColumn_ResetsToAscending()
+      {
+          var svc = new SortService();
+          svc.SetSort("Name");
+          svc.SetSort("Name");
+          svc.SetSort("Price");
+          svc.Ascending.Should().BeTrue();
+          svc.SortColumn.Should().Be("Price");
+      }
+
+      [Fact]
+      public void SetSort_FiresEvent()
+      {
+          var svc = new SortService();
+          var fired = false;
+          svc.OnSortChanged += () => fired = true;
+          svc.SetSort("col");
+          fired.Should().BeTrue();
+      }
+  }

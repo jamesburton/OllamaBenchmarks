@@ -1,0 +1,84 @@
+name: hard_aspnet_010
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A PostConfigure and IStartupFilter pattern for ASP.NET Core:
+  Class SecurityHeadersOptions: bool EnableHsts (default true), bool EnableXFrameOptions (default true),
+    string XContentTypeOptions (default "nosniff"), bool EnableCsp (default false), string CspPolicy.
+  Class SecurityHeadersStartupFilter : IStartupFilter —
+    adds SecurityHeadersMiddleware to the pipeline.
+  Class SecurityHeadersMiddleware — adds configured headers to every response:
+    Strict-Transport-Security (if EnableHsts), X-Frame-Options: DENY (if EnableXFrameOptions),
+    X-Content-Type-Options, Content-Security-Policy (if EnableCsp and CspPolicy not empty).
+  Class SecurityHeadersPostConfigureOptions : IPostConfigureOptions<SecurityHeadersOptions> —
+    ensures CspPolicy is not null (defaults to empty string) and XContentTypeOptions is trimmed.
+  Static: AddSecurityHeaders(this IServiceCollection svc, Action<SecurityHeadersOptions>? configure = null)
+  Return only valid C# code in a single file.
+test_code: |
+  public class SecurityHeadersTests
+  {
+      private static WebApplication BuildApp(Action<SecurityHeadersOptions>? configure = null)
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddSecurityHeaders(configure);
+          var app = builder.Build();
+          app.MapGet("/", () => "ok");
+          return app;
+      }
+
+      [Fact]
+      public async Task Response_HasXContentTypeOptions()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().ContainKey("X-Content-Type-Options");
+      }
+
+      [Fact]
+      public async Task Response_EnableHsts_AddsStrictTransportSecurity()
+      {
+          await using var app = BuildApp(o => o.EnableHsts = true);
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().ContainKey("Strict-Transport-Security");
+      }
+
+      [Fact]
+      public async Task Response_DisableHsts_NoStrictTransportSecurity()
+      {
+          await using var app = BuildApp(o => o.EnableHsts = false);
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().NotContainKey("Strict-Transport-Security");
+      }
+
+      [Fact]
+      public async Task Response_EnableCsp_AddsCspHeader()
+      {
+          await using var app = BuildApp(o => { o.EnableCsp = true; o.CspPolicy = "default-src 'self'"; });
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().ContainKey("Content-Security-Policy");
+      }
+
+      [Fact]
+      public async Task Response_DisableCsp_NoCspHeader()
+      {
+          await using var app = BuildApp(o => o.EnableCsp = false);
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().NotContainKey("Content-Security-Policy");
+      }
+
+      [Fact]
+      public async Task Response_XFrameOptions_AddsDenyHeader()
+      {
+          await using var app = BuildApp(o => o.EnableXFrameOptions = true);
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().ContainKey("X-Frame-Options");
+      }
+  }

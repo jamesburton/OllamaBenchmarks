@@ -1,0 +1,21 @@
+name: rewriting_medium_048
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'The aforementioned items must be returned to the warehouse by close of business today.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "items"
+    - "back"
+    - "today"
+    - "return"
+    - "end of day"
+  min_words: 5
+  max_words: 20

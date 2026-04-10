@@ -1,0 +1,93 @@
+name: hard_blazor_012
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor file upload service with validation:
+  Records:
+    UploadRequest(string FileName, string ContentType, long SizeBytes, byte[] Content)
+    UploadResult(bool Success, string? FileId, string? Url, string? Error)
+    UploadConstraints(long MaxSizeBytes, IReadOnlyList<string> AllowedContentTypes, int MaxFilesPerUser)
+
+  Interface IFileStorage:
+    Task<string> StoreAsync(string fileId, byte[] content, CancellationToken ct)
+
+  Class FileUploadService(IFileStorage storage, UploadConstraints constraints):
+    Task<UploadResult> UploadAsync(string userId, UploadRequest request, CancellationToken ct):
+      Validates: file size <= MaxSizeBytes (error: "File too large").
+      Validates: ContentType in AllowedContentTypes (error: "File type not allowed").
+      Validates: user has not exceeded MaxFilesPerUser (error: "Upload limit reached").
+      If valid: store file, return success with generated fileId and URL "/files/{fileId}".
+    int GetUserUploadCount(string userId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class FileUploadServiceTests
+  {
+      private readonly UploadConstraints _constraints = new(
+          5 * 1024 * 1024, new[] { "image/jpeg", "image/png" }, 3);
+
+      private IFileStorage CreateStorage()
+      {
+          var s = Substitute.For<IFileStorage>();
+          s.StoreAsync(Arg.Any<string>(), Arg.Any<byte[]>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult("/files/" + ci.Arg<string>()));
+          return s;
+      }
+
+      [Fact]
+      public async Task ValidUpload_Succeeds()
+      {
+          var svc = new FileUploadService(CreateStorage(), _constraints);
+          var req = new UploadRequest("photo.jpg", "image/jpeg", 1024, new byte[1024]);
+          var result = await svc.UploadAsync("u1", req, CancellationToken.None);
+          result.Success.Should().BeTrue();
+          result.FileId.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public async Task FileTooLarge_ReturnsFail()
+      {
+          var svc = new FileUploadService(CreateStorage(), _constraints);
+          var req = new UploadRequest("big.jpg", "image/jpeg", 10 * 1024 * 1024, new byte[1024]);
+          var result = await svc.UploadAsync("u1", req, CancellationToken.None);
+          result.Success.Should().BeFalse();
+          result.Error.Should().Contain("too large");
+      }
+
+      [Fact]
+      public async Task DisallowedContentType_ReturnsFail()
+      {
+          var svc = new FileUploadService(CreateStorage(), _constraints);
+          var req = new UploadRequest("doc.pdf", "application/pdf", 100, new byte[100]);
+          var result = await svc.UploadAsync("u1", req, CancellationToken.None);
+          result.Success.Should().BeFalse();
+          result.Error.Should().Contain("not allowed");
+      }
+
+      [Fact]
+      public async Task ExceedsLimit_ReturnsFail()
+      {
+          var svc = new FileUploadService(CreateStorage(), _constraints);
+          for (int i = 0; i < 3; i++)
+              await svc.UploadAsync("u2", new UploadRequest($"f{i}.jpg", "image/jpeg", 100, new byte[100]), CancellationToken.None);
+          var result = await svc.UploadAsync("u2", new UploadRequest("f4.jpg", "image/png", 100, new byte[100]), CancellationToken.None);
+          result.Success.Should().BeFalse();
+          result.Error.Should().Contain("limit");
+      }
+
+      [Fact]
+      public async Task GetUserUploadCount_TracksUploads()
+      {
+          var svc = new FileUploadService(CreateStorage(), _constraints);
+          await svc.UploadAsync("u3", new UploadRequest("a.jpg", "image/jpeg", 100, new byte[100]), CancellationToken.None);
+          await svc.UploadAsync("u3", new UploadRequest("b.png", "image/png", 100, new byte[100]), CancellationToken.None);
+          svc.GetUserUploadCount("u3").Should().Be(2);
+      }
+  }

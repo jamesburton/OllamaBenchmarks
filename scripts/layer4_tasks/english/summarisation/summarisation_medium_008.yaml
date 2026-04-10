@@ -1,0 +1,18 @@
+name: summarisation_medium_008
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Inflation has eroded consumer purchasing power, forcing households to reduce discretionary spending. Central banks have responded by raising interest rates, which in turn increases borrowing costs for businesses. Economists warn that the combination may tip the economy into recession.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "inflation"
+    - "interest rates"
+    - "recession"
+    - "spending"
+  max_words: 25

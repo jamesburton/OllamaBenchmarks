@@ -1,0 +1,96 @@
+name: hard_efcore_021
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with complex aggregations and window-function simulation using LINQ:
+  Entity: SalesRecord(int Id, string SalesPersonId, string Region, decimal Amount,
+    DateTime SaleDate, string ProductCategory).
+  DbContext: SalesDbContext.
+  Class SalesRankingService(SalesDbContext db):
+    Task<IReadOnlyList<SalesPersonRank>> RankSalesPersonsAsync(string region, int year, CancellationToken ct) —
+      per salesperson: TotalSales, Rank (1=highest), SalesCount.
+    Task<IReadOnlyList<MonthlyTrend>> GetMonthlyTrendAsync(int year, CancellationToken ct) —
+      per month: MonthNumber, TotalAmount, TxnCount, PreviousMonthAmount (null for Jan).
+    Task<CategoryBreakdown> GetCategoryBreakdownAsync(string region, CancellationToken ct) —
+      per category: Amount and percentage of total for that region.
+  Records: SalesPersonRank(string SalesPersonId, decimal TotalSales, int Rank, int SalesCount),
+           MonthlyTrend(int Month, decimal TotalAmount, int TxnCount, decimal? PreviousMonthAmount),
+           CategoryBreakdown(IReadOnlyList<CategoryShare> Shares),
+           CategoryShare(string Category, decimal Amount, double Percentage).
+  Use SQLite in-memory with seeded data.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SalesRankingServiceTests : IDisposable
+  {
+      private readonly SalesDbContext _db;
+      private readonly SalesRankingService _svc;
+
+      public SalesRankingServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<SalesDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new SalesDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData();
+          _svc = new SalesRankingService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          _db.SalesRecords.AddRange(
+              new SalesRecord { SalesPersonId="S1", Region="North", Amount=1000m, SaleDate=new DateTime(2024,1,10), ProductCategory="Electronics" },
+              new SalesRecord { SalesPersonId="S1", Region="North", Amount=500m,  SaleDate=new DateTime(2024,2,15), ProductCategory="Books" },
+              new SalesRecord { SalesPersonId="S2", Region="North", Amount=1200m, SaleDate=new DateTime(2024,1,20), ProductCategory="Electronics" },
+              new SalesRecord { SalesPersonId="S1", Region="South", Amount=800m,  SaleDate=new DateTime(2024,3,5),  ProductCategory="Books" }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task RankSalesPersons_CorrectRanking()
+      {
+          var result = await _svc.RankSalesPersonsAsync("North", 2024, CancellationToken.None);
+          result[0].Rank.Should().Be(1);
+          result[0].SalesPersonId.Should().Be("S2");
+      }
+
+      [Fact]
+      public async Task RankSalesPersons_TotalsCorrect()
+      {
+          var result = await _svc.RankSalesPersonsAsync("North", 2024, CancellationToken.None);
+          var s1 = result.First(r => r.SalesPersonId == "S1");
+          s1.TotalSales.Should().Be(1500m);
+          s1.SalesCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task GetMonthlyTrend_TwoMonths()
+      {
+          var result = await _svc.GetMonthlyTrendAsync(2024, CancellationToken.None);
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task GetMonthlyTrend_PreviousMonthAmount()
+      {
+          var result = await _svc.GetMonthlyTrendAsync(2024, CancellationToken.None);
+          result.First(m => m.Month == 1).PreviousMonthAmount.Should().BeNull();
+          result.First(m => m.Month == 2).PreviousMonthAmount.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task GetCategoryBreakdown_SumTo100Percent()
+      {
+          var breakdown = await _svc.GetCategoryBreakdownAsync("North", CancellationToken.None);
+          breakdown.Shares.Sum(s => s.Percentage).Should().BeApproximately(100.0, 0.01);
+      }
+  }

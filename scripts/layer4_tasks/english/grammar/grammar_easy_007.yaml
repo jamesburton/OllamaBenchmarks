@@ -1,0 +1,15 @@
+name: grammar_easy_007
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) A number of students was absent.
+  B) A number of students were absent.
+  C) A number of students has been absent.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

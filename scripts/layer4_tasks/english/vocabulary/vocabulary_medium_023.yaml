@@ -1,0 +1,16 @@
+name: vocabulary_medium_023
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'He was reticent about sharing his opinion', which word best replaces 'reticent'?
+  A) Eager
+  B) Reluctant
+  C) Excited
+  D) Confused
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

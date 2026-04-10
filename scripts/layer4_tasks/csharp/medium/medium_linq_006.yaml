@@ -1,0 +1,47 @@
+name: medium_linq_006
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ZipPairer with a constructor accepting IEnumerable<string> keys and IEnumerable<int> values.
+  Expose:
+    Dictionary<string, int> Pair()  — zips keys with values into a dictionary (stop at shorter sequence)
+    IEnumerable<string> KeysWithValueAbove(int threshold) — keys whose paired value exceeds threshold, ordered ascending
+  Return only valid C# code in a single file.
+test_code: |
+  public class ZipPairerTests
+  {
+      [Fact]
+      public void Pair_BasicCase()
+      {
+          var result = new ZipPairer(new[]{"a","b","c"}, new[]{10,20,30}).Pair();
+          result.Should().BeEquivalentTo(new Dictionary<string,int>{{"a",10},{"b",20},{"c",30}});
+      }
+
+      [Fact]
+      public void Pair_StopsAtShorterSequence()
+      {
+          var result = new ZipPairer(new[]{"a","b","c"}, new[]{1,2}).Pair();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void KeysWithValueAbove_ReturnsFiltered()
+      {
+          var pairer = new ZipPairer(new[]{"x","y","z"}, new[]{5,15,25});
+          pairer.KeysWithValueAbove(10).Should().BeEquivalentTo(new[]{"y","z"}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void KeysWithValueAbove_NoneMatch_ReturnsEmpty()
+      {
+          new ZipPairer(new[]{"a","b"}, new[]{1,2}).KeysWithValueAbove(100).Should().BeEmpty();
+      }
+  }

@@ -1,0 +1,43 @@
+name: easy_efcore_037
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Feature with properties: int Id, string Name, bool IsEnabled, string? Description
+  A DbContext class FeatureContext with:
+    DbSet<Feature> Features { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class FeatureRepository with:
+    Feature Toggle(FeatureContext context, string name)
+  that toggles IsEnabled for the named feature and returns it, or throws KeyNotFoundException if not found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FeatureRepositoryTests
+  {
+      [Fact]
+      public void Toggle_EnablesDisabledFeature()
+      {
+          using var context = new FeatureContext();
+          context.Database.EnsureCreated();
+          context.Features.Add(new Feature { Name = "darkMode", IsEnabled = false });
+          context.SaveChanges();
+          var result = FeatureRepository.Toggle(context, "darkMode");
+          result.IsEnabled.Should().BeTrue();
+      }
+      [Fact]
+      public void Toggle_NotFound_Throws()
+      {
+          using var context = new FeatureContext();
+          context.Database.EnsureCreated();
+          Action act = () => FeatureRepository.Toggle(context, "nonExistent");
+          act.Should().Throw<KeyNotFoundException>();
+      }
+  }

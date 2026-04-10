@@ -1,0 +1,114 @@
+name: hard_masstransit_015
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit request/response with timeout handling:
+  Messages:
+    record GetProductDetails(Guid ProductId);
+    record ProductDetails(Guid ProductId, string Name, decimal Price, bool InStock);
+    record ProductNotFound(Guid ProductId);
+
+  Class ProductDetailsConsumer : IConsumer<GetProductDetails>:
+    Has an in-memory dictionary of products seeded in constructor.
+    If product found: respond with ProductDetails.
+    If not found: respond with ProductNotFound.
+
+  Class ProductDetailsConsumerDefinition : ConsumerDefinition<ProductDetailsConsumer>:
+    Set endpoint name to "product-details".
+
+  Interface IProductService:
+    Task<ProductDetails?> GetProductAsync(Guid id, CancellationToken ct)
+
+  Class ProductService(IRequestClient<GetProductDetails> client) : IProductService:
+    Uses request client to send GetProductDetails with 5s timeout.
+    Returns ProductDetails on success, null on ProductNotFound or timeout.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductDetailsConsumerTests
+  {
+      [Fact]
+      public async Task KnownProduct_RespondsWithDetails()
+      {
+          var harness = new InMemoryTestHarness();
+          var consumer = harness.Consumer<ProductDetailsConsumer>();
+          await harness.Start();
+          try
+          {
+              var productId = ProductDetailsConsumer.SeedProductId;
+              var client = harness.CreateRequestClient<GetProductDetails>();
+              var response = await client.GetResponse<ProductDetails, ProductNotFound>(
+                  new GetProductDetails(productId));
+              response.Is(out Response<ProductDetails> details).Should().BeTrue();
+              details.Message.ProductId.Should().Be(productId);
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task UnknownProduct_RespondsWithNotFound()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<ProductDetailsConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<GetProductDetails>();
+              var response = await client.GetResponse<ProductDetails, ProductNotFound>(
+                  new GetProductDetails(Guid.NewGuid()));
+              response.Is(out Response<ProductNotFound> notFound).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task KnownProduct_HasCorrectPrice()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<ProductDetailsConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<GetProductDetails>();
+              var response = await client.GetResponse<ProductDetails, ProductNotFound>(
+                  new GetProductDetails(ProductDetailsConsumer.SeedProductId));
+              response.Is(out Response<ProductDetails> details).Should().BeTrue();
+              details.Message.Price.Should().BeGreaterThan(0);
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ConsumerDefinition_HasCorrectEndpointName()
+      {
+          var def = new ProductDetailsConsumerDefinition();
+          def.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task KnownProduct_IsInStock()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<ProductDetailsConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<GetProductDetails>();
+              var response = await client.GetResponse<ProductDetails, ProductNotFound>(
+                  new GetProductDetails(ProductDetailsConsumer.SeedProductId));
+              response.Is(out Response<ProductDetails> details).Should().BeTrue();
+              details.Message.Name.Should().NotBeNullOrEmpty();
+          }
+          finally { await harness.Stop(); }
+      }
+  }

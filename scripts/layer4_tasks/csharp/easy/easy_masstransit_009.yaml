@@ -1,0 +1,35 @@
+name: easy_masstransit_009
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record FileUploaded(Guid FileId, string FileName, long SizeBytes)
+  A consumer class FileUploadedConsumer that implements IConsumer<FileUploaded>:
+    Has a public long TotalBytesProcessed = 0
+    Consume method adds message.SizeBytes to TotalBytesProcessed
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class FileUploadedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_AddsSizeToTotal()
+      {
+          var consumer = new FileUploadedConsumer();
+          var ctx1 = Substitute.For<ConsumeContext<FileUploaded>>();
+          ctx1.Message.Returns(new FileUploaded(Guid.NewGuid(), "a.txt", 1000));
+          var ctx2 = Substitute.For<ConsumeContext<FileUploaded>>();
+          ctx2.Message.Returns(new FileUploaded(Guid.NewGuid(), "b.pdf", 2500));
+          await consumer.Consume(ctx1);
+          await consumer.Consume(ctx2);
+          consumer.TotalBytesProcessed.Should().Be(3500);
+      }
+  }

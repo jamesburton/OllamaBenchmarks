@@ -1,0 +1,18 @@
+name: summarisation_easy_062
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Voters in three states went to the polls yesterday in primary elections to choose candidates for the general election. Turnout was higher than expected, with queues forming at many polling stations. Early results show the incumbent candidates performing strongly.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "election"
+    - "voters"
+    - "turnout"
+    - "primary"
+  max_words: 25

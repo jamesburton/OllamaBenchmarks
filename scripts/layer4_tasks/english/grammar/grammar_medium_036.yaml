@@ -1,0 +1,15 @@
+name: grammar_medium_036
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The manager praised the team for working late, their creativity, and staying on budget.
+  B) The manager praised the team for working late, being creative, and staying on budget.
+  C) The manager praised the team for having worked late, creativity, and budget adherence.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

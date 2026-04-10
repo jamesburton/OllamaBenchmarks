@@ -1,0 +1,56 @@
+name: medium_masstransit_011
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record AccountDeactivated(Guid UserId, string Reason, DateTime DeactivatedAt).
+  A consumer AccountDeactivatedConsumer implementing IConsumer<AccountDeactivated>.
+  Constructor accepts ICleanupService service.
+  Interface ICleanupService with: Task CleanupUserDataAsync(Guid userId).
+  In Consume: calls service.CleanupUserDataAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record AccountDeactivated(Guid UserId, string Reason, DateTime DeactivatedAt); }
+  global using Contracts;
+
+  public class AccountDeactivatedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<ICleanupService>();
+          var consumer = new AccountDeactivatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<AccountDeactivated>>();
+          ctx.Message.Returns(new AccountDeactivated(Guid.NewGuid(), "Rea", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).CleanupUserDataAsync(Arg.Any<Guid userId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<ICleanupService>();
+          var consumer = new AccountDeactivatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<AccountDeactivated>>();
+          ctx.Message.Returns(new AccountDeactivated(Guid.NewGuid(), "Rea", DateTime.UtcNow));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<ICleanupService>();
+          var consumer = new AccountDeactivatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<AccountDeactivated>>();
+          ctx.Message.Returns(new AccountDeactivated(Guid.NewGuid(), "Reas", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).CleanupUserDataAsync(Arg.Any<Guid userId>(), Arg.Any<object>());
+      }
+  }

@@ -1,0 +1,22 @@
+name: rewriting_medium_145
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'It could be argued that the way in which the data was collected introduces a level of bias that may have impacted the validity of the findings.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "data"
+    - "bias"
+    - "collection"
+    - "validity"
+    - "findings"
+    - "may have"
+  min_words: 5
+  max_words: 20

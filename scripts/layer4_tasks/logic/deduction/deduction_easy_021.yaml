@@ -1,0 +1,14 @@
+name: deduction_easy_021
+category: logic
+subcategory: deduction
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If it rains, the road gets wet.
+  2. If the road gets wet, cars slow down.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "If it rains, cars slow down."
+validator_config: {}

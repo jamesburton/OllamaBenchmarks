@@ -1,0 +1,125 @@
+name: hard_masstransit_011
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit competing consumers with priority routing:
+  Messages:
+    record ProcessJob(Guid JobId, string Type, int Priority, string Payload);
+    record JobCompleted(Guid JobId, string Result);
+    record JobFailed(Guid JobId, string Error);
+
+  Interface IJobHandler:
+    Task<string> HandleAsync(string type, string payload, CancellationToken ct)
+
+  Class HighPriorityJobConsumer : IConsumer<ProcessJob>:
+    Handles jobs with Priority >= 5.
+    Uses IJobHandler to process.
+    Publishes JobCompleted on success, JobFailed on exception.
+
+  Class LowPriorityJobConsumer : IConsumer<ProcessJob>:
+    Handles jobs with Priority < 5.
+    Uses IJobHandler to process.
+    Publishes JobCompleted on success, JobFailed on exception.
+
+  Both consumers should check priority and skip (not process) if the message is not for them.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PriorityJobConsumerTests
+  {
+      [Fact]
+      public async Task HighPriority_ConsumesAndPublishesCompleted()
+      {
+          var handler = Substitute.For<IJobHandler>();
+          handler.HandleAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns("done");
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new HighPriorityJobConsumer(handler));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessJob(Guid.NewGuid(), "report", 8, "data"));
+              await Task.Delay(200);
+              (await harness.Published.Any<JobCompleted>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task LowPriority_ConsumesAndPublishesCompleted()
+      {
+          var handler = Substitute.For<IJobHandler>();
+          handler.HandleAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns("ok");
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new LowPriorityJobConsumer(handler));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessJob(Guid.NewGuid(), "email", 2, "body"));
+              await Task.Delay(200);
+              (await harness.Published.Any<JobCompleted>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task HighPriority_OnException_PublishesFailed()
+      {
+          var handler = Substitute.For<IJobHandler>();
+          handler.HandleAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .ThrowsAsync(new InvalidOperationException("oops"));
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new HighPriorityJobConsumer(handler));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessJob(Guid.NewGuid(), "bad", 9, "x"));
+              await Task.Delay(200);
+              (await harness.Published.Any<JobFailed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task HighPriority_SkipsLowPriorityMessage()
+      {
+          var handler = Substitute.For<IJobHandler>();
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new HighPriorityJobConsumer(handler));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessJob(Guid.NewGuid(), "low", 3, "x"));
+              await Task.Delay(200);
+              await handler.DidNotReceive().HandleAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task LowPriority_SkipsHighPriorityMessage()
+      {
+          var handler = Substitute.For<IJobHandler>();
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new LowPriorityJobConsumer(handler));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new ProcessJob(Guid.NewGuid(), "high", 7, "x"));
+              await Task.Delay(200);
+              await handler.DidNotReceive().HandleAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+          }
+          finally { await harness.Stop(); }
+      }
+  }

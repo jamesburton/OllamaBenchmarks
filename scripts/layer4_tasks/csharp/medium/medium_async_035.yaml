@@ -1,0 +1,51 @@
+name: medium_async_035
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IDataSink<T> with Task WriteAsync(T item, CancellationToken ct = default).
+  A class BufferedSink<T> implementing IDataSink<T> and IAsyncDisposable.
+  Constructor accepts IDataSink<T> inner and int bufferSize.
+  Buffers items; flushes to inner when buffer reaches capacity or on DisposeAsync.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BufferedSinkTests
+  {
+      [Fact]
+      public async Task BelowCapacity_DoesNotFlush()
+      {
+          var inner = Substitute.For<IDataSink<int>>();
+          await using var sink = new BufferedSink<int>(inner, 5);
+          await sink.WriteAsync(1);
+          await inner.DidNotReceiveWithAnyArgs().WriteAsync(default, default);
+      }
+
+      [Fact]
+      public async Task AtCapacity_Flushes()
+      {
+          var inner = Substitute.For<IDataSink<int>>();
+          inner.WriteAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          await using var sink = new BufferedSink<int>(inner, 2);
+          await sink.WriteAsync(1);
+          await sink.WriteAsync(2);
+          await inner.Received(2).WriteAsync(Arg.Any<int>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Dispose_FlushesRemaining()
+      {
+          var inner = Substitute.For<IDataSink<string>>();
+          inner.WriteAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var sink = new BufferedSink<string>(inner, 10);
+          await sink.WriteAsync("hello");
+          await sink.DisposeAsync();
+          await inner.Received(1).WriteAsync("hello", Arg.Any<CancellationToken>());
+      }
+  }

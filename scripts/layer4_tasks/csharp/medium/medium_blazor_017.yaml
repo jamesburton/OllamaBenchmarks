@@ -1,0 +1,61 @@
+name: medium_blazor_017
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class HistoryService with:
+    IReadOnlyList<string> History, int MaxHistory (default 50), Navigate(string url), GoBack()->string?, GoForward()->string?, Current string?, event Action? OnNavigated
+  Return only valid C# code in a single file.
+test_code: |
+  public class HistoryServiceTests
+  {
+      [Fact]
+      public void Navigate_AddToHistory()
+      {
+          var svc = new HistoryService();
+          svc.Navigate("/home");
+          svc.Current.Should().Be("/home");
+      }
+
+      [Fact]
+      public void GoBack_ReturnsPreviousUrl()
+      {
+          var svc = new HistoryService();
+          svc.Navigate("/a");
+          svc.Navigate("/b");
+          svc.GoBack().Should().Be("/a");
+      }
+
+      [Fact]
+      public void GoBack_NoPrevious_ReturnsNull()
+      {
+          var svc = new HistoryService();
+          svc.Navigate("/home");
+          svc.GoBack().Should().BeNull();
+      }
+
+      [Fact]
+      public void Navigate_FiresEvent()
+      {
+          var svc = new HistoryService();
+          var fired = false;
+          svc.OnNavigated += () => fired = true;
+          svc.Navigate("/page");
+          fired.Should().BeTrue();
+      }
+
+      [Fact]
+      public void History_DoesNotExceedMax()
+      {
+          var svc = new HistoryService();
+          for (int i = 0; i < 60; i++) svc.Navigate($"/page{i}");
+          svc.History.Count.Should().BeLessOrEqualTo(svc.MaxHistory);
+      }
+  }

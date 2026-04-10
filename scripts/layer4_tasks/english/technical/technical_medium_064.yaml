@@ -1,0 +1,23 @@
+name: technical_medium_064
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a notice informing users of a security breach, advising them to change their passwords.
+  Keep it under 60 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "security"
+    - "breach"
+    - "change"
+    - "password"
+    - "immediately"
+    - "unauthorised"
+    - "data"
+    - "protect"
+  min_words: 10
+  max_words: 60

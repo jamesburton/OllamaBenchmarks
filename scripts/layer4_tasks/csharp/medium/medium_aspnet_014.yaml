@@ -1,0 +1,61 @@
+name: medium_aspnet_014
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record TodoItem(int Id, string Title, bool IsCompleted).
+  A class TodosController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<TodoItem> (for testability).
+  Actions:
+    GET api/todos — all items
+    GET api/todos/completed — only completed items
+    GET api/todos/pending — only pending items
+    PUT api/todos/{id}/complete — mark as complete, 204 or 404
+  Return only valid C# code in a single file.
+test_code: |
+  public class TodosControllerTests
+  {
+      private TodosController MakeController() => new(new List<TodoItem>
+      {
+          new(1, "Buy milk", false),
+          new(2, "Write code", true),
+          new(3, "Exercise", false)
+      });
+
+      [Fact]
+      public void GetAll_ReturnsAll()
+      {
+          MakeController().GetAll().Should().BeOfType<OkObjectResult>()
+              .Which.Value.Should().BeAssignableTo<IEnumerable<TodoItem>>()
+              .Which.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetCompleted_ReturnsOnlyCompleted()
+      {
+          var result = MakeController().GetCompleted() as OkObjectResult;
+          (result!.Value as IEnumerable<TodoItem>).Should().OnlyContain(t => t.IsCompleted);
+      }
+
+      [Fact]
+      public void GetPending_ReturnsOnlyPending()
+      {
+          var result = MakeController().GetPending() as OkObjectResult;
+          (result!.Value as IEnumerable<TodoItem>).Should().OnlyContain(t => !t.IsCompleted);
+      }
+
+      [Fact]
+      public void Complete_MarksItem()
+      {
+          var ctrl = MakeController();
+          var result = ctrl.Complete(1);
+          result.Should().BeOfType<NoContentResult>();
+      }
+  }

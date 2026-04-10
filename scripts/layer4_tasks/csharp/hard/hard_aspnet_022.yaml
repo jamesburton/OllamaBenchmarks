@@ -1,0 +1,99 @@
+name: hard_aspnet_022
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A CQRS API dispatcher with minimal API endpoints:
+  Marker interface IQuery<TResult>.
+  Marker interface ICommand<TResult>.
+  Class ApiDispatcher(IServiceProvider sp):
+    Task<TResult> QueryAsync<TResult>(IQuery<TResult> query, CancellationToken ct)
+    Task<TResult> CommandAsync<TResult>(ICommand<TResult> command, CancellationToken ct)
+  Implementations for a simple task management domain:
+    record CreateTaskCommand(string Title, string? Description) : ICommand<TaskDto>
+    record GetTaskQuery(int Id) : IQuery<TaskDto?>
+    record ListTasksQuery(bool? CompletedOnly) : IQuery<IReadOnlyList<TaskDto>>
+    record CompleteTaskCommand(int Id) : ICommand<bool>
+  Record: TaskDto(int Id, string Title, string? Description, bool IsCompleted, DateTime CreatedAt).
+  Handlers: ICommandHandler<CreateTaskCommand, TaskDto>, IQueryHandler<GetTaskQuery, TaskDto?>, etc.
+  InMemory implementations. Static class TaskEndpoints with MapTaskEndpoints(this WebApplication app).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CqrsDispatcherTests
+  {
+      private static IServiceProvider BuildProvider()
+      {
+          var svc = new ServiceCollection();
+          svc.AddSingleton<InMemoryTaskStore>();
+          svc.AddTransient<ICommandHandler<CreateTaskCommand, TaskDto>, CreateTaskHandler>();
+          svc.AddTransient<IQueryHandler<GetTaskQuery, TaskDto?>, GetTaskHandler>();
+          svc.AddTransient<IQueryHandler<ListTasksQuery, IReadOnlyList<TaskDto>>, ListTasksHandler>();
+          svc.AddTransient<ICommandHandler<CompleteTaskCommand, bool>, CompleteTaskHandler>();
+          svc.AddTransient<ApiDispatcher>();
+          return svc.BuildServiceProvider();
+      }
+
+      [Fact]
+      public async Task CreateTask_ReturnsTaskDto()
+      {
+          var dispatcher = BuildProvider().GetRequiredService<ApiDispatcher>();
+          var result = await dispatcher.CommandAsync(new CreateTaskCommand("My Task", "Desc"), CancellationToken.None);
+          result.Title.Should().Be("My Task");
+          result.IsCompleted.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task GetTask_ExistingId_ReturnsTask()
+      {
+          var dispatcher = BuildProvider().GetRequiredService<ApiDispatcher>();
+          var created = await dispatcher.CommandAsync(new CreateTaskCommand("Task A", null), CancellationToken.None);
+          var found = await dispatcher.QueryAsync(new GetTaskQuery(created.Id), CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.Id.Should().Be(created.Id);
+      }
+
+      [Fact]
+      public async Task GetTask_NonExistentId_ReturnsNull()
+      {
+          var dispatcher = BuildProvider().GetRequiredService<ApiDispatcher>();
+          var result = await dispatcher.QueryAsync(new GetTaskQuery(9999), CancellationToken.None);
+          result.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task CompleteTask_MarkAsCompleted()
+      {
+          var dispatcher = BuildProvider().GetRequiredService<ApiDispatcher>();
+          var task = await dispatcher.CommandAsync(new CreateTaskCommand("T", null), CancellationToken.None);
+          var success = await dispatcher.CommandAsync(new CompleteTaskCommand(task.Id), CancellationToken.None);
+          success.Should().BeTrue();
+          var found = await dispatcher.QueryAsync(new GetTaskQuery(task.Id), CancellationToken.None);
+          found!.IsCompleted.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task ListTasks_FiltersCompleted()
+      {
+          var dispatcher = BuildProvider().GetRequiredService<ApiDispatcher>();
+          var t1 = await dispatcher.CommandAsync(new CreateTaskCommand("T1", null), CancellationToken.None);
+          await dispatcher.CommandAsync(new CreateTaskCommand("T2", null), CancellationToken.None);
+          await dispatcher.CommandAsync(new CompleteTaskCommand(t1.Id), CancellationToken.None);
+          var completed = await dispatcher.QueryAsync(new ListTasksQuery(true), CancellationToken.None);
+          completed.Should().ContainSingle(t => t.IsCompleted);
+      }
+
+      [Fact]
+      public async Task CompleteTask_NonExistent_ReturnsFalse()
+      {
+          var dispatcher = BuildProvider().GetRequiredService<ApiDispatcher>();
+          var result = await dispatcher.CommandAsync(new CompleteTaskCommand(9999), CancellationToken.None);
+          result.Should().BeFalse();
+      }
+  }

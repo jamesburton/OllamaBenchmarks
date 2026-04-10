@@ -1,0 +1,38 @@
+name: easy_xunit_050
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncTestFixture that implements IAsyncLifetime with:
+    string ConnectionString { get; private set; } = ""
+    bool IsConnected { get; private set; }
+    ValueTask InitializeAsync() sets ConnectionString = "Server=test;Database=db" and IsConnected = true
+    ValueTask DisposeAsync() sets IsConnected = false and ConnectionString = ""
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncTestFixtureTests : IAsyncLifetime
+  {
+      private readonly AsyncTestFixture _fixture = new();
+
+      public ValueTask InitializeAsync() => _fixture.InitializeAsync();
+      public ValueTask DisposeAsync() => _fixture.DisposeAsync();
+
+      [Fact]
+      public void AfterInit_IsConnected()
+      {
+          _fixture.IsConnected.Should().BeTrue();
+          _fixture.ConnectionString.Should().NotBeEmpty();
+      }
+      [Fact]
+      public void AfterInit_ConnectionStringIsSet()
+      {
+          _fixture.ConnectionString.Should().Be("Server=test;Database=db");
+      }
+  }

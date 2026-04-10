@@ -1,0 +1,15 @@
+name: grammar_medium_037
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Not only did she finish first, but also she scored highest.
+  B) Not only did she finish first, but she also scored highest.
+  C) Not only she finished first, but also scored highest.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

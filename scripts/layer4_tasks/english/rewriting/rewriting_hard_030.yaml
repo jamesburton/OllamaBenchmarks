@@ -1,0 +1,20 @@
+name: rewriting_hard_030
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in the passive voice, keeping the modal verb:
+  'You should return the completed forms to the administration office.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "should be returned"
+    - "be returned"
+    - "forms"
+    - "returned"
+  min_words: 5
+  max_words: 25

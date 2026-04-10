@@ -1,0 +1,80 @@
+name: hard_async_017
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncStreamProcessor that processes IAsyncEnumerable<T> streams:
+    Task<IReadOnlyList<TOut>> TransformAsync<TIn, TOut>(
+      IAsyncEnumerable<TIn> source,
+      Func<TIn, CancellationToken, Task<TOut>> transform,
+      CancellationToken ct) — transforms each item asynchronously, collects results.
+    IAsyncEnumerable<TOut> TransformStreaming<TIn, TOut>(
+      IAsyncEnumerable<TIn> source,
+      Func<TIn, CancellationToken, Task<TOut>> transform,
+      CancellationToken ct) — streaming version that yields results as produced.
+    Task<IReadOnlyList<TIn>> FilterAsync<TIn>(
+      IAsyncEnumerable<TIn> source,
+      Func<TIn, CancellationToken, Task<bool>> predicate,
+      CancellationToken ct) — collects items where predicate is true.
+    Task<TAccumulate> AggregateAsync<TIn, TAccumulate>(
+      IAsyncEnumerable<TIn> source,
+      TAccumulate seed,
+      Func<TAccumulate, TIn, CancellationToken, Task<TAccumulate>> accumulator,
+      CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncStreamProcessorTests
+  {
+      private static async IAsyncEnumerable<int> Range(int count, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct = default)
+      {
+          for (int i = 1; i <= count; i++) { ct.ThrowIfCancellationRequested(); yield return i; }
+      }
+      private readonly AsyncStreamProcessor _proc = new();
+
+      [Fact]
+      public async Task TransformAsync_TransformsAllItems()
+      {
+          var result = await _proc.TransformAsync(Range(5), (x, _) => Task.FromResult(x * 2), CancellationToken.None);
+          result.Should().BeEquivalentTo(new[] { 2, 4, 6, 8, 10 });
+      }
+
+      [Fact]
+      public async Task FilterAsync_FiltersCorrectly()
+      {
+          var result = await _proc.FilterAsync(Range(10), (x, _) => Task.FromResult(x % 2 == 0), CancellationToken.None);
+          result.Should().BeEquivalentTo(new[] { 2, 4, 6, 8, 10 });
+      }
+
+      [Fact]
+      public async Task AggregateAsync_SumsCorrectly()
+      {
+          var result = await _proc.AggregateAsync(Range(5), 0,
+              (acc, x, _) => Task.FromResult(acc + x), CancellationToken.None);
+          result.Should().Be(15);
+      }
+
+      [Fact]
+      public async Task TransformStreaming_YieldsResults()
+      {
+          var results = new List<string>();
+          await foreach (var s in _proc.TransformStreaming(Range(3), (x, _) => Task.FromResult(x.ToString()), CancellationToken.None))
+              results.Add(s);
+          results.Should().BeEquivalentTo(new[] { "1", "2", "3" });
+      }
+
+      [Fact]
+      public async Task TransformAsync_Cancelled_ThrowsOperationCancelled()
+      {
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          var act = async () => await _proc.TransformAsync(Range(100, cts.Token), (x, _) => Task.FromResult(x), cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+  }

@@ -1,0 +1,15 @@
+name: grammar_easy_082
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) He opens the door and saw her standing there.
+  B) He opens the door and sees her standing there.
+  C) He opened the door and sees her standing there.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

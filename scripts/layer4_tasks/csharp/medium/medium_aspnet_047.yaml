@@ -1,0 +1,59 @@
+name: medium_aspnet_047
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ApiUsage(string ApiKey, int RequestCount, DateTime WindowStart, DateTime WindowEnd).
+  A class UsageController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<ApiUsage> (for testability).
+  Actions:
+    GET api/usage — all usage records
+    GET api/usage/{apiKey} — usage for specific key or 404
+    GET api/usage/top?limit=10 — top N by RequestCount descending
+  Return only valid C# code in a single file.
+test_code: |
+  public class UsageControllerTests
+  {
+      private UsageController MakeController() => new(new List<ApiUsage>
+      {
+          new("key1", 1000, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow),
+          new("key2", 500, DateTime.UtcNow.AddHours(-2), DateTime.UtcNow),
+          new("key3", 2000, DateTime.UtcNow.AddHours(-3), DateTime.UtcNow)
+      });
+
+      [Fact]
+      public void GetAll_ReturnsAll()
+      {
+          (MakeController().GetAll() as OkObjectResult)!.Value.Should().BeAssignableTo<IEnumerable<ApiUsage>>()
+              .Which.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetByKey_Found()
+      {
+          var result = MakeController().GetByKey("key2") as OkObjectResult;
+          (result!.Value as ApiUsage)!.RequestCount.Should().Be(500);
+      }
+
+      [Fact]
+      public void GetByKey_NotFound_Returns404()
+      {
+          MakeController().GetByKey("key99").Should().BeOfType<NotFoundResult>();
+      }
+
+      [Fact]
+      public void GetTop_ReturnsInOrder()
+      {
+          var result = MakeController().GetTop(2) as OkObjectResult;
+          var items = (result!.Value as IEnumerable<ApiUsage>)!.ToList();
+          items.Should().HaveCount(2);
+          items.Should().BeInDescendingOrder(u => u.RequestCount);
+      }
+  }

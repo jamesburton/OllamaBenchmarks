@@ -1,0 +1,121 @@
+name: hard_masstransit_023
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit saga for return merchandise authorization (RMA):
+  Messages:
+    record InitiateReturn(Guid RmaId, Guid OrderId, string CustomerId, IReadOnlyList<string> ItemIds, string Reason);
+    record ReturnApproved(Guid RmaId);
+    record ReturnDenied(Guid RmaId, string Reason);
+    record ItemsReceived(Guid RmaId);
+    record RefundIssued(Guid RmaId, decimal Amount);
+    record RmaCompleted(Guid RmaId, Guid OrderId, decimal RefundAmount);
+
+  States: Pending, Approved, ItemsPending, RefundPending, Completed, Denied.
+  RmaStateMachine : MassTransitStateMachine<RmaState>
+  Transitions:
+    Initially + InitiateReturn -> Pending
+    Pending + ReturnApproved -> Approved
+    Pending + ReturnDenied -> Denied
+    Approved + ItemsReceived -> ItemsPending
+    ItemsPending + RefundIssued -> Completed (publish RmaCompleted)
+
+  RmaState: Guid CorrelationId, string CurrentState, Guid OrderId, string CustomerId,
+    int ItemCount, string Reason, decimal? RefundAmount, DateTime InitiatedAt.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RmaStateMachineTests
+  {
+      [Fact]
+      public async Task InitiateReturn_TransitionsToPending()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<RmaState, RmaStateMachine>(new RmaStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new InitiateReturn(id, Guid.NewGuid(), "c1", new[] { "item1", "item2" }, "Defective"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Pending).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ReturnApproved_TransitionsToApproved()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<RmaState, RmaStateMachine>(new RmaStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new InitiateReturn(id, Guid.NewGuid(), "c2", new[] { "i1" }, "Wrong size"));
+              await harness.InputQueueSendEndpoint.Send(new ReturnApproved(id));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Approved).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ReturnDenied_TransitionsToDenied()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<RmaState, RmaStateMachine>(new RmaStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new InitiateReturn(id, Guid.NewGuid(), "c3", new[] { "i2" }, "Changed mind"));
+              await harness.InputQueueSendEndpoint.Send(new ReturnDenied(id, "Policy violation"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Denied).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task FullFlow_PublishesRmaCompleted()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<RmaState, RmaStateMachine>(new RmaStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new InitiateReturn(id, Guid.NewGuid(), "c4", new[] { "i3" }, "Broken"));
+              await harness.InputQueueSendEndpoint.Send(new ReturnApproved(id));
+              await harness.InputQueueSendEndpoint.Send(new ItemsReceived(id));
+              await harness.InputQueueSendEndpoint.Send(new RefundIssued(id, 49.99m));
+              (await harness.Published.Any<RmaCompleted>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SagaState_StoresCustomerIdAndItemCount()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<RmaState, RmaStateMachine>(new RmaStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new InitiateReturn(id, Guid.NewGuid(), "cust-xyz", new[] { "a", "b", "c" }, "reason"));
+              var state = sagaHarness.Sagas.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Pending);
+              state!.CustomerId.Should().Be("cust-xyz");
+              state.ItemCount.Should().Be(3);
+          }
+          finally { await harness.Stop(); }
+      }
+  }

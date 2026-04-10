@@ -1,0 +1,18 @@
+name: riddles_hard_001
+category: logic
+subcategory: riddles
+difficulty: hard
+weight: 3
+validator_type: logic
+max_tokens: 64
+prompt: |
+  A man walks into a restaurant and orders albatross soup. He takes one sip, goes home, and kills himself. Why?
+  This is a lateral thinking puzzle. What was significant about the soup?
+  Reply with only the answer.
+expected_answer: "He realized the soup was not real albatross, meaning his companion had died at sea (not turned into soup), so he had been tricked before into eating his dead companion."
+validator_config:
+  accepted_answers:
+  - "His companion died and he had eaten the companion"
+  - "He ate his companion"
+  - "He had eaten human flesh thinking it was albatross"
+  - "He realized he had eaten his dead companion"

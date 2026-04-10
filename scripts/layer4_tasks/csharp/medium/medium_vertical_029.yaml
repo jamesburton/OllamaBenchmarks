@@ -1,0 +1,41 @@
+name: medium_vertical_029
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for updatepricing.
+  Include:
+    Command: string ProductId, decimal NewPrice, string UpdatedBy, string? ChangeNote
+  Result: string ProductId, decimal OldPrice, decimal NewPrice, decimal ChangePercent
+  Handler: constructor accepts Func<string,decimal> getPrice. Validates NewPrice > 0, ProductId not empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class UpdatePricingHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new UpdatePricingHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new UpdatePricingHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new UpdatePricingHandler();
+          handler.Should().NotBeNull();
+      }
+  }

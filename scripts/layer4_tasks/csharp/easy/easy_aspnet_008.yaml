@@ -1,0 +1,39 @@
+name: easy_aspnet_008
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class EndpointHandlers with a static method:
+    IResult CreateItem(string name)
+  that returns Results.BadRequest("Name is required") if name is null/empty,
+  otherwise returns Results.Created($"/items/{name}", new { Name = name }).
+  Return only valid C# code in a single file.
+test_code: |
+  public class EndpointHandlersTests
+  {
+      [Fact]
+      public void CreateItem_ValidName_ReturnsCreated()
+      {
+          var result = EndpointHandlers.CreateItem("widget");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Created<object>>();
+      }
+      [Fact]
+      public void CreateItem_EmptyName_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.CreateItem("");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+      [Fact]
+      public void CreateItem_NullName_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.CreateItem(null!);
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+  }

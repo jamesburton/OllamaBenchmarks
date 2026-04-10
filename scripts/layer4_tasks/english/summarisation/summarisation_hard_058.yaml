@@ -1,0 +1,18 @@
+name: summarisation_hard_058
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The talent identification and development pipelines of elite sport are disproportionately skewed toward athletes born in the early months of the selection year, a phenomenon known as relative age effect. Children with a relative age advantage benefit from more coaching attention and advanced peer competition during formative stages, creating a self-reinforcing selection bias. Structural reforms to cohort grouping are proposed but rarely implemented.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "relative age"
+    - "talent"
+    - "selection"
+    - "bias"
+  max_words: 25

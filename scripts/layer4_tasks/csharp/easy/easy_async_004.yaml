@@ -1,0 +1,32 @@
+name: easy_async_004
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Calculator with a static method:
+    async Task<int> AddAsync(int a, int b)
+  that asynchronously returns the sum of two integers using await Task.FromResult.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CalculatorTests
+  {
+      [Fact]
+      public async Task AddAsync_BasicCase()
+      {
+          var result = await Calculator.AddAsync(3, 4);
+          result.Should().Be(7);
+      }
+      [Fact]
+      public async Task AddAsync_NegativeNumbers()
+      {
+          var result = await Calculator.AddAsync(-5, 3);
+          result.Should().Be(-2);
+      }
+  }

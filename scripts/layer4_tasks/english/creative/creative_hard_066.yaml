@@ -1,0 +1,22 @@
+name: creative_hard_066
+category: english
+subcategory: creative
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description that captures both beauty and menace in the same natural scene.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "beautiful"
+    - "dangerous"
+    - "contrast"
+    - "threatening"
+    - "beneath"
+    - "both"
+    - "tension"
+    - "nature"
+  min_words: 15
+  max_words: 60

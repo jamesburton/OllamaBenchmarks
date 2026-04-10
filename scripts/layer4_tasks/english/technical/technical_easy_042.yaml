@@ -1,0 +1,21 @@
+name: technical_easy_042
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a clear error message for when a password is too short.
+  Keep it under 20 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "password"
+    - "characters"
+    - "least"
+    - "short"
+    - "must be"
+    - "longer"
+  min_words: 5
+  max_words: 20

@@ -1,0 +1,42 @@
+name: easy_xunit_040
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface ISearchService with method:
+    Task<List<string>> SearchAsync(string query)
+  A class SearchCache with constructor taking ISearchService, and async method:
+    Task<List<string>> GetResultsAsync(string query) caches results in a Dictionary and only calls the underlying service once per unique query
+  Return only valid C# code in a single file.
+test_code: |
+  public class SearchCacheTests
+  {
+      [Fact]
+      public async Task GetResultsAsync_CachesResults()
+      {
+          var service = Substitute.For<ISearchService>();
+          service.SearchAsync("cats").Returns(new List<string> { "cat1", "cat2" });
+          var cache = new SearchCache(service);
+          var first = await cache.GetResultsAsync("cats");
+          var second = await cache.GetResultsAsync("cats");
+          first.Should().BeEquivalentTo(second);
+          await service.Received(1).SearchAsync("cats");
+      }
+      [Fact]
+      public async Task GetResultsAsync_DifferentQueries_CallsServiceTwice()
+      {
+          var service = Substitute.For<ISearchService>();
+          service.SearchAsync(Arg.Any<string>()).Returns(new List<string>());
+          var cache = new SearchCache(service);
+          await cache.GetResultsAsync("dogs");
+          await cache.GetResultsAsync("cats");
+          await service.Received(2).SearchAsync(Arg.Any<string>());
+      }
+  }

@@ -1,0 +1,23 @@
+name: technical_medium_035
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for a context manager that handles database transactions.
+  Include Args, Yields, and Raises sections.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Yields:"
+    - "Raises:"
+    - "transaction"
+    - "database"
+    - "context"
+    - "manager"
+    - "commit"
+  min_words: 10
+  max_words: 80

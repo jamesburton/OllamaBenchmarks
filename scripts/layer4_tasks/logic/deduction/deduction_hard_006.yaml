@@ -1,0 +1,15 @@
+name: deduction_hard_006
+category: logic
+subcategory: deduction
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If A then B.
+  2. If not B then C.
+  3. A is true.
+  What can you conclude about C? Reply with only the conclusion.
+expected_answer: "C cannot be determined."
+validator_config: {}

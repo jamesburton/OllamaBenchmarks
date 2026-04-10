@@ -1,0 +1,62 @@
+name: medium_async_006
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IEventSource with method: IAsyncEnumerable<string> StreamAsync(CancellationToken ct = default)
+  A class EventAggregator with constructor accepting IEnumerable<IEventSource> sources.
+  Expose:
+    IAsyncEnumerable<string> MergeAsync(CancellationToken ct = default)
+  that merges events from all sources concurrently into a single stream using Channel<string>.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EventAggregatorTests
+  {
+      private static IEventSource MakeSource(params string[] items)
+      {
+          var src = Substitute.For<IEventSource>();
+          src.StreamAsync(Arg.Any<CancellationToken>()).Returns(AsyncEnumerableFrom(items));
+          return src;
+      }
+
+      private static async IAsyncEnumerable<string> AsyncEnumerableFrom(string[] items)
+      {
+          foreach (var item in items) { await Task.Yield(); yield return item; }
+      }
+
+      [Fact]
+      public async Task MergeAsync_AllItemsFromAllSources()
+      {
+          var agg = new EventAggregator(new[]{ MakeSource("a","b"), MakeSource("c") });
+          var result = new List<string>();
+          await foreach (var item in agg.MergeAsync())
+              result.Add(item);
+          result.Should().BeEquivalentTo(new[]{"a","b","c"});
+      }
+
+      [Fact]
+      public async Task MergeAsync_NoSources_CompletesImmediately()
+      {
+          var agg = new EventAggregator(Array.Empty<IEventSource>());
+          var count = 0;
+          await foreach (var _ in agg.MergeAsync()) count++;
+          count.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task MergeAsync_SingleSource_AllItems()
+      {
+          var agg = new EventAggregator(new[]{ MakeSource("x","y","z") });
+          var result = new List<string>();
+          await foreach (var item in agg.MergeAsync())
+              result.Add(item);
+          result.Should().HaveCount(3);
+      }
+  }

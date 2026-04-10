@@ -1,0 +1,21 @@
+name: rewriting_medium_041
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'Following our recent telephone conversation, I am writing to confirm the arrangements discussed.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "talked"
+    - "spoke"
+    - "confirming"
+    - "arrangements"
+    - "call"
+  min_words: 5
+  max_words: 20

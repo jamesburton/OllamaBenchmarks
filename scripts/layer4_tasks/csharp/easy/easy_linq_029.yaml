@@ -1,0 +1,32 @@
+name: easy_linq_029
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Deduplicator with a static method:
+    List<string> UniqueStrings(IEnumerable<string> items)
+  that returns distinct strings in original order, using case-insensitive comparison via LINQ Distinct with StringComparer.OrdinalIgnoreCase + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DeduplicatorTests
+  {
+      [Fact]
+      public void UniqueStrings_RemovesDuplicates()
+      {
+          var result = Deduplicator.UniqueStrings(new[]{"Apple","apple","APPLE","Banana"});
+          result.Should().HaveCount(2);
+      }
+      [Fact]
+      public void UniqueStrings_PreservesFirstOccurrence()
+      {
+          var result = Deduplicator.UniqueStrings(new[]{"Hello","hello","World"});
+          result[0].Should().Be("Hello");
+      }
+  }

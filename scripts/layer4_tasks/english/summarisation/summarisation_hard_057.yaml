@@ -1,0 +1,18 @@
+name: summarisation_hard_057
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The geopolitical instrumentalisation of sport — illustrated by state-sponsored doping programmes, sportswashing initiatives by authoritarian governments, and diplomatic boycotts of the Olympic Games — raises fundamental questions about whether athletics can function as a politically neutral space. Scholars of sports governance argue that the International Olympic Committee's commitment to universality has rendered it structurally incapable of policing political interference.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Olympics"
+    - "doping"
+    - "geopolitical"
+    - "governance"
+  max_words: 25

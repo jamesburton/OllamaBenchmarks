@@ -1,0 +1,82 @@
+name: hard_blazor_015
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor drag-and-drop kanban board service:
+  Enum TaskStatus { Backlog, InProgress, Review, Done }
+  Records:
+    KanbanTask(Guid Id, string Title, string Description, TaskStatus Status, int Priority, string? AssigneeId)
+    MoveRequest(Guid TaskId, TaskStatus FromStatus, TaskStatus ToStatus, int NewPosition)
+    ColumnSummary(TaskStatus Status, int Count, IReadOnlyList<KanbanTask> Tasks)
+
+  Class KanbanBoardService:
+    Constructor seeds 8 tasks across statuses.
+    KanbanTask AddTask(string title, string description, TaskStatus status, int priority): auto-assigns Id.
+    bool MoveTask(MoveRequest request): moves task; returns false if taskId not found.
+    IReadOnlyList<ColumnSummary> GetBoard(): returns columns in status order with tasks sorted by priority desc.
+    IReadOnlyList<KanbanTask> GetTasksByAssignee(string assigneeId)
+    bool AssignTask(Guid taskId, string assigneeId): returns false if not found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class KanbanBoardServiceTests
+  {
+      private readonly KanbanBoardService _board = new();
+
+      [Fact]
+      public void GetBoard_ReturnsFourColumns()
+      {
+          var board = _board.GetBoard();
+          board.Should().HaveCount(4);
+      }
+
+      [Fact]
+      public void AddTask_AppearsInCorrectColumn()
+      {
+          _board.AddTask("New Task", "Desc", TaskStatus.Backlog, 5);
+          var backlog = _board.GetBoard().First(c => c.Status == TaskStatus.Backlog);
+          backlog.Tasks.Should().Contain(t => t.Title == "New Task");
+      }
+
+      [Fact]
+      public void MoveTask_ChangesStatus()
+      {
+          var task = _board.AddTask("Move Me", "D", TaskStatus.Backlog, 3);
+          var req = new MoveRequest(task.Id, TaskStatus.Backlog, TaskStatus.InProgress, 0);
+          var result = _board.MoveTask(req);
+          result.Should().BeTrue();
+          _board.GetBoard().First(c => c.Status == TaskStatus.InProgress).Tasks
+              .Should().Contain(t => t.Id == task.Id);
+      }
+
+      [Fact]
+      public void MoveTask_UnknownId_ReturnsFalse()
+      {
+          var result = _board.MoveTask(new MoveRequest(Guid.NewGuid(), TaskStatus.Backlog, TaskStatus.Done, 0));
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public void GetBoard_TasksSortedByPriorityDesc()
+      {
+          _board.AddTask("Low", "D", TaskStatus.Backlog, 1);
+          _board.AddTask("High", "D", TaskStatus.Backlog, 10);
+          var backlog = _board.GetBoard().First(c => c.Status == TaskStatus.Backlog);
+          backlog.Tasks.First().Priority.Should().BeGreaterThanOrEqualTo(backlog.Tasks.Last().Priority);
+      }
+
+      [Fact]
+      public void AssignTask_UpdatesAssignee()
+      {
+          var task = _board.AddTask("Assign Me", "D", TaskStatus.Review, 2);
+          _board.AssignTask(task.Id, "user-99");
+          _board.GetTasksByAssignee("user-99").Should().Contain(t => t.Id == task.Id);
+      }
+  }

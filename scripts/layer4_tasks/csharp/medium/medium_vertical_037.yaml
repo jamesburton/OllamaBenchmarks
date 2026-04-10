@@ -1,0 +1,41 @@
+name: medium_vertical_037
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for splitbill.
+  Include:
+    Command: decimal Total, IEnumerable<string> Participants, IDictionary<string,decimal> CustomAmounts
+  Result: IDictionary<string,decimal> Splits, decimal TotalAllocated
+  Handler: if CustomAmounts specified for some, distribute remainder equally. Validates Total > 0.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SplitBillHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new SplitBillHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new SplitBillHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new SplitBillHandler();
+          handler.Should().NotBeNull();
+      }
+  }

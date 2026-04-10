@@ -1,0 +1,40 @@
+name: easy_aspnet_040
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class EndpointHandlers with a static method:
+    IResult GetStats(int[] values)
+  that:
+    - Returns Results.BadRequest("No values provided") if values is null/empty
+    - Returns Results.Ok(new { Min = values.Min(), Max = values.Max(), Avg = values.Average() })
+  Return only valid C# code in a single file.
+test_code: |
+  public class EndpointHandlersTests
+  {
+      [Fact]
+      public void GetStats_ValidValues_ReturnsOk()
+      {
+          var result = EndpointHandlers.GetStats(new[]{1,2,3,4,5});
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<object>>();
+      }
+      [Fact]
+      public void GetStats_EmptyValues_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.GetStats(Array.Empty<int>());
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+      [Fact]
+      public void GetStats_NullValues_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.GetStats(null!);
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+  }

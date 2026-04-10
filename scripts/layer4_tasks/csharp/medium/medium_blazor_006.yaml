@@ -1,0 +1,70 @@
+name: medium_blazor_006
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ModalService with:
+    bool IsOpen { get; private set; }
+    string? Title { get; private set; }
+    string? Content { get; private set; }
+    event Action? OnStateChanged
+    void Open(string title, string content)
+    void Close()
+  Return only valid C# code in a single file.
+test_code: |
+  public class ModalServiceTests
+  {
+      [Fact]
+      public void Open_SetsIsOpenTrue()
+      {
+          var svc = new ModalService();
+          svc.Open("Title", "Content");
+          svc.IsOpen.Should().BeTrue();
+      }
+
+      [Fact]
+      public void Open_SetsTitleAndContent()
+      {
+          var svc = new ModalService();
+          svc.Open("My Title", "My Content");
+          svc.Title.Should().Be("My Title");
+          svc.Content.Should().Be("My Content");
+      }
+
+      [Fact]
+      public void Close_SetsIsOpenFalse()
+      {
+          var svc = new ModalService();
+          svc.Open("T", "C");
+          svc.Close();
+          svc.IsOpen.Should().BeFalse();
+      }
+
+      [Fact]
+      public void Open_FiresStateChanged()
+      {
+          var svc = new ModalService();
+          var fired = false;
+          svc.OnStateChanged += () => fired = true;
+          svc.Open("T", "C");
+          fired.Should().BeTrue();
+      }
+
+      [Fact]
+      public void Close_FiresStateChanged()
+      {
+          var svc = new ModalService();
+          svc.Open("T", "C");
+          var fired = false;
+          svc.OnStateChanged += () => fired = true;
+          svc.Close();
+          fired.Should().BeTrue();
+      }
+  }

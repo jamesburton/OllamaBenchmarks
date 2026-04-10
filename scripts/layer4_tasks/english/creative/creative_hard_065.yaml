@@ -1,0 +1,22 @@
+name: creative_hard_065
+category: english
+subcategory: creative
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of time passing from the perspective of an ancient tree.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "centuries"
+    - "rings"
+    - "seasons"
+    - "rooted"
+    - "generations"
+    - "slow"
+    - "witnessed"
+    - "time"
+  min_words: 15
+  max_words: 60

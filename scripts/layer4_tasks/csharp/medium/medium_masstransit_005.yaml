@@ -1,0 +1,56 @@
+name: medium_masstransit_005
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record ShipmentCreated(Guid ShipmentId, Guid OrderId, string TrackingNumber, string Carrier).
+  A consumer ShipmentCreatedConsumer implementing IConsumer<ShipmentCreated>.
+  Constructor accepts ITrackingService trackingService.
+  Interface ITrackingService with: Task RegisterAsync(string trackingNumber, string carrier).
+  In Consume: registers the shipment tracking.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record ShipmentCreated(Guid ShipmentId, Guid OrderId, string TrackingNumber, string Carrier); }
+  global using Contracts;
+
+  public class ShipmentCreatedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_RegistersTracking()
+      {
+          var trackingSvc = Substitute.For<ITrackingService>();
+          var consumer = new ShipmentCreatedConsumer(trackingSvc);
+          var ctx = Substitute.For<ConsumeContext<ShipmentCreated>>();
+          ctx.Message.Returns(new ShipmentCreated(Guid.NewGuid(), Guid.NewGuid(), "1Z999AA1", "UPS"));
+          await consumer.Consume(ctx);
+          await trackingSvc.Received(1).RegisterAsync("1Z999AA1", "UPS");
+      }
+
+      [Fact]
+      public async Task Consume_PassesCorrectCarrier()
+      {
+          var trackingSvc = Substitute.For<ITrackingService>();
+          var consumer = new ShipmentCreatedConsumer(trackingSvc);
+          var ctx = Substitute.For<ConsumeContext<ShipmentCreated>>();
+          ctx.Message.Returns(new ShipmentCreated(Guid.NewGuid(), Guid.NewGuid(), "FX123", "FedEx"));
+          await consumer.Consume(ctx);
+          await trackingSvc.Received(1).RegisterAsync(Arg.Any<string>(), "FedEx");
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var trackingSvc = Substitute.For<ITrackingService>();
+          var consumer = new ShipmentCreatedConsumer(trackingSvc);
+          var ctx = Substitute.For<ConsumeContext<ShipmentCreated>>();
+          ctx.Message.Returns(new ShipmentCreated(Guid.NewGuid(), Guid.NewGuid(), "DHL456", "DHL"));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+  }

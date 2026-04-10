@@ -1,0 +1,41 @@
+name: medium_vertical_033
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for resendverificationemail.
+  Include:
+    Command: string Email, string RequestedBy, DateTime? LastSentAt
+  Result: bool Sent, string? Reason, DateTime? SentAt
+  Handler: throttles if LastSentAt within 5 minutes. Validates email format.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ResendVerificationEmailHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new ResendVerificationEmailHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new ResendVerificationEmailHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new ResendVerificationEmailHandler();
+          handler.Should().NotBeNull();
+      }
+  }

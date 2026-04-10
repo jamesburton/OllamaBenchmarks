@@ -1,0 +1,86 @@
+name: hard_xunit_015
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing pipeline/middleware with ordered behaviors:
+  Interface IPipelineStep<TContext>:
+    Task ExecuteAsync(TContext context, Func<Task> next, CancellationToken ct)
+
+  Class Pipeline<TContext>:
+    Pipeline<TContext> Use(IPipelineStep<TContext> step)
+    Task RunAsync(TContext context, CancellationToken ct)
+
+  Record RequestContext(string Method, string Path, Dictionary<string, string> Headers,
+    string? Body, int StatusCode, string? ResponseBody, IList<string> ExecutionLog)
+
+  Concrete steps:
+    LoggingStep: adds "Logging:before" and "Logging:after" to ExecutionLog.
+    AuthStep: if Headers["Authorization"] missing, sets StatusCode=401, does not call next.
+    TimingStep: measures execution time, appends "Timing:{ms}ms" to log.
+    JsonBodyStep: if Body is set and Content-Type is application/json, validates JSON (adds error to log if invalid).
+  Return only valid C# code in a single file.
+test_code: |
+  public class PipelineTests
+  {
+      [Fact]
+      public async Task Pipeline_ExecutesStepsInOrder()
+      {
+          var ctx = new RequestContext("GET", "/test", new(), null, 200, null, new List<string>());
+          var pipeline = new Pipeline<RequestContext>()
+              .Use(new LoggingStep())
+              .Use(new TimingStep());
+          await pipeline.RunAsync(ctx, CancellationToken.None);
+          ctx.ExecutionLog.Should().Contain("Logging:before");
+          ctx.ExecutionLog.Should().Contain("Logging:after");
+          ctx.ExecutionLog.Should().Contain(s => s.StartsWith("Timing:"));
+      }
+
+      [Fact]
+      public async Task AuthStep_NoHeader_SetsUnauthorized()
+      {
+          var ctx = new RequestContext("GET", "/secure", new(), null, 200, null, new List<string>());
+          var pipeline = new Pipeline<RequestContext>().Use(new AuthStep()).Use(new LoggingStep());
+          await pipeline.RunAsync(ctx, CancellationToken.None);
+          ctx.StatusCode.Should().Be(401);
+          ctx.ExecutionLog.Should().NotContain("Logging:before");
+      }
+
+      [Fact]
+      public async Task AuthStep_WithHeader_ProceedsToNext()
+      {
+          var ctx = new RequestContext("GET", "/secure",
+              new Dictionary<string, string> { ["Authorization"] = "Bearer token" },
+              null, 200, null, new List<string>());
+          var pipeline = new Pipeline<RequestContext>().Use(new AuthStep()).Use(new LoggingStep());
+          await pipeline.RunAsync(ctx, CancellationToken.None);
+          ctx.StatusCode.Should().Be(200);
+          ctx.ExecutionLog.Should().Contain("Logging:before");
+      }
+
+      [Fact]
+      public async Task JsonBodyStep_InvalidJson_LogsError()
+      {
+          var headers = new Dictionary<string, string> { ["Content-Type"] = "application/json" };
+          var ctx = new RequestContext("POST", "/api", headers, "not json", 200, null, new List<string>());
+          var pipeline = new Pipeline<RequestContext>().Use(new JsonBodyStep());
+          await pipeline.RunAsync(ctx, CancellationToken.None);
+          ctx.ExecutionLog.Should().Contain(s => s.Contains("error") || s.Contains("invalid") || s.Contains("Error"));
+      }
+
+      [Fact]
+      public async Task EmptyPipeline_Completes()
+      {
+          var ctx = new RequestContext("GET", "/", new(), null, 200, null, new List<string>());
+          var pipeline = new Pipeline<RequestContext>();
+          var act = async () => await pipeline.RunAsync(ctx, CancellationToken.None);
+          await act.Should().NotThrowAsync();
+      }
+  }

@@ -1,0 +1,57 @@
+name: medium_patterns_019
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TypeRegistry with:
+    void Register<T>(string name)
+    object CreateInstance(string name) — uses reflection; throws KeyNotFoundException if not registered
+    bool IsRegistered(string name)
+    IEnumerable<string> RegisteredNames()
+  Return only valid C# code in a single file.
+test_code: |
+  public class MyService { public string Name => "MyService"; }
+  public class OtherService { }
+
+  public class TypeRegistryTests
+  {
+      [Fact]
+      public void RegisterAndCreate()
+      {
+          var reg = new TypeRegistry();
+          reg.Register<MyService>("svc");
+          reg.CreateInstance("svc").Should().BeOfType<MyService>();
+      }
+
+      [Fact]
+      public void CreateInstance_NotRegistered_Throws()
+      {
+          Action act = () => new TypeRegistry().CreateInstance("missing");
+          act.Should().Throw<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public void IsRegistered_Correct()
+      {
+          var reg = new TypeRegistry();
+          reg.Register<MyService>("svc");
+          reg.IsRegistered("svc").Should().BeTrue();
+          reg.IsRegistered("other").Should().BeFalse();
+      }
+
+      [Fact]
+      public void RegisteredNames_ReturnsAll()
+      {
+          var reg = new TypeRegistry();
+          reg.Register<MyService>("s1");
+          reg.Register<OtherService>("s2");
+          reg.RegisteredNames().Should().BeEquivalentTo(new[]{"s1","s2"});
+      }
+  }

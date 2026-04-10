@@ -1,0 +1,18 @@
+name: summarisation_hard_015
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The financialisation of the global economy has led to a growing disconnect between corporate profitability and employment outcomes. Share buybacks, which return capital to shareholders rather than investing in labour or production, have become the dominant mechanism for deploying corporate cash flows. Critics argue this prioritisation of shareholder returns over stakeholder value has exacerbated inequality.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "financialisation"
+    - "buybacks"
+    - "shareholders"
+    - "inequality"
+  max_words: 25

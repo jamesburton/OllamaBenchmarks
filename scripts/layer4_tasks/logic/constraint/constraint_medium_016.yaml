@@ -1,0 +1,16 @@
+name: constraint_medium_016
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Tom, Dick, Harry each have different ages: 20, 25, 30.
+  Clues:
+  1. Tom is not the oldest.
+  2. Dick is younger than Harry.
+  3. Harry is not 30.
+  How old is Tom? Reply with only the number.
+expected_answer: "30"
+validator_config: {}

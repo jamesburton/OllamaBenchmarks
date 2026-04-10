@@ -1,0 +1,21 @@
+name: rewriting_easy_078
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'The book was long. It was interesting.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "long"
+    - "interesting"
+    - "but"
+    - "yet"
+    - "although"
+  min_words: 5
+  max_words: 15

@@ -1,0 +1,16 @@
+name: vocabulary_hard_096
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The word 'serendipity' was coined by Horace Walpole based on a Persian fairy tale about princes from which country?
+  A) China
+  B) India
+  C) Persia (Iran)
+  D) Sri Lanka (Serendip)
+  Reply with only the letter.
+expected_answer: "D"
+validator_config: {}

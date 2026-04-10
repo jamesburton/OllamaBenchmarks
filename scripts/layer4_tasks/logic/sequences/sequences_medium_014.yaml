@@ -1,0 +1,14 @@
+name: sequences_medium_014
+category: logic
+subcategory: sequences
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  What is the next number: 2, 6, 12, 20, 30, 42, ...? (Differences: 4, 6, 8, 10, 12, ...)
+  Reply with only the number.
+expected_answer: "56"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

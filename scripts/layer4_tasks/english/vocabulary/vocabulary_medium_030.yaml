@@ -1,0 +1,16 @@
+name: vocabulary_medium_030
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The new policy was met with ambivalence', which word best replaces 'ambivalence'?
+  A) Enthusiasm
+  B) Certainty
+  C) Mixed feelings
+  D) Anger
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

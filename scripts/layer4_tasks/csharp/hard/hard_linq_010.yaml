@@ -1,0 +1,90 @@
+name: hard_linq_010
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Ticket(int Id, string Queue, string Priority, DateTime CreatedAt, DateTime? ResolvedAt).
+  A class SupportMetrics with constructor accepting IEnumerable<Ticket> tickets.
+  Methods:
+    IEnumerable<QueueStats> QueueSummary() — per Queue: OpenCount (no ResolvedAt),
+      ClosedCount, AverageResolutionHours (avg hours from Created to Resolved for closed).
+      Orders by OpenCount descending.
+    IEnumerable<Ticket> Overdue(DateTime asOf, int slaHours) — open tickets where
+      (asOf - CreatedAt).TotalHours > slaHours. Orders by CreatedAt ascending.
+    IEnumerable<PriorityBreakdown> PriorityBreakdown() — per Priority: count of all tickets,
+      percentage of total. Orders by Count descending.
+  Records: QueueStats(string Queue, int OpenCount, int ClosedCount, double AverageResolutionHours),
+           PriorityBreakdown(string Priority, int Count, double Percentage).
+  Return only valid C# code in a single file.
+test_code: |
+  public class SupportMetricsTests
+  {
+      private static readonly DateTime Now = new(2024,3,1,12,0,0);
+      private static readonly List<Ticket> Tickets = new()
+      {
+          new(1, "Billing", "High",   Now.AddHours(-48), null),
+          new(2, "Billing", "Low",    Now.AddHours(-10), Now.AddHours(-5)),
+          new(3, "Tech",    "High",   Now.AddHours(-72), null),
+          new(4, "Tech",    "Medium", Now.AddHours(-24), Now.AddHours(-1)),
+          new(5, "Tech",    "Low",    Now.AddHours(-2),  null),
+      };
+
+      [Fact]
+      public void QueueSummary_ReturnsTwoQueues()
+      {
+          var result = new SupportMetrics(Tickets).QueueSummary().ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void QueueSummary_TechHasTwoOpenOneClose()
+      {
+          var result = new SupportMetrics(Tickets).QueueSummary().ToList();
+          var tech = result.First(q => q.Queue == "Tech");
+          tech.OpenCount.Should().Be(2);
+          tech.ClosedCount.Should().Be(1);
+      }
+
+      [Fact]
+      public void Overdue_Returns24HrSlaBreaches()
+      {
+          var result = new SupportMetrics(Tickets).Overdue(Now, 24).ToList();
+          result.Should().Contain(t => t.Id == 1);
+          result.Should().Contain(t => t.Id == 3);
+          result.Should().NotContain(t => t.Id == 5);
+      }
+
+      [Fact]
+      public void Overdue_ExcludesResolvedTickets()
+      {
+          var result = new SupportMetrics(Tickets).Overdue(Now, 1).ToList();
+          result.Should().AllSatisfy(t => t.ResolvedAt.Should().BeNull());
+      }
+
+      [Fact]
+      public void PriorityBreakdown_SumOfPercentageIsHundred()
+      {
+          var result = new SupportMetrics(Tickets).PriorityBreakdown().ToList();
+          result.Sum(p => p.Percentage).Should().BeApproximately(100.0, 0.01);
+      }
+
+      [Fact]
+      public void PriorityBreakdown_HighCountIsTwo()
+      {
+          var result = new SupportMetrics(Tickets).PriorityBreakdown().ToList();
+          result.First(p => p.Priority == "High").Count.Should().Be(2);
+      }
+
+      [Fact]
+      public void QueueSummary_EmptyInput_ReturnsEmpty()
+      {
+          new SupportMetrics(Array.Empty<Ticket>()).QueueSummary().Should().BeEmpty();
+      }
+  }

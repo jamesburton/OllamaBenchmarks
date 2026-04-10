@@ -1,0 +1,58 @@
+name: medium_vertical_006
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for scheduling appointments.
+  Include:
+    record ScheduleAppointmentCommand(string PatientId, string DoctorId, DateTime RequestedTime, int DurationMinutes)
+    record ScheduleAppointmentResult(Guid AppointmentId, DateTime ScheduledAt, string Status)
+    class ScheduleAppointmentHandler with constructor accepting:
+      Func<string, DateTime, bool> isDoctorAvailable
+    Method: Task<ScheduleAppointmentResult> HandleAsync(ScheduleAppointmentCommand command)
+    Validates: PatientId/DoctorId not empty, DurationMinutes 15-120, RequestedTime in future.
+    Returns Status="Scheduled" if available, "WaitingList" if not.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ScheduleAppointmentHandlerTests
+  {
+      [Fact]
+      public async Task HandleAsync_DoctorAvailable_ReturnsScheduled()
+      {
+          var handler = new ScheduleAppointmentHandler((_, _) => true);
+          var cmd = new ScheduleAppointmentCommand("p1", "d1", DateTime.UtcNow.AddDays(1), 30);
+          var result = await handler.HandleAsync(cmd);
+          result.Status.Should().Be("Scheduled");
+      }
+
+      [Fact]
+      public async Task HandleAsync_DoctorUnavailable_ReturnsWaitingList()
+      {
+          var handler = new ScheduleAppointmentHandler((_, _) => false);
+          var cmd = new ScheduleAppointmentCommand("p1", "d1", DateTime.UtcNow.AddDays(1), 30);
+          var result = await handler.HandleAsync(cmd);
+          result.Status.Should().Be("WaitingList");
+      }
+
+      [Fact]
+      public async Task HandleAsync_PastTime_Throws()
+      {
+          var handler = new ScheduleAppointmentHandler((_, _) => true);
+          var cmd = new ScheduleAppointmentCommand("p1", "d1", DateTime.UtcNow.AddDays(-1), 30);
+          await handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_InvalidDuration_Throws()
+      {
+          var handler = new ScheduleAppointmentHandler((_, _) => true);
+          var cmd = new ScheduleAppointmentCommand("p1", "d1", DateTime.UtcNow.AddDays(1), 5);
+          await handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+  }

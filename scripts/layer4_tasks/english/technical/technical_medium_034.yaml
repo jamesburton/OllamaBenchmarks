@@ -1,0 +1,23 @@
+name: technical_medium_034
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a JSDoc comment for a function that generates a JWT token for a user.
+  Include @param, @returns, and @throws.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "@param"
+    - "@returns"
+    - "@throws"
+    - "JWT"
+    - "token"
+    - "generate"
+    - "user"
+    - "expires"
+  min_words: 10
+  max_words: 80

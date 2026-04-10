@@ -1,0 +1,22 @@
+name: creative_medium_040
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a journalist interviewing a survivor of a disaster.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "journalist"
+    - "survivor"
+    - "interview"
+    - "disaster"
+    - "story"
+    - "questions"
+    - "grief"
+    - "telling"
+  min_words: 15
+  max_words: 60

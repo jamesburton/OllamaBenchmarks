@@ -1,0 +1,66 @@
+name: medium_async_004
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IFileReader with method: Task<string> ReadAsync(string path, CancellationToken ct = default)
+  A class RetryingFileReader with constructor accepting IFileReader inner, int maxRetries, TimeSpan delay.
+  Expose:
+    Task<string> ReadAsync(string path, CancellationToken ct = default)
+  that retries up to maxRetries times on IOException, waiting 'delay' between retries.
+  Throws the last exception if all retries are exhausted.
+  Propagates OperationCanceledException immediately without retrying.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RetryingFileReaderTests
+  {
+      [Fact]
+      public async Task ReadAsync_SuccessFirstAttempt_NoRetry()
+      {
+          var inner = Substitute.For<IFileReader>();
+          inner.ReadAsync("f.txt", Arg.Any<CancellationToken>()).Returns(Task.FromResult("data"));
+          var result = await new RetryingFileReader(inner, 3, TimeSpan.Zero).ReadAsync("f.txt");
+          result.Should().Be("data");
+          await inner.Received(1).ReadAsync("f.txt", Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task ReadAsync_FailsOnceThenSucceeds()
+      {
+          var inner = Substitute.For<IFileReader>();
+          inner.ReadAsync("f.txt", Arg.Any<CancellationToken>())
+              .Returns(Task.FromException<string>(new IOException()), Task.FromResult("ok"));
+          var result = await new RetryingFileReader(inner, 3, TimeSpan.Zero).ReadAsync("f.txt");
+          result.Should().Be("ok");
+      }
+
+      [Fact]
+      public async Task ReadAsync_ExceedsRetries_Throws()
+      {
+          var inner = Substitute.For<IFileReader>();
+          inner.ReadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(Task.FromException<string>(new IOException("disk")));
+          await Assert.ThrowsAsync<IOException>(() =>
+              new RetryingFileReader(inner, 2, TimeSpan.Zero).ReadAsync("f.txt"));
+      }
+
+      [Fact]
+      public async Task ReadAsync_Cancelled_ThrowsImmediately()
+      {
+          var inner = Substitute.For<IFileReader>();
+          inner.ReadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromException<string>(new OperationCanceledException(ci.Arg<CancellationToken>())));
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+              new RetryingFileReader(inner, 3, TimeSpan.Zero).ReadAsync("f.txt", cts.Token));
+          await inner.Received(1).ReadAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+      }
+  }

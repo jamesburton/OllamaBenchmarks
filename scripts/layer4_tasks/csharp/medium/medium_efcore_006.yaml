@@ -1,0 +1,67 @@
+name: medium_efcore_006
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Inventory with: int Id, string ProductCode, int Quantity, decimal UnitCost, DateTime LastUpdated.
+  A class InventoryDbContext : DbContext with DbSet<Inventory> Items.
+  A class InventoryService with constructor accepting InventoryDbContext.
+  Methods:
+    Task<int> GetTotalQuantityAsync(string productCode)
+    Task AdjustQuantityAsync(string productCode, int delta)
+    Task<IEnumerable<Inventory>> GetLowStockAsync(int threshold)
+    Task<decimal> GetInventoryValueAsync()
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryServiceTests : IAsyncLifetime
+  {
+      private InventoryDbContext _db = null!;
+      private InventoryService _svc = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<InventoryDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new InventoryDbContext(opts);
+          _svc = new InventoryService(_db);
+          _db.Items.AddRange(
+              new Inventory { ProductCode = "A", Quantity = 10, UnitCost = 5m, LastUpdated = DateTime.UtcNow },
+              new Inventory { ProductCode = "B", Quantity = 2, UnitCost = 20m, LastUpdated = DateTime.UtcNow },
+              new Inventory { ProductCode = "C", Quantity = 0, UnitCost = 50m, LastUpdated = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetTotalQuantity_ReturnsCorrect()
+      {
+          (await _svc.GetTotalQuantityAsync("A")).Should().Be(10);
+      }
+
+      [Fact]
+      public async Task AdjustQuantity_UpdatesValue()
+      {
+          await _svc.AdjustQuantityAsync("A", -3);
+          (await _svc.GetTotalQuantityAsync("A")).Should().Be(7);
+      }
+
+      [Fact]
+      public async Task GetLowStock_FiltersCorrectly()
+      {
+          (await _svc.GetLowStockAsync(5)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetInventoryValue_CalculatesCorrect()
+      {
+          (await _svc.GetInventoryValueAsync()).Should().Be(90m); // 10*5 + 2*20 + 0*50
+      }
+  }

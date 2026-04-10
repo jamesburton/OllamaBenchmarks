@@ -1,0 +1,22 @@
+name: creative_medium_054
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a city skyline reflected in wet pavement after rain.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "skyline"
+    - "reflection"
+    - "pavement"
+    - "wet"
+    - "city"
+    - "lights"
+    - "shimmering"
+    - "after"
+  min_words: 15
+  max_words: 60

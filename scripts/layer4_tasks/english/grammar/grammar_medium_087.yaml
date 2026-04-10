@@ -1,0 +1,15 @@
+name: grammar_medium_087
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) By the time she arrived, the meeting already started.
+  B) By the time she arrived, the meeting had already started.
+  C) By the time she arrives, the meeting had already started.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

@@ -1,0 +1,26 @@
+name: comprehension_hard_087
+category: english
+subcategory: comprehension
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  Vaccines protect individuals from infectious diseases by stimulating the immune system to produce antibodies without causing the disease itself. When a sufficient proportion of a population is vaccinated, a phenomenon known as herd immunity is achieved: the spread of the disease is limited because the pathogen cannot easily find unvaccinated hosts. The threshold for herd immunity varies depending on the transmissibility of the disease — measles, which is highly contagious, requires approximately 95 percent vaccination coverage, while polio requires around 80 percent. Herd immunity is particularly important for protecting vulnerable individuals who cannot be vaccinated for medical reasons, such as newborns or those with certain immune conditions. Vaccine hesitancy — the reluctance or refusal to vaccinate despite the availability of vaccines — poses a significant challenge to achieving herd immunity. Misinformation spread through social media has been linked to declining vaccination rates in several countries.
+  
+  Answer in one sentence:
+  Is the following statement fact or opinion according to the passage: 'Misinformation on social media causes vaccine hesitancy'?
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "linked"
+    - "associated"
+    - "not proven"
+    - "causal"
+    - "correlation"
+    - "fact"
+    - "implies"
+  min_words: 8
+  max_words: 40

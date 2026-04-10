@@ -1,0 +1,90 @@
+name: hard_aspnet_006
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A rate-limiting middleware for ASP.NET Core:
+  Class RateLimitOptions: int RequestsPerWindow (default 10), TimeSpan Window (default 60s),
+    string ClientIdHeader (default "X-Client-Id").
+  Class RateLimitMiddleware(RequestDelegate next, IOptions<RateLimitOptions> options):
+    Extracts client ID from header (uses IP if header absent).
+    Tracks request counts per client per window using an in-memory sliding window.
+    If over limit: responds 429 Too Many Requests with Retry-After header.
+    Adds X-RateLimit-Remaining header to all responses.
+  Static class RateLimitExtensions:
+    AddRateLimiting(this IServiceCollection svc, Action<RateLimitOptions>? configure = null)
+    UseRateLimiting(this IApplicationBuilder app)
+  Return only valid C# code in a single file.
+test_code: |
+  public class RateLimitMiddlewareTests
+  {
+      private static WebApplication BuildApp(Action<RateLimitOptions>? configure = null)
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddRateLimiting(configure);
+          var app = builder.Build();
+          app.UseRateLimiting();
+          app.MapGet("/", () => "ok");
+          return app;
+      }
+
+      [Fact]
+      public async Task Request_UnderLimit_Returns200()
+      {
+          await using var app = BuildApp(o => { o.RequestsPerWindow = 5; o.Window = TimeSpan.FromMinutes(1); });
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+
+      [Fact]
+      public async Task Request_AddsRateLimitRemainingHeader()
+      {
+          await using var app = BuildApp(o => o.RequestsPerWindow = 5);
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().ContainKey("X-RateLimit-Remaining");
+      }
+
+      [Fact]
+      public async Task Request_OverLimit_Returns429()
+      {
+          await using var app = BuildApp(o => { o.RequestsPerWindow = 2; o.Window = TimeSpan.FromMinutes(1); });
+          var client = app.GetTestClient();
+          var req = new HttpRequestMessage(HttpMethod.Get, "/");
+          req.Headers.Add("X-Client-Id", "test-client");
+          await client.GetAsync("/");
+          await client.SendAsync(req);
+          req = new HttpRequestMessage(HttpMethod.Get, "/"); req.Headers.Add("X-Client-Id", "test-client");
+          var resp = await client.SendAsync(req);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.TooManyRequests);
+      }
+
+      [Fact]
+      public async Task Request_DifferentClients_IndependentLimits()
+      {
+          await using var app = BuildApp(o => { o.RequestsPerWindow = 1; o.Window = TimeSpan.FromMinutes(1); });
+          var client = app.GetTestClient();
+          var r1 = new HttpRequestMessage(HttpMethod.Get, "/"); r1.Headers.Add("X-Client-Id", "a");
+          var r2 = new HttpRequestMessage(HttpMethod.Get, "/"); r2.Headers.Add("X-Client-Id", "b");
+          await client.SendAsync(r1);
+          var resp = await client.SendAsync(r2);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+
+      [Fact]
+      public async Task Request_429Response_HasRetryAfterHeader()
+      {
+          await using var app = BuildApp(o => { o.RequestsPerWindow = 1; o.Window = TimeSpan.FromMinutes(1); });
+          var client = app.GetTestClient();
+          var addHeader = () => { var r = new HttpRequestMessage(HttpMethod.Get, "/"); r.Headers.Add("X-Client-Id", "x"); return r; };
+          await client.SendAsync(addHeader());
+          var resp = await client.SendAsync(addHeader());
+          resp.Headers.Should().ContainKey("Retry-After");
+      }
+  }

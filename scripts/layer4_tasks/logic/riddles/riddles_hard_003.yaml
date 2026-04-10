@@ -1,0 +1,17 @@
+name: riddles_hard_003
+category: logic
+subcategory: riddles
+difficulty: hard
+weight: 3
+validator_type: logic
+max_tokens: 64
+prompt: |
+  You see a boat filled with people. It has not sunk, but when you look again you don't see a single person on the boat. Why?
+  Reply with only the answer.
+expected_answer: "All the people are married"
+validator_config:
+  accepted_answers:
+  - "All the people are married"
+  - "Everyone is married"
+  - "They are all married"
+  - "No single people - all married"

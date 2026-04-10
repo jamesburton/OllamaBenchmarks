@@ -1,0 +1,35 @@
+name: easy_linq_041
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Checker with a static method:
+    bool AllNonEmpty(IEnumerable<string> items)
+  that returns true only if all strings are non-null and non-empty using LINQ All.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CheckerTests
+  {
+      [Fact]
+      public void AllNonEmpty_AllHaveContent_ReturnsTrue()
+      {
+          Checker.AllNonEmpty(new[]{"a","b","c"}).Should().BeTrue();
+      }
+      [Fact]
+      public void AllNonEmpty_HasEmpty_ReturnsFalse()
+      {
+          Checker.AllNonEmpty(new[]{"a","","c"}).Should().BeFalse();
+      }
+      [Fact]
+      public void AllNonEmpty_EmptySource_ReturnsTrue()
+      {
+          Checker.AllNonEmpty(Array.Empty<string>()).Should().BeTrue();
+      }
+  }

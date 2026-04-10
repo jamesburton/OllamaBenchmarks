@@ -1,0 +1,22 @@
+name: rewriting_hard_052
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'Notwithstanding the foregoing, the parties reserve the right to terminate this agreement with immediate effect.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "still"
+    - "can"
+    - "end"
+    - "agreement"
+    - "immediately"
+    - "despite"
+  min_words: 5
+  max_words: 25

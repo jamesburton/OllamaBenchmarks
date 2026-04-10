@@ -1,0 +1,63 @@
+name: medium_aspnet_038
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record WaitlistEntry(Guid Id, string Email, DateTime JoinedAt, int Position).
+  A class WaitlistController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<WaitlistEntry> (for testability).
+  Actions:
+    POST api/waitlist/join — adds email to waitlist (400 if email invalid or already exists), returns 201 with position
+    GET api/waitlist/position?email=x — returns position or 404
+    DELETE api/waitlist/{id} — removes entry and renumbers positions, 404 if not found
+  Return only valid C# code in a single file.
+test_code: |
+  public class WaitlistControllerTests
+  {
+      [Fact]
+      public void Join_ValidEmail_Returns201WithPosition()
+      {
+          var ctrl = new WaitlistController(new List<WaitlistEntry>());
+          var result = ctrl.Join("new@example.com") as CreatedAtActionResult;
+          result!.StatusCode.Should().Be(201);
+          (result.Value as WaitlistEntry)!.Position.Should().Be(1);
+      }
+
+      [Fact]
+      public void Join_DuplicateEmail_Returns400()
+      {
+          var entries = new List<WaitlistEntry>
+          {
+              new(Guid.NewGuid(), "existing@example.com", DateTime.UtcNow, 1)
+          };
+          var ctrl = new WaitlistController(entries);
+          ctrl.Join("existing@example.com").Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public void GetPosition_Found()
+      {
+          var id = Guid.NewGuid();
+          var ctrl = new WaitlistController(new List<WaitlistEntry>
+          {
+              new(id, "test@example.com", DateTime.UtcNow, 1)
+          });
+          var result = ctrl.GetPosition("test@example.com") as OkObjectResult;
+          result!.Value.Should().Be(1);
+      }
+
+      [Fact]
+      public void Delete_RemovesEntry_Returns204()
+      {
+          var id = Guid.NewGuid();
+          var ctrl = new WaitlistController(new List<WaitlistEntry> { new(id, "a@b.com", DateTime.UtcNow, 1) });
+          ctrl.Remove(id).Should().BeOfType<NoContentResult>();
+      }
+  }

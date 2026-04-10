@@ -1,0 +1,59 @@
+name: medium_aspnet_031
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record DiscountRule(string Code, decimal DiscountPercent, DateTime ExpiresAt).
+  A class DiscountController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<DiscountRule> (for testability).
+  Actions:
+    POST api/discount/validate — accepts {code: string}, returns {valid: bool, discount: decimal} or 400 if code empty
+    GET api/discount/active — returns only non-expired rules
+  Return only valid C# code in a single file.
+test_code: |
+  public class DiscountControllerTests
+  {
+      private DiscountController MakeController() => new(new List<DiscountRule>
+      {
+          new("SAVE10", 10m, DateTime.UtcNow.AddDays(10)),
+          new("EXPIRED", 20m, DateTime.UtcNow.AddDays(-1))
+      });
+
+      [Fact]
+      public void Validate_ValidCode_ReturnsDiscount()
+      {
+          var ctrl = MakeController();
+          var result = ctrl.Validate(new { code = "SAVE10" }) as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+      }
+
+      [Fact]
+      public void Validate_InvalidCode_ReturnsNotValid()
+      {
+          var ctrl = MakeController();
+          var result = ctrl.Validate(new { code = "BADCODE" }) as OkObjectResult;
+          result.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Validate_EmptyCode_Returns400()
+      {
+          var ctrl = MakeController();
+          ctrl.Validate(new { code = "" }).Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public void GetActive_ReturnsNonExpired()
+      {
+          var result = MakeController().GetActive() as OkObjectResult;
+          var rules = result!.Value as IEnumerable<DiscountRule>;
+          rules!.All(r => r.ExpiresAt > DateTime.UtcNow).Should().BeTrue();
+      }
+  }

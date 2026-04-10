@@ -1,0 +1,58 @@
+name: medium_aspnet_033
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ReviewDto(Guid Id, string ProductId, string AuthorId, int Rating, string Comment, DateTime CreatedAt).
+  A class ReviewsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<ReviewDto> (for testability).
+  Actions:
+    GET api/reviews/{productId} — reviews for a product
+    GET api/reviews/{productId}/average — average rating (0 if no reviews)
+    POST api/reviews — adds review (validate Rating 1-5, returns 400 if invalid)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReviewsControllerTests
+  {
+      private ReviewsController MakeController() => new(new List<ReviewDto>
+      {
+          new(Guid.NewGuid(), "prod1", "user1", 5, "Great!", DateTime.UtcNow),
+          new(Guid.NewGuid(), "prod1", "user2", 3, "OK", DateTime.UtcNow),
+          new(Guid.NewGuid(), "prod2", "user1", 4, "Good", DateTime.UtcNow)
+      });
+
+      [Fact]
+      public void GetForProduct_ReturnsCorrect()
+      {
+          var result = MakeController().GetForProduct("prod1") as OkObjectResult;
+          (result!.Value as IEnumerable<ReviewDto>).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetAverage_CalculatesCorrectly()
+      {
+          var result = MakeController().GetAverage("prod1") as OkObjectResult;
+          ((double)result!.Value!).Should().BeApproximately(4.0, 0.01);
+      }
+
+      [Fact]
+      public void GetAverage_NoReviews_ReturnsZero()
+      {
+          var result = MakeController().GetAverage("prod999") as OkObjectResult;
+          ((double)result!.Value!).Should().Be(0);
+      }
+
+      [Fact]
+      public void Post_InvalidRating_Returns400()
+      {
+          var review = new ReviewDto(Guid.NewGuid(), "prod3", "user3", 6, "Too high", DateTime.UtcNow);
+          MakeController().Post(review).Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

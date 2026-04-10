@@ -1,0 +1,13 @@
+name: number_theory_easy_006
+category: maths
+subcategory: number_theory
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Is 97 a prime number? Reply with 1 for yes or 0 for no.
+expected_answer: "1"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

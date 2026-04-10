@@ -1,0 +1,21 @@
+name: rewriting_medium_091
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'The student failed the first test. She studied harder. She passed with distinction.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "failed"
+    - "studied"
+    - "passed"
+    - "distinction"
+    - "but"
+  min_words: 8
+  max_words: 30

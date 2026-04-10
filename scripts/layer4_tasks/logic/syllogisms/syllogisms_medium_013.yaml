@@ -1,0 +1,15 @@
+name: syllogisms_medium_013
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All programmers know logic.
+  2. All who know logic can solve puzzles.
+  3. Some puzzle solvers win competitions.
+  Do all programmers win competitions? Reply with only: Yes or No.
+expected_answer: "No."
+validator_config: {}

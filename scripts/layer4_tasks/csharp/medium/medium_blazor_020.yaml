@@ -1,0 +1,63 @@
+name: medium_blazor_020
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class SidebarService with:
+    bool IsOpen, string? ActiveSection, event Action? OnSidebarChanged, void Open(), void Close(), void Toggle(), void SetSection(string)
+  Return only valid C# code in a single file.
+test_code: |
+  public class SidebarServiceTests
+  {
+      [Fact]
+      public void Open_SetsIsOpenTrue()
+      {
+          var svc = new SidebarService();
+          svc.Open();
+          svc.IsOpen.Should().BeTrue();
+      }
+
+      [Fact]
+      public void Close_SetsIsOpenFalse()
+      {
+          var svc = new SidebarService();
+          svc.Open();
+          svc.Close();
+          svc.IsOpen.Should().BeFalse();
+      }
+
+      [Fact]
+      public void Toggle_TogglesState()
+      {
+          var svc = new SidebarService();
+          svc.Toggle();
+          svc.IsOpen.Should().BeTrue();
+          svc.Toggle();
+          svc.IsOpen.Should().BeFalse();
+      }
+
+      [Fact]
+      public void SetSection_UpdatesSection()
+      {
+          var svc = new SidebarService();
+          svc.SetSection("Dashboard");
+          svc.ActiveSection.Should().Be("Dashboard");
+      }
+
+      [Fact]
+      public void Open_FiresEvent()
+      {
+          var svc = new SidebarService();
+          var fired = false;
+          svc.OnSidebarChanged += () => fired = true;
+          svc.Open();
+          fired.Should().BeTrue();
+      }
+  }

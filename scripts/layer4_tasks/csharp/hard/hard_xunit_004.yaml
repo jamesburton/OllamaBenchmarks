@@ -1,0 +1,87 @@
+name: hard_xunit_004
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit parallel test isolation with thread-safe state:
+  Class ThreadSafeCounter:
+    void Increment(string key)
+    void Decrement(string key)
+    int Get(string key)
+    void Reset(string key)
+    IReadOnlyDictionary<string, int> GetAll()
+    int Total
+
+  Class ConcurrentWorkQueue<T>:
+    void Enqueue(T item)
+    bool TryDequeue(out T? item)
+    int Count { get; }
+    Task ProcessAllAsync(Func<T, Task> processor, int maxConcurrency, CancellationToken ct)
+
+  Tests for ThreadSafeCounter demonstrate concurrent increment/decrement.
+  Tests for ConcurrentWorkQueue demonstrate parallel processing with controlled concurrency.
+  Include at least one test that runs tasks concurrently using Task.WhenAll to verify thread safety.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ThreadSafeCounterTests
+  {
+      [Fact]
+      public void Increment_SingleThread_CorrectCount()
+      {
+          var counter = new ThreadSafeCounter();
+          for (int i = 0; i < 100; i++) counter.Increment("key");
+          counter.Get("key").Should().Be(100);
+      }
+
+      [Fact]
+      public async Task Increment_Concurrent_CorrectFinalCount()
+      {
+          var counter = new ThreadSafeCounter();
+          var tasks = Enumerable.Range(0, 1000).Select(_ => Task.Run(() => counter.Increment("x")));
+          await Task.WhenAll(tasks);
+          counter.Get("x").Should().Be(1000);
+      }
+
+      [Fact]
+      public void Total_SumsAllKeys()
+      {
+          var counter = new ThreadSafeCounter();
+          counter.Increment("a"); counter.Increment("a");
+          counter.Increment("b");
+          counter.Total.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task WorkQueue_ProcessAllAsync_ProcessesAllItems()
+      {
+          var queue = new ConcurrentWorkQueue<int>();
+          for (int i = 0; i < 10; i++) queue.Enqueue(i);
+          var processed = new System.Collections.Concurrent.ConcurrentBag<int>();
+          await queue.ProcessAllAsync(i => { processed.Add(i); return Task.CompletedTask; }, 3, CancellationToken.None);
+          processed.Should().HaveCount(10);
+      }
+
+      [Fact]
+      public async Task WorkQueue_RespectsConcurrencyLimit()
+      {
+          var queue = new ConcurrentWorkQueue<int>();
+          for (int i = 0; i < 6; i++) queue.Enqueue(i);
+          var concurrentCount = 0;
+          var maxConcurrent = 0;
+          await queue.ProcessAllAsync(async i =>
+          {
+              var curr = Interlocked.Increment(ref concurrentCount);
+              Interlocked.Exchange(ref maxConcurrent, Math.Max(maxConcurrent, curr));
+              await Task.Delay(10);
+              Interlocked.Decrement(ref concurrentCount);
+          }, 2, CancellationToken.None);
+          maxConcurrent.Should().BeLessThanOrEqualTo(2);
+      }
+  }

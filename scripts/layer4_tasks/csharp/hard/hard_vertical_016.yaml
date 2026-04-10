@@ -1,0 +1,92 @@
+name: hard_vertical_016
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + soft delete + CQRS for content management:
+  Entities:
+    Article(int Id, string Title, string Content, string AuthorId, string Status,
+      IReadOnlyList<string> Tags, DateTime CreatedAt, DateTime UpdatedAt, bool IsDeleted, DateTime? DeletedAt)
+  DbContext: CmsDbContext (SQLite in-memory) with soft-delete global filter.
+
+  Records:
+    CreateArticleCommand(string Title, string Content, string AuthorId, IReadOnlyList<string> Tags)
+    PublishArticleCommand(int ArticleId, string PublishedBy)
+    GetPublishedArticlesQuery(string? Tag, int Page, int PageSize)
+    ArticleDto(int Id, string Title, string AuthorId, string Status, IReadOnlyList<string> Tags, DateTime CreatedAt)
+    ArticleListResult(IReadOnlyList<ArticleDto> Items, int Total, int Page, int TotalPages)
+
+  Class ArticleService(CmsDbContext db):
+    Task<ArticleDto> CreateAsync(CreateArticleCommand cmd, CancellationToken ct): Status="Draft".
+    Task<ArticleDto?> PublishAsync(PublishArticleCommand cmd, CancellationToken ct): Status="Published".
+    Task<ArticleListResult> GetPublishedAsync(GetPublishedArticlesQuery q, CancellationToken ct)
+    Task<bool> SoftDeleteAsync(int id, CancellationToken ct): sets IsDeleted, excluded from queries.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ArticleServiceTests : IDisposable
+  {
+      private readonly CmsDbContext _db;
+      private readonly ArticleService _svc;
+
+      public ArticleServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<CmsDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new CmsDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new ArticleService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task CreateArticle_StatusIsDraft()
+      {
+          var cmd = new CreateArticleCommand("My Title", "Content", "author1", new[] { "tech" });
+          var article = await _svc.CreateAsync(cmd, CancellationToken.None);
+          article.Status.Should().Be("Draft");
+      }
+
+      [Fact]
+      public async Task PublishArticle_ChangesStatusToPublished()
+      {
+          var created = await _svc.CreateAsync(new CreateArticleCommand("T", "C", "a1", Array.Empty<string>()), CancellationToken.None);
+          var published = await _svc.PublishAsync(new PublishArticleCommand(created.Id, "editor1"), CancellationToken.None);
+          published!.Status.Should().Be("Published");
+      }
+
+      [Fact]
+      public async Task GetPublished_ReturnsOnlyPublished()
+      {
+          await _svc.CreateAsync(new CreateArticleCommand("Draft", "C", "a1", Array.Empty<string>()), CancellationToken.None);
+          var created = await _svc.CreateAsync(new CreateArticleCommand("Pub", "C", "a2", Array.Empty<string>()), CancellationToken.None);
+          await _svc.PublishAsync(new PublishArticleCommand(created.Id, "ed"), CancellationToken.None);
+          var result = await _svc.GetPublishedAsync(new GetPublishedArticlesQuery(null, 1, 10), CancellationToken.None);
+          result.Items.Should().AllSatisfy(a => a.Status.Should().Be("Published"));
+      }
+
+      [Fact]
+      public async Task SoftDelete_ExcludesFromQueries()
+      {
+          var created = await _svc.CreateAsync(new CreateArticleCommand("Del", "C", "a1", Array.Empty<string>()), CancellationToken.None);
+          await _svc.PublishAsync(new PublishArticleCommand(created.Id, "ed"), CancellationToken.None);
+          await _svc.SoftDeleteAsync(created.Id, CancellationToken.None);
+          var result = await _svc.GetPublishedAsync(new GetPublishedArticlesQuery(null, 1, 10), CancellationToken.None);
+          result.Items.Should().NotContain(a => a.Id == created.Id);
+      }
+
+      [Fact]
+      public async Task GetPublished_FiltersByTag()
+      {
+          var created = await _svc.CreateAsync(new CreateArticleCommand("T1", "C", "a1", new[] { "dotnet" }), CancellationToken.None);
+          await _svc.PublishAsync(new PublishArticleCommand(created.Id, "ed"), CancellationToken.None);
+          var result = await _svc.GetPublishedAsync(new GetPublishedArticlesQuery("dotnet", 1, 10), CancellationToken.None);
+          result.Items.Should().Contain(a => a.Tags.Contains("dotnet"));
+      }
+  }

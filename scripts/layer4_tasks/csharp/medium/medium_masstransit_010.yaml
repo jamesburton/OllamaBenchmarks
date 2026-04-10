@@ -1,0 +1,64 @@
+name: medium_masstransit_010
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record CartAbandoned(Guid CartId, string UserId, IEnumerable<string> ProductIds, decimal CartTotal).
+  A consumer CartAbandonmentConsumer implementing IConsumer<CartAbandoned>.
+  Constructor accepts IEmailSender emailSender and IDiscountService discountService.
+  Interface IDiscountService with: Task<string> GenerateDiscountCodeAsync(string userId).
+  Interface IEmailSender with: Task SendAsync(string to, string subject, string body).
+  In Consume: generates discount code and sends recovery email.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record CartAbandoned(Guid CartId, string UserId, IEnumerable<string> ProductIds, decimal CartTotal); }
+  global using Contracts;
+
+  public class CartAbandonmentConsumerTests
+  {
+      [Fact]
+      public async Task Consume_GeneratesDiscountAndSendsEmail()
+      {
+          var email = Substitute.For<IEmailSender>();
+          var discount = Substitute.For<IDiscountService>();
+          discount.GenerateDiscountCodeAsync("u1").Returns("SAVE10");
+          var consumer = new CartAbandonmentConsumer(email, discount);
+          var ctx = Substitute.For<ConsumeContext<CartAbandoned>>();
+          ctx.Message.Returns(new CartAbandoned(Guid.NewGuid(), "u1", new[] { "p1", "p2" }, 50m));
+          await consumer.Consume(ctx);
+          await discount.Received(1).GenerateDiscountCodeAsync("u1");
+          await email.Received(1).SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
+      }
+
+      [Fact]
+      public async Task Consume_EmailBodyContainsDiscountCode()
+      {
+          var email = Substitute.For<IEmailSender>();
+          var discount = Substitute.For<IDiscountService>();
+          discount.GenerateDiscountCodeAsync(Arg.Any<string>()).Returns("COMEBACK20");
+          var consumer = new CartAbandonmentConsumer(email, discount);
+          var ctx = Substitute.For<ConsumeContext<CartAbandoned>>();
+          ctx.Message.Returns(new CartAbandoned(Guid.NewGuid(), "u2", new[] { "p3" }, 25m));
+          await consumer.Consume(ctx);
+          await email.Received(1).SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Is<string>(b => b.Contains("COMEBACK20")));
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var email = Substitute.For<IEmailSender>();
+          var discount = Substitute.For<IDiscountService>();
+          discount.GenerateDiscountCodeAsync(Arg.Any<string>()).Returns("D1");
+          var consumer = new CartAbandonmentConsumer(email, discount);
+          var ctx = Substitute.For<ConsumeContext<CartAbandoned>>();
+          ctx.Message.Returns(new CartAbandoned(Guid.NewGuid(), "u3", new string[0], 0m));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+  }

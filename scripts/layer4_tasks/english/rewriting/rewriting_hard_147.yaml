@@ -1,0 +1,22 @@
+name: rewriting_hard_147
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity, removing jargon:
+  'We need to leverage synergies across our core competencies to drive value creation and optimise our go-to-market strategy.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "improve"
+    - "combine"
+    - "strengths"
+    - "market"
+    - "value"
+    - "efficiency"
+  min_words: 5
+  max_words: 20

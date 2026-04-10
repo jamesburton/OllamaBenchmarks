@@ -1,0 +1,55 @@
+name: medium_blazor_012
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class FilterService with:
+    IDictionary<string,string> ActiveFilters, Apply(key, value), Remove(key), Clear(), IsActive(key)->bool, OnFiltersChanged event
+  Return only valid C# code in a single file.
+test_code: |
+  public class FilterServiceTests
+  {
+      [Fact]
+      public void Apply_SetsFilter()
+      {
+          var svc = new FilterService();
+          svc.Apply("category", "electronics");
+          svc.IsActive("category").Should().BeTrue();
+      }
+
+      [Fact]
+      public void Remove_DeletesFilter()
+      {
+          var svc = new FilterService();
+          svc.Apply("category", "books");
+          svc.Remove("category");
+          svc.IsActive("category").Should().BeFalse();
+      }
+
+      [Fact]
+      public void Clear_RemovesAllFilters()
+      {
+          var svc = new FilterService();
+          svc.Apply("a", "1");
+          svc.Apply("b", "2");
+          svc.Clear();
+          svc.ActiveFilters.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void Apply_FiresEvent()
+      {
+          var svc = new FilterService();
+          var fired = false;
+          svc.OnFiltersChanged += () => fired = true;
+          svc.Apply("x", "y");
+          fired.Should().BeTrue();
+      }
+  }

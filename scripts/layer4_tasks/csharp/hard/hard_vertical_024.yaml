@@ -1,0 +1,101 @@
+name: hard_vertical_024
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + many-to-many + CQRS for course enrollment system:
+  Entities:
+    Student(int Id, string Name, string Email, DateTime EnrolledAt, List<CourseEnrollment> Enrollments)
+    Course(int Id, string Title, string Description, string InstructorId, int MaxStudents, DateTime StartDate,
+      List<CourseEnrollment> Enrollments)
+    CourseEnrollment(int StudentId, Student Student, int CourseId, Course Course,
+      DateTime EnrolledAt, string Status, decimal? Grade)
+  DbContext: EnrollmentDbContext (SQLite in-memory, explicit join entity).
+
+  Records:
+    EnrollStudentCommand(int StudentId, int CourseId)
+    GradeStudentCommand(int StudentId, int CourseId, decimal Grade)
+    CourseRosterDto(int CourseId, string Title, int EnrolledCount, int MaxStudents, IReadOnlyList<StudentEnrollmentDto> Students)
+    StudentEnrollmentDto(int StudentId, string Name, string Email, string Status, decimal? Grade)
+
+  Class EnrollmentService(EnrollmentDbContext db):
+    Task EnrollAsync(EnrollStudentCommand cmd, CancellationToken ct):
+      Throws if already enrolled, course full, student/course not found.
+    Task GradeAsync(GradeStudentCommand cmd, CancellationToken ct): Grade must be 0-100.
+    Task<CourseRosterDto> GetRosterAsync(int courseId, CancellationToken ct)
+    Task<IReadOnlyList<Course>> GetStudentCoursesAsync(int studentId, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class EnrollmentServiceTests : IDisposable
+  {
+      private readonly EnrollmentDbContext _db;
+      private readonly EnrollmentService _svc;
+
+      public EnrollmentServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<EnrollmentDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new EnrollmentDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData();
+          _svc = new EnrollmentService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          _db.Students.Add(new Student { Name = "Alice", Email = "a@b.com", EnrolledAt = DateTime.UtcNow });
+          _db.Students.Add(new Student { Name = "Bob", Email = "b@c.com", EnrolledAt = DateTime.UtcNow });
+          _db.Courses.Add(new Course { Title = "C# 101", Description = "Basics", InstructorId = "i1", MaxStudents = 2, StartDate = DateTime.UtcNow.AddDays(7) });
+          _db.Courses.Add(new Course { Title = "Full", Description = "Full course", InstructorId = "i2", MaxStudents = 1, StartDate = DateTime.UtcNow.AddDays(14) });
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task Enroll_ValidStudentAndCourse_Succeeds()
+      {
+          var student = _db.Students.First(s => s.Name == "Alice");
+          var course = _db.Courses.First(c => c.Title == "C# 101");
+          await _svc.EnrollAsync(new EnrollStudentCommand(student.Id, course.Id), CancellationToken.None);
+          var roster = await _svc.GetRosterAsync(course.Id, CancellationToken.None);
+          roster.EnrolledCount.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task Enroll_AlreadyEnrolled_Throws()
+      {
+          var student = _db.Students.First(s => s.Name == "Bob");
+          var course = _db.Courses.First(c => c.Title == "C# 101");
+          await _svc.EnrollAsync(new EnrollStudentCommand(student.Id, course.Id), CancellationToken.None);
+          var act = async () => await _svc.EnrollAsync(new EnrollStudentCommand(student.Id, course.Id), CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task GradeStudent_ValidGrade_Persists()
+      {
+          var student = _db.Students.First(s => s.Name == "Alice");
+          var course = _db.Courses.First(c => c.Title == "C# 101");
+          await _svc.EnrollAsync(new EnrollStudentCommand(student.Id, course.Id), CancellationToken.None);
+          await _svc.GradeAsync(new GradeStudentCommand(student.Id, course.Id, 92.5m), CancellationToken.None);
+          var roster = await _svc.GetRosterAsync(course.Id, CancellationToken.None);
+          roster.Students.First(s => s.StudentId == student.Id).Grade.Should().Be(92.5m);
+      }
+
+      [Fact]
+      public async Task GradeStudent_InvalidGrade_Throws()
+      {
+          var student = _db.Students.First();
+          var course = _db.Courses.First();
+          await _svc.EnrollAsync(new EnrollStudentCommand(student.Id, course.Id), CancellationToken.None);
+          var act = async () => await _svc.GradeAsync(new GradeStudentCommand(student.Id, course.Id, 110m), CancellationToken.None);
+          await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+      }
+  }

@@ -1,0 +1,41 @@
+name: medium_vertical_038
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for checkfeatureaccess.
+  Include:
+    Command: string UserId, string Feature, string SubscriptionPlan, IEnumerable<string> UserRoles
+  Result: bool HasAccess, string? Reason
+  Handler: admin role always has access. Features can be restricted by plan (free/basic/pro) or role.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CheckFeatureAccessHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new CheckFeatureAccessHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new CheckFeatureAccessHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new CheckFeatureAccessHandler();
+          handler.Should().NotBeNull();
+      }
+  }

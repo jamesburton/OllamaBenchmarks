@@ -1,0 +1,22 @@
+name: technical_easy_047
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a clear error message for when an internet connection is lost during a form submission.
+  Keep it under 20 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "connection"
+    - "lost"
+    - "try again"
+    - "internet"
+    - "submit"
+    - "offline"
+    - "reconnect"
+  min_words: 5
+  max_words: 20

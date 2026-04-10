@@ -1,0 +1,54 @@
+name: medium_aspnet_006
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record LoginRequest(string Username, string Password).
+  A record LoginResponse(string Token, DateTime ExpiresAt).
+  An interface IAuthService with:
+    Task<LoginResponse?> AuthenticateAsync(string username, string password)
+  A class AuthController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IAuthService.
+  Action: POST api/auth/login — calls AuthenticateAsync, returns 200 with token or 401.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuthControllerTests
+  {
+      [Fact]
+      public async Task Login_ValidCredentials_Returns200WithToken()
+      {
+          var svc = Substitute.For<IAuthService>();
+          svc.AuthenticateAsync("user", "pass").Returns(new LoginResponse("tok123", DateTime.UtcNow.AddHours(1)));
+          var ctrl = new AuthController(svc);
+          var result = await ctrl.Login(new LoginRequest("user", "pass")) as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+          (result.Value as LoginResponse)!.Token.Should().Be("tok123");
+      }
+
+      [Fact]
+      public async Task Login_InvalidCredentials_Returns401()
+      {
+          var svc = Substitute.For<IAuthService>();
+          svc.AuthenticateAsync(Arg.Any<string>(), Arg.Any<string>()).Returns((LoginResponse?)null);
+          var ctrl = new AuthController(svc);
+          var result = await ctrl.Login(new LoginRequest("user", "bad"));
+          result.Should().BeOfType<UnauthorizedResult>();
+      }
+
+      [Fact]
+      public async Task Login_CallsServiceWithCredentials()
+      {
+          var svc = Substitute.For<IAuthService>();
+          svc.AuthenticateAsync("admin", "1234").Returns(new LoginResponse("t", DateTime.UtcNow));
+          var ctrl = new AuthController(svc);
+          await ctrl.Login(new LoginRequest("admin", "1234"));
+          await svc.Received(1).AuthenticateAsync("admin", "1234");
+      }
+  }

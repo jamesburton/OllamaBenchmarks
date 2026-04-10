@@ -1,0 +1,86 @@
+name: hard_blazor_018
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor localization and i18n service:
+  Records:
+    LocaleInfo(string Code, string DisplayName, bool IsRightToLeft, string DateFormat, string NumberFormat)
+    TranslationEntry(string Key, string Value, string Locale)
+
+  Interface ITranslationService:
+    string Translate(string key, string locale, params object[] args)
+    void RegisterTranslation(TranslationEntry entry)
+    IReadOnlyList<LocaleInfo> GetSupportedLocales()
+    LocaleInfo GetLocale(string code)
+
+  Class InMemoryTranslationService : ITranslationService:
+    Pre-loaded locales: "en-US", "fr-FR", "de-DE", "ar-SA" (Arabic, IsRightToLeft=true).
+    Pre-loaded translations for keys: "app.title", "nav.home", "nav.about", "errors.notfound".
+    Translate: if key+locale found, return value with string.Format args substituted.
+    If locale not found, fall back to "en-US".
+    If key not found in any locale, return $"[{key}]".
+  Return only valid C# code in a single file.
+test_code: |
+  public class InMemoryTranslationServiceTests
+  {
+      private readonly ITranslationService _svc = new InMemoryTranslationService();
+
+      [Fact]
+      public void Translate_KnownKey_ReturnsTranslation()
+      {
+          var result = _svc.Translate("app.title", "en-US");
+          result.Should().NotStartWith("[");
+      }
+
+      [Fact]
+      public void Translate_UnknownKey_ReturnsKeyInBrackets()
+      {
+          var result = _svc.Translate("unknown.key", "en-US");
+          result.Should().Be("[unknown.key]");
+      }
+
+      [Fact]
+      public void Translate_UnknownLocale_FallsBackToEnglish()
+      {
+          var enResult = _svc.Translate("app.title", "en-US");
+          var unknownResult = _svc.Translate("app.title", "zz-ZZ");
+          unknownResult.Should().Be(enResult);
+      }
+
+      [Fact]
+      public void GetSupportedLocales_ReturnsAll()
+      {
+          var locales = _svc.GetSupportedLocales();
+          locales.Should().HaveCount(4);
+      }
+
+      [Fact]
+      public void GetLocale_Arabic_IsRightToLeft()
+      {
+          var locale = _svc.GetLocale("ar-SA");
+          locale.IsRightToLeft.Should().BeTrue();
+      }
+
+      [Fact]
+      public void RegisterTranslation_CanBeRetrieved()
+      {
+          _svc.RegisterTranslation(new TranslationEntry("custom.key", "Hello World", "en-US"));
+          _svc.Translate("custom.key", "en-US").Should().Be("Hello World");
+      }
+
+      [Fact]
+      public void Translate_WithArgs_FormatsCorrectly()
+      {
+          _svc.RegisterTranslation(new TranslationEntry("greeting", "Hello {0}!", "en-US"));
+          var result = _svc.Translate("greeting", "en-US", "Alice");
+          result.Should().Be("Hello Alice!");
+      }
+  }

@@ -1,0 +1,21 @@
+name: rewriting_medium_068
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Split this compound sentence into two shorter sentences:
+  'The new drug showed promising results in early trials, and researchers are now planning a larger phase-three study.'
+  Write only the two rewritten sentences.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "drug"
+    - "trials"
+    - "phase"
+    - "study"
+    - "researchers"
+  min_words: 7
+  max_words: 30

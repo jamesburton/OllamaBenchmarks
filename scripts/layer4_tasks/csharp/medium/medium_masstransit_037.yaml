@@ -1,0 +1,56 @@
+name: medium_masstransit_037
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record DataSyncCompleted(Guid SyncId, string Source, string Target, int RecordsSynced, bool Success).
+  A consumer DataSyncCompletedConsumer implementing IConsumer<DataSyncCompleted>.
+  Constructor accepts ISyncMonitor service.
+  Interface ISyncMonitor with: Task RecordAsync(Guid syncId, int recordsSynced, bool success).
+  In Consume: calls the service method with appropriate message properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record DataSyncCompleted(Guid SyncId, string Source, string Target, int RecordsSynced, bool Success); }
+  global using Contracts;
+
+  public class DataSyncCompletedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<ISyncMonitor>();
+          var consumer = new DataSyncCompletedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DataSyncCompleted>>();
+          ctx.Message.Returns(new DataSyncCompleted(Guid.NewGuid(), "test", "test", 1, true));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RecordAsync(Arg.Any<Guid>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<ISyncMonitor>();
+          var consumer = new DataSyncCompletedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DataSyncCompleted>>();
+          ctx.Message.Returns(new DataSyncCompleted(Guid.NewGuid(), "test", "test", 1, true));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<ISyncMonitor>();
+          var consumer = new DataSyncCompletedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DataSyncCompleted>>();
+          ctx.Message.Returns(new DataSyncCompleted(Guid.NewGuid(), "test", "test", 1, true));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RecordAsync(Arg.Any<Guid>(), Arg.Any<object>());
+      }
+  }

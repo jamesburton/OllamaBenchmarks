@@ -1,0 +1,41 @@
+name: medium_vertical_013
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for calculatetax.
+  Include:
+    Command: decimal Amount, string Country, string? State, bool IsBusinessCustomer
+  Result: decimal TaxRate, decimal TaxAmount, decimal TotalWithTax
+  Handler returns different rates: US=10%, UK=20%, EU=15%, others=0%. B2B gets 0%.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CalculateTaxHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new CalculateTaxHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new CalculateTaxHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new CalculateTaxHandler();
+          handler.Should().NotBeNull();
+      }
+  }

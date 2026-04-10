@@ -1,0 +1,38 @@
+name: easy_patterns_014
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Temperature(double Value, string Unit)
+  and a static class TempConverter with:
+    double ToCelsius(Temperature temp)
+  that converts from Fahrenheit ("F") or Kelvin ("K") to Celsius, or returns Value as-is if Unit is "C".
+  Formulas: C = (F - 32) * 5/9; C = K - 273.15
+  Return only valid C# code in a single file.
+test_code: |
+  public class TempConverterTests
+  {
+      [Fact]
+      public void ToCelsius_FromCelsius()
+      {
+          TempConverter.ToCelsius(new Temperature(100, "C")).Should().BeApproximately(100.0, 0.01);
+      }
+      [Fact]
+      public void ToCelsius_FromFahrenheit()
+      {
+          TempConverter.ToCelsius(new Temperature(212, "F")).Should().BeApproximately(100.0, 0.01);
+      }
+      [Fact]
+      public void ToCelsius_FromKelvin()
+      {
+          TempConverter.ToCelsius(new Temperature(373.15, "K")).Should().BeApproximately(100.0, 0.01);
+      }
+  }

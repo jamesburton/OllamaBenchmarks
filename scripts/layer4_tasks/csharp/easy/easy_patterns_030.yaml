@@ -1,0 +1,34 @@
+name: easy_patterns_030
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class DeconstHelper with a static method:
+    void Deconstruct(string fullName, out string first, out string last)
+  that splits "First Last" into first and last names (assume exactly one space).
+  Return only valid C# code in a single file.
+test_code: |
+  public class DeconstHelperTests
+  {
+      [Fact]
+      public void Deconstruct_BasicCase()
+      {
+          DeconstHelper.Deconstruct("John Doe", out var first, out var last);
+          first.Should().Be("John");
+          last.Should().Be("Doe");
+      }
+      [Fact]
+      public void Deconstruct_SingleLetterName()
+      {
+          DeconstHelper.Deconstruct("A B", out var first, out var last);
+          first.Should().Be("A");
+          last.Should().Be("B");
+      }
+  }

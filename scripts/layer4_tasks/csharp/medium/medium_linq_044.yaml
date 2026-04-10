@@ -1,0 +1,60 @@
+name: medium_linq_044
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Pipeline<T> with a constructor accepting IEnumerable<T> source.
+  Expose a fluent builder:
+    Pipeline<T> Filter(Func<T, bool> predicate)
+    Pipeline<TOut> Transform<TOut>(Func<T, TOut> selector)
+    Pipeline<T> SortAscending<TKey>(Func<T, TKey> keySelector) where TKey : IComparable<TKey>
+    IEnumerable<T> Execute()
+  Operations are applied lazily in order of addition.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PipelineTests
+  {
+      [Fact]
+      public void Filter_ThenExecute()
+      {
+          var result = new Pipeline<int>(new[]{1,2,3,4,5})
+              .Filter(x => x % 2 == 0)
+              .Execute();
+          result.Should().BeEquivalentTo(new[]{2,4}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void SortAscending_ThenExecute()
+      {
+          var result = new Pipeline<int>(new[]{5,3,1,4,2})
+              .SortAscending(x => x)
+              .Execute();
+          result.Should().BeInAscendingOrder();
+      }
+
+      [Fact]
+      public void Transform_ReturnsNewType()
+      {
+          var result = new Pipeline<int>(new[]{1,2,3})
+              .Transform(x => x.ToString())
+              .Execute();
+          result.Should().BeEquivalentTo(new[]{"1","2","3"});
+      }
+
+      [Fact]
+      public void ChainedOperations()
+      {
+          var result = new Pipeline<int>(new[]{5,1,3,2,4})
+              .Filter(x => x > 2)
+              .SortAscending(x => x)
+              .Execute();
+          result.Should().BeEquivalentTo(new[]{3,4,5}, cfg => cfg.WithStrictOrdering());
+      }
+  }

@@ -1,0 +1,16 @@
+name: vocabulary_hard_037
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'Her equanimity in the face of disaster was admirable', which word best replaces 'equanimity'?
+  A) Panic
+  B) Composure
+  C) Grief
+  D) Anger
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

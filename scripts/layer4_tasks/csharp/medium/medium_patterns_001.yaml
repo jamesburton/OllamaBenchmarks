@@ -1,0 +1,44 @@
+name: medium_patterns_001
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  Records: Circle(double Radius), Rectangle(double Width, double Height), Triangle(double Base, double Height) — all inheriting from abstract record Shape.
+  A static class AreaCalculator with:
+    double ComputeArea(Shape shape)
+  using a switch expression.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AreaCalculatorTests
+  {
+      [Fact]
+      public void Circle_AreaCorrect()
+      {
+          AreaCalculator.ComputeArea(new Circle(5)).Should().BeApproximately(Math.PI * 25, 0.001);
+      }
+
+      [Fact]
+      public void Rectangle_AreaCorrect()
+      {
+          AreaCalculator.ComputeArea(new Rectangle(4, 3)).Should().Be(12.0);
+      }
+
+      [Fact]
+      public void Triangle_AreaCorrect()
+      {
+          AreaCalculator.ComputeArea(new Triangle(6, 4)).Should().Be(12.0);
+      }
+
+      [Fact]
+      public void Circle_Zero_ReturnsZero()
+      {
+          AreaCalculator.ComputeArea(new Circle(0)).Should().Be(0.0);
+      }
+  }

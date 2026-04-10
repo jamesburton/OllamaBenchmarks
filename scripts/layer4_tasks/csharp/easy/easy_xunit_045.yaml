@@ -1,0 +1,35 @@
+name: easy_xunit_045
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class MatrixUtils with static methods:
+    int[,] Transpose(int[,] matrix) returns the transpose of a 2D matrix
+    int[] FlattenRow(int[,] matrix, int rowIndex) returns a specific row as a 1D array
+  Return only valid C# code in a single file.
+test_code: |
+  public class MatrixUtilsTests
+  {
+      [Fact]
+      public void Transpose_TransposesMatrix()
+      {
+          var m = new int[,] { { 1, 2, 3 }, { 4, 5, 6 } };
+          var t = MatrixUtils.Transpose(m);
+          t[0, 0].Should().Be(1);
+          t[1, 0].Should().Be(2);
+          t[0, 1].Should().Be(4);
+      }
+      [Fact]
+      public void FlattenRow_ReturnsCorrectRow()
+      {
+          var m = new int[,] { { 1, 2, 3 }, { 4, 5, 6 } };
+          MatrixUtils.FlattenRow(m, 1).Should().Equal(4, 5, 6);
+      }
+  }

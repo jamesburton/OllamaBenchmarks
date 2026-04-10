@@ -1,0 +1,15 @@
+name: syllogisms_easy_005
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All mammals have hearts.
+  2. All whales are mammals.
+  3. Moby is a whale.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "Moby has a heart."
+validator_config: {}

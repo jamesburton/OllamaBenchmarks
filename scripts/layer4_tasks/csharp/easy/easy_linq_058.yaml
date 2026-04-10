@@ -1,0 +1,32 @@
+name: easy_linq_058
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Mapper with a static method:
+    List<double> SelectSqrt(IEnumerable<int> numbers)
+  that returns the square root of each non-negative number using LINQ Where (non-negative filter) + Select(Math.Sqrt) + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MapperTests
+  {
+      [Fact]
+      public void SelectSqrt_BasicCase()
+      {
+          var result = Mapper.SelectSqrt(new[]{4,9,16});
+          result.Should().BeEquivalentTo(new[]{2.0,3.0,4.0}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void SelectSqrt_FiltersNegatives()
+      {
+          var result = Mapper.SelectSqrt(new[]{4,-1,9});
+          result.Should().HaveCount(2);
+      }
+  }

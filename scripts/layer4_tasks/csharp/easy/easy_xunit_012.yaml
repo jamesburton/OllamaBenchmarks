@@ -1,0 +1,35 @@
+name: easy_xunit_012
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface ICache<TKey, TValue> with methods:
+    void Set(TKey key, TValue value)
+    bool TryGet(TKey key, out TValue? value)
+  A class MemoryCache<TKey, TValue> implementing ICache<TKey, TValue> using a Dictionary
+  Return only valid C# code in a single file.
+test_code: |
+  public class MemoryCacheTests
+  {
+      [Fact]
+      public void Set_And_TryGet_ReturnsValue()
+      {
+          var cache = new MemoryCache<string, int>();
+          cache.Set("count", 42);
+          cache.TryGet("count", out var value).Should().BeTrue();
+          value.Should().Be(42);
+      }
+      [Fact]
+      public void TryGet_MissingKey_ReturnsFalse()
+      {
+          var cache = new MemoryCache<string, string>();
+          cache.TryGet("missing", out _).Should().BeFalse();
+      }
+  }

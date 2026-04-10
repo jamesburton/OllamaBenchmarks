@@ -1,0 +1,38 @@
+name: easy_async_025
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncCollector with a static method:
+    async Task<List<T>> ToListAsync<T>(IAsyncEnumerable<T> source)
+  that collects all items from an async enumerable into a list using await foreach.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncCollectorTests
+  {
+      private static async IAsyncEnumerable<string> GetStrings()
+      {
+          yield return "a";
+          yield return "b";
+          yield return "c";
+      }
+      [Fact]
+      public async Task ToListAsync_ReturnsAllItems()
+      {
+          var result = await AsyncCollector.ToListAsync(GetStrings());
+          result.Should().BeEquivalentTo(new[]{"a","b","c"}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public async Task ToListAsync_EmptySource_ReturnsEmpty()
+      {
+          var result = await AsyncCollector.ToListAsync(AsyncEnumerable.Empty<int>());
+          result.Should().BeEmpty();
+      }
+  }

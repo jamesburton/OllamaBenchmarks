@@ -1,0 +1,36 @@
+name: easy_xunit_026
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class RomanNumerals with a static method:
+    string ToRoman(int number) converts integer (1-3999) to Roman numeral string
+    throws ArgumentOutOfRangeException if number < 1 or > 3999
+  Return only valid C# code in a single file.
+test_code: |
+  public class RomanNumeralsTests
+  {
+      [Theory]
+      [InlineData(1, "I")]
+      [InlineData(4, "IV")]
+      [InlineData(9, "IX")]
+      [InlineData(42, "XLII")]
+      [InlineData(1994, "MCMXCIV")]
+      public void ToRoman_ConvertsCorrectly(int number, string expected)
+      {
+          RomanNumerals.ToRoman(number).Should().Be(expected);
+      }
+      [Fact]
+      public void ToRoman_OutOfRange_ThrowsArgumentOutOfRangeException()
+      {
+          var act = () => RomanNumerals.ToRoman(0);
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+  }

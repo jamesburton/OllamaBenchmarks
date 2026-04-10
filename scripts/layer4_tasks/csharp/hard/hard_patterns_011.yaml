@@ -1,0 +1,87 @@
+name: hard_patterns_011
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A chain-of-responsibility pattern for HTTP request authorization:
+  Abstract class AuthorizationHandler:
+    void SetNext(AuthorizationHandler handler)
+    AuthorizationResult Authorize(AuthContext context)
+    abstract AuthorizationResult HandleAuthorization(AuthContext context)
+  Concrete handlers:
+    ApiKeyHandler — passes if context.Headers contains "X-Api-Key" with a non-empty value.
+    JwtHandler — passes if context.Headers contains "Authorization" starting with "Bearer ".
+    IpWhitelistHandler(IReadOnlyList<string> allowedIps) — passes if context.ClientIp is in list.
+    RoleRequirementHandler(string requiredRole) — passes if context.Roles contains requiredRole.
+  Record: AuthContext(Dictionary<string,string> Headers, string ClientIp, IReadOnlyList<string> Roles).
+  Record: AuthorizationResult(bool IsAuthorized, string Reason).
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuthorizationChainTests
+  {
+      [Fact]
+      public void ApiKeyHandler_AuthorizeWithValidKey()
+      {
+          var handler = new ApiKeyHandler();
+          var ctx = new AuthContext(new(){ ["X-Api-Key"] = "secret" }, "1.2.3.4", Array.Empty<string>());
+          handler.Authorize(ctx).IsAuthorized.Should().BeTrue();
+      }
+
+      [Fact]
+      public void ApiKeyHandler_NoKey_Unauthorized()
+      {
+          var handler = new ApiKeyHandler();
+          var ctx = new AuthContext(new(), "1.2.3.4", Array.Empty<string>());
+          handler.Authorize(ctx).IsAuthorized.Should().BeFalse();
+      }
+
+      [Fact]
+      public void JwtHandler_ValidBearer_Authorized()
+      {
+          var handler = new JwtHandler();
+          var ctx = new AuthContext(new(){ ["Authorization"] = "Bearer mytoken" }, "1.1.1.1", Array.Empty<string>());
+          handler.Authorize(ctx).IsAuthorized.Should().BeTrue();
+      }
+
+      [Fact]
+      public void IpWhitelist_AllowedIp_Authorized()
+      {
+          var handler = new IpWhitelistHandler(new[] { "10.0.0.1" });
+          var ctx = new AuthContext(new(), "10.0.0.1", Array.Empty<string>());
+          handler.Authorize(ctx).IsAuthorized.Should().BeTrue();
+      }
+
+      [Fact]
+      public void IpWhitelist_BlockedIp_Unauthorized()
+      {
+          var handler = new IpWhitelistHandler(new[] { "10.0.0.1" });
+          var ctx = new AuthContext(new(), "192.168.1.1", Array.Empty<string>());
+          handler.Authorize(ctx).IsAuthorized.Should().BeFalse();
+      }
+
+      [Fact]
+      public void ChainedHandlers_FirstPassAuthorizesRequest()
+      {
+          var apiKey = new ApiKeyHandler();
+          var jwt = new JwtHandler();
+          apiKey.SetNext(jwt);
+          var ctx = new AuthContext(new(), "1.1.1.1", Array.Empty<string>());
+          ctx.Headers["X-Api-Key"] = "key123";
+          apiKey.Authorize(ctx).IsAuthorized.Should().BeTrue();
+      }
+
+      [Fact]
+      public void RoleHandler_MissingRole_Unauthorized()
+      {
+          var handler = new RoleRequirementHandler("Admin");
+          var ctx = new AuthContext(new(), "1.1.1.1", new[] { "User" });
+          handler.Authorize(ctx).IsAuthorized.Should().BeFalse();
+      }
+  }

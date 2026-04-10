@@ -1,0 +1,23 @@
+name: technical_medium_068
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a notice reminding users to complete their profile before accessing premium features.
+  Keep it under 50 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "profile"
+    - "complete"
+    - "premium"
+    - "features"
+    - "access"
+    - "required"
+    - "information"
+    - "unlock"
+  min_words: 8
+  max_words: 50

@@ -1,0 +1,14 @@
+name: number_theory_hard_001
+category: maths
+subcategory: number_theory
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Find the smallest positive integer x such that x is congruent to 3 (mod 7) and x is congruent to 5 (mod 11).
+  Reply with only the number.
+expected_answer: "38"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

@@ -1,0 +1,22 @@
+name: rewriting_medium_137
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'The new system is less efficient than the old one in some ways but better in others, though the overall assessment depends on how you look at it.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "new system"
+    - "efficient"
+    - "depends"
+    - "criteria"
+    - "trade-off"
+    - "compared"
+  min_words: 5
+  max_words: 25

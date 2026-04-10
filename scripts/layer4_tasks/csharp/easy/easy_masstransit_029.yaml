@@ -1,0 +1,41 @@
+name: easy_masstransit_029
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record ConfigurationChanged(string Key, string OldValue, string NewValue, string ChangedBy)
+  A consumer class ConfigurationChangedConsumer that implements IConsumer<ConfigurationChanged>:
+    Has a public List<string> ChangedKeys = new()
+    Consume method adds Key to ChangedKeys if OldValue != NewValue
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class ConfigurationChangedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_ValueChanged_AddsKey()
+      {
+          var consumer = new ConfigurationChangedConsumer();
+          var context = Substitute.For<ConsumeContext<ConfigurationChanged>>();
+          context.Message.Returns(new ConfigurationChanged("timeout", "30", "60", "admin"));
+          await consumer.Consume(context);
+          consumer.ChangedKeys.Should().Contain("timeout");
+      }
+      [Fact]
+      public async Task Consume_SameValue_NotAdded()
+      {
+          var consumer = new ConfigurationChangedConsumer();
+          var context = Substitute.For<ConsumeContext<ConfigurationChanged>>();
+          context.Message.Returns(new ConfigurationChanged("key", "value", "value", "admin"));
+          await consumer.Consume(context);
+          consumer.ChangedKeys.Should().BeEmpty();
+      }
+  }

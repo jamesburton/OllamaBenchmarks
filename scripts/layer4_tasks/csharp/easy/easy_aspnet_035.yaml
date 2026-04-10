@@ -1,0 +1,36 @@
+name: easy_aspnet_035
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TenantOptions with:
+    [Required] string TenantId { get; set; }
+    string BaseUrl { get; set; } = "https://api.example.com"
+    int TimeoutSeconds { get; set; } = 30
+  and a static class TenantHelper with:
+    string GetApiUrl(TenantOptions options, string path)
+  that returns $"{options.BaseUrl}/tenants/{options.TenantId}/{path.TrimStart('/')}".
+  Return only valid C# code in a single file.
+test_code: |
+  public class TenantHelperTests
+  {
+      [Fact]
+      public void GetApiUrl_BasicCase()
+      {
+          var opts = new TenantOptions { TenantId = "t1" };
+          TenantHelper.GetApiUrl(opts, "users").Should().Be("https://api.example.com/tenants/t1/users");
+      }
+      [Fact]
+      public void GetApiUrl_PathWithLeadingSlash_RemovesSlash()
+      {
+          var opts = new TenantOptions { TenantId = "t2", BaseUrl = "https://custom.com" };
+          TenantHelper.GetApiUrl(opts, "/items").Should().Be("https://custom.com/tenants/t2/items");
+      }
+  }

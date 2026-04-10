@@ -1,0 +1,21 @@
+name: rewriting_hard_117
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'It is the position of the management team that the proposed restructuring initiative will, in the final analysis, result in a more efficient and cost-effective organisational structure.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "restructuring"
+    - "efficient"
+    - "cost"
+    - "management"
+    - "believes"
+  min_words: 5
+  max_words: 22

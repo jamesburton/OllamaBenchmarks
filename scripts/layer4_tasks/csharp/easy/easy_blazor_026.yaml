@@ -1,0 +1,35 @@
+name: easy_blazor_026
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class SortableListComponent that extends ComponentBase with:
+    [Parameter] List<string> Items { get; set; } = new()
+    bool SortAscending { get; set; } = true
+    List<string> SortedItems => SortAscending ? Items.OrderBy(x => x).ToList() : Items.OrderByDescending(x => x).ToList()
+    void ToggleSort() flips SortAscending
+  Return only valid C# code in a single file.
+test_code: |
+  public class SortableListComponentTests
+  {
+      [Fact]
+      public void SortedItems_AscendingOrder()
+      {
+          var c = new SortableListComponent { Items = new List<string> { "Banana", "Apple", "Cherry" } };
+          c.SortedItems.Should().ContainInOrder("Apple", "Banana", "Cherry");
+      }
+      [Fact]
+      public void ToggleSort_ChangesToDescending()
+      {
+          var c = new SortableListComponent { Items = new List<string> { "B", "A", "C" } };
+          c.ToggleSort();
+          c.SortedItems.First().Should().Be("C");
+      }
+  }

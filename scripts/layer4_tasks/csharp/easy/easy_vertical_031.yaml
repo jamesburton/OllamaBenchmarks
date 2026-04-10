@@ -1,0 +1,38 @@
+name: easy_vertical_031
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record LibraryBook(string Isbn, string Title, string Author, bool IsAvailable)
+  A class Library with:
+    void AddBook(LibraryBook book)
+    bool Checkout(string isbn) marks book as unavailable, returns false if already checked out
+    bool Return(string isbn) marks book as available, returns false if not found
+    List<LibraryBook> GetAvailable() returns books where IsAvailable is true
+  Return only valid C# code in a single file.
+test_code: |
+  public class LibraryTests
+  {
+      [Fact]
+      public void Checkout_SuccessfulCheckout_ReturnsTrueAndMarksUnavailable()
+      {
+          var library = new Library();
+          library.AddBook(new LibraryBook("978-1", "Clean Code", "Martin", true));
+          library.Checkout("978-1").Should().BeTrue();
+          library.GetAvailable().Should().BeEmpty();
+      }
+      [Fact]
+      public void Checkout_AlreadyCheckedOut_ReturnsFalse()
+      {
+          var library = new Library();
+          library.AddBook(new LibraryBook("978-1", "DDD", "Evans", false));
+          library.Checkout("978-1").Should().BeFalse();
+      }
+  }

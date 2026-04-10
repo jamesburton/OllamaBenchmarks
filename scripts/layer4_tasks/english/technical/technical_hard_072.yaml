@@ -1,0 +1,24 @@
+name: technical_hard_072
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a notice informing users that their account has been temporarily suspended due to suspected fraudulent activity.
+  Explain next steps clearly.
+  Keep it under 70 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "suspended"
+    - "fraudulent"
+    - "activity"
+    - "contact"
+    - "restore"
+    - "access"
+    - "security"
+    - "appeal"
+  min_words: 10
+  max_words: 70

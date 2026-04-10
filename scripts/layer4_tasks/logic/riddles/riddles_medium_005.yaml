@@ -1,0 +1,16 @@
+name: riddles_medium_005
+category: logic
+subcategory: riddles
+difficulty: medium
+weight: 2
+validator_type: logic
+max_tokens: 64
+prompt: |
+  What can run but never walks, has a mouth but never talks, has a head but never weeps, has a bed but never sleeps?
+  Reply with only the answer.
+expected_answer: "A river"
+validator_config:
+  accepted_answers:
+  - "A river"
+  - "river"
+  - "a river"

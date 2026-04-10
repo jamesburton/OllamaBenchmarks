@@ -1,0 +1,42 @@
+name: easy_aspnet_036
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class EndpointHandlers with a static method:
+    IResult GetContent(string format)
+  that:
+    - Returns Results.Ok("<html>Hello</html>") with text/html content type if format is "html"
+    - Returns Results.Ok("{\"message\":\"Hello\"}") for "json"
+    - Returns Results.BadRequest("Unknown format") otherwise
+  Use Results.Content for html/json cases with appropriate content types.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EndpointHandlersTests
+  {
+      [Fact]
+      public void GetContent_Html_ReturnsContent()
+      {
+          var result = EndpointHandlers.GetContent("html");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.ContentHttpResult>();
+      }
+      [Fact]
+      public void GetContent_Json_ReturnsContent()
+      {
+          var result = EndpointHandlers.GetContent("json");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.ContentHttpResult>();
+      }
+      [Fact]
+      public void GetContent_Unknown_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.GetContent("xml");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+  }

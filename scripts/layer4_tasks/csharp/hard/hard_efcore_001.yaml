@@ -1,0 +1,104 @@
+name: hard_efcore_001
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core entities: Customer(int Id, string Name, string Email, List<Order> Orders),
+  Order(int Id, int CustomerId, Customer Customer, DateTime PlacedAt, List<OrderLine> Lines),
+  OrderLine(int Id, int OrderId, string ProductName, decimal UnitPrice, int Qty).
+  DbContext: ShopDbContext with DbSets for each entity.
+  Use SQLite in-memory. Seed with 2 customers, 3 orders, multiple lines.
+  Class CustomerOrderRepository(ShopDbContext db):
+    Task<Customer?> GetWithOrdersAsync(int customerId, CancellationToken ct) — eager loads Orders and Lines.
+    Task<IReadOnlyList<CustomerSpend>> GetTopSpendersAsync(int topN, CancellationToken ct) —
+      joins customers to orders to lines, computes TotalSpend (UnitPrice*Qty), returns top N.
+    Task<IReadOnlyList<Order>> GetRecentOrdersAsync(int days, CancellationToken ct)
+  Record: CustomerSpend(string Name, decimal TotalSpend).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CustomerOrderRepositoryTests : IDisposable
+  {
+      private readonly ShopDbContext _db;
+      private readonly CustomerOrderRepository _repo;
+
+      public CustomerOrderRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<ShopDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new ShopDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData(_db);
+          _repo = new CustomerOrderRepository(_db);
+      }
+
+      private static void SeedData(ShopDbContext db)
+      {
+          var c1 = new Customer { Name = "Alice", Email = "alice@example.com" };
+          var c2 = new Customer { Name = "Bob",   Email = "bob@example.com" };
+          db.Customers.AddRange(c1, c2);
+          db.SaveChanges();
+          db.Orders.AddRange(
+              new Order { CustomerId = c1.Id, PlacedAt = DateTime.UtcNow.AddDays(-2),
+                  Lines = new(){ new(){ ProductName="Widget", UnitPrice=10m, Qty=3 } } },
+              new Order { CustomerId = c1.Id, PlacedAt = DateTime.UtcNow.AddDays(-1),
+                  Lines = new(){ new(){ ProductName="Gadget", UnitPrice=25m, Qty=1 } } },
+              new Order { CustomerId = c2.Id, PlacedAt = DateTime.UtcNow.AddDays(-5),
+                  Lines = new(){ new(){ ProductName="Widget", UnitPrice=10m, Qty=10 } } }
+          );
+          db.SaveChanges();
+      }
+
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task GetWithOrders_LoadsOrdersAndLines()
+      {
+          var c = await _repo.GetWithOrdersAsync(1, CancellationToken.None);
+          c.Should().NotBeNull();
+          c!.Orders.Should().NotBeEmpty();
+          c.Orders[0].Lines.Should().NotBeEmpty();
+      }
+
+      [Fact]
+      public async Task GetWithOrders_UnknownId_ReturnsNull()
+      {
+          var c = await _repo.GetWithOrdersAsync(9999, CancellationToken.None);
+          c.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task GetTopSpenders_ReturnsCorrectOrder()
+      {
+          var result = await _repo.GetTopSpendersAsync(2, CancellationToken.None);
+          result.Should().HaveCount(2);
+          result[0].TotalSpend.Should().BeGreaterThanOrEqualTo(result[1].TotalSpend);
+      }
+
+      [Fact]
+      public async Task GetTopSpenders_SpendCalculationCorrect()
+      {
+          var result = await _repo.GetTopSpendersAsync(1, CancellationToken.None);
+          result[0].TotalSpend.Should().Be(100m);
+      }
+
+      [Fact]
+      public async Task GetRecentOrders_FiltersCorrectly()
+      {
+          var result = await _repo.GetRecentOrdersAsync(3, CancellationToken.None);
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetRecentOrders_ZeroDays_ReturnsEmpty()
+      {
+          var result = await _repo.GetRecentOrdersAsync(0, CancellationToken.None);
+          result.Should().BeEmpty();
+      }
+  }

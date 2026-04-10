@@ -1,0 +1,30 @@
+name: easy_patterns_006
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Interpolator with a static method:
+    string FormatPerson(string name, int age)
+  that returns a string like "Name: Alice, Age: 30" using string interpolation.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InterpolatorTests
+  {
+      [Fact]
+      public void FormatPerson_BasicCase()
+      {
+          Interpolator.FormatPerson("Alice", 30).Should().Be("Name: Alice, Age: 30");
+      }
+      [Fact]
+      public void FormatPerson_DifferentValues()
+      {
+          Interpolator.FormatPerson("Bob", 25).Should().Be("Name: Bob, Age: 25");
+      }
+  }

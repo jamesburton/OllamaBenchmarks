@@ -1,0 +1,119 @@
+name: hard_masstransit_010
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit saga with timeout support:
+  Messages:
+    record SubmitPayment(Guid PaymentId, decimal Amount, string Currency);
+    record PaymentAuthorized(Guid PaymentId, string AuthCode);
+    record PaymentCaptured(Guid PaymentId);
+    record PaymentExpired(Guid PaymentId);
+    record PaymentFailed(Guid PaymentId, string Reason);
+
+  States: Submitted, Authorized, Captured, Expired, Failed.
+  PaymentSaga : MassTransitStateMachine<PaymentState>
+  Transitions:
+    Initially + SubmitPayment -> Submitted (schedule PaymentExpired after 30s)
+    Submitted + PaymentAuthorized -> Authorized (unschedule expiry)
+    Authorized + PaymentCaptured -> Captured (publish final event)
+    (any active) + PaymentExpired -> Expired
+    (any active) + PaymentFailed -> Failed
+
+  PaymentState: Guid CorrelationId, string CurrentState, decimal Amount, string Currency,
+    string? AuthCode, DateTime SubmittedAt.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaymentSagaTests
+  {
+      [Fact]
+      public async Task SubmitPayment_TransitionsToSubmitted()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<PaymentState, PaymentSaga>(new PaymentSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitPayment(id, 99.99m, "USD"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Submitted).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task PaymentAuthorized_TransitionsToAuthorized()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<PaymentState, PaymentSaga>(new PaymentSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitPayment(id, 50m, "EUR"));
+              await harness.InputQueueSendEndpoint.Send(new PaymentAuthorized(id, "AUTH-XYZ"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Authorized).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task FullCapture_TransitionsToCaptured()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<PaymentState, PaymentSaga>(new PaymentSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitPayment(id, 200m, "GBP"));
+              await harness.InputQueueSendEndpoint.Send(new PaymentAuthorized(id, "AUTH-ABC"));
+              await harness.InputQueueSendEndpoint.Send(new PaymentCaptured(id));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Captured).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task PaymentFailed_TransitionsToFailed()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<PaymentState, PaymentSaga>(new PaymentSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitPayment(id, 300m, "USD"));
+              await harness.InputQueueSendEndpoint.Send(new PaymentFailed(id, "Declined"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Failed).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SagaState_StoresAmountAndCurrency()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<PaymentState, PaymentSaga>(new PaymentSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitPayment(id, 123.45m, "CAD"));
+              var state = sagaHarness.Sagas.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Submitted);
+              state!.Amount.Should().Be(123.45m);
+              state.Currency.Should().Be("CAD");
+          }
+          finally { await harness.Stop(); }
+      }
+  }

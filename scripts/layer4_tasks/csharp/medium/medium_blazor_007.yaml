@@ -1,0 +1,79 @@
+name: medium_blazor_007
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class PaginationService with:
+    int CurrentPage { get; private set; } (starts at 1)
+    int PageSize { get; }
+    int TotalItems { get; private set; }
+    int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize)
+    bool HasPreviousPage => CurrentPage > 1
+    bool HasNextPage => CurrentPage < TotalPages
+    event Action? OnPageChanged
+    void SetTotalItems(int total)
+    void NextPage()
+    void PreviousPage()
+    void GoToPage(int page)
+  Constructor accepts int pageSize.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaginationServiceTests
+  {
+      [Fact]
+      public void DefaultPage_IsOne()
+      {
+          new PaginationService(10).CurrentPage.Should().Be(1);
+      }
+
+      [Fact]
+      public void TotalPages_CalculatesCorrectly()
+      {
+          var svc = new PaginationService(10);
+          svc.SetTotalItems(25);
+          svc.TotalPages.Should().Be(3);
+      }
+
+      [Fact]
+      public void NextPage_IncreasesPage()
+      {
+          var svc = new PaginationService(10);
+          svc.SetTotalItems(20);
+          svc.NextPage();
+          svc.CurrentPage.Should().Be(2);
+      }
+
+      [Fact]
+      public void PreviousPage_DecreasesPage()
+      {
+          var svc = new PaginationService(10);
+          svc.SetTotalItems(30);
+          svc.GoToPage(3);
+          svc.PreviousPage();
+          svc.CurrentPage.Should().Be(2);
+      }
+
+      [Fact]
+      public void HasNextPage_OnLastPage_ReturnsFalse()
+      {
+          var svc = new PaginationService(10);
+          svc.SetTotalItems(10);
+          svc.HasNextPage.Should().BeFalse();
+      }
+
+      [Fact]
+      public void NextPage_BeyondLastPage_DoesNotAdvance()
+      {
+          var svc = new PaginationService(10);
+          svc.SetTotalItems(10);
+          svc.NextPage();
+          svc.CurrentPage.Should().Be(1);
+      }
+  }

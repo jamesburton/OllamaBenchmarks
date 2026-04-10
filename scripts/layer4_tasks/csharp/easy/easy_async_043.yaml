@@ -1,0 +1,35 @@
+name: easy_async_043
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncQueue with a static method:
+    async Task<Queue<T>> FillQueueAsync<T>(IEnumerable<Task<T>> tasks)
+  that awaits each task in sequence and enqueues results into a Queue<T>, then returns the queue.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncQueueTests
+  {
+      [Fact]
+      public async Task FillQueueAsync_FillsInOrder()
+      {
+          var tasks = new[]{Task.FromResult(1), Task.FromResult(2), Task.FromResult(3)};
+          var queue = await AsyncQueue.FillQueueAsync(tasks);
+          queue.Dequeue().Should().Be(1);
+          queue.Dequeue().Should().Be(2);
+          queue.Dequeue().Should().Be(3);
+      }
+      [Fact]
+      public async Task FillQueueAsync_Empty_ReturnsEmptyQueue()
+      {
+          var queue = await AsyncQueue.FillQueueAsync(Array.Empty<Task<int>>());
+          queue.Should().BeEmpty();
+      }
+  }

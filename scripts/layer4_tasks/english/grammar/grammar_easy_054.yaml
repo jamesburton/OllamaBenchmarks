@@ -1,0 +1,15 @@
+name: grammar_easy_054
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Their going to the park.
+  B) They're going to the park.
+  C) There going to the park.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

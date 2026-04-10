@@ -1,0 +1,69 @@
+name: medium_efcore_017
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity FileRecord with: int Id, string FileName, string StoragePath, long SizeBytes, string MimeType, string OwnerId, DateTime UploadedAt.
+  A class FileDbContext : DbContext with DbSet<FileRecord> Files.
+  A class FileRepository with constructor accepting FileDbContext.
+  Methods:
+    Task<IEnumerable<FileRecord>> GetByOwnerAsync(string ownerId)
+    Task<long> GetTotalStorageUsedAsync(string ownerId)
+    Task<IEnumerable<FileRecord>> GetByMimeTypeAsync(string mimeType)
+    Task DeleteAsync(int fileId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class FileRepositoryTests : IAsyncLifetime
+  {
+      private FileDbContext _db = null!;
+      private FileRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<FileDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new FileDbContext(opts);
+          _repo = new FileRepository(_db);
+          _db.Files.AddRange(
+              new FileRecord { FileName = "a.jpg", StoragePath = "/a.jpg", SizeBytes = 1024, MimeType = "image/jpeg", OwnerId = "u1", UploadedAt = DateTime.UtcNow },
+              new FileRecord { FileName = "b.jpg", StoragePath = "/b.jpg", SizeBytes = 2048, MimeType = "image/jpeg", OwnerId = "u1", UploadedAt = DateTime.UtcNow },
+              new FileRecord { FileName = "c.pdf", StoragePath = "/c.pdf", SizeBytes = 512, MimeType = "application/pdf", OwnerId = "u2", UploadedAt = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByOwner_ReturnsCorrect()
+      {
+          (await _repo.GetByOwnerAsync("u1")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetTotalStorage_SumsCorrectly()
+      {
+          (await _repo.GetTotalStorageUsedAsync("u1")).Should().Be(3072L);
+      }
+
+      [Fact]
+      public async Task GetByMimeType_FiltersCorrectly()
+      {
+          (await _repo.GetByMimeTypeAsync("image/jpeg")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task Delete_RemovesRecord()
+      {
+          var id = _db.Files.First().Id;
+          await _repo.DeleteAsync(id);
+          _db.ChangeTracker.Clear();
+          (await _db.Files.FindAsync(id)).Should().BeNull();
+      }
+  }

@@ -1,0 +1,58 @@
+name: medium_linq_015
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Flight with: string FlightNo, string Origin, string Destination, DateTime Departure, int Seats.
+  A class FlightSearch with a constructor accepting IEnumerable<Flight> flights.
+  Expose:
+    IEnumerable<Flight> Search(string origin, string destination, DateTime date)
+      — flights matching origin+destination on the same calendar date as 'date', ordered by Departure asc
+    IEnumerable<RouteStats> RouteStats()
+      — distinct Origin+Destination pairs with TotalFlights and TotalSeats, ordered by TotalFlights desc
+  RouteStats is a record with: string Origin, string Destination, int TotalFlights, int TotalSeats.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FlightSearchTests
+  {
+      private readonly Flight[] _flights = {
+          new("AA1","LHR","JFK", new DateTime(2024,6,1,8,0,0),  180),
+          new("AA2","LHR","JFK", new DateTime(2024,6,1,14,0,0), 220),
+          new("BA1","JFK","LHR", new DateTime(2024,6,1,10,0,0), 200),
+          new("AA3","LHR","JFK", new DateTime(2024,6,2,9,0,0),  180),
+      };
+
+      [Fact]
+      public void Search_FindsTwoFlightsOnDate()
+      {
+          new FlightSearch(_flights).Search("LHR","JFK",new DateTime(2024,6,1)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Search_OrderedByDeparture()
+      {
+          var result = new FlightSearch(_flights).Search("LHR","JFK",new DateTime(2024,6,1)).ToList();
+          result[0].FlightNo.Should().Be("AA1");
+      }
+
+      [Fact]
+      public void RouteStats_CorrectRouteCount()
+      {
+          new FlightSearch(_flights).RouteStats().Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void RouteStats_LHRJFKHasThreeFlights()
+      {
+          var stats = new FlightSearch(_flights).RouteStats().First(r => r.Origin == "LHR");
+          stats.TotalFlights.Should().Be(3);
+          stats.TotalSeats.Should().Be(580);
+      }
+  }

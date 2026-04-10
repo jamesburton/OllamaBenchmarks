@@ -1,0 +1,15 @@
+name: grammar_easy_021
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) I saw he and his brother at the store.
+  B) I saw him and his brother at the store.
+  C) I saw him and he is brother at the store.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

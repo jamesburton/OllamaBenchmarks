@@ -1,0 +1,97 @@
+name: hard_linq_013
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: MenuItem(int Id, string Section, string Name, decimal Price, bool Available).
+  A class MenuOptimiser with constructor accepting IEnumerable<MenuItem> items.
+  Methods:
+    IEnumerable<SectionMenu> BuildSectionMenus() — per Section, lists only Available items
+      ordered by Price ascending. Includes SectionName and Items list.
+    IEnumerable<MenuItem> SearchAvailable(string query) — case-insensitive search in Name
+      across available items, ordered by Price ascending.
+    IEnumerable<PriceBandSummary> PriceBands() — groups all items into bands:
+      "Budget" (<=10), "Mid" (>10 and <=25), "Premium" (>25).
+      Per band: ItemCount, AvailableCount. Orders by band name ascending.
+    decimal AveragePriceForSection(string section) — average price of available items.
+      Throws KeyNotFoundException if no available items in section.
+  Records: SectionMenu(string SectionName, IReadOnlyList<MenuItem> Items),
+           PriceBandSummary(string Band, int ItemCount, int AvailableCount).
+  Return only valid C# code in a single file.
+test_code: |
+  public class MenuOptimiserTests
+  {
+      private static readonly List<MenuItem> Items = new()
+      {
+          new(1, "Starters", "Soup",       5.50m,  true),
+          new(2, "Starters", "Bruschetta", 7.00m,  false),
+          new(3, "Mains",    "Pasta",     12.00m,  true),
+          new(4, "Mains",    "Steak",     28.00m,  true),
+          new(5, "Mains",    "Salad",      9.50m,  false),
+          new(6, "Desserts", "Ice Cream",  6.00m,  true),
+          new(7, "Desserts", "Cheesecake",11.00m,  true),
+      };
+
+      [Fact]
+      public void BuildSectionMenus_MainsHasTwoAvailable()
+      {
+          var result = new MenuOptimiser(Items).BuildSectionMenus().ToList();
+          result.First(s => s.SectionName == "Mains").Items.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void BuildSectionMenus_StartersExcludesUnavailable()
+      {
+          var result = new MenuOptimiser(Items).BuildSectionMenus().ToList();
+          result.First(s => s.SectionName == "Starters").Items
+                .Should().NotContain(m => m.Name == "Bruschetta");
+      }
+
+      [Fact]
+      public void SearchAvailable_FindsPartialMatch()
+      {
+          var result = new MenuOptimiser(Items).SearchAvailable("ice").ToList();
+          result.Should().ContainSingle(m => m.Name == "Ice Cream");
+      }
+
+      [Fact]
+      public void PriceBands_BudgetCountIsTwo()
+      {
+          var result = new MenuOptimiser(Items).PriceBands().ToList();
+          result.First(b => b.Band == "Budget").ItemCount.Should().Be(2);
+      }
+
+      [Fact]
+      public void PriceBands_PremiumAvailableCountIsOne()
+      {
+          var result = new MenuOptimiser(Items).PriceBands().ToList();
+          result.First(b => b.Band == "Premium").AvailableCount.Should().Be(1);
+      }
+
+      [Fact]
+      public void AveragePriceForSection_MainsCorrect()
+      {
+          var avg = new MenuOptimiser(Items).AveragePriceForSection("Mains");
+          avg.Should().Be((12.00m + 28.00m) / 2m);
+      }
+
+      [Fact]
+      public void AveragePriceForSection_NoAvailableItems_ThrowsKeyNotFoundException()
+      {
+          var act = () => new MenuOptimiser(Items).AveragePriceForSection("Starters");
+          act.Should().Throw<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public void SearchAvailable_NoMatch_ReturnsEmpty()
+      {
+          new MenuOptimiser(Items).SearchAvailable("xyznotfound").Should().BeEmpty();
+      }
+  }

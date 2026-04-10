@@ -1,0 +1,87 @@
+name: hard_linq_003
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Invoice(int Id, int CustomerId, DateOnly Date, List<InvoiceLine> Lines) and
+  InvoiceLine(string Product, decimal UnitPrice, int Qty).
+  A class InvoiceQueryEngine with constructor accepting IEnumerable<Invoice> invoices.
+  Methods:
+    IEnumerable<CustomerSpend> TopSpenders(int topN) — computes total spend per customer
+      (sum of UnitPrice*Qty across all lines), returns top N ordered by TotalSpend descending.
+    IEnumerable<Invoice> InvoicesInRange(DateOnly from, DateOnly to) — inclusive date filter.
+    IEnumerable<ProductRevenue> ProductRevenueSummary() — groups all lines across all
+      invoices by Product, sums revenue (UnitPrice*Qty), orders by Revenue descending.
+  Records: CustomerSpend(int CustomerId, decimal TotalSpend), ProductRevenue(string Product, decimal Revenue).
+  Return only valid C# code in a single file.
+test_code: |
+  public class InvoiceQueryEngineTests
+  {
+      private static readonly List<Invoice> Invoices = new()
+      {
+          new(1, 10, new DateOnly(2024,1,5),  new(){ new("Widget",10m,3), new("Gadget",25m,2) }),
+          new(2, 10, new DateOnly(2024,2,10), new(){ new("Widget",10m,5) }),
+          new(3, 20, new DateOnly(2024,1,20), new(){ new("Gadget",25m,4) }),
+          new(4, 30, new DateOnly(2024,3,1),  new(){ new("Widget",10m,1) }),
+      };
+
+      [Fact]
+      public void TopSpenders_ReturnsCorrectTopN()
+      {
+          var result = new InvoiceQueryEngine(Invoices).TopSpenders(2).ToList();
+          result.Should().HaveCount(2);
+          result[0].CustomerId.Should().Be(10);
+      }
+
+      [Fact]
+      public void TopSpenders_Customer10SpendIsCorrect()
+      {
+          var result = new InvoiceQueryEngine(Invoices).TopSpenders(3).ToList();
+          var c10 = result.First(c => c.CustomerId == 10);
+          c10.TotalSpend.Should().Be(10m*3 + 25m*2 + 10m*5);
+      }
+
+      [Fact]
+      public void InvoicesInRange_FiltersByDate()
+      {
+          var result = new InvoiceQueryEngine(Invoices)
+              .InvoicesInRange(new DateOnly(2024,1,1), new DateOnly(2024,1,31)).ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void InvoicesInRange_NoResultsForFutureRange()
+      {
+          var result = new InvoiceQueryEngine(Invoices)
+              .InvoicesInRange(new DateOnly(2025,1,1), new DateOnly(2025,12,31)).ToList();
+          result.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void ProductRevenueSummary_WidgetRevenueCorrect()
+      {
+          var result = new InvoiceQueryEngine(Invoices).ProductRevenueSummary().ToList();
+          var widget = result.First(p => p.Product == "Widget");
+          widget.Revenue.Should().Be(10m*(3+5+1));
+      }
+
+      [Fact]
+      public void ProductRevenueSummary_OrderedByRevenueDescending()
+      {
+          var result = new InvoiceQueryEngine(Invoices).ProductRevenueSummary().ToList();
+          result.Select(r => r.Revenue).Should().BeInDescendingOrder();
+      }
+
+      [Fact]
+      public void TopSpenders_EmptyInput_ReturnsEmpty()
+      {
+          new InvoiceQueryEngine(Array.Empty<Invoice>()).TopSpenders(5).Should().BeEmpty();
+      }
+  }

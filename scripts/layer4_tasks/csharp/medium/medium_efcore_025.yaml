@@ -1,0 +1,69 @@
+name: medium_efcore_025
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Comment with: int Id, int PostId, string AuthorId, string Content, bool IsApproved, DateTime CreatedAt, int? ParentCommentId.
+  A class CommentDbContext : DbContext with DbSet<Comment> Comments and self-referencing relationship.
+  A class CommentRepository with constructor accepting CommentDbContext.
+  Methods:
+    Task<IEnumerable<Comment>> GetForPostAsync(int postId)
+    Task<IEnumerable<Comment>> GetPendingApprovalAsync()
+    Task ApproveAsync(int commentId)
+    Task<IEnumerable<Comment>> GetRepliesAsync(int parentCommentId)
+  GetForPostAsync returns only approved comments.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CommentRepositoryTests : IAsyncLifetime
+  {
+      private CommentDbContext _db = null!;
+      private CommentRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<CommentDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new CommentDbContext(opts);
+          _repo = new CommentRepository(_db);
+          _db.Comments.AddRange(
+              new Comment { Id = 1, PostId = 1, AuthorId = "u1", Content = "Great post!", IsApproved = true, CreatedAt = DateTime.UtcNow, ParentCommentId = null },
+              new Comment { Id = 2, PostId = 1, AuthorId = "u2", Content = "Spam!", IsApproved = false, CreatedAt = DateTime.UtcNow, ParentCommentId = null },
+              new Comment { Id = 3, PostId = 1, AuthorId = "u3", Content = "I agree!", IsApproved = true, CreatedAt = DateTime.UtcNow, ParentCommentId = 1 });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetForPost_ReturnsOnlyApproved()
+      {
+          (await _repo.GetForPostAsync(1)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetPendingApproval_ReturnsPending()
+      {
+          (await _repo.GetPendingApprovalAsync()).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task Approve_SetsApproved()
+      {
+          await _repo.ApproveAsync(2);
+          _db.ChangeTracker.Clear();
+          (await _db.Comments.FindAsync(2))!.IsApproved.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task GetReplies_ReturnsChildren()
+      {
+          (await _repo.GetRepliesAsync(1)).Should().HaveCount(1);
+      }
+  }

@@ -1,0 +1,39 @@
+name: medium_patterns_022
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Trie for string prefix search.
+  Expose: void Insert(string word), bool Search(string word), bool StartsWith(string prefix), IEnumerable<string> WordsWithPrefix(string prefix).
+  Return only valid C# code in a single file.
+test_code: |
+  public class TrieTests
+  {
+      private static Trie Build(params string[] words) { var t = new Trie(); foreach (var w in words) t.Insert(w); return t; }
+
+      [Fact]
+      public void Search_Existing_True() { Build("apple","app").Search("apple").Should().BeTrue(); }
+
+      [Fact]
+      public void Search_NonExisting_False() { Build("apple").Search("app").Should().BeFalse(); }
+
+      [Fact]
+      public void StartsWith_ValidPrefix_True() { Build("apple").StartsWith("app").Should().BeTrue(); }
+
+      [Fact]
+      public void WordsWithPrefix_ReturnsMatching()
+      {
+          Build("apple","app","application","banana").WordsWithPrefix("app")
+              .Should().BeEquivalentTo(new[]{"apple","app","application"});
+      }
+
+      [Fact]
+      public void Search_EmptyTrie_False() { new Trie().Search("x").Should().BeFalse(); }
+  }

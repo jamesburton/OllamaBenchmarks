@@ -1,0 +1,16 @@
+name: vocabulary_medium_093
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The prefix 'inter-' (as in 'international') means:
+  A) Within
+  B) Between
+  C) Against
+  D) Before
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

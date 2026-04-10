@@ -1,0 +1,65 @@
+name: medium_aspnet_019
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record CacheEntry<T>(T Value, DateTime ExpiresAt).
+  A class ResponseCachingMiddleware with constructor accepting RequestDelegate next and TimeSpan cacheDuration.
+  Cache GET responses in a ConcurrentDictionary<string, CacheEntry<string>> keyed by path+query.
+  Return cached response if not expired; otherwise call next, cache the response body, and return it.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ResponseCachingMiddlewareTests
+  {
+      [Fact]
+      public async Task FirstRequest_CallsNext()
+      {
+          var callCount = 0;
+          var mw = new ResponseCachingMiddleware(_ => { callCount++; return Task.CompletedTask; }, TimeSpan.FromMinutes(1));
+          var ctx = new DefaultHttpContext();
+          ctx.Request.Method = "GET";
+          ctx.Request.Path = "/api/data";
+          ctx.Response.Body = new System.IO.MemoryStream();
+          await mw.InvokeAsync(ctx);
+          callCount.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task SecondRequest_UsesCachedResponse()
+      {
+          var callCount = 0;
+          var mw = new ResponseCachingMiddleware(ctx => { callCount++; return Task.CompletedTask; }, TimeSpan.FromMinutes(1));
+          for (int i = 0; i < 2; i++)
+          {
+              var ctx = new DefaultHttpContext();
+              ctx.Request.Method = "GET";
+              ctx.Request.Path = "/api/data";
+              ctx.Response.Body = new System.IO.MemoryStream();
+              await mw.InvokeAsync(ctx);
+          }
+          callCount.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task PostRequest_NotCached()
+      {
+          var callCount = 0;
+          var mw = new ResponseCachingMiddleware(_ => { callCount++; return Task.CompletedTask; }, TimeSpan.FromMinutes(1));
+          for (int i = 0; i < 2; i++)
+          {
+              var ctx = new DefaultHttpContext();
+              ctx.Request.Method = "POST";
+              ctx.Request.Path = "/api/data";
+              ctx.Response.Body = new System.IO.MemoryStream();
+              await mw.InvokeAsync(ctx);
+          }
+          callCount.Should().Be(2);
+      }
+  }

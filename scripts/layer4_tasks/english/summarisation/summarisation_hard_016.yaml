@@ -1,0 +1,18 @@
+name: summarisation_hard_016
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Algorithmic pricing, now common in retail and hospitality sectors, allows companies to adjust prices in real time based on demand signals, competitor data, and individual customer profiles. While proponents argue this maximises market efficiency, consumer advocates contend it enables discrimination and erodes price transparency.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "algorithmic"
+    - "pricing"
+    - "discrimination"
+    - "transparency"
+  max_words: 25

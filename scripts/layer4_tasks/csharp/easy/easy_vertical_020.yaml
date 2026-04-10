@@ -1,0 +1,38 @@
+name: easy_vertical_020
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Transaction(string Id, string AccountId, decimal Amount, string Type)
+  A class AccountLedger with:
+    void Record(Transaction transaction)
+    decimal GetBalance(string accountId) sums deposits (Type == "credit") minus withdrawals (Type == "debit")
+    List<Transaction> GetHistory(string accountId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class AccountLedgerTests
+  {
+      [Fact]
+      public void GetBalance_CalculatesCorrectly()
+      {
+          var ledger = new AccountLedger();
+          ledger.Record(new Transaction("t1", "acc1", 100m, "credit"));
+          ledger.Record(new Transaction("t2", "acc1", 30m, "debit"));
+          ledger.GetBalance("acc1").Should().Be(70m);
+      }
+      [Fact]
+      public void GetHistory_ReturnsAccountTransactions()
+      {
+          var ledger = new AccountLedger();
+          ledger.Record(new Transaction("t1", "acc1", 50m, "credit"));
+          ledger.Record(new Transaction("t2", "acc2", 20m, "credit"));
+          ledger.GetHistory("acc1").Should().HaveCount(1);
+      }
+  }

@@ -1,0 +1,39 @@
+name: easy_efcore_027
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Job with properties: int Id, string Name, string Status, DateTime CreatedAt
+  A DbContext class JobContext with:
+    DbSet<Job> Jobs { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class JobRepository with:
+    Dictionary<string, int> GetCountByStatus(JobContext context)
+  that returns a dictionary of status -> count for all jobs.
+  Return only valid C# code in a single file.
+test_code: |
+  public class JobRepositoryTests
+  {
+      [Fact]
+      public void GetCountByStatus_BasicCase()
+      {
+          using var context = new JobContext();
+          context.Database.EnsureCreated();
+          context.Jobs.AddRange(
+              new Job { Name = "A", Status = "pending", CreatedAt = DateTime.UtcNow },
+              new Job { Name = "B", Status = "running", CreatedAt = DateTime.UtcNow },
+              new Job { Name = "C", Status = "pending", CreatedAt = DateTime.UtcNow });
+          context.SaveChanges();
+          var result = JobRepository.GetCountByStatus(context);
+          result["pending"].Should().Be(2);
+          result["running"].Should().Be(1);
+      }
+  }

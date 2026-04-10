@@ -1,0 +1,57 @@
+name: medium_masstransit_006
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record PasswordResetRequested(Guid UserId, string Email, string ResetToken, DateTime ExpiresAt).
+  A consumer PasswordResetConsumer implementing IConsumer<PasswordResetRequested>.
+  Constructor accepts IEmailSender emailSender.
+  Interface IEmailSender with: Task SendAsync(string to, string subject, string body).
+  In Consume: sends email with reset token to user.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record PasswordResetRequested(Guid UserId, string Email, string ResetToken, DateTime ExpiresAt); }
+  global using Contracts;
+
+  public class PasswordResetConsumerTests
+  {
+      [Fact]
+      public async Task Consume_SendsResetEmail()
+      {
+          var sender = Substitute.For<IEmailSender>();
+          var consumer = new PasswordResetConsumer(sender);
+          var ctx = Substitute.For<ConsumeContext<PasswordResetRequested>>();
+          ctx.Message.Returns(new PasswordResetRequested(Guid.NewGuid(), "user@test.com", "token123", DateTime.UtcNow.AddHours(1)));
+          await consumer.Consume(ctx);
+          await sender.Received(1).SendAsync("user@test.com", Arg.Any<string>(), Arg.Any<string>());
+      }
+
+      [Fact]
+      public async Task Consume_BodyContainsToken()
+      {
+          var sender = Substitute.For<IEmailSender>();
+          var consumer = new PasswordResetConsumer(sender);
+          var ctx = Substitute.For<ConsumeContext<PasswordResetRequested>>();
+          ctx.Message.Returns(new PasswordResetRequested(Guid.NewGuid(), "user@test.com", "mytoken999", DateTime.UtcNow.AddHours(1)));
+          await consumer.Consume(ctx);
+          await sender.Received(1).SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Is<string>(b => b.Contains("mytoken999")));
+      }
+
+      [Fact]
+      public async Task Consume_SendsExactlyOnce()
+      {
+          var sender = Substitute.For<IEmailSender>();
+          var consumer = new PasswordResetConsumer(sender);
+          var ctx = Substitute.For<ConsumeContext<PasswordResetRequested>>();
+          ctx.Message.Returns(new PasswordResetRequested(Guid.NewGuid(), "a@b.com", "t", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await sender.Received(1).SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
+      }
+  }

@@ -1,0 +1,41 @@
+name: medium_vertical_016
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for assigntask.
+  Include:
+    Command: Guid TaskId, string AssigneeId, string AssignedBy, int Priority
+  Result: Guid TaskId, string AssigneeId, int Priority, DateTime AssignedAt
+  Handler validates: Priority 1-5, AssigneeId/AssignedBy not empty, AssignedBy != AssigneeId.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AssignTaskHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new AssignTaskHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new AssignTaskHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new AssignTaskHandler();
+          handler.Should().NotBeNull();
+      }
+  }

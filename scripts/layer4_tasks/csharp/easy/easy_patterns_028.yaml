@@ -1,0 +1,37 @@
+name: easy_patterns_028
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Guard with a static method:
+    string ThrowIfNullOrEmpty(string? value, string paramName)
+  that throws ArgumentNullException if value is null, ArgumentException if empty, or returns the value.
+  Return only valid C# code in a single file.
+test_code: |
+  public class GuardTests
+  {
+      [Fact]
+      public void ThrowIfNullOrEmpty_ValidValue_ReturnsValue()
+      {
+          Guard.ThrowIfNullOrEmpty("hello", "param").Should().Be("hello");
+      }
+      [Fact]
+      public void ThrowIfNullOrEmpty_Null_ThrowsArgumentNullException()
+      {
+          Action act = () => Guard.ThrowIfNullOrEmpty(null, "param");
+          act.Should().Throw<ArgumentNullException>();
+      }
+      [Fact]
+      public void ThrowIfNullOrEmpty_Empty_ThrowsArgumentException()
+      {
+          Action act = () => Guard.ThrowIfNullOrEmpty("", "param");
+          act.Should().Throw<ArgumentException>();
+      }
+  }

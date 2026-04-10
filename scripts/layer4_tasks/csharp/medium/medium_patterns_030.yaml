@@ -1,0 +1,45 @@
+name: medium_patterns_030
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ComparisonChain for multi-field comparators.
+    static ComparisonChain Start()
+    ComparisonChain ThenCompare<T>(T left, T right) where T : IComparable<T>
+    ComparisonChain ThenCompareDescending<T>(T left, T right) where T : IComparable<T>
+    int Result() — -1, 0, or 1
+  Return only valid C# code in a single file.
+test_code: |
+  public class ComparisonChainTests
+  {
+      [Fact]
+      public void SingleField_FirstLess_Negative()
+      {
+          ComparisonChain.Start().ThenCompare("Alice","Bob").Result().Should().BeLessThan(0);
+      }
+
+      [Fact]
+      public void TwoFields_FirstEqual_UsesSecond()
+      {
+          ComparisonChain.Start().ThenCompare("Alice","Alice").ThenCompare(25,30).Result().Should().BeLessThan(0);
+      }
+
+      [Fact]
+      public void AllEqual_Zero()
+      {
+          ComparisonChain.Start().ThenCompare(1,1).ThenCompare("x","x").Result().Should().Be(0);
+      }
+
+      [Fact]
+      public void Descending_Inverts()
+      {
+          ComparisonChain.Start().ThenCompareDescending(10,5).Result().Should().BeLessThan(0);
+      }
+  }

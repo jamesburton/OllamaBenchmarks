@@ -1,0 +1,14 @@
+name: number_theory_medium_005
+category: maths
+subcategory: number_theory
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  What is the sum of all prime numbers less than 20?
+  Reply with only the number.
+expected_answer: "77"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

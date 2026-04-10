@@ -1,0 +1,85 @@
+name: hard_xunit_012
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing domain model with invariants:
+  Class Money(decimal Amount, string Currency):
+    Throws ArgumentException if Amount < 0.
+    Throws ArgumentException if Currency is not 3 uppercase letters.
+    Money Add(Money other): throws if different currencies.
+    Money Subtract(Money other): throws if result < 0 or different currencies.
+    Money Multiply(decimal factor): throws if factor < 0.
+    bool Equals(Money other): value equality on Amount and Currency.
+    static Money Zero(string currency)
+
+  Class MoneyBag:
+    void Add(Money money): accumulates per currency.
+    Money Get(string currency): throws KeyNotFoundException if not found.
+    IReadOnlyDictionary<string, Money> GetAll()
+    Money Total(string targetCurrency): sums all amounts (throws if multiple currencies and no conversion).
+
+  Tests cover: invariants, arithmetic, currency mismatch, MoneyBag operations.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MoneyTests
+  {
+      [Fact]
+      public void Negative_Amount_Throws()
+      {
+          var act = () => new Money(-1, "USD");
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Invalid_Currency_Throws()
+      {
+          var act = () => new Money(10, "us");
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Add_SameCurrency_Succeeds()
+      {
+          var result = new Money(10, "USD").Add(new Money(5, "USD"));
+          result.Amount.Should().Be(15);
+          result.Currency.Should().Be("USD");
+      }
+
+      [Fact]
+      public void Add_DifferentCurrency_Throws()
+      {
+          var act = () => new Money(10, "USD").Add(new Money(5, "EUR"));
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Subtract_WouldBeNegative_Throws()
+      {
+          var act = () => new Money(5, "USD").Subtract(new Money(10, "USD"));
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void Multiply_NegativeFactor_Throws()
+      {
+          var act = () => new Money(10, "USD").Multiply(-1);
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void MoneyBag_Accumulates_PerCurrency()
+      {
+          var bag = new MoneyBag();
+          bag.Add(new Money(10, "USD"));
+          bag.Add(new Money(5, "USD"));
+          bag.Get("USD").Amount.Should().Be(15);
+      }
+  }

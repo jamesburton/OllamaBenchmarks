@@ -1,0 +1,60 @@
+name: medium_linq_050
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Shipment with: int Id, string Origin, string Destination, decimal Weight, string Status.
+  A class ShipmentTracker with a constructor accepting IEnumerable<Shipment> shipments.
+  Expose:
+    IEnumerable<Shipment> Pending() — Status == "Pending", ordered by Weight desc
+    Dictionary<string, RouteMetrics> RouteMetrics()
+      — key is "{Origin}->{Destination}", value has: int Count, decimal TotalWeight, decimal AvgWeight
+    IEnumerable<string> ActiveRoutes() — distinct Origin->Destination pairs with any Pending shipment
+  RouteMetrics is a record with: int Count, decimal TotalWeight, decimal AvgWeight.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShipmentTrackerTests
+  {
+      private readonly Shipment[] _shipments = {
+          new(1,"NYC","LAX", 10m,"Pending"),
+          new(2,"NYC","LAX", 20m,"Delivered"),
+          new(3,"NYC","SFO", 15m,"Pending"),
+          new(4,"LAX","SFO",  5m,"Pending"),
+      };
+
+      [Fact]
+      public void Pending_ThreeShipments_OrderedByWeightDesc()
+      {
+          var result = new ShipmentTracker(_shipments).Pending().ToList();
+          result.Should().HaveCount(3);
+          result[0].Weight.Should().Be(15m);
+      }
+
+      [Fact]
+      public void RouteMetrics_NYCLAXCorrect()
+      {
+          var metrics = new ShipmentTracker(_shipments).RouteMetrics();
+          metrics["NYC->LAX"].Count.Should().Be(2);
+          metrics["NYC->LAX"].TotalWeight.Should().Be(30m);
+      }
+
+      [Fact]
+      public void ActiveRoutes_ThreeRoutes()
+      {
+          new ShipmentTracker(_shipments).ActiveRoutes().Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void RouteMetrics_AvgWeightCorrect()
+      {
+          var metrics = new ShipmentTracker(_shipments).RouteMetrics();
+          metrics["NYC->LAX"].AvgWeight.Should().Be(15m);
+      }
+  }

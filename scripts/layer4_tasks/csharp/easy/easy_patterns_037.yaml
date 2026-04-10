@@ -1,0 +1,33 @@
+name: easy_patterns_037
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Maybe with a static method:
+    TResult? Map<T, TResult>(T? value, Func<T, TResult> transform) where T : class where TResult : class
+  that applies transform if value is not null, otherwise returns null.
+  Use the null-conditional pattern.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MaybeTests
+  {
+      [Fact]
+      public void Map_NonNull_AppliesTransform()
+      {
+          var result = Maybe.Map("hello", s => s.ToUpper());
+          result.Should().Be("HELLO");
+      }
+      [Fact]
+      public void Map_Null_ReturnsNull()
+      {
+          var result = Maybe.Map<string, string>(null, s => s.ToUpper());
+          result.Should().BeNull();
+      }
+  }

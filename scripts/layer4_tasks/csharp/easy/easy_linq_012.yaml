@@ -1,0 +1,31 @@
+name: easy_linq_012
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Stats with two static methods:
+    int Min(IEnumerable<int> numbers)
+    int Max(IEnumerable<int> numbers)
+  that return the minimum and maximum values respectively using LINQ Min and Max.
+  Return only valid C# code in a single file.
+test_code: |
+  public class StatsTests
+  {
+      [Fact]
+      public void Min_BasicCase()
+      {
+          Stats.Min(new[]{3,1,4,1,5}).Should().Be(1);
+      }
+      [Fact]
+      public void Max_BasicCase()
+      {
+          Stats.Max(new[]{3,1,4,1,5}).Should().Be(5);
+      }
+  }

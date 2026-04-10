@@ -1,0 +1,35 @@
+name: easy_linq_053
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Stats with a static method:
+    int Product(IEnumerable<int> numbers)
+  that returns the product of all numbers using LINQ Aggregate with seed of 1.
+  Return only valid C# code in a single file.
+test_code: |
+  public class StatsTests
+  {
+      [Fact]
+      public void Product_BasicCase()
+      {
+          Stats.Product(new[]{1,2,3,4,5}).Should().Be(120);
+      }
+      [Fact]
+      public void Product_SingleElement()
+      {
+          Stats.Product(new[]{7}).Should().Be(7);
+      }
+      [Fact]
+      public void Product_Empty_ReturnsOne()
+      {
+          Stats.Product(Array.Empty<int>()).Should().Be(1);
+      }
+  }

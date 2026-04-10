@@ -1,0 +1,104 @@
+name: hard_blazor_025
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor virtual scroll / infinite loading service:
+  Records:
+    VirtualScrollState(int TotalItems, int LoadedCount, int FirstVisibleIndex, int LastVisibleIndex, bool IsLoading)
+    ScrollPage<T>(int PageIndex, IReadOnlyList<T> Items, bool HasMore)
+
+  Interface IInfiniteDataSource<T>:
+    Task<ScrollPage<T>> LoadPageAsync(int pageIndex, int pageSize, CancellationToken ct)
+
+  Class VirtualScrollService<T>:
+    Constructor takes IInfiniteDataSource<T>, pageSize (default 20).
+    Task<IReadOnlyList<T>> InitializeAsync(CancellationToken ct): loads first page.
+    Task<IReadOnlyList<T>> LoadMoreAsync(CancellationToken ct):
+      If already loading or no more data, returns empty list.
+      Loads next page, appends to internal buffer.
+    VirtualScrollState GetState()
+    IReadOnlyList<T> GetLoadedItems()
+    bool HasMore { get; }
+    event Action? OnStateChanged
+  Return only valid C# code in a single file.
+test_code: |
+  public class VirtualScrollServiceTests
+  {
+      private IInfiniteDataSource<string> CreateSource(int totalItems)
+      {
+          var source = Substitute.For<IInfiniteDataSource<string>>();
+          source.LoadPageAsync(Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+              .Returns(ci => {
+                  var pageIndex = ci.Arg<int>();
+                  var pageSize = ci.ArgAt<int>(1);
+                  var skip = pageIndex * pageSize;
+                  var items = Enumerable.Range(skip + 1, Math.Min(pageSize, Math.Max(0, totalItems - skip)))
+                      .Select(i => $"item-{i}").ToList();
+                  return Task.FromResult(new ScrollPage<string>(pageIndex, items, skip + pageSize < totalItems));
+              });
+          return source;
+      }
+
+      [Fact]
+      public async Task Initialize_LoadsFirstPage()
+      {
+          var svc = new VirtualScrollService<string>(CreateSource(50), 10);
+          var items = await svc.InitializeAsync(CancellationToken.None);
+          items.Should().HaveCount(10);
+          items.First().Should().Be("item-1");
+      }
+
+      [Fact]
+      public async Task LoadMore_AppendsItems()
+      {
+          var svc = new VirtualScrollService<string>(CreateSource(50), 10);
+          await svc.InitializeAsync(CancellationToken.None);
+          await svc.LoadMoreAsync(CancellationToken.None);
+          svc.GetLoadedItems().Should().HaveCount(20);
+      }
+
+      [Fact]
+      public async Task HasMore_FalseWhenAllLoaded()
+      {
+          var svc = new VirtualScrollService<string>(CreateSource(5), 10);
+          await svc.InitializeAsync(CancellationToken.None);
+          svc.HasMore.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task LoadMore_NoMoreData_ReturnsEmpty()
+      {
+          var svc = new VirtualScrollService<string>(CreateSource(5), 10);
+          await svc.InitializeAsync(CancellationToken.None);
+          var more = await svc.LoadMoreAsync(CancellationToken.None);
+          more.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task GetState_ReflectsLoadedCount()
+      {
+          var svc = new VirtualScrollService<string>(CreateSource(50), 10);
+          await svc.InitializeAsync(CancellationToken.None);
+          var state = svc.GetState();
+          state.LoadedCount.Should().Be(10);
+          state.TotalItems.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task OnStateChanged_FiredOnLoad()
+      {
+          var svc = new VirtualScrollService<string>(CreateSource(30), 10);
+          var fired = false;
+          svc.OnStateChanged += () => fired = true;
+          await svc.InitializeAsync(CancellationToken.None);
+          fired.Should().BeTrue();
+      }
+  }

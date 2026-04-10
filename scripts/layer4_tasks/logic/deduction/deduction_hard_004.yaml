@@ -1,0 +1,16 @@
+name: deduction_hard_004
+category: logic
+subcategory: deduction
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If it is raining and cold, the roads are icy.
+  2. If roads are icy, drive slowly or stay home.
+  3. It is raining and cold.
+  4. You are driving.
+  What must you do? Reply with only the conclusion.
+expected_answer: "Drive slowly."
+validator_config: {}

@@ -1,0 +1,58 @@
+name: medium_masstransit_008
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record SubscriptionExpiring(Guid SubscriptionId, string UserId, DateTime ExpiresAt, string PlanName).
+  A consumer SubscriptionExpiryConsumer implementing IConsumer<SubscriptionExpiring>.
+  Constructor accepts INotificationService notificationService.
+  Interface INotificationService with: Task SendRenewalReminderAsync(string userId, string planName, DateTime expiresAt).
+  In Consume: calls SendRenewalReminderAsync.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record SubscriptionExpiring(Guid SubscriptionId, string UserId, DateTime ExpiresAt, string PlanName); }
+  global using Contracts;
+
+  public class SubscriptionExpiryConsumerTests
+  {
+      [Fact]
+      public async Task Consume_SendsRenewalReminder()
+      {
+          var svc = Substitute.For<INotificationService>();
+          var consumer = new SubscriptionExpiryConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SubscriptionExpiring>>();
+          var expiry = DateTime.UtcNow.AddDays(3);
+          ctx.Message.Returns(new SubscriptionExpiring(Guid.NewGuid(), "u1", expiry, "Pro"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).SendRenewalReminderAsync("u1", "Pro", expiry);
+      }
+
+      [Fact]
+      public async Task Consume_PassesCorrectPlan()
+      {
+          var svc = Substitute.For<INotificationService>();
+          var consumer = new SubscriptionExpiryConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SubscriptionExpiring>>();
+          ctx.Message.Returns(new SubscriptionExpiring(Guid.NewGuid(), "u2", DateTime.UtcNow, "Enterprise"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).SendRenewalReminderAsync(Arg.Any<string>(), "Enterprise", Arg.Any<DateTime>());
+      }
+
+      [Fact]
+      public async Task Consume_CallsOnce()
+      {
+          var svc = Substitute.For<INotificationService>();
+          var consumer = new SubscriptionExpiryConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SubscriptionExpiring>>();
+          ctx.Message.Returns(new SubscriptionExpiring(Guid.NewGuid(), "u3", DateTime.UtcNow, "Basic"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).SendRenewalReminderAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<DateTime>());
+      }
+  }

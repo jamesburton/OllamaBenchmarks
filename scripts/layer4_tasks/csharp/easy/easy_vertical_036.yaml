@@ -1,0 +1,39 @@
+name: easy_vertical_036
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Contact(string Id, string Name, string Phone, string? Email)
+  A class AddressBook with:
+    void Add(Contact contact)
+    Contact? FindById(string id)
+    List<Contact> Search(string query) returns contacts where Name or Phone contains query (case-insensitive)
+    bool Delete(string id) removes contact, returns false if not found
+  Return only valid C# code in a single file.
+test_code: |
+  public class AddressBookTests
+  {
+      [Fact]
+      public void Search_FindsByName()
+      {
+          var book = new AddressBook();
+          book.Add(new Contact("c1", "Alice Smith", "555-1111", null));
+          book.Add(new Contact("c2", "Bob Jones", "555-2222", null));
+          book.Search("alice").Should().HaveCount(1);
+      }
+      [Fact]
+      public void Delete_RemovesContact()
+      {
+          var book = new AddressBook();
+          book.Add(new Contact("c1", "Carol", "555-3333", "carol@test.com"));
+          book.Delete("c1").Should().BeTrue();
+          book.FindById("c1").Should().BeNull();
+      }
+  }

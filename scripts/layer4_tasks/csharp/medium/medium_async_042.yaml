@@ -1,0 +1,51 @@
+name: medium_async_042
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TaskCompletionTracker<T> wrapping TaskCompletionSource<T>.
+  Exposes: Task<T> Awaitable, void Complete(T result), void Fail(Exception ex), void Cancel(), bool IsCompleted.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaskCompletionTrackerTests
+  {
+      [Fact]
+      public async Task Complete_ReturnsResult()
+      {
+          var t = new TaskCompletionTracker<int>();
+          t.Complete(42);
+          (await t.Awaitable).Should().Be(42);
+      }
+
+      [Fact]
+      public async Task Fail_Throws()
+      {
+          var t = new TaskCompletionTracker<int>();
+          t.Fail(new InvalidOperationException("err"));
+          await Assert.ThrowsAsync<InvalidOperationException>(() => t.Awaitable);
+      }
+
+      [Fact]
+      public async Task Cancel_Cancels()
+      {
+          var t = new TaskCompletionTracker<int>();
+          t.Cancel();
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() => t.Awaitable);
+      }
+
+      [Fact]
+      public void IsCompleted_AfterComplete_True()
+      {
+          var t = new TaskCompletionTracker<string>();
+          t.IsCompleted.Should().BeFalse();
+          t.Complete("done");
+          t.IsCompleted.Should().BeTrue();
+      }
+  }

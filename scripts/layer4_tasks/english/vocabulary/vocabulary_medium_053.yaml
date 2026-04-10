@@ -1,0 +1,16 @@
+name: vocabulary_medium_053
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word has the most POSITIVE connotation?
+  A) Manipulative
+  B) Persuasive
+  C) Scheming
+  D) Cunning
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

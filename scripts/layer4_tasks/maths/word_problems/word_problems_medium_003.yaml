@@ -1,0 +1,14 @@
+name: word_problems_medium_003
+category: maths
+subcategory: word_problems
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  Alice can complete a job in 5 hours and Bob can complete the same job in 10 hours. How many hours does it take them working together?
+  Reply with only the number.
+expected_answer: "3.33"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

@@ -1,0 +1,31 @@
+name: easy_linq_013
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Deduplicator with a static method:
+    List<int> Unique(IEnumerable<int> numbers)
+  that returns distinct values in original order using LINQ Distinct + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DeduplicatorTests
+  {
+      [Fact]
+      public void Unique_RemovesDuplicates()
+      {
+          var result = Deduplicator.Unique(new[]{1,2,2,3,1,4});
+          result.Should().BeEquivalentTo(new[]{1,2,3,4}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void Unique_NoDuplicates_ReturnsSame()
+      {
+          Deduplicator.Unique(new[]{1,2,3}).Should().BeEquivalentTo(new[]{1,2,3}, cfg => cfg.WithStrictOrdering());
+      }
+  }

@@ -1,0 +1,30 @@
+name: easy_linq_051
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Checker with a static method:
+    bool AnyContains(IEnumerable<string> items, string substring)
+  that returns true if any string contains the given substring using LINQ Any.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CheckerTests
+  {
+      [Fact]
+      public void AnyContains_Found_ReturnsTrue()
+      {
+          Checker.AnyContains(new[]{"hello world","foo"}, "world").Should().BeTrue();
+      }
+      [Fact]
+      public void AnyContains_NotFound_ReturnsFalse()
+      {
+          Checker.AnyContains(new[]{"hello","world"}, "xyz").Should().BeFalse();
+      }
+  }

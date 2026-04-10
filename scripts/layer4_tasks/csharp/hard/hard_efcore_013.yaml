@@ -1,0 +1,99 @@
+name: hard_efcore_013
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core left join (outer join) using LINQ:
+  Entities: Employee(int Id, string Name, string Department, int? ManagerId),
+  PerformanceReview(int Id, int EmployeeId, decimal Rating, string Reviewer, DateTime ReviewDate).
+  DbContext: HrDbContext.
+  Class HrRepository(HrDbContext db):
+    Task<IReadOnlyList<EmployeeReviewSummary>> GetEmployeesWithLatestReviewAsync(CancellationToken ct) —
+      left joins employees to their latest review (null if no review exists).
+    Task<IReadOnlyList<EmployeeReviewSummary>> GetUnreviewedEmployeesAsync(CancellationToken ct) —
+      employees who have no performance reviews.
+    Task<IReadOnlyList<ManagerReport>> GetManagerReportsAsync(CancellationToken ct) —
+      for each manager (non-null ManagerId employees grouped), name of manager, count of reports,
+      average rating of all reports' latest reviews.
+  Records: EmployeeReviewSummary(string EmployeeName, string Department, decimal? LatestRating, DateTime? ReviewDate),
+           ManagerReport(string ManagerName, int ReportCount, double? AverageRating).
+  Use SQLite in-memory with seed data.
+  Return only valid C# code in a single file.
+test_code: |
+  public class HrRepositoryTests : IDisposable
+  {
+      private readonly HrDbContext _db;
+      private readonly HrRepository _repo;
+
+      public HrRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<HrDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new HrDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData();
+          _repo = new HrRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          var mgr  = new Employee { Name = "Alice", Department = "Eng", ManagerId = null };
+          var emp1 = new Employee { Name = "Bob",   Department = "Eng", ManagerId = null };
+          var emp2 = new Employee { Name = "Carol",  Department = "HR",  ManagerId = null };
+          _db.Employees.AddRange(mgr, emp1, emp2);
+          _db.SaveChanges();
+          emp1.ManagerId = mgr.Id; emp2.ManagerId = mgr.Id;
+          _db.SaveChanges();
+          _db.PerformanceReviews.AddRange(
+              new PerformanceReview { EmployeeId = mgr.Id,  Rating = 4.5m, Reviewer = "CEO",   ReviewDate = DateTime.UtcNow.AddDays(-30) },
+              new PerformanceReview { EmployeeId = emp1.Id, Rating = 3.8m, Reviewer = "Alice", ReviewDate = DateTime.UtcNow.AddDays(-10) }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task GetEmployeesWithLatestReview_IncludesNullForUnreviewed()
+      {
+          var result = await _repo.GetEmployeesWithLatestReviewAsync(CancellationToken.None);
+          result.Should().Contain(r => r.EmployeeName == "Carol" && r.LatestRating == null);
+      }
+
+      [Fact]
+      public async Task GetEmployeesWithLatestReview_LatestRatingCorrect()
+      {
+          var result = await _repo.GetEmployeesWithLatestReviewAsync(CancellationToken.None);
+          result.First(r => r.EmployeeName == "Bob").LatestRating.Should().Be(3.8m);
+      }
+
+      [Fact]
+      public async Task GetUnreviewedEmployees_ReturnsOnlyUnreviewed()
+      {
+          var result = await _repo.GetUnreviewedEmployeesAsync(CancellationToken.None);
+          result.Should().ContainSingle(r => r.EmployeeName == "Carol");
+          result.Should().NotContain(r => r.EmployeeName == "Bob");
+      }
+
+      [Fact]
+      public async Task GetManagerReports_AliceManagesTwoReports()
+      {
+          var result = await _repo.GetManagerReportsAsync(CancellationToken.None);
+          var alice = result.First(m => m.ManagerName == "Alice");
+          alice.ReportCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task GetManagerReports_AverageRatingIsCorrect()
+      {
+          var result = await _repo.GetManagerReportsAsync(CancellationToken.None);
+          var alice = result.First(m => m.ManagerName == "Alice");
+          alice.AverageRating.Should().BeApproximately(3.8, 0.01);
+      }
+  }

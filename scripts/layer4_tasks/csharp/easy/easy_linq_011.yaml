@@ -1,0 +1,31 @@
+name: easy_linq_011
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Stats with a static method:
+    double Average(IEnumerable<int> numbers)
+  that returns the average of all numbers using LINQ Average.
+  Throw InvalidOperationException if the sequence is empty (LINQ Average does this by default).
+  Return only valid C# code in a single file.
+test_code: |
+  public class StatsTests
+  {
+      [Fact]
+      public void Average_BasicCase()
+      {
+          Stats.Average(new[]{2,4,6}).Should().Be(4.0);
+      }
+      [Fact]
+      public void Average_SingleElement()
+      {
+          Stats.Average(new[]{7}).Should().Be(7.0);
+      }
+  }

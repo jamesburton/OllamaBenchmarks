@@ -1,0 +1,20 @@
+name: rewriting_medium_114
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'The purpose of the training session is to ensure that staff are equipped with the necessary skills.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "training"
+    - "equip"
+    - "staff"
+    - "skills"
+  min_words: 4
+  max_words: 15

@@ -1,0 +1,43 @@
+name: easy_aspnet_037
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class MonitoringOptions with:
+    bool EnableMetrics { get; set; } = true
+    bool EnableTracing { get; set; } = true
+    string MetricsEndpoint { get; set; } = "/metrics"
+    string ServiceName { get; set; } = "my-service"
+  and a static class MonitoringHelper with:
+    IEnumerable<string> GetEnabledFeatures(MonitoringOptions options)
+  that returns "metrics" if EnableMetrics, "tracing" if EnableTracing.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MonitoringHelperTests
+  {
+      [Fact]
+      public void GetEnabledFeatures_BothEnabled_ReturnsBoth()
+      {
+          var opts = new MonitoringOptions { EnableMetrics = true, EnableTracing = true };
+          MonitoringHelper.GetEnabledFeatures(opts).Should().BeEquivalentTo(new[]{"metrics","tracing"});
+      }
+      [Fact]
+      public void GetEnabledFeatures_NoneEnabled_ReturnsEmpty()
+      {
+          var opts = new MonitoringOptions { EnableMetrics = false, EnableTracing = false };
+          MonitoringHelper.GetEnabledFeatures(opts).Should().BeEmpty();
+      }
+      [Fact]
+      public void GetEnabledFeatures_OnlyMetrics_ReturnsMetrics()
+      {
+          var opts = new MonitoringOptions { EnableMetrics = true, EnableTracing = false };
+          MonitoringHelper.GetEnabledFeatures(opts).Should().BeEquivalentTo(new[]{"metrics"});
+      }
+  }

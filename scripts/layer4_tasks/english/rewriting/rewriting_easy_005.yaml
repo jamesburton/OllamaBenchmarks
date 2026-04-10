@@ -1,0 +1,19 @@
+name: rewriting_easy_005
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in the passive voice:
+  'The teacher marked the essays.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "were marked"
+    - "essays were"
+    - "the essays"
+  min_words: 4
+  max_words: 15

@@ -1,0 +1,16 @@
+name: deduction_medium_017
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All mammals are animals.
+  2. All animals are living things.
+  3. All living things need energy.
+  4. A cat is a mammal.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "A cat needs energy."
+validator_config: {}

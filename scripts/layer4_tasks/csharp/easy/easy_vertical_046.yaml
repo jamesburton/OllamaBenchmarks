@@ -1,0 +1,40 @@
+name: easy_vertical_046
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Pledge(string UserId, string CampaignId, decimal Amount)
+  A class Crowdfunding with:
+    void AddPledge(Pledge pledge)
+    decimal TotalRaised(string campaignId) returns sum of all pledges for campaign
+    int BackerCount(string campaignId) returns number of unique backers for campaign
+    List<Pledge> GetPledgesForCampaign(string campaignId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class CrowdfundingTests
+  {
+      [Fact]
+      public void TotalRaised_SumsPledgesCorrectly()
+      {
+          var cf = new Crowdfunding();
+          cf.AddPledge(new Pledge("u1", "c1", 50m));
+          cf.AddPledge(new Pledge("u2", "c1", 75m));
+          cf.TotalRaised("c1").Should().Be(125m);
+      }
+      [Fact]
+      public void BackerCount_CountsUniqueBacker()
+      {
+          var cf = new Crowdfunding();
+          cf.AddPledge(new Pledge("u1", "c1", 10m));
+          cf.AddPledge(new Pledge("u1", "c1", 20m));
+          cf.AddPledge(new Pledge("u2", "c1", 30m));
+          cf.BackerCount("c1").Should().Be(2);
+      }
+  }

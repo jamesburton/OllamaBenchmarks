@@ -1,0 +1,16 @@
+name: riddles_medium_009
+category: logic
+subcategory: riddles
+difficulty: medium
+weight: 2
+validator_type: logic
+max_tokens: 64
+prompt: |
+  What is so fragile that saying its name breaks it?
+  Reply with only the answer.
+expected_answer: "Silence"
+validator_config:
+  accepted_answers:
+  - "Silence"
+  - "silence"
+  - "quiet"

@@ -1,0 +1,18 @@
+name: summarisation_medium_032
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A longitudinal study tracking 10,000 people over 20 years found that chronic sleep deprivation significantly increases the risk of dementia. Participants who averaged fewer than six hours of sleep per night had a 30 percent higher likelihood of developing cognitive decline. Researchers believe sleep plays a critical role in clearing amyloid plaques from the brain.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "sleep"
+    - "dementia"
+    - "cognitive"
+    - "amyloid"
+  max_words: 25

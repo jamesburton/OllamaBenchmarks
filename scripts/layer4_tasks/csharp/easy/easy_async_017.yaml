@@ -1,0 +1,37 @@
+name: easy_async_017
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncRepository with a private List<string> _items initialized empty, and methods:
+    async Task AddAsync(string item)     — adds item to the list using await Task.Yield() first
+    async Task<List<string>> GetAllAsync() — returns a copy of the list
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncRepositoryTests
+  {
+      [Fact]
+      public async Task AddAsync_ThenGetAll_ReturnsItem()
+      {
+          var repo = new AsyncRepository();
+          await repo.AddAsync("hello");
+          var items = await repo.GetAllAsync();
+          items.Should().Contain("hello");
+      }
+      [Fact]
+      public async Task AddAsync_Multiple_ReturnsAll()
+      {
+          var repo = new AsyncRepository();
+          await repo.AddAsync("a");
+          await repo.AddAsync("b");
+          var items = await repo.GetAllAsync();
+          items.Should().HaveCount(2);
+      }
+  }

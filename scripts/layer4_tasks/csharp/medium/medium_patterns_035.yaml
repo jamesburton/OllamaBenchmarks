@@ -1,0 +1,56 @@
+name: medium_patterns_035
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class GenericRepository<T> where T : class with constructor accepting List<T> storage.
+  Expose:
+    void Add(T entity)
+    T? FindFirst(Func<T, bool> predicate)
+    IEnumerable<T> FindAll(Func<T, bool> predicate)
+    bool Remove(Func<T, bool> predicate)
+    int Count
+  Return only valid C# code in a single file.
+test_code: |
+  public class Wgt { public int Id { get; set; } public string Name { get; set; } = ""; }
+
+  public class GenericRepositoryTests
+  {
+      [Fact]
+      public void Add_And_FindFirst()
+      {
+          var repo = new GenericRepository<Wgt>(new List<Wgt>());
+          repo.Add(new Wgt{Id=1,Name="A"});
+          repo.FindFirst(w => w.Id==1)!.Name.Should().Be("A");
+      }
+
+      [Fact]
+      public void FindAll_ReturnsMatching()
+      {
+          var repo = new GenericRepository<Wgt>(new List<Wgt>());
+          repo.Add(new Wgt{Id=1,Name="X"}); repo.Add(new Wgt{Id=2,Name="Y"}); repo.Add(new Wgt{Id=3,Name="X"});
+          repo.FindAll(w => w.Name=="X").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Remove_RemovesFirstMatch()
+      {
+          var repo = new GenericRepository<Wgt>(new List<Wgt>());
+          repo.Add(new Wgt{Id=1,Name="A"});
+          repo.Remove(w => w.Id==1).Should().BeTrue();
+          repo.Count.Should().Be(0);
+      }
+
+      [Fact]
+      public void Remove_NotFound_False()
+      {
+          new GenericRepository<Wgt>(new List<Wgt>()).Remove(w => w.Id==99).Should().BeFalse();
+      }
+  }

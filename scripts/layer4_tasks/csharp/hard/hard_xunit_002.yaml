@@ -1,0 +1,96 @@
+name: hard_xunit_002
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit collection fixture sharing expensive state:
+  [CollectionDefinition("Cache")] and CacheCollection with ICollectionFixture<CacheFixture>.
+
+  CacheFixture : IDisposable:
+    Creates an in-memory IMemoryCache.
+    Tracks access counts.
+    IMemoryCache Cache { get; }
+    int GetAccessCount(string key)
+    void RecordAccess(string key)
+
+  Class CacheService(IMemoryCache cache, CacheFixture fixture):
+    Task<T?> GetOrSetAsync<T>(string key, Func<Task<T>> factory, TimeSpan expiry, CancellationToken ct):
+      Checks cache; on miss calls factory, stores result, records access.
+    void Invalidate(string key)
+    int GetHitCount(string key): returns fixture access count.
+
+  Two test classes both marked [Collection("Cache")] share the same CacheFixture instance.
+  Return only valid C# code in a single file.
+test_code: |
+  [Collection("Cache")]
+  public class CacheServiceTests
+  {
+      private readonly CacheService _svc;
+      private readonly CacheFixture _fixture;
+
+      public CacheServiceTests(CacheFixture fixture)
+      {
+          _fixture = fixture;
+          _svc = new CacheService(fixture.Cache, fixture);
+      }
+
+      [Fact]
+      public async Task GetOrSet_Miss_CallsFactory()
+      {
+          var called = 0;
+          var result = await _svc.GetOrSetAsync("k1", async () => { called++; return "value1"; }, TimeSpan.FromMinutes(1), CancellationToken.None);
+          result.Should().Be("value1");
+          called.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task GetOrSet_Hit_DoesNotCallFactory()
+      {
+          await _svc.GetOrSetAsync("k2", async () => "cached", TimeSpan.FromMinutes(1), CancellationToken.None);
+          var called = 0;
+          await _svc.GetOrSetAsync("k2", async () => { called++; return "new"; }, TimeSpan.FromMinutes(1), CancellationToken.None);
+          called.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task Invalidate_RemovesFromCache()
+      {
+          await _svc.GetOrSetAsync("k3", async () => "v3", TimeSpan.FromMinutes(1), CancellationToken.None);
+          _svc.Invalidate("k3");
+          var called = 0;
+          await _svc.GetOrSetAsync("k3", async () => { called++; return "new"; }, TimeSpan.FromMinutes(1), CancellationToken.None);
+          called.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task GetOrSet_RecordsAccess()
+      {
+          await _svc.GetOrSetAsync("k4", async () => "v4", TimeSpan.FromMinutes(1), CancellationToken.None);
+          _svc.GetHitCount("k4").Should().BeGreaterThan(0);
+      }
+  }
+
+  [Collection("Cache")]
+  public class CacheService2Tests
+  {
+      private readonly CacheService _svc;
+
+      public CacheService2Tests(CacheFixture fixture)
+      {
+          _svc = new CacheService(fixture.Cache, fixture);
+      }
+
+      [Fact]
+      public async Task SharedFixture_IndependentKey()
+      {
+          var result = await _svc.GetOrSetAsync("shared-key", async () => 42, TimeSpan.FromMinutes(5), CancellationToken.None);
+          result.Should().Be(42);
+      }
+  }

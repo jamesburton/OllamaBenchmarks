@@ -1,0 +1,59 @@
+name: medium_linq_035
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record TimeSlot with: DayOfWeek Day, int StartHour, int EndHour.
+  A class WeeklySchedule with a constructor accepting IEnumerable<TimeSlot> slots.
+  Expose:
+    IEnumerable<TimeSlot> SlotsOn(DayOfWeek day) — slots for a given day ordered by StartHour
+    int TotalHours() — sum of (EndHour - StartHour) across all slots
+    bool HasGap(DayOfWeek day) — true if there is a gap between consecutive slots on that day
+  Return only valid C# code in a single file.
+test_code: |
+  public class WeeklyScheduleTests
+  {
+      private readonly TimeSlot[] _slots = {
+          new(DayOfWeek.Monday, 9, 11),
+          new(DayOfWeek.Monday, 13, 15),
+          new(DayOfWeek.Tuesday, 10, 12),
+          new(DayOfWeek.Tuesday, 12, 14),
+      };
+
+      [Fact]
+      public void SlotsOn_Monday_ReturnsTwoSlots()
+      {
+          new WeeklySchedule(_slots).SlotsOn(DayOfWeek.Monday).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void TotalHours_Is8()
+      {
+          new WeeklySchedule(_slots).TotalHours().Should().Be(8);
+      }
+
+      [Fact]
+      public void HasGap_Monday_True()
+      {
+          new WeeklySchedule(_slots).HasGap(DayOfWeek.Monday).Should().BeTrue();
+      }
+
+      [Fact]
+      public void HasGap_Tuesday_False()
+      {
+          new WeeklySchedule(_slots).HasGap(DayOfWeek.Tuesday).Should().BeFalse();
+      }
+
+      [Fact]
+      public void SlotsOn_Wednesday_ReturnsEmpty()
+      {
+          new WeeklySchedule(_slots).SlotsOn(DayOfWeek.Wednesday).Should().BeEmpty();
+      }
+  }

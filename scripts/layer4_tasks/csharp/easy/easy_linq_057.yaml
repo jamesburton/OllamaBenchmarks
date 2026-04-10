@@ -1,0 +1,31 @@
+name: easy_linq_057
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class SetOps with a static method:
+    List<int> Union(IEnumerable<int> first, IEnumerable<int> second)
+  that returns a union of both sequences without duplicates using LINQ Union + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SetOpsTests
+  {
+      [Fact]
+      public void Union_BasicCase()
+      {
+          var result = SetOps.Union(new[]{1,2,3}, new[]{3,4,5});
+          result.Should().BeEquivalentTo(new[]{1,2,3,4,5});
+      }
+      [Fact]
+      public void Union_NoDuplicates_ReturnsCombined()
+      {
+          SetOps.Union(new[]{1,2}, new[]{3,4}).Should().HaveCount(4);
+      }
+  }

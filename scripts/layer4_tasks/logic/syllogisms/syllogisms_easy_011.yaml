@@ -1,0 +1,15 @@
+name: syllogisms_easy_011
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All students study hard.
+  2. All who study hard pass exams.
+  3. Alice is a student.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "Alice passes exams."
+validator_config: {}

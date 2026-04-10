@@ -1,0 +1,21 @@
+name: rewriting_easy_081
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'He forgot his keys. He could not enter the house.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "keys"
+    - "enter"
+    - "house"
+    - "forgot"
+    - "could not"
+  min_words: 5
+  max_words: 15

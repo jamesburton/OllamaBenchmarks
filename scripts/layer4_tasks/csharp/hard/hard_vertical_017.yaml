@@ -1,0 +1,103 @@
+name: hard_vertical_017
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Async + observer + NSubstitute for sensor data ingestion:
+  Records:
+    SensorReading(string SensorId, string Type, double Value, string Unit, DateTime Timestamp)
+    AlertThreshold(string SensorType, double MinValue, double MaxValue, string AlertLevel)
+    SensorAlert(string SensorId, string Type, double Value, string AlertLevel, string Message, DateTime TriggeredAt)
+
+  Interface ISensorStorage:
+    Task SaveReadingAsync(SensorReading reading, CancellationToken ct)
+    Task<IReadOnlyList<SensorReading>> GetReadingsAsync(string sensorId, DateTime from, DateTime to, CancellationToken ct)
+
+  Interface IAlertDispatcher:
+    Task DispatchAsync(SensorAlert alert, CancellationToken ct)
+
+  Class SensorIngestionService(ISensorStorage storage, IAlertDispatcher dispatcher, IReadOnlyList<AlertThreshold> thresholds):
+    Task IngestAsync(SensorReading reading, CancellationToken ct):
+      Saves reading.
+      Checks thresholds for matching SensorType.
+      If value out of range, dispatches SensorAlert.
+    Task<SensorStats> GetStatsAsync(string sensorId, DateTime from, DateTime to, CancellationToken ct)
+  Record SensorStats(string SensorId, double Min, double Max, double Avg, int Count)
+  Return only valid C# code in a single file.
+test_code: |
+  public class SensorIngestionServiceTests
+  {
+      private readonly ISensorStorage _storage;
+      private readonly IAlertDispatcher _dispatcher;
+      private readonly IReadOnlyList<AlertThreshold> _thresholds;
+
+      public SensorIngestionServiceTests()
+      {
+          _storage = Substitute.For<ISensorStorage>();
+          _storage.SaveReadingAsync(Arg.Any<SensorReading>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          _dispatcher = Substitute.For<IAlertDispatcher>();
+          _dispatcher.DispatchAsync(Arg.Any<SensorAlert>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          _thresholds = new[] { new AlertThreshold("temperature", 0, 100, "Warning") };
+      }
+
+      [Fact]
+      public async Task Ingest_SavesReading()
+      {
+          var svc = new SensorIngestionService(_storage, _dispatcher, _thresholds);
+          var reading = new SensorReading("s1", "temperature", 25.5, "C", DateTime.UtcNow);
+          await svc.IngestAsync(reading, CancellationToken.None);
+          await _storage.Received(1).SaveReadingAsync(reading, Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Ingest_NormalValue_NoAlert()
+      {
+          var svc = new SensorIngestionService(_storage, _dispatcher, _thresholds);
+          await svc.IngestAsync(new SensorReading("s1", "temperature", 25.0, "C", DateTime.UtcNow), CancellationToken.None);
+          await _dispatcher.DidNotReceive().DispatchAsync(Arg.Any<SensorAlert>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Ingest_ExceedsMax_DispatchesAlert()
+      {
+          var svc = new SensorIngestionService(_storage, _dispatcher, _thresholds);
+          await svc.IngestAsync(new SensorReading("s2", "temperature", 150.0, "C", DateTime.UtcNow), CancellationToken.None);
+          await _dispatcher.Received(1).DispatchAsync(
+              Arg.Is<SensorAlert>(a => a.SensorId == "s2"),
+              Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Ingest_BelowMin_DispatchesAlert()
+      {
+          var svc = new SensorIngestionService(_storage, _dispatcher, _thresholds);
+          await svc.IngestAsync(new SensorReading("s3", "temperature", -10.0, "C", DateTime.UtcNow), CancellationToken.None);
+          await _dispatcher.Received(1).DispatchAsync(Arg.Any<SensorAlert>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task GetStats_CalculatesCorrectly()
+      {
+          var readings = new[]
+          {
+              new SensorReading("s4", "humidity", 40, "%", DateTime.UtcNow),
+              new SensorReading("s4", "humidity", 60, "%", DateTime.UtcNow),
+              new SensorReading("s4", "humidity", 50, "%", DateTime.UtcNow)
+          };
+          _storage.GetReadingsAsync("s4", Arg.Any<DateTime>(), Arg.Any<DateTime>(), Arg.Any<CancellationToken>())
+              .Returns(readings);
+          var svc = new SensorIngestionService(_storage, _dispatcher, _thresholds);
+          var stats = await svc.GetStatsAsync("s4", DateTime.MinValue, DateTime.MaxValue, CancellationToken.None);
+          stats.Avg.Should().BeApproximately(50, 0.01);
+          stats.Min.Should().Be(40);
+          stats.Max.Should().Be(60);
+          stats.Count.Should().Be(3);
+      }
+  }

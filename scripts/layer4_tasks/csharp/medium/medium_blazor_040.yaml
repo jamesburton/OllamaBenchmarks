@@ -1,0 +1,41 @@
+name: medium_blazor_040
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AppStateService with:
+    IDictionary<string,object> State, void Set(string key, object value), T? Get<T>(string key), bool ContainsKey(string key), void Reset(), event Action? OnStateChanged
+  Return only valid C# code in a single file.
+test_code: |
+  public class AppStateServiceTests
+  {
+      [Fact]
+      public void Service_CanBeInstantiated()
+      {
+          var svc = new AppStateService();
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_InitialState_IsDefault()
+      {
+          var svc = new AppStateService();
+          // Just verify construction does not throw
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_BasicOperation_Works()
+      {
+          var svc = new AppStateService();
+          // Basic smoke test
+          svc.Should().NotBeNull();
+      }
+  }

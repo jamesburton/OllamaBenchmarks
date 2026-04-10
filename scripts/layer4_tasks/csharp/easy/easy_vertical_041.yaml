@@ -1,0 +1,39 @@
+name: easy_vertical_041
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ApiKey(string Key, string OwnerId, bool IsRevoked, DateTime CreatedAt)
+  A class ApiKeyManager with:
+    ApiKey Generate(string ownerId) creates a new ApiKey with a random Guid key, IsRevoked = false
+    void Revoke(string key) marks ApiKey as revoked using 'with' expression
+    bool IsValid(string key) returns true if key exists and is not revoked
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApiKeyManagerTests
+  {
+      [Fact]
+      public void Generate_CreatesValidKey()
+      {
+          var manager = new ApiKeyManager();
+          var apiKey = manager.Generate("owner1");
+          apiKey.IsRevoked.Should().BeFalse();
+          apiKey.Key.Should().NotBeNullOrEmpty();
+          manager.IsValid(apiKey.Key).Should().BeTrue();
+      }
+      [Fact]
+      public void Revoke_InvalidatesKey()
+      {
+          var manager = new ApiKeyManager();
+          var apiKey = manager.Generate("owner2");
+          manager.Revoke(apiKey.Key);
+          manager.IsValid(apiKey.Key).Should().BeFalse();
+      }
+  }

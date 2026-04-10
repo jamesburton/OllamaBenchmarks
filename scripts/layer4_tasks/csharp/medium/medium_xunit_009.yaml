@@ -1,0 +1,73 @@
+name: medium_xunit_009
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Graph<T> with:
+    void AddVertex(T vertex)
+    void AddEdge(T from, T to)
+    bool HasPath(T from, T to) — uses BFS
+    IEnumerable<T> GetNeighbors(T vertex)
+    int VertexCount { get; }
+  Return only valid C# code in a single file.
+test_code: |
+  public class GraphTests
+  {
+      [Fact]
+      public void AddVertex_IncreasesCount()
+      {
+          var g = new Graph<string>();
+          g.AddVertex("A");
+          g.VertexCount.Should().Be(1);
+      }
+
+      [Fact]
+      public void HasPath_DirectConnection_ReturnsTrue()
+      {
+          var g = new Graph<string>();
+          g.AddVertex("A");
+          g.AddVertex("B");
+          g.AddEdge("A", "B");
+          g.HasPath("A", "B").Should().BeTrue();
+      }
+
+      [Fact]
+      public void HasPath_IndirectConnection_ReturnsTrue()
+      {
+          var g = new Graph<string>();
+          g.AddVertex("A");
+          g.AddVertex("B");
+          g.AddVertex("C");
+          g.AddEdge("A", "B");
+          g.AddEdge("B", "C");
+          g.HasPath("A", "C").Should().BeTrue();
+      }
+
+      [Fact]
+      public void HasPath_NoConnection_ReturnsFalse()
+      {
+          var g = new Graph<string>();
+          g.AddVertex("A");
+          g.AddVertex("B");
+          g.HasPath("A", "B").Should().BeFalse();
+      }
+
+      [Fact]
+      public void GetNeighbors_ReturnsAdjacentVertices()
+      {
+          var g = new Graph<int>();
+          g.AddVertex(1);
+          g.AddVertex(2);
+          g.AddVertex(3);
+          g.AddEdge(1, 2);
+          g.AddEdge(1, 3);
+          g.GetNeighbors(1).Should().Contain(2).And.Contain(3);
+      }
+  }

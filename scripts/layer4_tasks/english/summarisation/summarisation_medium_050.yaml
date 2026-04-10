@@ -1,0 +1,18 @@
+name: summarisation_medium_050
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The inclusion of e-sports in the Asian Games marks a significant step toward mainstream recognition of competitive gaming. Professional players now train for eight hours a day and are supported by nutritionists and psychologists. Prize pools for major tournaments rival those of traditional sports events.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "e-sports"
+    - "gaming"
+    - "tournament"
+    - "prize"
+  max_words: 25

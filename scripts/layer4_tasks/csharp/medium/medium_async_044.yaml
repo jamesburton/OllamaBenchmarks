@@ -1,0 +1,53 @@
+name: medium_async_044
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncEventSourcing<TState, TEvent> with constructor accepting TState initialState and Func<TState, TEvent, TState> reducer.
+  Exposes Task ApplyAsync(TEvent evt, CancellationToken ct = default), Task<TState> GetStateAsync(CancellationToken ct = default), IReadOnlyList<TEvent> EventLog.
+  Thread-safe, sequential event application.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncEventSourcingTests
+  {
+      [Fact]
+      public async Task Apply_ReducerApplied()
+      {
+          var es = new AsyncEventSourcing<int, int>(0, (s, e) => s + e);
+          await es.ApplyAsync(5);
+          (await es.GetStateAsync()).Should().Be(5);
+      }
+
+      [Fact]
+      public async Task Apply_Multiple_Accumulates()
+      {
+          var es = new AsyncEventSourcing<int, int>(0, (s, e) => s + e);
+          await es.ApplyAsync(1);
+          await es.ApplyAsync(2);
+          await es.ApplyAsync(3);
+          (await es.GetStateAsync()).Should().Be(6);
+      }
+
+      [Fact]
+      public async Task EventLog_ContainsAll()
+      {
+          var es = new AsyncEventSourcing<string, string>("", (s, e) => s + e);
+          await es.ApplyAsync("a");
+          await es.ApplyAsync("b");
+          es.EventLog.Should().BeEquivalentTo(new[]{"a","b"}, o => o.WithStrictOrdering());
+      }
+
+      [Fact]
+      public async Task InitialState_BeforeEvents()
+      {
+          var es = new AsyncEventSourcing<int, int>(100, (s, e) => s + e);
+          (await es.GetStateAsync()).Should().Be(100);
+      }
+  }

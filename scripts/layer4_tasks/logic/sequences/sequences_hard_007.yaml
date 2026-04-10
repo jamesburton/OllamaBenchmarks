@@ -1,0 +1,14 @@
+name: sequences_hard_007
+category: logic
+subcategory: sequences
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  In a geometric sequence, the 3rd term is 12 and the 6th term is 96. What is the first term?
+  Reply with only the number.
+expected_answer: "3"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

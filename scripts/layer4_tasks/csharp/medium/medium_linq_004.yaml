@@ -1,0 +1,64 @@
+name: medium_linq_004
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Student with: int Id, string Name, IReadOnlyList<int> Scores.
+  A class GradeBook with a constructor accepting IEnumerable<Student> students.
+  Expose:
+    ILookup<string, Student> ByGrade()
+  that classifies students into grade buckets using their average score:
+    "A" >= 90, "B" >= 80, "C" >= 70, "D" >= 60, "F" below 60.
+  Also expose:
+    IEnumerable<Student> HonourRoll() — students with average >= 90, ordered by average descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class GradeBookTests
+  {
+      private static Student MakeStudent(int id, string name, params int[] scores)
+          => new(id, name, scores);
+
+      private readonly Student[] _students = {
+          new(1, "Alice",  new[]{95, 92, 98}),
+          new(2, "Bob",    new[]{82, 78, 85}),
+          new(3, "Carol",  new[]{70, 68, 72}),
+          new(4, "Dave",   new[]{55, 60, 58}),
+          new(5, "Eve",    new[]{91, 93, 95}),
+      };
+
+      [Fact]
+      public void ByGrade_AContainsAliceAndEve()
+      {
+          var lookup = new GradeBook(_students).ByGrade();
+          lookup["A"].Select(s => s.Name).Should().BeEquivalentTo(new[]{"Alice","Eve"});
+      }
+
+      [Fact]
+      public void ByGrade_BContainsBob()
+      {
+          var lookup = new GradeBook(_students).ByGrade();
+          lookup["B"].Single().Name.Should().Be("Bob");
+      }
+
+      [Fact]
+      public void ByGrade_FContainsDave()
+      {
+          var lookup = new GradeBook(_students).ByGrade();
+          lookup["F"].Single().Name.Should().Be("Dave");
+      }
+
+      [Fact]
+      public void HonourRoll_OrderedByAverageDescending()
+      {
+          var result = new GradeBook(_students).HonourRoll().ToList();
+          result.Should().HaveCount(2);
+          result[0].Name.Should().Be("Eve");
+      }
+  }

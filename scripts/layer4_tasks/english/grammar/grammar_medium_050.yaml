@@ -1,0 +1,15 @@
+name: grammar_medium_050
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Born in a small village, fame found him unexpectedly.
+  B) Born in a small village, he found fame unexpectedly.
+  C) Born in a small village, unexpected fame arrived.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

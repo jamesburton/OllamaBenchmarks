@@ -1,0 +1,35 @@
+name: easy_xunit_022
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Fibonacci with a static method:
+    int Nth(int n) returns the nth Fibonacci number (0-indexed: Nth(0)=0, Nth(1)=1, Nth(2)=1, Nth(3)=2)
+    throws ArgumentException if n < 0
+  Return only valid C# code in a single file.
+test_code: |
+  public class FibonacciTests
+  {
+      [Theory]
+      [InlineData(0, 0)]
+      [InlineData(1, 1)]
+      [InlineData(6, 8)]
+      [InlineData(10, 55)]
+      public void Nth_ReturnsCorrectFibonacciNumber(int n, int expected)
+      {
+          Fibonacci.Nth(n).Should().Be(expected);
+      }
+      [Fact]
+      public void Nth_Negative_ThrowsArgumentException()
+      {
+          var act = () => Fibonacci.Nth(-1);
+          act.Should().Throw<ArgumentException>();
+      }
+  }

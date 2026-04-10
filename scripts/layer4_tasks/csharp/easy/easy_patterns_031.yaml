@@ -1,0 +1,35 @@
+name: easy_patterns_031
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Classifier with a static method:
+    string ClassifyDay(DayOfWeek day)
+  that uses a switch expression to return "weekend" for Saturday and Sunday, "weekday" otherwise.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ClassifierTests
+  {
+      [Fact]
+      public void ClassifyDay_Saturday_ReturnsWeekend()
+      {
+          Classifier.ClassifyDay(DayOfWeek.Saturday).Should().Be("weekend");
+      }
+      [Fact]
+      public void ClassifyDay_Sunday_ReturnsWeekend()
+      {
+          Classifier.ClassifyDay(DayOfWeek.Sunday).Should().Be("weekend");
+      }
+      [Fact]
+      public void ClassifyDay_Monday_ReturnsWeekday()
+      {
+          Classifier.ClassifyDay(DayOfWeek.Monday).Should().Be("weekday");
+      }
+  }

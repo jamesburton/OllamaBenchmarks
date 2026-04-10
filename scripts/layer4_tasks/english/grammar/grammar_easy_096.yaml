@@ -1,0 +1,15 @@
+name: grammar_easy_096
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The weather effected our plans.
+  B) The weather affected our plans.
+  C) The weather has had an affect on our plans.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

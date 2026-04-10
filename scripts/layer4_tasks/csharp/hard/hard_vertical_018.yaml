@@ -1,0 +1,95 @@
+name: hard_vertical_018
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + TPH inheritance + CQRS for notification system:
+  Abstract entity: BaseNotification(int Id, string RecipientId, string Title, string Body,
+    bool IsRead, DateTime CreatedAt, string NotificationType) — TPH discriminator.
+  Concrete entities:
+    EmailNotification : BaseNotification (string Email, string Subject)
+    PushNotification : BaseNotification (string DeviceToken, string ActionUrl)
+    SmsNotification : BaseNotification (string PhoneNumber)
+  DbContext: NotificationDbContext (SQLite in-memory, TPH via HasDiscriminator).
+
+  Records:
+    SendEmailCommand(string RecipientId, string Email, string Subject, string Title, string Body)
+    SendPushCommand(string RecipientId, string DeviceToken, string ActionUrl, string Title, string Body)
+    NotificationSummary(string RecipientId, int TotalCount, int UnreadCount, Dictionary<string, int> ByType)
+
+  Class NotificationService(NotificationDbContext db):
+    Task<EmailNotification> SendEmailAsync(SendEmailCommand cmd, CancellationToken ct)
+    Task<PushNotification> SendPushAsync(SendPushCommand cmd, CancellationToken ct)
+    Task MarkAsReadAsync(int id, CancellationToken ct)
+    Task<NotificationSummary> GetSummaryAsync(string recipientId, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationServiceTests : IDisposable
+  {
+      private readonly NotificationDbContext _db;
+      private readonly NotificationService _svc;
+
+      public NotificationServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<NotificationDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new NotificationDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new NotificationService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task SendEmail_PersistsEmailNotification()
+      {
+          var cmd = new SendEmailCommand("u1", "a@b.com", "Sub", "Title", "Body");
+          var result = await _svc.SendEmailAsync(cmd, CancellationToken.None);
+          result.Id.Should().BeGreaterThan(0);
+          result.Email.Should().Be("a@b.com");
+          result.IsRead.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task SendPush_PersistsPushNotification()
+      {
+          var cmd = new SendPushCommand("u2", "device-token-xyz", "/action", "Alert", "You have a msg");
+          var result = await _svc.SendPushAsync(cmd, CancellationToken.None);
+          result.DeviceToken.Should().Be("device-token-xyz");
+      }
+
+      [Fact]
+      public async Task MarkAsRead_UpdatesIsRead()
+      {
+          var email = await _svc.SendEmailAsync(new SendEmailCommand("u3", "x@y.com", "S", "T", "B"), CancellationToken.None);
+          await _svc.MarkAsReadAsync(email.Id, CancellationToken.None);
+          _db.Set<BaseNotification>().First(n => n.Id == email.Id).IsRead.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task GetSummary_CountsCorrectly()
+      {
+          await _svc.SendEmailAsync(new SendEmailCommand("u4", "a@b.com", "S1", "T1", "B1"), CancellationToken.None);
+          await _svc.SendEmailAsync(new SendEmailCommand("u4", "a@b.com", "S2", "T2", "B2"), CancellationToken.None);
+          await _svc.SendPushAsync(new SendPushCommand("u4", "tok", "/url", "T3", "B3"), CancellationToken.None);
+          var summary = await _svc.GetSummaryAsync("u4", CancellationToken.None);
+          summary.TotalCount.Should().Be(3);
+          summary.UnreadCount.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task GetSummary_ByType_IncludesBothTypes()
+      {
+          await _svc.SendEmailAsync(new SendEmailCommand("u5", "e@f.com", "S", "T", "B"), CancellationToken.None);
+          await _svc.SendPushAsync(new SendPushCommand("u5", "tok2", "/url2", "T2", "B2"), CancellationToken.None);
+          var summary = await _svc.GetSummaryAsync("u5", CancellationToken.None);
+          summary.ByType.Should().ContainKey("Email");
+          summary.ByType.Should().ContainKey("Push");
+      }
+  }

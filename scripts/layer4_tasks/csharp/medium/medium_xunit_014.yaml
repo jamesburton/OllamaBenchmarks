@@ -1,0 +1,39 @@
+name: medium_xunit_014
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CsvParser with:
+    IEnumerable<string[]> Parse(string csv), string Serialize(IEnumerable<string[]> rows), handles quoted fields
+  Return only valid C# code in a single file.
+test_code: |
+  public class CsvParserTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new CsvParser();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new CsvParser();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new CsvParser();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

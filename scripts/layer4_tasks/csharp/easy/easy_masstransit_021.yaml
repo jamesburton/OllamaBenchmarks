@@ -1,0 +1,36 @@
+name: easy_masstransit_021
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record ChatMessage(Guid MessageId, string RoomId, string SenderName, string Content)
+  A consumer class ChatMessageConsumer that implements IConsumer<ChatMessage>:
+    Has a public Dictionary<string, int> MessageCountByRoom = new()
+    Consume method increments the count for message.RoomId
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class ChatMessageConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CountsMessagesByRoom()
+      {
+          var consumer = new ChatMessageConsumer();
+          foreach (var room in new[]{"room1","room1","room2"})
+          {
+              var context = Substitute.For<ConsumeContext<ChatMessage>>();
+              context.Message.Returns(new ChatMessage(Guid.NewGuid(), room, "user", "hello"));
+              await consumer.Consume(context);
+          }
+          consumer.MessageCountByRoom["room1"].Should().Be(2);
+          consumer.MessageCountByRoom["room2"].Should().Be(1);
+      }
+  }

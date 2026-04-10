@@ -1,0 +1,38 @@
+name: easy_xunit_027
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IPermissionChecker with method:
+    bool HasPermission(string userId, string permission)
+  A class ResourceController with constructor taking IPermissionChecker, and method:
+    string AccessResource(string userId, string resource) returns "Granted: {resource}" if user has "read" permission, throws UnauthorizedAccessException otherwise
+  Return only valid C# code in a single file.
+test_code: |
+  public class ResourceControllerTests
+  {
+      [Fact]
+      public void AccessResource_WithPermission_ReturnsGranted()
+      {
+          var checker = Substitute.For<IPermissionChecker>();
+          checker.HasPermission("user1", "read").Returns(true);
+          var controller = new ResourceController(checker);
+          controller.AccessResource("user1", "file.txt").Should().Be("Granted: file.txt");
+      }
+      [Fact]
+      public void AccessResource_WithoutPermission_ThrowsUnauthorized()
+      {
+          var checker = Substitute.For<IPermissionChecker>();
+          checker.HasPermission("user2", "read").Returns(false);
+          var controller = new ResourceController(checker);
+          var act = () => controller.AccessResource("user2", "secret.txt");
+          act.Should().Throw<UnauthorizedAccessException>();
+      }
+  }

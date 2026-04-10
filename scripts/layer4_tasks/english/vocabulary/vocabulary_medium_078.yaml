@@ -1,0 +1,16 @@
+name: vocabulary_medium_078
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which phrase is appropriate for a FORMAL report conclusion?
+  A) 'To wrap things up'
+  B) 'In summary'
+  C) 'At the end of the day'
+  D) 'Long story short'
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

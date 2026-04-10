@@ -1,0 +1,15 @@
+name: deduction_medium_015
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If X then Y.
+  2. If Y then Z.
+  3. If Z then W.
+  What single conclusion can you draw connecting X and W? Reply with only the conclusion.
+expected_answer: "If X then W."
+validator_config: {}

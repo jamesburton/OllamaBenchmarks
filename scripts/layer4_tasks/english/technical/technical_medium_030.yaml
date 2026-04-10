@@ -1,0 +1,23 @@
+name: technical_medium_030
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a JSDoc comment for an async function that saves a user record to a database and returns the created ID.
+  Include @param, @returns, and @throws tags.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "@param"
+    - "@returns"
+    - "@throws"
+    - "async"
+    - "database"
+    - "user"
+    - "ID"
+    - "saves"
+  min_words: 10
+  max_words: 80

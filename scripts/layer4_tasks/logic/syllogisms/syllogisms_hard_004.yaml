@@ -1,0 +1,16 @@
+name: syllogisms_hard_004
+category: logic
+subcategory: syllogisms
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All X are Y.
+  2. All Y are Z.
+  3. No Z are W.
+  4. Some W are V.
+  Are any X also V? Reply with only: Yes, No, or Cannot be determined.
+expected_answer: "Cannot be determined."
+validator_config: {}

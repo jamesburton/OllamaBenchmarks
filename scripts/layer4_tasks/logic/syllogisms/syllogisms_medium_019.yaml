@@ -1,0 +1,15 @@
+name: syllogisms_medium_019
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. No perfect square is negative.
+  2. x^2 is a perfect square.
+  3. -4 is negative.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "x^2 is not equal to -4."
+validator_config: {}

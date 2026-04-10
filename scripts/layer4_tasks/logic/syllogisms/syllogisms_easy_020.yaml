@@ -1,0 +1,15 @@
+name: syllogisms_easy_020
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. No birds are reptiles.
+  2. A lizard is a reptile.
+  3. All reptiles are cold-blooded.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "A lizard is cold-blooded."
+validator_config: {}

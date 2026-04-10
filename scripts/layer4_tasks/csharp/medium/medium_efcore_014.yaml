@@ -1,0 +1,72 @@
+name: medium_efcore_014
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Notification with: int Id, string UserId, string Type, string Message, bool IsRead, DateTime CreatedAt.
+  A class NotificationDbContext : DbContext with DbSet<Notification> Notifications.
+  A class NotificationRepository with constructor accepting NotificationDbContext.
+  Methods:
+    Task<IEnumerable<Notification>> GetUnreadAsync(string userId)
+    Task MarkAsReadAsync(int notificationId)
+    Task MarkAllAsReadAsync(string userId)
+    Task<int> GetUnreadCountAsync(string userId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class NotificationRepositoryTests : IAsyncLifetime
+  {
+      private NotificationDbContext _db = null!;
+      private NotificationRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<NotificationDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new NotificationDbContext(opts);
+          _repo = new NotificationRepository(_db);
+          _db.Notifications.AddRange(
+              new Notification { UserId = "u1", Type = "info", Message = "Hello", IsRead = false, CreatedAt = DateTime.UtcNow },
+              new Notification { UserId = "u1", Type = "alert", Message = "Warning", IsRead = false, CreatedAt = DateTime.UtcNow },
+              new Notification { UserId = "u1", Type = "info", Message = "Done", IsRead = true, CreatedAt = DateTime.UtcNow },
+              new Notification { UserId = "u2", Type = "info", Message = "Hi", IsRead = false, CreatedAt = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetUnread_ReturnsOnlyUnread()
+      {
+          (await _repo.GetUnreadAsync("u1")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetUnreadCount_ReturnsCorrect()
+      {
+          (await _repo.GetUnreadCountAsync("u1")).Should().Be(2);
+      }
+
+      [Fact]
+      public async Task MarkAsRead_MarksOne()
+      {
+          var id = _db.Notifications.First(n => !n.IsRead && n.UserId == "u1").Id;
+          await _repo.MarkAsReadAsync(id);
+          _db.ChangeTracker.Clear();
+          (await _db.Notifications.FindAsync(id))!.IsRead.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task MarkAllAsRead_MarksAllForUser()
+      {
+          await _repo.MarkAllAsReadAsync("u1");
+          _db.ChangeTracker.Clear();
+          (await _repo.GetUnreadCountAsync("u1")).Should().Be(0);
+      }
+  }

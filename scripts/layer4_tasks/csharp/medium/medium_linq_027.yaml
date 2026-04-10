@@ -1,0 +1,59 @@
+name: medium_linq_027
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Course with: int Id, string Title, string Instructor, int EnrolledCount, double Rating.
+  A class CourseRecommender with a constructor accepting IEnumerable<Course> courses.
+  Expose:
+    IEnumerable<Course> TopRated(int n) — top n courses by Rating desc
+    IEnumerable<Course> Popular(int minEnrolled) — courses with EnrolledCount >= minEnrolled, ordered by EnrolledCount desc
+    IEnumerable<InstructorSummary> InstructorRankings()
+      — each instructor's average rating and total enrolments, ordered by AvgRating desc
+  InstructorSummary is a record with: string Instructor, double AvgRating, int TotalEnrolled.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CourseRecommenderTests
+  {
+      private readonly Course[] _courses = {
+          new(1, "ML101",    "Alice", 500,  4.8),
+          new(2, "Data101",  "Alice", 300,  4.5),
+          new(3, "Cloud101", "Bob",   800,  4.2),
+          new(4, "Web101",   "Bob",   200,  3.9),
+          new(5, "DevOps",   "Carol", 150,  4.7),
+      };
+
+      [Fact]
+      public void TopRated_Top2()
+      {
+          var result = new CourseRecommender(_courses).TopRated(2).ToList();
+          result[0].Title.Should().Be("ML101");
+          result[1].Title.Should().Be("DevOps");
+      }
+
+      [Fact]
+      public void Popular_Min300_Returns3()
+      {
+          new CourseRecommender(_courses).Popular(300).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void InstructorRankings_AliceFirst()
+      {
+          new CourseRecommender(_courses).InstructorRankings().First().Instructor.Should().Be("Alice");
+      }
+
+      [Fact]
+      public void InstructorRankings_AliceTotalEnrolled800()
+      {
+          var alice = new CourseRecommender(_courses).InstructorRankings().First(i => i.Instructor == "Alice");
+          alice.TotalEnrolled.Should().Be(800);
+      }
+  }

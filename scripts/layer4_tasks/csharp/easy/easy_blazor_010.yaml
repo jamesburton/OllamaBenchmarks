@@ -1,0 +1,42 @@
+name: easy_blazor_010
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class FormComponent that extends ComponentBase with:
+    string Username { get; set; } = ""
+    string Password { get; set; } = ""
+    string? ErrorMessage { get; private set; }
+    bool IsValid => !string.IsNullOrWhiteSpace(Username) && Password.Length >= 8
+    void Validate() — sets ErrorMessage to null if IsValid, else "Invalid credentials"
+  Return only valid C# code in a single file.
+test_code: |
+  public class FormComponentTests
+  {
+      [Fact]
+      public void IsValid_ValidInput_ReturnsTrue()
+      {
+          var c = new FormComponent { Username = "alice", Password = "password123" };
+          c.IsValid.Should().BeTrue();
+      }
+      [Fact]
+      public void IsValid_ShortPassword_ReturnsFalse()
+      {
+          var c = new FormComponent { Username = "alice", Password = "abc" };
+          c.IsValid.Should().BeFalse();
+      }
+      [Fact]
+      public void Validate_InvalidInput_SetsErrorMessage()
+      {
+          var c = new FormComponent { Username = "", Password = "abc" };
+          c.Validate();
+          c.ErrorMessage.Should().Be("Invalid credentials");
+      }
+  }

@@ -1,0 +1,54 @@
+name: medium_async_024
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IEmailService with method:
+    Task<bool> SendAsync(string to, string subject, string body, CancellationToken ct = default)
+  A class WelcomeEmailSender with constructor accepting IEmailService emailService.
+  Expose:
+    Task<bool> SendWelcomeAsync(string userName, string email, CancellationToken ct = default)
+  Sends a welcome email with subject "Welcome, {userName}!" and body "Hello {userName}, welcome to our platform."
+  Returns the result from IEmailService.SendAsync.
+  Return only valid C# code in a single file.
+test_code: |
+  public class WelcomeEmailSenderTests
+  {
+      [Fact]
+      public async Task SendWelcomeAsync_CorrectSubject()
+      {
+          var email = Substitute.For<IEmailService>();
+          email.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(Task.FromResult(true));
+          await new WelcomeEmailSender(email).SendWelcomeAsync("Alice", "alice@x.com");
+          await email.Received(1).SendAsync("alice@x.com", "Welcome, Alice!", Arg.Any<string>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task SendWelcomeAsync_BodyContainsName()
+      {
+          string? capturedBody = null;
+          var email = Substitute.For<IEmailService>();
+          email.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Do<string>(b => capturedBody = b), Arg.Any<CancellationToken>())
+              .Returns(Task.FromResult(true));
+          await new WelcomeEmailSender(email).SendWelcomeAsync("Bob", "bob@x.com");
+          capturedBody.Should().Contain("Bob");
+      }
+
+      [Fact]
+      public async Task SendWelcomeAsync_ReturnsServiceResult()
+      {
+          var email = Substitute.For<IEmailService>();
+          email.SendAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(Task.FromResult(false));
+          var result = await new WelcomeEmailSender(email).SendWelcomeAsync("X", "x@x.com");
+          result.Should().BeFalse();
+      }
+  }

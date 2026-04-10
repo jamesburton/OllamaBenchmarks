@@ -1,0 +1,14 @@
+name: deduction_easy_008
+category: logic
+subcategory: deduction
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If the alarm rings, everyone wakes up.
+  2. The alarm rings.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "Everyone wakes up."
+validator_config: {}

@@ -1,0 +1,88 @@
+name: hard_linq_018
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Subscription(int Id, int UserId, string Plan, DateOnly StartDate, DateOnly? EndDate, decimal MonthlyFee).
+  A class SubscriptionReporter with constructor accepting IEnumerable<Subscription> subscriptions.
+  Methods:
+    IEnumerable<PlanRevenue> ActiveRevenueByPlan(DateOnly asOf) — for subscriptions active on asOf
+      (StartDate <= asOf and (EndDate is null or EndDate >= asOf)), group by Plan,
+      compute UserCount and MonthlyRevenue. Orders by MonthlyRevenue descending.
+    IEnumerable<Subscription> ChurnedInPeriod(DateOnly from, DateOnly to) — subscriptions
+      where EndDate falls within [from, to].
+    IEnumerable<UserSubscriptionHistory> UserHistory(int userId) — all subscriptions for that user,
+      ordered by StartDate ascending, with duration in days (open-ended counts to asOf=today).
+  Records: PlanRevenue(string Plan, int UserCount, decimal MonthlyRevenue),
+           UserSubscriptionHistory(int SubscriptionId, string Plan, DateOnly StartDate, DateOnly? EndDate, int DurationDays).
+  Return only valid C# code in a single file.
+test_code: |
+  public class SubscriptionReporterTests
+  {
+      private static readonly DateOnly Ref = new(2024,6,1);
+      private static readonly List<Subscription> Subs = new()
+      {
+          new(1, 10, "Pro",   new DateOnly(2024,1,1), null,                   29.99m),
+          new(2, 11, "Basic", new DateOnly(2024,2,1), new DateOnly(2024,5,31),  9.99m),
+          new(3, 12, "Pro",   new DateOnly(2024,3,1), null,                   29.99m),
+          new(4, 10, "Basic", new DateOnly(2023,6,1), new DateOnly(2023,12,31), 9.99m),
+          new(5, 13, "Enterprise", new DateOnly(2024,1,1), null,              99.99m),
+      };
+
+      [Fact]
+      public void ActiveRevenueByPlan_ProHasTwoUsers()
+      {
+          var result = new SubscriptionReporter(Subs).ActiveRevenueByPlan(Ref).ToList();
+          result.First(p => p.Plan == "Pro").UserCount.Should().Be(2);
+      }
+
+      [Fact]
+      public void ActiveRevenueByPlan_BasicExpiredNotCounted()
+      {
+          var result = new SubscriptionReporter(Subs).ActiveRevenueByPlan(Ref).ToList();
+          result.Should().NotContain(p => p.Plan == "Basic");
+      }
+
+      [Fact]
+      public void ChurnedInPeriod_FindsExpiredInMay()
+      {
+          var result = new SubscriptionReporter(Subs)
+              .ChurnedInPeriod(new DateOnly(2024,5,1), new DateOnly(2024,5,31)).ToList();
+          result.Should().ContainSingle(s => s.Id == 2);
+      }
+
+      [Fact]
+      public void ChurnedInPeriod_NoChurnInFutureRange_ReturnsEmpty()
+      {
+          new SubscriptionReporter(Subs)
+              .ChurnedInPeriod(new DateOnly(2025,1,1), new DateOnly(2025,12,31))
+              .Should().BeEmpty();
+      }
+
+      [Fact]
+      public void UserHistory_User10HasTwoSubscriptions()
+      {
+          var result = new SubscriptionReporter(Subs).UserHistory(10).ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void UserHistory_OrderedByStartDateAscending()
+      {
+          var result = new SubscriptionReporter(Subs).UserHistory(10).ToList();
+          result.Select(h => h.StartDate).Should().BeInAscendingOrder();
+      }
+
+      [Fact]
+      public void UserHistory_UnknownUser_ReturnsEmpty()
+      {
+          new SubscriptionReporter(Subs).UserHistory(9999).Should().BeEmpty();
+      }
+  }

@@ -1,0 +1,51 @@
+name: medium_patterns_029
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ConcurrentCounter with thread-safe operations using Interlocked:
+    void Increment(), void Decrement(), void Add(int value), void Reset()
+    int Value, int MaxSeen
+  Return only valid C# code in a single file.
+test_code: |
+  public class ConcurrentCounterTests
+  {
+      [Fact]
+      public void Increment_IncreasesValue()
+      {
+          var c = new ConcurrentCounter();
+          c.Increment(); c.Increment();
+          c.Value.Should().Be(2);
+      }
+
+      [Fact]
+      public void Decrement_DecreasesValue()
+      {
+          var c = new ConcurrentCounter();
+          c.Add(10); c.Decrement();
+          c.Value.Should().Be(9);
+      }
+
+      [Fact]
+      public void Reset_SetsZero()
+      {
+          var c = new ConcurrentCounter();
+          c.Add(50); c.Reset();
+          c.Value.Should().Be(0);
+      }
+
+      [Fact]
+      public void MaxSeen_TracksMax()
+      {
+          var c = new ConcurrentCounter();
+          c.Add(10); c.Add(20); c.Decrement();
+          c.MaxSeen.Should().Be(30);
+      }
+  }

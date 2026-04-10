@@ -1,0 +1,20 @@
+name: rewriting_medium_021
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in the passive voice:
+  'The architect had designed the building before the regulations changed.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "had been designed"
+    - "been designed"
+    - "building"
+    - "designed"
+  min_words: 6
+  max_words: 25

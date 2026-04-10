@@ -1,0 +1,39 @@
+name: easy_efcore_040
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class AuditLog with properties: int Id, string UserId, string Action, string EntityType, DateTime Timestamp
+  A DbContext class AuditContext with:
+    DbSet<AuditLog> AuditLogs { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class AuditRepository with:
+    List<AuditLog> GetRecent(AuditContext context, string userId, int count)
+  that returns the most recent count audit logs for the given userId ordered by Timestamp descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuditRepositoryTests
+  {
+      [Fact]
+      public void GetRecent_ReturnsRecentLogs()
+      {
+          using var context = new AuditContext();
+          context.Database.EnsureCreated();
+          context.AuditLogs.AddRange(
+              new AuditLog { UserId = "u1", Action = "login", EntityType = "Session", Timestamp = new DateTime(2024,1,1) },
+              new AuditLog { UserId = "u1", Action = "update", EntityType = "Profile", Timestamp = new DateTime(2024,2,1) },
+              new AuditLog { UserId = "u2", Action = "login", EntityType = "Session", Timestamp = new DateTime(2024,3,1) });
+          context.SaveChanges();
+          var result = AuditRepository.GetRecent(context, "u1", 1);
+          result.Should().HaveCount(1);
+          result[0].Action.Should().Be("update");
+      }
+  }

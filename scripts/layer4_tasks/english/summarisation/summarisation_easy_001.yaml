@@ -1,0 +1,18 @@
+name: summarisation_easy_001
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The company reported record profits last quarter, driven by strong sales in its technology division. Revenue grew by 15 percent compared to the same period last year. The CEO credited the results to a successful product launch and expansion into new markets.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "profits"
+    - "revenue"
+    - "technology"
+    - "sales"
+  max_words: 25

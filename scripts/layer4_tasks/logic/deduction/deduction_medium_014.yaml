@@ -1,0 +1,14 @@
+name: deduction_medium_014
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All valid triangles have angles summing to 180 degrees.
+  2. Shape W's angles sum to 200 degrees.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "Shape W is not a valid triangle."
+validator_config: {}

@@ -1,0 +1,15 @@
+name: syllogisms_medium_012
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. No irrational numbers can be expressed as a fraction.
+  2. Pi is irrational.
+  3. All fractions are rational numbers.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "Pi cannot be expressed as a fraction."
+validator_config: {}

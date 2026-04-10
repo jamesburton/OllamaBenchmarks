@@ -1,0 +1,16 @@
+name: vocabulary_medium_025
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The verdict was seen as arbitrary', which word best replaces 'arbitrary'?
+  A) Fair
+  B) Logical
+  C) Random
+  D) Careful
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

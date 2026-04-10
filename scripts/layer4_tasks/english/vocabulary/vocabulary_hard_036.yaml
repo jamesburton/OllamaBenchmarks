@@ -1,0 +1,16 @@
+name: vocabulary_hard_036
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The critic offered an incisive analysis of the novel', which word best replaces 'incisive'?
+  A) Superficial
+  B) Gentle
+  C) Penetrating
+  D) Rambling
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

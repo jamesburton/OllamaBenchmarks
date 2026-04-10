@@ -1,0 +1,33 @@
+name: easy_async_034
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class TaskConverter with a static method:
+    async Task<string> NumberToStringAsync(int number)
+  that converts the number to string asynchronously and prefixes it with "Number: ".
+  Use async/await.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaskConverterTests
+  {
+      [Fact]
+      public async Task NumberToStringAsync_BasicCase()
+      {
+          var result = await TaskConverter.NumberToStringAsync(42);
+          result.Should().Be("Number: 42");
+      }
+      [Fact]
+      public async Task NumberToStringAsync_Zero()
+      {
+          var result = await TaskConverter.NumberToStringAsync(0);
+          result.Should().Be("Number: 0");
+      }
+  }

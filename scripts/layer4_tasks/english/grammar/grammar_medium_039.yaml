@@ -1,0 +1,15 @@
+name: grammar_medium_039
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) She is as talented as, if not more talented than, her colleagues.
+  B) She is as talented, if not more talented than, her colleagues.
+  C) She is as talented as, if not more talented, than her colleagues.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

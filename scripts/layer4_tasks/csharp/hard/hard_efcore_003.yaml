@@ -1,0 +1,87 @@
+name: hard_efcore_003
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core value conversion for Money type:
+  Struct Money(decimal Amount, string Currency) with + operator and ToString override.
+  Entity: Expense(int Id, string Description, Money Amount, string Category, DateTime Date).
+  DbContext: ExpenseDbContext — configure Money to store as decimal (Amount) + string (Currency)
+    using value converters and property configurations.
+  Class ExpenseRepository(ExpenseDbContext db):
+    Task<Expense> AddAsync(Expense expense, CancellationToken ct)
+    Task<Expense?> GetAsync(int id, CancellationToken ct)
+    Task<Money> TotalByCurrencyAsync(string currency, CancellationToken ct) — sums all expenses in that currency.
+    Task<IReadOnlyList<Expense>> GetByCategoryAsync(string category, CancellationToken ct)
+  Use SQLite in-memory. Verify Money roundtrips through EF Core.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExpenseRepositoryTests : IDisposable
+  {
+      private readonly ExpenseDbContext _db;
+      private readonly ExpenseRepository _repo;
+
+      public ExpenseRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<ExpenseDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new ExpenseDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new ExpenseRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task AddAndGet_MoneyRoundtrips()
+      {
+          var money = new Money(49.99m, "GBP");
+          var expense = await _repo.AddAsync(
+              new Expense { Description = "Hotel", Amount = money, Category = "Travel", Date = DateTime.UtcNow },
+              CancellationToken.None);
+          var found = await _repo.GetAsync(expense.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.Amount.Amount.Should().Be(49.99m);
+          found.Amount.Currency.Should().Be("GBP");
+      }
+
+      [Fact]
+      public async Task TotalByCurrency_SumsCorrectly()
+      {
+          await _repo.AddAsync(new Expense { Description = "A", Amount = new(10m, "USD"), Category = "Food", Date = DateTime.UtcNow }, CancellationToken.None);
+          await _repo.AddAsync(new Expense { Description = "B", Amount = new(20m, "USD"), Category = "Food", Date = DateTime.UtcNow }, CancellationToken.None);
+          await _repo.AddAsync(new Expense { Description = "C", Amount = new(5m, "GBP"),  Category = "Food", Date = DateTime.UtcNow }, CancellationToken.None);
+          var total = await _repo.TotalByCurrencyAsync("USD", CancellationToken.None);
+          total.Amount.Should().Be(30m);
+          total.Currency.Should().Be("USD");
+      }
+
+      [Fact]
+      public async Task TotalByCurrency_NoCurrency_ReturnsZero()
+      {
+          var total = await _repo.TotalByCurrencyAsync("EUR", CancellationToken.None);
+          total.Amount.Should().Be(0m);
+      }
+
+      [Fact]
+      public async Task GetByCategory_FiltersCorrectly()
+      {
+          await _repo.AddAsync(new Expense { Description = "Flight", Amount = new(200m, "USD"), Category = "Travel", Date = DateTime.UtcNow }, CancellationToken.None);
+          await _repo.AddAsync(new Expense { Description = "Lunch",  Amount = new(15m, "USD"),  Category = "Food",   Date = DateTime.UtcNow }, CancellationToken.None);
+          var result = await _repo.GetByCategoryAsync("Travel", CancellationToken.None);
+          result.Should().ContainSingle(e => e.Description == "Flight");
+      }
+
+      [Fact]
+      public async Task Get_UnknownId_ReturnsNull()
+      {
+          var result = await _repo.GetAsync(9999, CancellationToken.None);
+          result.Should().BeNull();
+      }
+  }

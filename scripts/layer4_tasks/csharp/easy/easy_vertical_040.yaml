@@ -1,0 +1,36 @@
+name: easy_vertical_040
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Permission(string Name, string Resource, string Action)
+  A class RolePermissionStore with:
+    void AssignPermission(string role, Permission permission)
+    List<Permission> GetPermissions(string role)
+    bool CanDo(string role, string resource, string action) returns true if role has a matching permission
+  Return only valid C# code in a single file.
+test_code: |
+  public class RolePermissionStoreTests
+  {
+      [Fact]
+      public void CanDo_WithPermission_ReturnsTrue()
+      {
+          var store = new RolePermissionStore();
+          store.AssignPermission("admin", new Permission("ReadUsers", "users", "read"));
+          store.CanDo("admin", "users", "read").Should().BeTrue();
+      }
+      [Fact]
+      public void CanDo_WithoutPermission_ReturnsFalse()
+      {
+          var store = new RolePermissionStore();
+          store.AssignPermission("viewer", new Permission("ReadUsers", "users", "read"));
+          store.CanDo("viewer", "users", "delete").Should().BeFalse();
+      }
+  }

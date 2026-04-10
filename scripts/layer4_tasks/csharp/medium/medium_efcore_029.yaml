@@ -1,0 +1,71 @@
+name: medium_efcore_029
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity EventLog with: int Id, string EventType, string Source, string Payload, string Severity, DateTime OccurredAt.
+  A class EventLogDbContext : DbContext with DbSet<EventLog> Events.
+  A class EventLogRepository with constructor accepting EventLogDbContext.
+  Methods:
+    Task<IEnumerable<EventLog>> GetBySeverityAsync(string severity)
+    Task<IEnumerable<EventLog>> GetBySourceAsync(string source)
+    Task<IDictionary<string, int>> GetCountByEventTypeAsync()
+    Task<IEnumerable<EventLog>> GetInTimeRangeAsync(DateTime from, DateTime to)
+  Return only valid C# code in a single file.
+test_code: |
+  public class EventLogRepositoryTests : IAsyncLifetime
+  {
+      private EventLogDbContext _db = null!;
+      private EventLogRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<EventLogDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new EventLogDbContext(opts);
+          _repo = new EventLogRepository(_db);
+          var now = DateTime.UtcNow;
+          _db.Events.AddRange(
+              new EventLog { EventType = "Login", Source = "AuthService", Payload = "{}", Severity = "Info", OccurredAt = now.AddHours(-2) },
+              new EventLog { EventType = "Error", Source = "OrderService", Payload = "{}", Severity = "Error", OccurredAt = now.AddHours(-1) },
+              new EventLog { EventType = "Login", Source = "AuthService", Payload = "{}", Severity = "Info", OccurredAt = now });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetBySeverity_FiltersCorrectly()
+      {
+          (await _repo.GetBySeverityAsync("Info")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetBySource_FiltersCorrectly()
+      {
+          (await _repo.GetBySourceAsync("AuthService")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetCountByEventType_GroupsCorrectly()
+      {
+          var result = await _repo.GetCountByEventTypeAsync();
+          result["Login"].Should().Be(2);
+          result["Error"].Should().Be(1);
+      }
+
+      [Fact]
+      public async Task GetInTimeRange_FiltersCorrectly()
+      {
+          var from = DateTime.UtcNow.AddHours(-1.5);
+          var to = DateTime.UtcNow.AddHours(1);
+          (await _repo.GetInTimeRangeAsync(from, to)).Should().HaveCount(2);
+      }
+  }

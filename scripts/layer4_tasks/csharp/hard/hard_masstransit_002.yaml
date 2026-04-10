@@ -1,0 +1,117 @@
+name: hard_masstransit_002
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit request/response pattern:
+  Messages:
+    record GetProductRequest(int ProductId);
+    record GetProductResponse(int ProductId, string Name, decimal Price, bool Found);
+    record PriceCheckRequest(int ProductId, decimal ProposedPrice);
+    record PriceCheckResponse(int ProductId, bool IsAcceptable, decimal? SuggestedPrice, string Reason);
+
+  Class GetProductConsumer : IConsumer<GetProductRequest>:
+    Responds with GetProductResponse. Product not found -> Found=false.
+    Use in-memory product store (Dictionary<int, (string Name, decimal Price)>).
+
+  Class PriceCheckConsumer : IConsumer<PriceCheckRequest>:
+    Acceptable if ProposedPrice >= product's Price * 0.8m. Suggests price * 0.9m if below.
+    Returns PriceCheckResponse.
+
+  Static class ProductData: static dictionary of test products seeded with 3 products.
+  Use MassTransit test harness for all tests.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductConsumerTests
+  {
+      [Fact]
+      public async Task GetProduct_ExistingProduct_ReturnsFound()
+      {
+          var harness = new InMemoryTestHarness();
+          var consumer = harness.Consumer<GetProductConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<GetProductRequest>();
+              var response = await client.GetResponse<GetProductResponse>(new GetProductRequest(1));
+              response.Message.Found.Should().BeTrue();
+              response.Message.Name.Should().NotBeNullOrEmpty();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task GetProduct_NonExistentProduct_ReturnsNotFound()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<GetProductConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<GetProductRequest>();
+              var response = await client.GetResponse<GetProductResponse>(new GetProductRequest(9999));
+              response.Message.Found.Should().BeFalse();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task PriceCheck_AcceptablePrice_ReturnsTrue()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<PriceCheckConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<PriceCheckRequest>();
+              var product = ProductData.Products[1];
+              var response = await client.GetResponse<PriceCheckResponse>(
+                  new PriceCheckRequest(1, product.Price));
+              response.Message.IsAcceptable.Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task PriceCheck_TooLowPrice_ReturnsFalseWithSuggestion()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<PriceCheckConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<PriceCheckRequest>();
+              var product = ProductData.Products[1];
+              var response = await client.GetResponse<PriceCheckResponse>(
+                  new PriceCheckRequest(1, product.Price * 0.5m));
+              response.Message.IsAcceptable.Should().BeFalse();
+              response.Message.SuggestedPrice.Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task GetProduct_ConsumerConsumedRequest()
+      {
+          var harness = new InMemoryTestHarness();
+          var consumer = harness.Consumer<GetProductConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<GetProductRequest>();
+              await client.GetResponse<GetProductResponse>(new GetProductRequest(1));
+              consumer.Consumed.Select<GetProductRequest>().Should().HaveCount(1);
+          }
+          finally { await harness.Stop(); }
+      }
+  }

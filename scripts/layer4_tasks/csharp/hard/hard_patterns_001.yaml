@@ -1,0 +1,77 @@
+name: hard_patterns_001
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A discriminated union using OneOf<T0,T1,T2> for a payment processing result:
+  Types: PaymentSuccess(string TransactionId, decimal Amount),
+         PaymentDeclined(string Reason, string Code),
+         PaymentError(string Message, Exception? Cause).
+  A class PaymentProcessor with:
+    OneOf<PaymentSuccess, PaymentDeclined, PaymentError> Process(PaymentRequest request) —
+      if Amount <= 0 returns PaymentDeclined("Invalid amount","INVALID_AMOUNT");
+      if request.CardNumber starts with "4" and Amount <= 10000 returns PaymentSuccess with Guid TransactionId;
+      if CardNumber starts with "4" and Amount > 10000 returns PaymentDeclined("Limit exceeded","LIMIT");
+      otherwise returns PaymentError("Unsupported card","...").
+  Record: PaymentRequest(string CardNumber, decimal Amount, string Currency).
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaymentProcessorTests
+  {
+      private readonly PaymentProcessor _processor = new();
+
+      [Fact]
+      public void Process_ValidVisa_ReturnsSuccess()
+      {
+          var result = _processor.Process(new("4111111111111111", 100m, "GBP"));
+          result.IsT0.Should().BeTrue();
+          result.AsT0.Amount.Should().Be(100m);
+          result.AsT0.TransactionId.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public void Process_InvalidAmount_ReturnsDeclined()
+      {
+          var result = _processor.Process(new("4111111111111111", 0m, "GBP"));
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Code.Should().Be("INVALID_AMOUNT");
+      }
+
+      [Fact]
+      public void Process_NegativeAmount_ReturnsDeclined()
+      {
+          var result = _processor.Process(new("4111111111111111", -50m, "GBP"));
+          result.IsT1.Should().BeTrue();
+      }
+
+      [Fact]
+      public void Process_VisaExceedsLimit_ReturnsDeclined()
+      {
+          var result = _processor.Process(new("4111111111111111", 20000m, "GBP"));
+          result.IsT1.Should().BeTrue();
+          result.AsT1.Code.Should().Be("LIMIT");
+      }
+
+      [Fact]
+      public void Process_UnsupportedCard_ReturnsError()
+      {
+          var result = _processor.Process(new("9999999999999999", 100m, "GBP"));
+          result.IsT2.Should().BeTrue();
+          result.AsT2.Message.Should().Be("Unsupported card");
+      }
+
+      [Fact]
+      public void Process_MatchSwitchCoversAllCases()
+      {
+          var result = _processor.Process(new("4111111111111111", 50m, "GBP"));
+          var str = result.Match(s => "ok", d => "declined", e => "error");
+          str.Should().Be("ok");
+      }
+  }

@@ -1,0 +1,44 @@
+name: easy_efcore_006
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Order with properties: int Id, string CustomerName, decimal Total, bool IsCompleted
+  A DbContext class OrderContext with:
+    DbSet<Order> Orders { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class OrderRepository with:
+    decimal GetTotalRevenue(OrderContext context)
+  that returns the sum of Total for all completed orders.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderRepositoryTests
+  {
+      [Fact]
+      public void GetTotalRevenue_SumsCompletedOrders()
+      {
+          using var context = new OrderContext();
+          context.Database.EnsureCreated();
+          context.Orders.AddRange(
+              new Order { CustomerName = "Alice", Total = 100m, IsCompleted = true },
+              new Order { CustomerName = "Bob", Total = 50m, IsCompleted = false },
+              new Order { CustomerName = "Carol", Total = 200m, IsCompleted = true });
+          context.SaveChanges();
+          OrderRepository.GetTotalRevenue(context).Should().Be(300m);
+      }
+      [Fact]
+      public void GetTotalRevenue_NoCompletedOrders_ReturnsZero()
+      {
+          using var context = new OrderContext();
+          context.Database.EnsureCreated();
+          OrderRepository.GetTotalRevenue(context).Should().Be(0m);
+      }
+  }

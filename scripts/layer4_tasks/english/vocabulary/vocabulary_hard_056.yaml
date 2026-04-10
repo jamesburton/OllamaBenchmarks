@@ -1,0 +1,16 @@
+name: vocabulary_hard_056
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In corporate communications, which word carries the LEAST negative connotation for reducing staff?
+  A) Firing
+  B) Sacking
+  C) Rightsizing
+  D) Axing
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

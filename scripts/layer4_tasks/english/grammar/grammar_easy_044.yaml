@@ -1,0 +1,15 @@
+name: grammar_easy_044
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Exhausted after the marathon, a long sleep was needed.
+  B) Exhausted after the marathon, she needed a long sleep.
+  C) Exhausted after the marathon, the need for sleep was felt.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

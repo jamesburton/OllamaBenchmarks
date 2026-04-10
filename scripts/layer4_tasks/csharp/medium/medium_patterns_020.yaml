@@ -1,0 +1,51 @@
+name: medium_patterns_020
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Specification<T> applied to text: StringContainsSpec(string sub, bool ignoreCase) and StringLengthSpec(int min, int max).
+  Both implement ISpecification<string> with bool IsSatisfiedBy(string s).
+  A class SpecificationComposer<T> combining specs with And/Or/Not.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SpecificationComposerTests
+  {
+      [Fact]
+      public void Contains_CaseSensitive_Match()
+      {
+          new StringContainsSpec("hello", false).IsSatisfiedBy("say hello world").Should().BeTrue();
+      }
+
+      [Fact]
+      public void Contains_CaseInsensitive_Match()
+      {
+          new StringContainsSpec("HELLO", true).IsSatisfiedBy("say hello world").Should().BeTrue();
+      }
+
+      [Fact]
+      public void Length_InRange_True()
+      {
+          new StringLengthSpec(3, 10).IsSatisfiedBy("hello").Should().BeTrue();
+      }
+
+      [Fact]
+      public void Length_TooShort_False()
+      {
+          new StringLengthSpec(10, 20).IsSatisfiedBy("hi").Should().BeFalse();
+      }
+
+      [Fact]
+      public void And_BothSatisfied_True()
+      {
+          var spec = new SpecificationComposer<string>(new StringLengthSpec(1, 20))
+              .And(new StringContainsSpec("world", true));
+          spec.IsSatisfiedBy("hello world").Should().BeTrue();
+      }
+  }

@@ -1,0 +1,18 @@
+name: summarisation_easy_041
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The national football team won the championship after a thrilling final match that went to penalties. The goalkeeper saved two crucial shots to secure the trophy. Thousands of fans celebrated in the streets following the historic victory.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "football"
+    - "championship"
+    - "penalties"
+    - "victory"
+  max_words: 25

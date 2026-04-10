@@ -1,0 +1,87 @@
+name: hard_async_014
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncWorkQueue that processes work items with configurable parallelism:
+    Constructor: AsyncWorkQueue(int parallelism)
+    Task EnqueueAsync<T>(T item, Func<T, CancellationToken, Task> handler, CancellationToken ct)
+    Task DrainAsync(CancellationToken ct) — waits until all enqueued work completes.
+    int ActiveCount — number of items currently executing.
+    int QueuedCount — number of items waiting to start.
+    bool IsIdle — true when both Active and Queued are zero.
+  If the handler throws, the exception is captured and rethrown when DrainAsync completes
+  (wrapped in AggregateException if multiple failures).
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncWorkQueueTests
+  {
+      [Fact]
+      public async Task EnqueueAndDrain_ProcessesAllItems()
+      {
+          var results = new System.Collections.Concurrent.ConcurrentBag<int>();
+          var queue = new AsyncWorkQueue(2);
+          for (int i = 1; i <= 5; i++)
+          {
+              var captured = i;
+              await queue.EnqueueAsync(captured, (item, _) =>
+              {
+                  results.Add(item);
+                  return Task.CompletedTask;
+              }, CancellationToken.None);
+          }
+          await queue.DrainAsync(CancellationToken.None);
+          results.Should().BeEquivalentTo(new[] { 1, 2, 3, 4, 5 });
+      }
+
+      [Fact]
+      public async Task ParallelismRespected()
+      {
+          int concurrent = 0, maxConcurrent = 0;
+          var queue = new AsyncWorkQueue(2);
+          var tasks = Enumerable.Range(0, 6).Select(i =>
+              queue.EnqueueAsync(i, async (_, ct) =>
+              {
+                  Interlocked.Increment(ref concurrent);
+                  maxConcurrent = Math.Max(maxConcurrent, concurrent);
+                  await Task.Delay(30, ct);
+                  Interlocked.Decrement(ref concurrent);
+              }, CancellationToken.None));
+          await Task.WhenAll(tasks);
+          await queue.DrainAsync(CancellationToken.None);
+          maxConcurrent.Should().BeLessThanOrEqualTo(2);
+      }
+
+      [Fact]
+      public async Task DrainAsync_HandlerThrows_ThrowsAggregateException()
+      {
+          var queue = new AsyncWorkQueue(2);
+          await queue.EnqueueAsync(1, (_, _) => throw new InvalidOperationException("err"), CancellationToken.None);
+          var act = async () => await queue.DrainAsync(CancellationToken.None);
+          await act.Should().ThrowAsync<Exception>();
+      }
+
+      [Fact]
+      public async Task IsIdle_TrueAfterDrain()
+      {
+          var queue = new AsyncWorkQueue(2);
+          await queue.EnqueueAsync(1, (_, _) => Task.CompletedTask, CancellationToken.None);
+          await queue.DrainAsync(CancellationToken.None);
+          queue.IsIdle.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task DrainAsync_EmptyQueue_ReturnsImmediately()
+      {
+          var queue = new AsyncWorkQueue(2);
+          await queue.DrainAsync(CancellationToken.None);
+          queue.IsIdle.Should().BeTrue();
+      }
+  }

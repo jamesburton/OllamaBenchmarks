@@ -1,0 +1,57 @@
+name: medium_masstransit_001
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: a record OrderPlaced(Guid OrderId, string CustomerId, decimal Total).
+  A consumer class OrderPlacedConsumer that implements IConsumer<OrderPlaced>.
+  Constructor accepts Action<string> logger.
+  In Consume: logs "Order {OrderId} placed for customer {CustomerId} with total {Total}".
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record OrderPlaced(Guid OrderId, string CustomerId, decimal Total); }
+  global using Contracts;
+
+  public class OrderPlacedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_LogsOrderDetails()
+      {
+          var logs = new List<string>();
+          var consumer = new OrderPlacedConsumer(logs.Add);
+          var ctx = Substitute.For<ConsumeContext<OrderPlaced>>();
+          var orderId = Guid.NewGuid();
+          ctx.Message.Returns(new OrderPlaced(orderId, "cust1", 99.99m));
+          await consumer.Consume(ctx);
+          logs.Should().Contain(s => s.Contains(orderId.ToString()));
+          logs.Should().Contain(s => s.Contains("cust1"));
+          logs.Should().Contain(s => s.Contains("99.99"));
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var consumer = new OrderPlacedConsumer(_ => { });
+          var ctx = Substitute.For<ConsumeContext<OrderPlaced>>();
+          ctx.Message.Returns(new OrderPlaced(Guid.NewGuid(), "c", 1m));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_LogsOnce()
+      {
+          var logs = new List<string>();
+          var consumer = new OrderPlacedConsumer(logs.Add);
+          var ctx = Substitute.For<ConsumeContext<OrderPlaced>>();
+          ctx.Message.Returns(new OrderPlaced(Guid.NewGuid(), "c", 1m));
+          await consumer.Consume(ctx);
+          logs.Should().HaveCount(1);
+      }
+  }

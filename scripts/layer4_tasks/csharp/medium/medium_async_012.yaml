@@ -1,0 +1,54 @@
+name: medium_async_012
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface ITokenProvider with method: ValueTask<string> GetTokenAsync(CancellationToken ct = default)
+  A class TokenRefreshingClient with constructor accepting ITokenProvider provider.
+  Expose:
+    Task<string> CallApiAsync(string endpoint, CancellationToken ct = default)
+  Uses the token from the provider, prefixing it with "Bearer " and returning "Bearer <token>: <endpoint>".
+  On first call to an endpoint, fetches a fresh token. Caches the token for subsequent calls.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TokenRefreshingClientTests
+  {
+      [Fact]
+      public async Task CallApiAsync_IncludesToken()
+      {
+          var provider = Substitute.For<ITokenProvider>();
+          provider.GetTokenAsync(Arg.Any<CancellationToken>()).Returns(new ValueTask<string>("abc123"));
+          var result = await new TokenRefreshingClient(provider).CallApiAsync("/api/data");
+          result.Should().Be("Bearer abc123: /api/data");
+      }
+
+      [Fact]
+      public async Task CallApiAsync_TokenCachedOnSecondCall()
+      {
+          var provider = Substitute.For<ITokenProvider>();
+          provider.GetTokenAsync(Arg.Any<CancellationToken>()).Returns(new ValueTask<string>("tok"));
+          var client = new TokenRefreshingClient(provider);
+          await client.CallApiAsync("/a");
+          await client.CallApiAsync("/b");
+          await provider.Received(1).GetTokenAsync(Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task CallApiAsync_DifferentEndpoints_DifferentResults()
+      {
+          var provider = Substitute.For<ITokenProvider>();
+          provider.GetTokenAsync(Arg.Any<CancellationToken>()).Returns(new ValueTask<string>("t"));
+          var client = new TokenRefreshingClient(provider);
+          var r1 = await client.CallApiAsync("/x");
+          var r2 = await client.CallApiAsync("/y");
+          r1.Should().Contain("/x");
+          r2.Should().Contain("/y");
+      }
+  }

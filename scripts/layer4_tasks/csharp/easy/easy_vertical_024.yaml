@@ -1,0 +1,40 @@
+name: easy_vertical_024
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Shipment(string TrackingNumber, string Status, DateTime EstimatedDelivery)
+  A class ShipmentTracker with:
+    void AddShipment(Shipment shipment)
+    Shipment? GetByTracking(string trackingNumber)
+    List<Shipment> GetDelayed(DateTime now) returns shipments where EstimatedDelivery < now and Status != "Delivered"
+    List<Shipment> GetAll()
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShipmentTrackerTests
+  {
+      [Fact]
+      public void GetByTracking_ReturnsCorrectShipment()
+      {
+          var tracker = new ShipmentTracker();
+          tracker.AddShipment(new Shipment("TRK001", "In Transit", DateTime.UtcNow.AddDays(2)));
+          tracker.GetByTracking("TRK001")!.Status.Should().Be("In Transit");
+      }
+      [Fact]
+      public void GetDelayed_ReturnsOverdueShipments()
+      {
+          var tracker = new ShipmentTracker();
+          var now = DateTime.UtcNow;
+          tracker.AddShipment(new Shipment("TRK001", "In Transit", now.AddDays(-1)));
+          tracker.AddShipment(new Shipment("TRK002", "Delivered", now.AddDays(-2)));
+          tracker.AddShipment(new Shipment("TRK003", "In Transit", now.AddDays(1)));
+          tracker.GetDelayed(now).Should().HaveCount(1);
+      }
+  }

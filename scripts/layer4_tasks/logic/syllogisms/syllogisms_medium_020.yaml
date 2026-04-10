@@ -1,0 +1,15 @@
+name: syllogisms_medium_020
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All prime numbers have exactly two distinct factors.
+  2. 1 has only one factor.
+  3. Any number with only one factor is not prime.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "1 is not prime."
+validator_config: {}

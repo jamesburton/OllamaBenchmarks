@@ -1,0 +1,57 @@
+name: medium_async_017
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TimeoutWrapper with static method:
+    Task<T> ExecuteWithTimeoutAsync<T>(Func<CancellationToken, Task<T>> operation, TimeSpan timeout)
+  Runs the operation with a combined CancellationTokenSource that expires after 'timeout'.
+  Throws TimeoutException if the timeout is exceeded.
+  Rethrows original exception if operation fails for other reasons.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TimeoutWrapperTests
+  {
+      [Fact]
+      public async Task ExecuteWithTimeout_CompletesInTime_ReturnsResult()
+      {
+          var result = await TimeoutWrapper.ExecuteWithTimeoutAsync(
+              async ct => { await Task.Yield(); return 42; },
+              TimeSpan.FromSeconds(5));
+          result.Should().Be(42);
+      }
+
+      [Fact]
+      public async Task ExecuteWithTimeout_ExceedsTimeout_ThrowsTimeoutException()
+      {
+          await Assert.ThrowsAsync<TimeoutException>(() =>
+              TimeoutWrapper.ExecuteWithTimeoutAsync(
+                  async ct => { await Task.Delay(5000, ct); return 0; },
+                  TimeSpan.FromMilliseconds(50)));
+      }
+
+      [Fact]
+      public async Task ExecuteWithTimeout_OperationThrows_Rethrows()
+      {
+          await Assert.ThrowsAsync<InvalidOperationException>(() =>
+              TimeoutWrapper.ExecuteWithTimeoutAsync<int>(
+                  ct => Task.FromException<int>(new InvalidOperationException("fail")),
+                  TimeSpan.FromSeconds(5)));
+      }
+
+      [Fact]
+      public async Task ExecuteWithTimeout_ZeroTimeout_ThrowsTimeout()
+      {
+          await Assert.ThrowsAsync<TimeoutException>(() =>
+              TimeoutWrapper.ExecuteWithTimeoutAsync(
+                  async ct => { await Task.Delay(500, ct); return 0; },
+                  TimeSpan.Zero));
+      }
+  }

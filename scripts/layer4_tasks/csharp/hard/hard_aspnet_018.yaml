@@ -1,0 +1,105 @@
+name: hard_aspnet_018
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A minimal API with output caching and ETag support:
+  Record: CatalogItem(int Id, string Name, string Category, decimal Price, DateTime LastModified).
+  Interface ICatalogRepository:
+    Task<IReadOnlyList<CatalogItem>> GetAllAsync(CancellationToken ct)
+    Task<CatalogItem?> GetByIdAsync(int id, CancellationToken ct)
+    Task UpdateAsync(CatalogItem item, CancellationToken ct)
+  Class InMemoryCatalogRepository : ICatalogRepository.
+  Static class CatalogEndpoints with MapCatalogEndpoints(this WebApplication app):
+    GET /catalog — returns all items. Adds ETag header (MD5 hash of response).
+    GET /catalog/{id} — returns item or 404. Adds ETag. Returns 304 if If-None-Match matches.
+    PUT /catalog/{id} — updates item. Validates If-Match header; returns 412 if ETag mismatch.
+  Class ETagHelper: string ComputeETag(object obj), bool IsMatch(string etag, string ifNoneMatch).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CatalogEndpointsTests
+  {
+      private static WebApplication BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddSingleton<ICatalogRepository>(new InMemoryCatalogRepository(new[]
+          {
+              new CatalogItem(1, "Widget", "Tools", 9.99m, DateTime.UtcNow),
+              new CatalogItem(2, "Gadget", "Electronics", 29.99m, DateTime.UtcNow),
+          }));
+          var app = builder.Build();
+          app.MapCatalogEndpoints();
+          return app;
+      }
+
+      [Fact]
+      public async Task GetAll_Returns200WithItems()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/catalog");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          var items = await resp.Content.ReadFromJsonAsync<IReadOnlyList<CatalogItem>>();
+          items.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetAll_HasETagHeader()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/catalog");
+          resp.Headers.ETag.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task GetById_Returns200ForExistingItem()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/catalog/1");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+
+      [Fact]
+      public async Task GetById_Returns404ForMissingItem()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync("/catalog/9999");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+      }
+
+      [Fact]
+      public async Task GetById_IfNoneMatchMatch_Returns304()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var first = await client.GetAsync("/catalog/1");
+          var etag = first.Headers.ETag!.Tag;
+          var req = new HttpRequestMessage(HttpMethod.Get, "/catalog/1");
+          req.Headers.IfNoneMatch.ParseAdd(etag);
+          var resp = await client.SendAsync(req);
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NotModified);
+      }
+
+      [Fact]
+      public async Task ETagHelper_SameInput_SameETag()
+      {
+          var item = new CatalogItem(1, "Test", "Cat", 1m, new DateTime(2024, 1, 1));
+          var e1 = ETagHelper.ComputeETag(item);
+          var e2 = ETagHelper.ComputeETag(item);
+          e1.Should().Be(e2);
+      }
+
+      [Fact]
+      public async Task ETagHelper_DifferentInput_DifferentETag()
+      {
+          var e1 = ETagHelper.ComputeETag(new { A = 1 });
+          var e2 = ETagHelper.ComputeETag(new { A = 2 });
+          e1.Should().NotBe(e2);
+      }
+  }

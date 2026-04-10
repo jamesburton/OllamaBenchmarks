@@ -1,0 +1,43 @@
+name: easy_vertical_027
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Project(string Id, string Name, string OwnerId, bool IsArchived)
+  An interface IProjectRepository with methods:
+    Task AddAsync(Project project)
+    Task<List<Project>> GetByOwnerAsync(string ownerId)
+    Task<Project?> GetByIdAsync(string id)
+    Task UpdateAsync(Project project)
+  A class ProjectService with constructor taking IProjectRepository, and async method:
+    Task ArchiveAsync(string projectId) sets IsArchived = true using 'with' and saves
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProjectServiceTests
+  {
+      [Fact]
+      public async Task ArchiveAsync_SetsIsArchivedTrue()
+      {
+          var repo = Substitute.For<IProjectRepository>();
+          repo.GetByIdAsync("proj1").Returns(new Project("proj1", "My App", "owner1", false));
+          var service = new ProjectService(repo);
+          await service.ArchiveAsync("proj1");
+          await repo.Received(1).UpdateAsync(Arg.Is<Project>(p => p.IsArchived && p.Id == "proj1"));
+      }
+      [Fact]
+      public async Task ArchiveAsync_NotFound_DoesNotCallUpdate()
+      {
+          var repo = Substitute.For<IProjectRepository>();
+          repo.GetByIdAsync("none").Returns((Project?)null);
+          var service = new ProjectService(repo);
+          await service.ArchiveAsync("none");
+          await repo.DidNotReceive().UpdateAsync(Arg.Any<Project>());
+      }
+  }

@@ -1,0 +1,14 @@
+name: word_problems_medium_015
+category: maths
+subcategory: word_problems
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  A car and a truck start from the same point. The car travels at 90 km/h and the truck at 60 km/h. After 2 hours, how much farther ahead is the car?
+  Reply with only the number.
+expected_answer: "60"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

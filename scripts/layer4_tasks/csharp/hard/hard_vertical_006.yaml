@@ -1,0 +1,90 @@
+name: hard_vertical_006
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + async + LINQ for analytics dashboard:
+  Entities:
+    Sale(int Id, string ProductId, string ProductName, string Category, decimal Amount, int Quantity, DateTime SaleDate, string Region)
+  DbContext: SalesDbContext (SQLite in-memory), seeds 50 sales across 3 categories and 4 regions.
+
+  Records:
+    CategoryStats(string Category, decimal TotalRevenue, int TotalQuantity, decimal AvgOrderValue, int OrderCount)
+    RegionStats(string Region, decimal TotalRevenue, int OrderCount)
+    DashboardData(IReadOnlyList<CategoryStats> ByCategory, IReadOnlyList<RegionStats> ByRegion,
+      decimal GrandTotal, DateTime From, DateTime To)
+
+  Class SalesDashboardService(SalesDbContext db):
+    Task<DashboardData> GetDashboardAsync(DateTime from, DateTime to, CancellationToken ct)
+    Task<IReadOnlyList<Sale>> GetTopSalesAsync(int count, CancellationToken ct): by Amount desc.
+    Task<decimal> GetAverageOrderValueAsync(string? category, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class SalesDashboardServiceTests : IDisposable
+  {
+      private readonly SalesDbContext _db;
+      private readonly SalesDashboardService _svc;
+
+      public SalesDashboardServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<SalesDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new SalesDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new SalesDashboardService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task GetDashboard_ReturnsAllCategories()
+      {
+          var data = await _svc.GetDashboardAsync(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow, CancellationToken.None);
+          data.ByCategory.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task GetDashboard_ReturnsAllRegions()
+      {
+          var data = await _svc.GetDashboardAsync(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow, CancellationToken.None);
+          data.ByRegion.Should().HaveCount(4);
+      }
+
+      [Fact]
+      public async Task GetDashboard_GrandTotalSumsAllRevenue()
+      {
+          var data = await _svc.GetDashboardAsync(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow, CancellationToken.None);
+          data.GrandTotal.Should().Be(data.ByCategory.Sum(c => c.TotalRevenue));
+      }
+
+      [Fact]
+      public async Task GetTopSales_ReturnsCorrectCount()
+      {
+          var top = await _svc.GetTopSalesAsync(5, CancellationToken.None);
+          top.Should().HaveCount(5);
+          top.Should().BeInDescendingOrder(s => s.Amount);
+      }
+
+      [Fact]
+      public async Task GetAverageOrderValue_AllCategories()
+      {
+          var avg = await _svc.GetAverageOrderValueAsync(null, CancellationToken.None);
+          avg.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task GetAverageOrderValue_ByCategory_LessThanOverall()
+      {
+          var all = await _svc.GetAverageOrderValueAsync(null, CancellationToken.None);
+          var data = await _svc.GetDashboardAsync(DateTime.MinValue, DateTime.MaxValue, CancellationToken.None);
+          var firstCategory = data.ByCategory.First().Category;
+          var catAvg = await _svc.GetAverageOrderValueAsync(firstCategory, CancellationToken.None);
+          catAvg.Should().BeGreaterThan(0);
+      }
+  }

@@ -1,0 +1,14 @@
+name: sequences_hard_006
+category: logic
+subcategory: sequences
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  What is the next number in: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, ...? (11th term)
+  Reply with only the number.
+expected_answer: "89"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

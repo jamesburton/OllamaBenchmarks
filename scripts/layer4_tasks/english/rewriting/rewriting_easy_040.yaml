@@ -1,0 +1,21 @@
+name: rewriting_easy_040
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'Your request has been forwarded to the relevant department.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "sent"
+    - "forwarded"
+    - "passed on"
+    - "department"
+    - "request"
+  min_words: 4
+  max_words: 15

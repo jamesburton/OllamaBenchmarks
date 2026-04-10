@@ -1,0 +1,87 @@
+name: hard_linq_008
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: Transaction(int Id, string AccountId, string Type, decimal Amount, DateTime OccurredAt).
+  A class TransactionLedger with constructor accepting IEnumerable<Transaction> transactions.
+  Methods:
+    IEnumerable<AccountBalance> ComputeBalances() — for each account, credits (Type=="Credit")
+      add to balance, debits (Type=="Debit") subtract. Returns AccountBalance ordered by AccountId.
+    IEnumerable<Transaction> Suspicious(decimal threshold) — transactions where Amount > threshold
+      ordered by Amount descending.
+    IEnumerable<DailyVolume> DailyVolumes(string accountId) — groups by date, sums Amount
+      for all transaction types. Orders by Date ascending.
+  Records: AccountBalance(string AccountId, decimal Balance),
+           DailyVolume(DateOnly Date, decimal Volume).
+  Throw ArgumentException if accountId is null or empty in DailyVolumes.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TransactionLedgerTests
+  {
+      private static readonly DateTime T1 = new(2024,1,10);
+      private static readonly DateTime T2 = new(2024,1,11);
+      private static readonly List<Transaction> Txns = new()
+      {
+          new(1, "ACC1", "Credit", 500m,  T1),
+          new(2, "ACC1", "Debit",  200m,  T1),
+          new(3, "ACC1", "Credit", 300m,  T2),
+          new(4, "ACC2", "Credit", 1000m, T1),
+          new(5, "ACC2", "Debit",  1500m, T2),
+      };
+
+      [Fact]
+      public void ComputeBalances_ACC1IsCorrect()
+      {
+          var result = new TransactionLedger(Txns).ComputeBalances().ToList();
+          result.First(b => b.AccountId == "ACC1").Balance.Should().Be(600m);
+      }
+
+      [Fact]
+      public void ComputeBalances_ACC2IsNegative()
+      {
+          var result = new TransactionLedger(Txns).ComputeBalances().ToList();
+          result.First(b => b.AccountId == "ACC2").Balance.Should().Be(-500m);
+      }
+
+      [Fact]
+      public void Suspicious_FiltersAboveThreshold()
+      {
+          var result = new TransactionLedger(Txns).Suspicious(400m).ToList();
+          result.Should().AllSatisfy(t => t.Amount.Should().BeGreaterThan(400m));
+      }
+
+      [Fact]
+      public void Suspicious_OrderedByAmountDescending()
+      {
+          var result = new TransactionLedger(Txns).Suspicious(100m).ToList();
+          result.Select(t => t.Amount).Should().BeInDescendingOrder();
+      }
+
+      [Fact]
+      public void DailyVolumes_ACC1HasTwoDays()
+      {
+          var result = new TransactionLedger(Txns).DailyVolumes("ACC1").ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void DailyVolumes_NullAccountId_ThrowsArgumentException()
+      {
+          var act = () => new TransactionLedger(Txns).DailyVolumes(null!).ToList();
+          act.Should().Throw<ArgumentException>();
+      }
+
+      [Fact]
+      public void ComputeBalances_EmptyInput_ReturnsEmpty()
+      {
+          new TransactionLedger(Array.Empty<Transaction>()).ComputeBalances().Should().BeEmpty();
+      }
+  }

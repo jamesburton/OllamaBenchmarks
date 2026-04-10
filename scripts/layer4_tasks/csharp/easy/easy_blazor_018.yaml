@@ -1,0 +1,38 @@
+name: easy_blazor_018
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class TabsComponent that extends ComponentBase with:
+    [Parameter] List<string> Tabs { get; set; } = new()
+    string ActiveTab { get; set; } = ""
+    void SelectTab(string tab) sets ActiveTab = tab
+    public void OnInitializedPublic() calls OnInitialized()
+  Override protected void OnInitialized() to set ActiveTab to Tabs.FirstOrDefault() ?? "".
+  Return only valid C# code in a single file.
+test_code: |
+  public class TabsComponentTests
+  {
+      [Fact]
+      public void OnInitialized_SetsFirstTabAsActive()
+      {
+          var c = new TabsComponent { Tabs = new List<string> { "Home", "About", "Contact" } };
+          c.OnInitializedPublic();
+          c.ActiveTab.Should().Be("Home");
+      }
+      [Fact]
+      public void SelectTab_ChangesActiveTab()
+      {
+          var c = new TabsComponent { Tabs = new List<string> { "Home", "About" } };
+          c.OnInitializedPublic();
+          c.SelectTab("About");
+          c.ActiveTab.Should().Be("About");
+      }
+  }

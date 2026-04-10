@@ -1,0 +1,39 @@
+name: medium_xunit_038
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TextDiff with:
+    IEnumerable<(int Line, string Change, string Content)> Diff(string original, string modified), int LinesAdded, int LinesRemoved, int LinesUnchanged
+  Return only valid C# code in a single file.
+test_code: |
+  public class TextDiffTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new TextDiff();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new TextDiff();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new TextDiff();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

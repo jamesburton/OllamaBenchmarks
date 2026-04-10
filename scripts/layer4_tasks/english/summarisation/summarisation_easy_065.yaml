@@ -1,0 +1,18 @@
+name: summarisation_easy_065
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A new immigration law has been passed, tightening border controls and creating a faster process for asylum applications. Human rights organisations have raised concerns about the welfare of asylum seekers under the new rules. The government says the changes are necessary to reduce illegal crossings.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "immigration"
+    - "asylum"
+    - "border"
+    - "human rights"
+  max_words: 25

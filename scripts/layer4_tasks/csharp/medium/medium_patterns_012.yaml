@@ -1,0 +1,40 @@
+name: medium_patterns_012
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class StringParser with nullable-aware methods:
+    int? ParseInt(string? input)
+    double? ParseDouble(string? input)
+    DateTime? ParseDate(string? input, string format)
+    T? ParseEnum<T>(string? input) where T : struct, Enum
+  All return null if parsing fails or input is null.
+  Return only valid C# code in a single file.
+test_code: |
+  public class StringParserTests
+  {
+      [Fact]
+      public void ParseInt_Valid() { new StringParser().ParseInt("42").Should().Be(42); }
+
+      [Fact]
+      public void ParseInt_Invalid_Null() { new StringParser().ParseInt("abc").Should().BeNull(); }
+
+      [Fact]
+      public void ParseInt_NullInput_Null() { new StringParser().ParseInt(null).Should().BeNull(); }
+
+      [Fact]
+      public void ParseEnum_Valid() { new StringParser().ParseEnum<DayOfWeek>("Monday").Should().Be(DayOfWeek.Monday); }
+
+      [Fact]
+      public void ParseDate_Valid()
+      {
+          new StringParser().ParseDate("2024-01-15","yyyy-MM-dd").Should().Be(new DateTime(2024,1,15));
+      }
+  }

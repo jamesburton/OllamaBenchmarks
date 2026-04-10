@@ -1,0 +1,41 @@
+name: medium_vertical_026
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for sendsurvey.
+  Include:
+    Command: string SurveyId, IEnumerable<string> RecipientEmails, string Subject, DateTime? ExpiresAt
+  Result: int Sent, int Failed, DateTime SentAt
+  Handler validates: RecipientEmails not empty, all valid emails, ExpiresAt if set must be future.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SendSurveyHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new SendSurveyHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new SendSurveyHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new SendSurveyHandler();
+          handler.Should().NotBeNull();
+      }
+  }

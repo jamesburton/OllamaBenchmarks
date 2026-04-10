@@ -1,0 +1,18 @@
+name: summarisation_medium_013
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The shift to electric vehicles is forcing automotive manufacturers to overhaul their supply chains. Traditional suppliers of combustion engine components face an uncertain future, while battery manufacturers are expanding rapidly. Governments are offering incentives to accelerate the transition to cleaner transportation.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "electric vehicles"
+    - "battery"
+    - "supply chain"
+    - "manufacturers"
+  max_words: 25

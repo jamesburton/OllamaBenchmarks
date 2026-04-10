@@ -1,0 +1,57 @@
+name: medium_aspnet_037
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record MetricPoint(string Name, double Value, DateTime Timestamp, IDictionary<string, string> Tags).
+  A class MetricsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<MetricPoint> (for testability).
+  Actions:
+    POST api/metrics — adds a metric point, returns 201
+    GET api/metrics/{name} — returns all points for a metric name
+    GET api/metrics/{name}/summary — returns { min, max, avg, count } for the metric
+  Return only valid C# code in a single file.
+test_code: |
+  public class MetricsControllerTests
+  {
+      private MetricsController MakeController() => new(new List<MetricPoint>
+      {
+          new("cpu", 40.0, DateTime.UtcNow.AddMinutes(-3), new Dictionary<string, string> { ["host"] = "srv1" }),
+          new("cpu", 60.0, DateTime.UtcNow.AddMinutes(-2), new Dictionary<string, string> { ["host"] = "srv1" }),
+          new("cpu", 80.0, DateTime.UtcNow.AddMinutes(-1), new Dictionary<string, string> { ["host"] = "srv2" }),
+          new("mem", 50.0, DateTime.UtcNow, new Dictionary<string, string>())
+      });
+
+      [Fact]
+      public void Add_Returns201()
+      {
+          var ctrl = new MetricsController(new List<MetricPoint>());
+          var point = new MetricPoint("test", 1.0, DateTime.UtcNow, new Dictionary<string, string>());
+          ctrl.Add(point).Should().BeOfType<CreatedAtActionResult>();
+      }
+
+      [Fact]
+      public void GetByName_ReturnsCorrectPoints()
+      {
+          var result = MakeController().GetByName("cpu") as OkObjectResult;
+          (result!.Value as IEnumerable<MetricPoint>).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void GetSummary_CalculatesCorrectly()
+      {
+          var result = MakeController().GetSummary("cpu") as OkObjectResult;
+          var summary = result!.Value!;
+          var type = summary.GetType();
+          ((double)type.GetProperty("min")!.GetValue(summary)!).Should().BeApproximately(40.0, 0.01);
+          ((double)type.GetProperty("max")!.GetValue(summary)!).Should().BeApproximately(80.0, 0.01);
+          ((int)type.GetProperty("count")!.GetValue(summary)!).Should().Be(3);
+      }
+  }

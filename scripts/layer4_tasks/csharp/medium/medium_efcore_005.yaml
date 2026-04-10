@@ -1,0 +1,70 @@
+name: medium_efcore_005
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity UserProfile with: int Id, string UserId, string DisplayName, string? Bio, DateTime LastSeen.
+  Add a HasQueryFilter that filters out profiles where LastSeen < 30 days ago (inactive).
+  A class ProfileDbContext : DbContext with DbSet<UserProfile> Profiles.
+  A class ProfileRepository with constructor accepting ProfileDbContext.
+  Methods:
+    Task<UserProfile?> GetActiveProfileAsync(string userId)
+    Task<IEnumerable<UserProfile>> GetAllIncludingInactiveAsync()
+    Task UpdateLastSeenAsync(string userId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProfileRepositoryTests : IAsyncLifetime
+  {
+      private ProfileDbContext _db = null!;
+      private ProfileRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<ProfileDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new ProfileDbContext(opts);
+          _repo = new ProfileRepository(_db);
+          _db.Profiles.AddRange(
+              new UserProfile { UserId = "u1", DisplayName = "Alice", LastSeen = DateTime.UtcNow },
+              new UserProfile { UserId = "u2", DisplayName = "Bob", LastSeen = DateTime.UtcNow.AddDays(-60) });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetActiveProfile_ReturnsActiveOnly()
+      {
+          var p = await _repo.GetActiveProfileAsync("u1");
+          p!.DisplayName.Should().Be("Alice");
+      }
+
+      [Fact]
+      public async Task GetActiveProfile_InactiveUser_ReturnsNull()
+      {
+          (await _repo.GetActiveProfileAsync("u2")).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task GetAllIncludingInactive_ReturnsAll()
+      {
+          (await _repo.GetAllIncludingInactiveAsync()).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task UpdateLastSeen_SetsCurrentTime()
+      {
+          var before = DateTime.UtcNow.AddSeconds(-1);
+          await _repo.UpdateLastSeenAsync("u2");
+          _db.ChangeTracker.Clear();
+          var profile = await _db.Profiles.IgnoreQueryFilters().FirstAsync(p => p.UserId == "u2");
+          profile.LastSeen.Should().BeAfter(before);
+      }
+  }

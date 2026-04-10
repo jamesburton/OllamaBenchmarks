@@ -1,0 +1,14 @@
+name: word_problems_medium_011
+category: maths
+subcategory: word_problems
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  A tank is filled by one pipe in 4 hours and drained by another pipe in 6 hours. If both pipes are open, how many hours to fill the tank?
+  Reply with only the number.
+expected_answer: "12"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

@@ -1,0 +1,38 @@
+name: easy_vertical_050
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Reservation(string Id, string GuestName, int RoomNumber, DateTime CheckIn, DateTime CheckOut)
+  A class Hotel with:
+    void AddReservation(Reservation reservation)
+    bool IsRoomAvailable(int roomNumber, DateTime checkIn, DateTime checkOut) returns true if no overlapping reservations exist
+    List<Reservation> GetForGuest(string guestName)
+    List<Reservation> GetCurrentReservations(DateTime now) returns active reservations where now is between CheckIn and CheckOut
+  Return only valid C# code in a single file.
+test_code: |
+  public class HotelTests
+  {
+      [Fact]
+      public void IsRoomAvailable_NoOverlap_ReturnsTrue()
+      {
+          var hotel = new Hotel();
+          var existing = new Reservation("r1", "Alice", 101, new DateTime(2024,1,10), new DateTime(2024,1,15));
+          hotel.AddReservation(existing);
+          hotel.IsRoomAvailable(101, new DateTime(2024,1,16), new DateTime(2024,1,20)).Should().BeTrue();
+      }
+      [Fact]
+      public void IsRoomAvailable_Overlapping_ReturnsFalse()
+      {
+          var hotel = new Hotel();
+          hotel.AddReservation(new Reservation("r1", "Alice", 101, new DateTime(2024,1,10), new DateTime(2024,1,15)));
+          hotel.IsRoomAvailable(101, new DateTime(2024,1,12), new DateTime(2024,1,18)).Should().BeFalse();
+      }
+  }

@@ -1,0 +1,14 @@
+name: word_problems_medium_014
+category: maths
+subcategory: word_problems
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  Three workers can finish a job in 6 days. If two workers are added, how many days does it take?
+  Reply with only the number.
+expected_answer: "3.6"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

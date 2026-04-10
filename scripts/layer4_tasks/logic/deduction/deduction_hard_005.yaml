@@ -1,0 +1,16 @@
+name: deduction_hard_005
+category: logic
+subcategory: deduction
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All mammals are warm-blooded.
+  2. No reptile is warm-blooded.
+  3. All warm-blooded vertebrates are either mammals or birds.
+  4. A platypus is warm-blooded and a vertebrate, but not a bird.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "A platypus is a mammal."
+validator_config: {}

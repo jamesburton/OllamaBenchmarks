@@ -1,0 +1,102 @@
+name: hard_xunit_009
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing async exception scenarios:
+  Records:
+    RetryConfig(int MaxAttempts, TimeSpan Delay, IReadOnlyList<Type> RetryableExceptions)
+    RetryResult<T>(T? Value, int Attempts, bool Succeeded, Exception? LastException)
+
+  Class RetryPolicy(RetryConfig config):
+    Task<RetryResult<T>> ExecuteAsync<T>(Func<int, CancellationToken, Task<T>> operation, CancellationToken ct):
+      Retries up to MaxAttempts times with Delay between attempts.
+      Only retries if exception type is in RetryableExceptions.
+      Returns RetryResult with attempt count, success flag, value or last exception.
+
+  Class TransientException : Exception { }
+  Class PermanentException : Exception { }
+
+  Tests verify:
+    Success on first attempt.
+    Retry on TransientException, success on Nth attempt.
+    No retry on PermanentException.
+    Exhausted retries returns failed result.
+    CancellationToken respected.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RetryPolicyTests
+  {
+      private RetryPolicy CreatePolicy(int maxAttempts = 3) => new(new RetryConfig(
+          maxAttempts, TimeSpan.FromMilliseconds(10),
+          new[] { typeof(TransientException) }));
+
+      [Fact]
+      public async Task Success_FirstAttempt_ReturnsResult()
+      {
+          var policy = CreatePolicy();
+          var result = await policy.ExecuteAsync<string>((_, _) => Task.FromResult("ok"), CancellationToken.None);
+          result.Succeeded.Should().BeTrue();
+          result.Value.Should().Be("ok");
+          result.Attempts.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task TransientException_RetriesAndSucceeds()
+      {
+          var policy = CreatePolicy();
+          var callCount = 0;
+          var result = await policy.ExecuteAsync<int>(async (attempt, ct) =>
+          {
+              callCount++;
+              if (callCount < 3) throw new TransientException();
+              return 42;
+          }, CancellationToken.None);
+          result.Succeeded.Should().BeTrue();
+          result.Attempts.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task PermanentException_DoesNotRetry()
+      {
+          var policy = CreatePolicy();
+          var calls = 0;
+          var result = await policy.ExecuteAsync<int>((_, _) =>
+          {
+              calls++;
+              throw new PermanentException();
+          }, CancellationToken.None);
+          result.Succeeded.Should().BeFalse();
+          calls.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task ExhaustedRetries_ReturnsFailed()
+      {
+          var policy = CreatePolicy(2);
+          var result = await policy.ExecuteAsync<int>((_, _) => throw new TransientException(), CancellationToken.None);
+          result.Succeeded.Should().BeFalse();
+          result.Attempts.Should().Be(2);
+          result.LastException.Should().BeOfType<TransientException>();
+      }
+
+      [Fact]
+      public async Task Cancellation_StopsRetry()
+      {
+          var policy = CreatePolicy();
+          using var cts = new CancellationTokenSource(50);
+          var result = await policy.ExecuteAsync<int>(async (_, ct) =>
+          {
+              await Task.Delay(200, ct);
+              throw new TransientException();
+          }, cts.Token);
+          result.Succeeded.Should().BeFalse();
+      }
+  }

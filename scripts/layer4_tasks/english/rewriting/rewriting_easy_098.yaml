@@ -1,0 +1,21 @@
+name: rewriting_easy_098
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'At this point in time, we are unable to provide a refund.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "currently"
+    - "now"
+    - "refund"
+    - "cannot"
+    - "provide"
+  min_words: 4
+  max_words: 12

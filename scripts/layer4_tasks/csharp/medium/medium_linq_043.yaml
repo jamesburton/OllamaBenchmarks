@@ -1,0 +1,64 @@
+name: medium_linq_043
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ExamResult with: string StudentName, string Subject, int Score.
+  A class ExamReporter with a constructor accepting IEnumerable<ExamResult> results.
+  Expose:
+    IEnumerable<StudentReport> StudentReports()
+      — for each student: TotalScore, SubjectCount, BestSubject (highest score)
+      ordered by TotalScore desc
+    IEnumerable<SubjectStats> SubjectStats()
+      — for each subject: Mean, Min, Max, PassRate (percentage with Score >= 50)
+      ordered by Mean desc
+  StudentReport is a record with: string StudentName, int TotalScore, int SubjectCount, string BestSubject.
+  SubjectStats is a record with: string Subject, double Mean, int Min, int Max, double PassRate.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExamReporterTests
+  {
+      private readonly ExamResult[] _results = {
+          new("Alice","Maths",   80),
+          new("Alice","Science", 70),
+          new("Bob",  "Maths",   40),
+          new("Bob",  "Science", 60),
+          new("Bob",  "English", 55),
+      };
+
+      [Fact]
+      public void StudentReports_AliceHasTwoSubjects()
+      {
+          var alice = new ExamReporter(_results).StudentReports().First(s => s.StudentName == "Alice");
+          alice.SubjectCount.Should().Be(2);
+          alice.TotalScore.Should().Be(150);
+      }
+
+      [Fact]
+      public void StudentReports_AliceBestSubjectMaths()
+      {
+          var alice = new ExamReporter(_results).StudentReports().First(s => s.StudentName == "Alice");
+          alice.BestSubject.Should().Be("Maths");
+      }
+
+      [Fact]
+      public void SubjectStats_MathsPassRateIs50Percent()
+      {
+          var maths = new ExamReporter(_results).SubjectStats().First(s => s.Subject == "Maths");
+          maths.PassRate.Should().Be(50.0);
+      }
+
+      [Fact]
+      public void StudentReports_OrderedByTotalDesc()
+      {
+          var result = new ExamReporter(_results).StudentReports().ToList();
+          result.Select(s => s.TotalScore).Should().BeInDescendingOrder();
+      }
+  }

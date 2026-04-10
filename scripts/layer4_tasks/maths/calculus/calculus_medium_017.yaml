@@ -1,0 +1,13 @@
+name: calculus_medium_017
+category: maths
+subcategory: calculus
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Evaluate: integral of x^2 dx from 1 to 4. Reply with only the number.
+expected_answer: "21"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

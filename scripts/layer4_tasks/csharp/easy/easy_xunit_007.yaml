@@ -1,0 +1,33 @@
+name: easy_xunit_007
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Validator with a static method:
+    bool IsValidEmail(string email) returns true if email contains exactly one '@' and at least one '.' after the '@'
+  Return only valid C# code in a single file.
+test_code: |
+  public class ValidatorTests
+  {
+      [Theory]
+      [InlineData("user@example.com", true)]
+      [InlineData("notanemail", false)]
+      [InlineData("missing@dot", false)]
+      [InlineData("two@@signs.com", false)]
+      public void IsValidEmail_ReturnsCorrectResult(string email, bool expected)
+      {
+          Validator.IsValidEmail(email).Should().Be(expected);
+      }
+      [Fact]
+      public void IsValidEmail_EmptyString_ReturnsFalse()
+      {
+          Validator.IsValidEmail("").Should().BeFalse();
+      }
+  }

@@ -1,0 +1,22 @@
+name: technical_medium_015
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Security' section for an application that handles sensitive user data.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "security"
+    - "encrypt"
+    - "password"
+    - "data"
+    - "HTTPS"
+    - "vulnerability"
+    - "report"
+  min_words: 10
+  max_words: 80

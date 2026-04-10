@@ -1,0 +1,119 @@
+name: hard_masstransit_021
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit saga for document approval workflow:
+  Messages:
+    record SubmitDocument(Guid DocumentId, string AuthorId, string Title, string Content);
+    record ReviewDocument(Guid DocumentId, string ReviewerId, bool Approved, string? Comments);
+    record DocumentApproved(Guid DocumentId, string AuthorId);
+    record DocumentRejected(Guid DocumentId, string AuthorId, string Reason);
+    record RequestRevision(Guid DocumentId, string Comments);
+
+  States: Submitted, UnderReview, Approved, Rejected, RevisionRequested.
+  DocumentApprovalSaga : MassTransitStateMachine<DocumentApprovalState>
+  Transitions:
+    Initially + SubmitDocument -> Submitted
+    Submitted + ReviewDocument (Approved=true) -> Approved (publish DocumentApproved)
+    Submitted + ReviewDocument (Approved=false, no comments) -> Rejected (publish DocumentRejected)
+    Submitted + ReviewDocument (Approved=false, has comments) -> RevisionRequested (publish RequestRevision)
+    RevisionRequested + SubmitDocument -> Submitted (re-submission)
+
+  DocumentApprovalState: Guid CorrelationId, string CurrentState, string AuthorId, string Title,
+    string? ReviewerId, int RevisionCount, DateTime SubmittedAt.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DocumentApprovalSagaTests
+  {
+      [Fact]
+      public async Task SubmitDocument_TransitionsToSubmitted()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<DocumentApprovalState, DocumentApprovalSaga>(new DocumentApprovalSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitDocument(id, "author1", "My Doc", "Content here"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Submitted).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task Approval_TransitionsToApproved_And_PublishesEvent()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<DocumentApprovalState, DocumentApprovalSaga>(new DocumentApprovalSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitDocument(id, "author2", "Report", "Body"));
+              await harness.InputQueueSendEndpoint.Send(new ReviewDocument(id, "reviewer1", true, null));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Approved).Should().NotBeNull();
+              (await harness.Published.Any<DocumentApproved>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task Rejection_NoComments_TransitionsToRejected()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<DocumentApprovalState, DocumentApprovalSaga>(new DocumentApprovalSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitDocument(id, "author3", "Doc3", "Body3"));
+              await harness.InputQueueSendEndpoint.Send(new ReviewDocument(id, "reviewer2", false, null));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Rejected).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task RevisionRequested_WithComments_TransitionsState()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<DocumentApprovalState, DocumentApprovalSaga>(new DocumentApprovalSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitDocument(id, "author4", "Draft", "v1"));
+              await harness.InputQueueSendEndpoint.Send(new ReviewDocument(id, "reviewer3", false, "Needs more detail"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.RevisionRequested).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SagaState_StoresAuthorAndTitle()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<DocumentApprovalState, DocumentApprovalSaga>(new DocumentApprovalSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new SubmitDocument(id, "stored-author", "Stored Title", "c"));
+              var state = sagaHarness.Sagas.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Submitted);
+              state!.AuthorId.Should().Be("stored-author");
+              state.Title.Should().Be("Stored Title");
+          }
+          finally { await harness.Stop(); }
+      }
+  }

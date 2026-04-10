@@ -1,0 +1,85 @@
+name: hard_async_011
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncPriorityQueue<T> implementing an async-friendly priority queue:
+    Constructor: AsyncPriorityQueue()
+    Task EnqueueAsync(T item, int priority, CancellationToken ct) — enqueues item.
+    Task<T> DequeueAsync(CancellationToken ct) — dequeues highest-priority item (highest int = highest priority).
+      Waits asynchronously if the queue is empty.
+    Task<T[]> DrainAsync(CancellationToken ct) — dequeues all currently available items, returns them in priority order.
+    int Count — current queue size.
+    void Complete() — signals no more items will be enqueued; DequeueAsync returns when empty.
+  Must be thread-safe. DequeueAsync must return ChannelClosedException when Complete() is called and queue is empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncPriorityQueueTests
+  {
+      [Fact]
+      public async Task DequeueAsync_ReturnsHighestPriorityFirst()
+      {
+          var q = new AsyncPriorityQueue<string>();
+          await q.EnqueueAsync("low",  1, CancellationToken.None);
+          await q.EnqueueAsync("high", 5, CancellationToken.None);
+          await q.EnqueueAsync("mid",  3, CancellationToken.None);
+          var first = await q.DequeueAsync(CancellationToken.None);
+          first.Should().Be("high");
+      }
+
+      [Fact]
+      public async Task DrainAsync_ReturnsAllInPriorityOrder()
+      {
+          var q = new AsyncPriorityQueue<int>();
+          await q.EnqueueAsync(10, 1, CancellationToken.None);
+          await q.EnqueueAsync(20, 3, CancellationToken.None);
+          await q.EnqueueAsync(30, 2, CancellationToken.None);
+          var result = await q.DrainAsync(CancellationToken.None);
+          result.Should().ContainInOrder(20, 30, 10);
+      }
+
+      [Fact]
+      public void Count_ReflectsQueueSize()
+      {
+          var q = new AsyncPriorityQueue<int>();
+          q.EnqueueAsync(1, 1, CancellationToken.None).Wait();
+          q.EnqueueAsync(2, 2, CancellationToken.None).Wait();
+          q.Count.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task DequeueAsync_WaitsForItem()
+      {
+          var q = new AsyncPriorityQueue<int>();
+          var deqTask = q.DequeueAsync(CancellationToken.None);
+          deqTask.IsCompleted.Should().BeFalse();
+          await q.EnqueueAsync(99, 1, CancellationToken.None);
+          var result = await deqTask;
+          result.Should().Be(99);
+      }
+
+      [Fact]
+      public async Task DequeueAsync_Cancelled_ThrowsOperationCancelled()
+      {
+          var q = new AsyncPriorityQueue<int>();
+          var cts = new CancellationTokenSource(50);
+          var act = async () => await q.DequeueAsync(cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+
+      [Fact]
+      public async Task Complete_EmptyQueue_ThrowsOnDequeue()
+      {
+          var q = new AsyncPriorityQueue<int>();
+          q.Complete();
+          var act = async () => await q.DequeueAsync(CancellationToken.None);
+          await act.Should().ThrowAsync<Exception>();
+      }
+  }

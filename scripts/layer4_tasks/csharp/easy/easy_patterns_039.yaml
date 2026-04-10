@@ -1,0 +1,48 @@
+name: easy_patterns_039
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ImmutableStack<T> with:
+    - static readonly ImmutableStack<T> Empty with no items
+    - bool IsEmpty { get; }
+    - ImmutableStack<T> Push(T item) — returns new stack with item on top
+    - (T Top, ImmutableStack<T> Rest) Pop() — returns top item and remainder
+  Implement using a readonly field for head and tail.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ImmutableStackTests
+  {
+      [Fact]
+      public void Push_Pop_ReturnsValue()
+      {
+          var stack = ImmutableStack<int>.Empty.Push(1).Push(2).Push(3);
+          var (top, rest) = stack.Pop();
+          top.Should().Be(3);
+          rest.IsEmpty.Should().BeFalse();
+      }
+      [Fact]
+      public void Empty_IsEmpty_ReturnsTrue()
+      {
+          ImmutableStack<string>.Empty.IsEmpty.Should().BeTrue();
+      }
+      [Fact]
+      public void Push_ThenPop_ThreeTimes()
+      {
+          var stack = ImmutableStack<int>.Empty.Push(1).Push(2).Push(3);
+          var (t1, r1) = stack.Pop();
+          var (t2, r2) = r1.Pop();
+          var (t3, r3) = r2.Pop();
+          t1.Should().Be(3);
+          t2.Should().Be(2);
+          t3.Should().Be(1);
+          r3.IsEmpty.Should().BeTrue();
+      }
+  }

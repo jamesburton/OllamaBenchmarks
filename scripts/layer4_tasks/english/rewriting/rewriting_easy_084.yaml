@@ -1,0 +1,21 @@
+name: rewriting_easy_084
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'He bought flowers. He wanted to apologise.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "bought"
+    - "flowers"
+    - "apologise"
+    - "because"
+    - "to"
+  min_words: 5
+  max_words: 15

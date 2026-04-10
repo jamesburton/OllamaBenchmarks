@@ -1,0 +1,24 @@
+name: comprehension_hard_015
+category: english
+subcategory: comprehension
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  Photosynthesis is the process by which green plants convert sunlight, water, and carbon dioxide into glucose and oxygen. This biochemical reaction occurs primarily in the chloroplasts, organelles that contain the green pigment chlorophyll. Chlorophyll absorbs light energy, which drives the splitting of water molecules and the reduction of carbon dioxide to produce glucose. Oxygen is released as a by-product. Photosynthesis is fundamental to life on Earth, providing the energy that underpins almost all food chains and maintaining the oxygen levels in the atmosphere. Factors including light intensity, temperature, and carbon dioxide concentration affect the rate at which photosynthesis occurs. At low light levels, rate increases proportionally with light. Above a saturation point, other factors become limiting.
+  
+  Answer in one sentence:
+  What tone does the author use in this passage?
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "objective"
+    - "scientific"
+    - "informative"
+    - "neutral"
+    - "factual"
+  min_words: 8
+  max_words: 40

@@ -1,0 +1,16 @@
+name: vocabulary_hard_100
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The Latin root 'ambul' (as in 'ambulatory') means:
+  A) Breathe
+  B) Walk
+  C) Heal
+  D) Carry
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

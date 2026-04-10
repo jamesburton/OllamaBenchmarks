@@ -1,0 +1,16 @@
+name: vocabulary_medium_032
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'Her taciturn nature made her difficult to know', which word best replaces 'taciturn'?
+  A) Talkative
+  B) Quiet
+  C) Friendly
+  D) Cheerful
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

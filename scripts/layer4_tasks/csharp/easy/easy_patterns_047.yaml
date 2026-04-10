@@ -1,0 +1,38 @@
+name: easy_patterns_047
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ChainNullable with a static method:
+    string? GetNestedValue(string? input)
+  that uses the null-conditional operator to:
+    1. Call ToUpper() on input if not null
+    2. Return the first 3 characters using Substring(0, 3) if the result has length >= 3, else return the whole value
+  Use ?. and ?? operators.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ChainNullableTests
+  {
+      [Fact]
+      public void GetNestedValue_LongString_ReturnsFirst3Upper()
+      {
+          ChainNullable.GetNestedValue("hello").Should().Be("HEL");
+      }
+      [Fact]
+      public void GetNestedValue_ShortString_ReturnsAllUpper()
+      {
+          ChainNullable.GetNestedValue("hi").Should().Be("HI");
+      }
+      [Fact]
+      public void GetNestedValue_Null_ReturnsNull()
+      {
+          ChainNullable.GetNestedValue(null).Should().BeNull();
+      }
+  }

@@ -1,0 +1,37 @@
+name: easy_patterns_018
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Name(string First, string Last)
+  with a method:
+    string FullName() => $"{First} {Last}"
+  and a static class NameHelper with:
+    Name Swap(Name name)
+  that returns a new Name with First and Last swapped using a with expression.
+  Return only valid C# code in a single file.
+test_code: |
+  public class NameHelperTests
+  {
+      [Fact]
+      public void Swap_SwapsFirstAndLast()
+      {
+          var original = new Name("John", "Doe");
+          var result = NameHelper.Swap(original);
+          result.First.Should().Be("Doe");
+          result.Last.Should().Be("John");
+      }
+      [Fact]
+      public void FullName_ReturnsCombined()
+      {
+          new Name("Jane", "Smith").FullName().Should().Be("Jane Smith");
+      }
+  }

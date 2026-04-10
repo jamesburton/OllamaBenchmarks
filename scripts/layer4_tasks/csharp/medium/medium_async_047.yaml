@@ -1,0 +1,56 @@
+name: medium_async_047
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface INotificationChannel with:
+    string Name { get; }
+    Task<bool> IsAvailableAsync(CancellationToken ct = default)
+    Task SendAsync(string message, CancellationToken ct = default)
+  A class FallbackNotifier with constructor accepting IEnumerable<INotificationChannel> channels.
+  Exposes Task<string> SendWithFallbackAsync(string message, CancellationToken ct = default).
+  Tries channels in order; uses first available. Returns channel Name used.
+  Throws InvalidOperationException if none available.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FallbackNotifierTests
+  {
+      [Fact]
+      public async Task UsesFirstAvailable()
+      {
+          var c1 = Substitute.For<INotificationChannel>();
+          c1.Name.Returns("email");
+          c1.IsAvailableAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(true));
+          c1.SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          (await new FallbackNotifier(new[]{c1}).SendWithFallbackAsync("hi")).Should().Be("email");
+      }
+
+      [Fact]
+      public async Task SkipsUnavailable()
+      {
+          var c1 = Substitute.For<INotificationChannel>();
+          c1.Name.Returns("sms");
+          c1.IsAvailableAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(false));
+          var c2 = Substitute.For<INotificationChannel>();
+          c2.Name.Returns("push");
+          c2.IsAvailableAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(true));
+          c2.SendAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          (await new FallbackNotifier(new[]{c1,c2}).SendWithFallbackAsync("msg")).Should().Be("push");
+      }
+
+      [Fact]
+      public async Task NoneAvailable_Throws()
+      {
+          var c = Substitute.For<INotificationChannel>();
+          c.IsAvailableAsync(Arg.Any<CancellationToken>()).Returns(Task.FromResult(false));
+          await Assert.ThrowsAsync<InvalidOperationException>(() =>
+              new FallbackNotifier(new[]{c}).SendWithFallbackAsync("msg"));
+      }
+  }

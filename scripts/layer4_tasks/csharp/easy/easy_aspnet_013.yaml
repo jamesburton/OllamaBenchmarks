@@ -1,0 +1,39 @@
+name: easy_aspnet_013
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class EndpointHandlers with a static method:
+    IResult GetList(int page, int pageSize)
+  that returns Results.BadRequest("Invalid pagination") if page < 1 or pageSize < 1,
+  otherwise returns Results.Ok(new { Page = page, PageSize = pageSize, Items = Array.Empty<string>() }).
+  Return only valid C# code in a single file.
+test_code: |
+  public class EndpointHandlersTests
+  {
+      [Fact]
+      public void GetList_ValidPagination_ReturnsOk()
+      {
+          var result = EndpointHandlers.GetList(1, 10);
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<object>>();
+      }
+      [Fact]
+      public void GetList_PageZero_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.GetList(0, 10);
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+      [Fact]
+      public void GetList_PageSizeZero_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.GetList(1, 0);
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+  }

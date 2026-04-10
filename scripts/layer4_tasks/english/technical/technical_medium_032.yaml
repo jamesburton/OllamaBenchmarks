@@ -1,0 +1,23 @@
+name: technical_medium_032
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a JSDoc comment for a function that applies rate limiting to API calls.
+  Include @param, @returns, and a usage example in the description.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "@param"
+    - "@returns"
+    - "rate"
+    - "limit"
+    - "API"
+    - "calls"
+    - "example"
+    - "function"
+  min_words: 10
+  max_words: 80

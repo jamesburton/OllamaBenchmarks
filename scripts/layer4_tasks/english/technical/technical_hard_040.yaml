@@ -1,0 +1,23 @@
+name: technical_hard_040
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a JSDoc comment for a function that implements an exponential backoff retry strategy.
+  Include @param, @returns, @throws, and configuration notes.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "@param"
+    - "@returns"
+    - "@throws"
+    - "retry"
+    - "exponential"
+    - "backoff"
+    - "delay"
+    - "attempts"
+  min_words: 12
+  max_words: 100

@@ -1,0 +1,34 @@
+name: easy_linq_044
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Grouper with a static method:
+    Dictionary<int, List<string>> GroupByLength(IEnumerable<string> items)
+  that groups strings by their length and returns a dictionary using LINQ GroupBy + ToDictionary.
+  Return only valid C# code in a single file.
+test_code: |
+  public class GrouperTests
+  {
+      [Fact]
+      public void GroupByLength_BasicCase()
+      {
+          var result = Grouper.GroupByLength(new[]{"a","bb","cc","ddd"});
+          result[1].Should().BeEquivalentTo(new[]{"a"});
+          result[2].Should().BeEquivalentTo(new[]{"bb","cc"});
+          result[3].Should().BeEquivalentTo(new[]{"ddd"});
+      }
+      [Fact]
+      public void GroupByLength_SingleItem()
+      {
+          var result = Grouper.GroupByLength(new[]{"hello"});
+          result[5].Should().BeEquivalentTo(new[]{"hello"});
+      }
+  }

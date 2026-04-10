@@ -1,0 +1,21 @@
+name: rewriting_medium_050
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'It has come to our attention that certain members of staff are not adhering to the dress code.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "staff"
+    - "dress code"
+    - "not following"
+    - "wearing"
+    - "noticed"
+  min_words: 5
+  max_words: 20

@@ -1,0 +1,37 @@
+name: easy_patterns_020
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Coordinate(int Row, int Column)
+  and a static class GridHelper with:
+    bool IsCorner(Coordinate coord, int gridSize)
+  that returns true if the coordinate is at any corner of a gridSize x gridSize grid (0-indexed, so corners are (0,0), (0,gridSize-1), (gridSize-1,0), (gridSize-1,gridSize-1)).
+  Return only valid C# code in a single file.
+test_code: |
+  public class GridHelperTests
+  {
+      [Fact]
+      public void IsCorner_TopLeft_ReturnsTrue()
+      {
+          GridHelper.IsCorner(new Coordinate(0, 0), 5).Should().BeTrue();
+      }
+      [Fact]
+      public void IsCorner_BottomRight_ReturnsTrue()
+      {
+          GridHelper.IsCorner(new Coordinate(4, 4), 5).Should().BeTrue();
+      }
+      [Fact]
+      public void IsCorner_Center_ReturnsFalse()
+      {
+          GridHelper.IsCorner(new Coordinate(2, 2), 5).Should().BeFalse();
+      }
+  }

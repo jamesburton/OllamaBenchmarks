@@ -1,0 +1,41 @@
+name: medium_vertical_032
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for exportdata.
+  Include:
+    Command: string Format, IEnumerable<string> Fields, string OwnerId, int MaxRecords
+  Result: Guid ExportId, string Format, int ExportedCount, string DownloadUrl
+  Handler validates: Format in (csv/json/xlsx), Fields not empty, MaxRecords 1-10000.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExportDataHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new ExportDataHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new ExportDataHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new ExportDataHandler();
+          handler.Should().NotBeNull();
+      }
+  }

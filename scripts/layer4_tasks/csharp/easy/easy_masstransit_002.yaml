@@ -1,0 +1,34 @@
+name: easy_masstransit_002
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record UserRegistered(Guid UserId, string Email, DateTime RegisteredAt)
+  A consumer class UserRegisteredConsumer that implements IConsumer<UserRegistered>:
+    Has a public int ConsumedCount = 0
+    Consume method increments ConsumedCount and returns Task.CompletedTask
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class UserRegisteredConsumerTests
+  {
+      [Fact]
+      public async Task Consume_IncrementsCount()
+      {
+          var consumer = new UserRegisteredConsumer();
+          var message = new UserRegistered(Guid.NewGuid(), "user@test.com", DateTime.UtcNow);
+          var context = Substitute.For<ConsumeContext<UserRegistered>>();
+          context.Message.Returns(message);
+          await consumer.Consume(context);
+          await consumer.Consume(context);
+          consumer.ConsumedCount.Should().Be(2);
+      }
+  }

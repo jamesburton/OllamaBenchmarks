@@ -1,0 +1,107 @@
+name: hard_patterns_007
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  An observer/event pattern for inventory management:
+  Interface IInventoryObserver with:
+    void OnStockAdded(string sku, int quantity)
+    void OnStockRemoved(string sku, int quantity)
+    void OnLowStock(string sku, int currentLevel, int threshold)
+  Class InventoryManager:
+    void Subscribe(IInventoryObserver observer)
+    void Unsubscribe(IInventoryObserver observer)
+    void AddStock(string sku, int quantity) — notifies OnStockAdded.
+    bool RemoveStock(string sku, int quantity) — removes stock; notifies OnStockRemoved.
+      Returns false if insufficient stock. Notifies OnLowStock if level falls below threshold.
+    int GetStock(string sku) — returns current level, 0 if unknown.
+    void SetLowStockThreshold(string sku, int threshold)
+  Return only valid C# code in a single file.
+test_code: |
+  public class InventoryManagerTests
+  {
+      private class TestObserver : IInventoryObserver
+      {
+          public List<string> Events { get; } = new();
+          public void OnStockAdded(string sku, int qty) => Events.Add($"added:{sku}:{qty}");
+          public void OnStockRemoved(string sku, int qty) => Events.Add($"removed:{sku}:{qty}");
+          public void OnLowStock(string sku, int level, int threshold) => Events.Add($"low:{sku}:{level}");
+      }
+
+      [Fact]
+      public void AddStock_NotifiesObserver()
+      {
+          var obs = new TestObserver();
+          var mgr = new InventoryManager();
+          mgr.Subscribe(obs);
+          mgr.AddStock("SKU1", 50);
+          obs.Events.Should().Contain("added:SKU1:50");
+      }
+
+      [Fact]
+      public void RemoveStock_NotifiesObserver()
+      {
+          var obs = new TestObserver();
+          var mgr = new InventoryManager();
+          mgr.Subscribe(obs);
+          mgr.AddStock("SKU1", 20);
+          mgr.RemoveStock("SKU1", 10);
+          obs.Events.Should().Contain("removed:SKU1:10");
+      }
+
+      [Fact]
+      public void RemoveStock_BelowThreshold_NotifiesLowStock()
+      {
+          var obs = new TestObserver();
+          var mgr = new InventoryManager();
+          mgr.Subscribe(obs);
+          mgr.SetLowStockThreshold("SKU1", 10);
+          mgr.AddStock("SKU1", 15);
+          mgr.RemoveStock("SKU1", 8);
+          obs.Events.Should().Contain(e => e.StartsWith("low:SKU1"));
+      }
+
+      [Fact]
+      public void RemoveStock_InsufficientStock_ReturnsFalse()
+      {
+          var mgr = new InventoryManager();
+          mgr.AddStock("SKU1", 5);
+          mgr.RemoveStock("SKU1", 10).Should().BeFalse();
+          mgr.GetStock("SKU1").Should().Be(5);
+      }
+
+      [Fact]
+      public void Unsubscribe_StopsNotifications()
+      {
+          var obs = new TestObserver();
+          var mgr = new InventoryManager();
+          mgr.Subscribe(obs);
+          mgr.Unsubscribe(obs);
+          mgr.AddStock("SKU1", 10);
+          obs.Events.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void GetStock_UnknownSku_ReturnsZero()
+      {
+          new InventoryManager().GetStock("UNKNOWN").Should().Be(0);
+      }
+
+      [Fact]
+      public void MultipleObservers_BothNotified()
+      {
+          var obs1 = new TestObserver(); var obs2 = new TestObserver();
+          var mgr = new InventoryManager();
+          mgr.Subscribe(obs1); mgr.Subscribe(obs2);
+          mgr.AddStock("SKU1", 10);
+          obs1.Events.Should().NotBeEmpty();
+          obs2.Events.Should().NotBeEmpty();
+      }
+  }

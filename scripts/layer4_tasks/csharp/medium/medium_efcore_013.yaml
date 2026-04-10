@@ -1,0 +1,69 @@
+name: medium_efcore_013
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Coupon with: int Id, string Code, decimal DiscountAmount, bool IsPercentage, int MaxUses, int UsedCount, DateTime? ExpiresAt.
+  A class CouponDbContext : DbContext with DbSet<Coupon> Coupons.
+  A class CouponRepository with constructor accepting CouponDbContext.
+  Methods:
+    Task<Coupon?> GetValidCouponAsync(string code)
+    Task IncrementUsageAsync(int couponId)
+    Task<IEnumerable<Coupon>> GetExpiredAsync()
+  GetValidCouponAsync returns a coupon only if UsedCount < MaxUses and (ExpiresAt is null or ExpiresAt > UtcNow).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CouponRepositoryTests : IAsyncLifetime
+  {
+      private CouponDbContext _db = null!;
+      private CouponRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<CouponDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new CouponDbContext(opts);
+          _repo = new CouponRepository(_db);
+          _db.Coupons.AddRange(
+              new Coupon { Code = "VALID", DiscountAmount = 10m, IsPercentage = false, MaxUses = 5, UsedCount = 2, ExpiresAt = DateTime.UtcNow.AddDays(10) },
+              new Coupon { Code = "EXPIRED", DiscountAmount = 5m, IsPercentage = false, MaxUses = 10, UsedCount = 0, ExpiresAt = DateTime.UtcNow.AddDays(-1) },
+              new Coupon { Code = "MAXED", DiscountAmount = 20m, IsPercentage = true, MaxUses = 1, UsedCount = 1, ExpiresAt = null });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetValidCoupon_ValidCode_ReturnsCoupon()
+      {
+          (await _repo.GetValidCouponAsync("VALID")).Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task GetValidCoupon_Expired_ReturnsNull()
+      {
+          (await _repo.GetValidCouponAsync("EXPIRED")).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task GetValidCoupon_MaxedOut_ReturnsNull()
+      {
+          (await _repo.GetValidCouponAsync("MAXED")).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task IncrementUsage_IncrementsCount()
+      {
+          var id = _db.Coupons.First(c => c.Code == "VALID").Id;
+          await _repo.IncrementUsageAsync(id);
+          _db.ChangeTracker.Clear();
+          (await _db.Coupons.FindAsync(id))!.UsedCount.Should().Be(3);
+      }
+  }

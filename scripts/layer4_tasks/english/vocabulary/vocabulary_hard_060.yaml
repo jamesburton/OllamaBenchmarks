@@ -1,0 +1,16 @@
+name: vocabulary_hard_060
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word has a NEGATIVE connotation when describing a political leader?
+  A) Resolute
+  B) Decisive
+  C) Inflexible
+  D) Steadfast
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

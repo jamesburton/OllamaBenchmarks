@@ -1,0 +1,16 @@
+name: vocabulary_hard_097
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The root 'lucre' (as in 'lucrative') comes from Latin and relates to:
+  A) Light
+  B) Work
+  C) Money
+  D) Luck
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

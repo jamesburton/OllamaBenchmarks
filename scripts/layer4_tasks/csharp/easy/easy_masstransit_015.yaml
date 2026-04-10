@@ -1,0 +1,44 @@
+name: easy_masstransit_015
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record StockAlert(string Symbol, decimal Price, string AlertType)
+  A consumer class StockAlertConsumer that implements IConsumer<StockAlert>:
+    Has a public List<string> BuyAlerts = new()
+    Has a public List<string> SellAlerts = new()
+    Consume method: if AlertType == "buy" adds Symbol to BuyAlerts, if "sell" adds to SellAlerts
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class StockAlertConsumerTests
+  {
+      [Fact]
+      public async Task Consume_BuyAlert_AddsToBuyList()
+      {
+          var consumer = new StockAlertConsumer();
+          var context = Substitute.For<ConsumeContext<StockAlert>>();
+          context.Message.Returns(new StockAlert("AAPL", 150m, "buy"));
+          await consumer.Consume(context);
+          consumer.BuyAlerts.Should().Contain("AAPL");
+          consumer.SellAlerts.Should().BeEmpty();
+      }
+      [Fact]
+      public async Task Consume_SellAlert_AddsToSellList()
+      {
+          var consumer = new StockAlertConsumer();
+          var context = Substitute.For<ConsumeContext<StockAlert>>();
+          context.Message.Returns(new StockAlert("GOOGL", 2000m, "sell"));
+          await consumer.Consume(context);
+          consumer.SellAlerts.Should().Contain("GOOGL");
+          consumer.BuyAlerts.Should().BeEmpty();
+      }
+  }

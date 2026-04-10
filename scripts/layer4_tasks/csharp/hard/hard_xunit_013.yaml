@@ -1,0 +1,89 @@
+name: hard_xunit_013
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing with [InlineData] and [Theory] for parser/tokenizer:
+  Enum TokenType { Number, Operator, LeftParen, RightParen, Whitespace, Unknown }
+  Record Token(TokenType Type, string Value, int Position)
+
+  Class ExpressionTokenizer:
+    IReadOnlyList<Token> Tokenize(string expression):
+      Recognizes: numbers (int/decimal), operators (+,-,*,/,=), parentheses, whitespace.
+      Returns Token list with positions.
+      Unknown characters become Token with type Unknown.
+
+  Class ExpressionEvaluator:
+    double Evaluate(string expression):
+      Evaluates simple arithmetic: +, -, *, / with operator precedence.
+      Supports parentheses.
+      Throws FormatException on invalid expression.
+      Throws DivideByZeroException on /0.
+
+  Tests use [InlineData] for multiple tokenizer and evaluator cases.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExpressionTokenizerTests
+  {
+      private readonly ExpressionTokenizer _tokenizer = new();
+
+      [Theory]
+      [InlineData("123", 1)]
+      [InlineData("1+2", 3)]
+      [InlineData("(1+2)*3", 7)]
+      [InlineData(" 10 ", 3)]
+      public void Tokenize_CountsTokensCorrectly(string input, int expectedCount)
+      {
+          var tokens = _tokenizer.Tokenize(input);
+          tokens.Should().HaveCount(expectedCount);
+      }
+
+      [Theory]
+      [InlineData("42", TokenType.Number)]
+      [InlineData("+", TokenType.Operator)]
+      [InlineData("(", TokenType.LeftParen)]
+      [InlineData(")", TokenType.RightParen)]
+      [InlineData(" ", TokenType.Whitespace)]
+      public void Tokenize_SingleToken_CorrectType(string input, TokenType expectedType)
+      {
+          var tokens = _tokenizer.Tokenize(input);
+          tokens.First().Type.Should().Be(expectedType);
+      }
+  }
+
+  public class ExpressionEvaluatorTests
+  {
+      private readonly ExpressionEvaluator _eval = new();
+
+      [Theory]
+      [InlineData("1+1", 2.0)]
+      [InlineData("10-3", 7.0)]
+      [InlineData("2*3", 6.0)]
+      [InlineData("10/2", 5.0)]
+      [InlineData("(1+2)*3", 9.0)]
+      public void Evaluate_CorrectResult(string expr, double expected)
+      {
+          _eval.Evaluate(expr).Should().BeApproximately(expected, 0.001);
+      }
+
+      [Fact]
+      public void Evaluate_DivideByZero_Throws()
+      {
+          var act = () => _eval.Evaluate("5/0");
+          act.Should().Throw<DivideByZeroException>();
+      }
+
+      [Fact]
+      public void Evaluate_InvalidExpression_ThrowsFormatException()
+      {
+          var act = () => _eval.Evaluate("++");
+          act.Should().Throw<FormatException>();
+      }
+  }

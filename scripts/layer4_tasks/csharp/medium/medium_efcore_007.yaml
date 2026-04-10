@@ -1,0 +1,60 @@
+name: medium_efcore_007
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Employee with: int Id, string Name, string Department, decimal Salary, int? ManagerId, Employee? Manager.
+  A class HrDbContext : DbContext with DbSet<Employee> Employees and self-referencing relationship configured.
+  A class EmployeeRepository with constructor accepting HrDbContext.
+  Methods:
+    Task<IEnumerable<Employee>> GetByDepartmentAsync(string dept)
+    Task<IEnumerable<Employee>> GetDirectReportsAsync(int managerId)
+    Task<decimal> GetAverageSalaryByDepartmentAsync(string dept)
+  Return only valid C# code in a single file.
+test_code: |
+  public class EmployeeRepositoryTests : IAsyncLifetime
+  {
+      private HrDbContext _db = null!;
+      private EmployeeRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<HrDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new HrDbContext(opts);
+          _repo = new EmployeeRepository(_db);
+          _db.Employees.AddRange(
+              new Employee { Id = 1, Name = "Alice", Department = "Eng", Salary = 100000m, ManagerId = null },
+              new Employee { Id = 2, Name = "Bob", Department = "Eng", Salary = 80000m, ManagerId = 1 },
+              new Employee { Id = 3, Name = "Carol", Department = "HR", Salary = 70000m, ManagerId = 1 },
+              new Employee { Id = 4, Name = "Dave", Department = "Eng", Salary = 90000m, ManagerId = 1 });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByDepartment_FiltersCorrectly()
+      {
+          (await _repo.GetByDepartmentAsync("Eng")).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task GetDirectReports_ReturnsReports()
+      {
+          (await _repo.GetDirectReportsAsync(1)).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task GetAverageSalary_CalculatesCorrectly()
+      {
+          (await _repo.GetAverageSalaryByDepartmentAsync("Eng")).Should().BeApproximately(90000m, 1m);
+      }
+  }

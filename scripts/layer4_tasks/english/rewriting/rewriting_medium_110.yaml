@@ -1,0 +1,21 @@
+name: rewriting_medium_110
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'At the present time, the organisation does not have the capacity to accommodate additional staff members.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "currently"
+    - "cannot"
+    - "hire"
+    - "staff"
+    - "more"
+  min_words: 5
+  max_words: 15

@@ -1,0 +1,18 @@
+name: summarisation_medium_073
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Ranked-choice voting has been adopted in several jurisdictions as an alternative to plurality systems, aiming to reduce strategic voting and better reflect voter preferences. Supporters argue it encourages more civil campaigns and reduces the spoiler effect. Opponents contend it is more complex and less transparent than traditional voting.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "ranked choice"
+    - "voting"
+    - "plurality"
+    - "spoiler"
+  max_words: 25

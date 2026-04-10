@@ -1,0 +1,21 @@
+name: rewriting_easy_132
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'The team met in the office that was noisy.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "noisy"
+    - "team"
+    - "met"
+    - "office"
+    - "the noisy"
+  min_words: 4
+  max_words: 15

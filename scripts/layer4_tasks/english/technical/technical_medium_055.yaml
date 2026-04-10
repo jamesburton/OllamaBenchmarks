@@ -1,0 +1,24 @@
+name: technical_medium_055
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a developer-facing error message for a missing required configuration variable.
+  Include the variable name and how to set it.
+  Keep it under 40 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "environment"
+    - "variable"
+    - "missing"
+    - "required"
+    - "set"
+    - "configuration"
+    - "undefined"
+    - "key"
+  min_words: 8
+  max_words: 40

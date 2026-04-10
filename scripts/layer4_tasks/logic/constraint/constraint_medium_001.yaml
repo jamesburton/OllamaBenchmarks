@@ -1,0 +1,17 @@
+name: constraint_medium_001
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Four people - Alice, Bob, Carol, Dave - live on floors 1, 2, 3, 4.
+  Clues:
+  1. Alice lives on a higher floor than Bob.
+  2. Carol lives on floor 2.
+  3. Dave lives on the highest floor.
+  4. Bob does not live on floor 1.
+  What floor does Alice live on? Reply with only the number.
+expected_answer: "3"
+validator_config: {}

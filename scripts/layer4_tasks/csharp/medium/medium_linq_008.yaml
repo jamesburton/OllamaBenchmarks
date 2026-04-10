@@ -1,0 +1,58 @@
+name: medium_linq_008
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ChunkProcessor with a constructor accepting IEnumerable<int> numbers.
+  Expose:
+    IEnumerable<int[]> ChunkBy(int size) — splits sequence into chunks of given size
+    IEnumerable<int[]> WindowedChunks(int size) — overlapping windows of given size (slide by 1)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ChunkProcessorTests
+  {
+      [Fact]
+      public void ChunkBy_EvenDivision()
+      {
+          var result = new ChunkProcessor(new[]{1,2,3,4,5,6}).ChunkBy(2).ToList();
+          result.Should().HaveCount(3);
+          result[0].Should().BeEquivalentTo(new[]{1,2}, cfg => cfg.WithStrictOrdering());
+          result[2].Should().BeEquivalentTo(new[]{5,6}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void ChunkBy_Remainder()
+      {
+          var result = new ChunkProcessor(new[]{1,2,3,4,5}).ChunkBy(2).ToList();
+          result.Should().HaveCount(3);
+          result.Last().Should().BeEquivalentTo(new[]{5});
+      }
+
+      [Fact]
+      public void ChunkBy_Empty_ReturnsEmpty()
+      {
+          new ChunkProcessor(Array.Empty<int>()).ChunkBy(3).Should().BeEmpty();
+      }
+
+      [Fact]
+      public void WindowedChunks_CorrectCount()
+      {
+          var result = new ChunkProcessor(new[]{1,2,3,4,5}).WindowedChunks(3).ToList();
+          result.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void WindowedChunks_FirstAndLastCorrect()
+      {
+          var result = new ChunkProcessor(new[]{10,20,30,40}).WindowedChunks(2).ToList();
+          result.First().Should().BeEquivalentTo(new[]{10,20}, cfg => cfg.WithStrictOrdering());
+          result.Last().Should().BeEquivalentTo(new[]{30,40},  cfg => cfg.WithStrictOrdering());
+      }
+  }

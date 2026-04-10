@@ -1,0 +1,61 @@
+name: medium_async_031
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface ICommandHandler<TCommand> with method:
+    Task HandleAsync(TCommand command, CancellationToken ct = default)
+  A class LoggingCommandHandler<TCommand> with constructor accepting:
+    ICommandHandler<TCommand> inner
+    Action<string> log
+  Expose:
+    Task HandleAsync(TCommand command, CancellationToken ct = default)
+  Logs "Handling {typeof(TCommand).Name}" before and "Handled {typeof(TCommand).Name}" after.
+  On exception: logs "Failed {typeof(TCommand).Name}: {message}" and rethrows.
+  Return only valid C# code in a single file.
+test_code: |
+  public record DoSomething(string Value);
+
+  public class LoggingCommandHandlerTests
+  {
+      [Fact]
+      public async Task HandleAsync_LogsBeforeAndAfter()
+      {
+          var log = new List<string>();
+          var inner = Substitute.For<ICommandHandler<DoSomething>>();
+          inner.HandleAsync(Arg.Any<DoSomething>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          await new LoggingCommandHandler<DoSomething>(inner, log.Add).HandleAsync(new DoSomething("x"));
+          log.Should().Contain(s => s.Contains("Handling"));
+          log.Should().Contain(s => s.Contains("Handled"));
+      }
+
+      [Fact]
+      public async Task HandleAsync_OnFailure_LogsAndRethrows()
+      {
+          var log = new List<string>();
+          var inner = Substitute.For<ICommandHandler<DoSomething>>();
+          inner.HandleAsync(Arg.Any<DoSomething>(), Arg.Any<CancellationToken>())
+              .Returns(Task.FromException(new Exception("oops")));
+          await Assert.ThrowsAsync<Exception>(() =>
+              new LoggingCommandHandler<DoSomething>(inner, log.Add).HandleAsync(new DoSomething("x")));
+          log.Should().Contain(s => s.Contains("Failed"));
+      }
+
+      [Fact]
+      public async Task HandleAsync_InnerHandlerCalled()
+      {
+          var log = new List<string>();
+          var inner = Substitute.For<ICommandHandler<DoSomething>>();
+          inner.HandleAsync(Arg.Any<DoSomething>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var cmd = new DoSomething("v");
+          await new LoggingCommandHandler<DoSomething>(inner, log.Add).HandleAsync(cmd);
+          await inner.Received(1).HandleAsync(cmd, Arg.Any<CancellationToken>());
+      }
+  }

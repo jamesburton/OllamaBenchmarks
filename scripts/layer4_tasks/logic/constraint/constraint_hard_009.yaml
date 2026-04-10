@@ -1,0 +1,18 @@
+name: constraint_hard_009
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  On a street, 5 houses are numbered 1-5. Each is a different color.
+  Clues:
+  1. House 1 is not red or blue.
+  2. House 2 is green.
+  3. House 3 is red.
+  4. House 5 is yellow.
+  5. The blue house is next to the green house.
+  What color is house 1? Reply with only the colour.
+expected_answer: "White"
+validator_config: {}

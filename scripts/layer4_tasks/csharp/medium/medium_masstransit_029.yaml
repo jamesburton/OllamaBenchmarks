@@ -1,0 +1,56 @@
+name: medium_masstransit_029
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record OfferAccepted(Guid OfferId, string BuyerId, string SellerId, decimal Price).
+  A consumer OfferAcceptedConsumer implementing IConsumer<OfferAccepted>.
+  Constructor accepts IContractService service.
+  Interface IContractService with: Task GenerateContractAsync(Guid offerId, string buyerId, string sellerId).
+  In Consume: calls service.GenerateContractAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record OfferAccepted(Guid OfferId, string BuyerId, string SellerId, decimal Price); }
+  global using Contracts;
+
+  public class OfferAcceptedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IContractService>();
+          var consumer = new OfferAcceptedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<OfferAccepted>>();
+          ctx.Message.Returns(new OfferAccepted(Guid.NewGuid(), "Buy", "Sel", 1));
+          await consumer.Consume(ctx);
+          await svc.Received(1).GenerateContractAsync(Arg.Any<Guid offerId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IContractService>();
+          var consumer = new OfferAcceptedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<OfferAccepted>>();
+          ctx.Message.Returns(new OfferAccepted(Guid.NewGuid(), "Buy", "Sel", 1));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IContractService>();
+          var consumer = new OfferAcceptedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<OfferAccepted>>();
+          ctx.Message.Returns(new OfferAccepted(Guid.NewGuid(), "Buye", "Sell", 2));
+          await consumer.Consume(ctx);
+          await svc.Received(1).GenerateContractAsync(Arg.Any<Guid offerId>(), Arg.Any<object>());
+      }
+  }

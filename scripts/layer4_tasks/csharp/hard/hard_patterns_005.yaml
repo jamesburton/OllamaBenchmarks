@@ -1,0 +1,88 @@
+name: hard_patterns_005
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A state machine for order lifecycle management:
+  Enum OrderState { Pending, Confirmed, Shipped, Delivered, Cancelled }.
+  Class OrderStateMachine with constructor accepting initial state (default Pending):
+    bool CanTransition(OrderState from, OrderState to) — checks if transition is valid.
+    OrderState Transition(string trigger) — applies a trigger and moves to next state.
+      Throws InvalidOperationException for invalid triggers in current state.
+    IReadOnlyList<string> AvailableTriggers() — returns valid triggers for current state.
+    OrderState CurrentState { get; }
+    IReadOnlyList<(OrderState From, string Trigger, OrderState To)> History
+  Valid transitions:
+    Pending   + "confirm"  -> Confirmed
+    Pending   + "cancel"   -> Cancelled
+    Confirmed + "ship"     -> Shipped
+    Confirmed + "cancel"   -> Cancelled
+    Shipped   + "deliver"  -> Delivered
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderStateMachineTests
+  {
+      [Fact]
+      public void InitialState_IsPending()
+      {
+          new OrderStateMachine().CurrentState.Should().Be(OrderState.Pending);
+      }
+
+      [Fact]
+      public void Transition_Confirm_MovesToConfirmed()
+      {
+          var sm = new OrderStateMachine();
+          sm.Transition("confirm");
+          sm.CurrentState.Should().Be(OrderState.Confirmed);
+      }
+
+      [Fact]
+      public void Transition_FullFlow_PendingToDelivered()
+      {
+          var sm = new OrderStateMachine();
+          sm.Transition("confirm");
+          sm.Transition("ship");
+          sm.Transition("deliver");
+          sm.CurrentState.Should().Be(OrderState.Delivered);
+      }
+
+      [Fact]
+      public void Transition_InvalidTrigger_ThrowsInvalidOperationException()
+      {
+          var sm = new OrderStateMachine();
+          var act = () => sm.Transition("ship");
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void AvailableTriggers_PendingHasConfirmAndCancel()
+      {
+          new OrderStateMachine().AvailableTriggers()
+              .Should().BeEquivalentTo(new[] { "confirm", "cancel" });
+      }
+
+      [Fact]
+      public void History_RecordsTransitions()
+      {
+          var sm = new OrderStateMachine();
+          sm.Transition("confirm");
+          sm.Transition("ship");
+          sm.History.Should().HaveCount(2);
+          sm.History[0].From.Should().Be(OrderState.Pending);
+          sm.History[0].To.Should().Be(OrderState.Confirmed);
+      }
+
+      [Fact]
+      public void CanTransition_ReturnsFalseForInvalidTransition()
+      {
+          new OrderStateMachine().CanTransition(OrderState.Pending, OrderState.Delivered)
+              .Should().BeFalse();
+      }
+  }

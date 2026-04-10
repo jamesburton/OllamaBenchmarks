@@ -1,0 +1,63 @@
+name: medium_aspnet_040
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record SurveyQuestion(int Id, string Text, IEnumerable<string> Options).
+  A record SurveyAnswer(int QuestionId, string SelectedOption).
+  A record SurveyResult(Guid SurveyId, IEnumerable<SurveyAnswer> Answers, DateTime SubmittedAt).
+  A class SurveysController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<SurveyQuestion> and List<SurveyResult> (for testability).
+  Actions: GET api/surveys/questions — all questions; POST api/surveys/submit — validates all answers reference valid question ids and valid options, stores result, returns 201.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SurveysControllerTests
+  {
+      private SurveysController MakeController() => new(
+          new List<SurveyQuestion>
+          {
+              new(1, "How satisfied are you?", new[] { "Very", "Somewhat", "Not at all" }),
+              new(2, "Would you recommend us?", new[] { "Yes", "No", "Maybe" })
+          },
+          new List<SurveyResult>());
+
+      [Fact]
+      public void GetQuestions_ReturnsAll()
+      {
+          (MakeController().GetQuestions() as OkObjectResult)!
+              .Value.Should().BeAssignableTo<IEnumerable<SurveyQuestion>>()
+              .Which.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Submit_Valid_Returns201()
+      {
+          var ctrl = MakeController();
+          var answers = new[] { new SurveyAnswer(1, "Very"), new SurveyAnswer(2, "Yes") };
+          var result = ctrl.Submit(answers) as CreatedAtActionResult;
+          result!.StatusCode.Should().Be(201);
+      }
+
+      [Fact]
+      public void Submit_InvalidOption_Returns400()
+      {
+          var ctrl = MakeController();
+          var answers = new[] { new SurveyAnswer(1, "Invalid"), new SurveyAnswer(2, "Yes") };
+          ctrl.Submit(answers).Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public void Submit_InvalidQuestionId_Returns400()
+      {
+          var ctrl = MakeController();
+          var answers = new[] { new SurveyAnswer(99, "Yes") };
+          ctrl.Submit(answers).Should().BeOfType<BadRequestObjectResult>();
+      }
+  }

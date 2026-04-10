@@ -1,0 +1,18 @@
+name: summarisation_medium_027
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  CRISPR gene-editing technology has moved from laboratory research to early clinical trials, with promising results for treating genetic disorders such as sickle cell disease. The technique allows scientists to edit specific DNA sequences with unprecedented precision. Ethical questions remain about germline editing that could alter heritable traits.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "CRISPR"
+    - "gene editing"
+    - "DNA"
+    - "genetic"
+  max_words: 25

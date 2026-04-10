@@ -1,0 +1,36 @@
+name: easy_aspnet_016
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class CacheOptions with:
+    int AbsoluteExpirationSeconds { get; set; } = 3600
+    int SlidingExpirationSeconds { get; set; } = 600
+    bool Enabled { get; set; } = true
+  and a static class CacheOptionsHelper with:
+    TimeSpan GetAbsoluteExpiration(CacheOptions options)
+  that returns TimeSpan.FromSeconds(options.AbsoluteExpirationSeconds).
+  Return only valid C# code in a single file.
+test_code: |
+  public class CacheOptionsHelperTests
+  {
+      [Fact]
+      public void GetAbsoluteExpiration_Default_Returns1Hour()
+      {
+          var opts = new CacheOptions();
+          CacheOptionsHelper.GetAbsoluteExpiration(opts).Should().Be(TimeSpan.FromSeconds(3600));
+      }
+      [Fact]
+      public void GetAbsoluteExpiration_Custom_ReturnsCorrect()
+      {
+          var opts = new CacheOptions { AbsoluteExpirationSeconds = 7200 };
+          CacheOptionsHelper.GetAbsoluteExpiration(opts).Should().Be(TimeSpan.FromSeconds(7200));
+      }
+  }

@@ -1,0 +1,44 @@
+name: easy_masstransit_004
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record EmailNotification(string To, string Subject, string Body)
+  A consumer class EmailNotificationConsumer that implements IConsumer<EmailNotification>:
+    Has a public List<string> SentTo = new()
+    Consume method adds message.To to SentTo
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class EmailNotificationConsumerTests
+  {
+      [Fact]
+      public async Task Consume_TracksRecipient()
+      {
+          var consumer = new EmailNotificationConsumer();
+          var context = Substitute.For<ConsumeContext<EmailNotification>>();
+          context.Message.Returns(new EmailNotification("alice@test.com", "Hello", "World"));
+          await consumer.Consume(context);
+          consumer.SentTo.Should().Contain("alice@test.com");
+      }
+      [Fact]
+      public async Task Consume_MultipleMessages()
+      {
+          var consumer = new EmailNotificationConsumer();
+          var ctx1 = Substitute.For<ConsumeContext<EmailNotification>>();
+          ctx1.Message.Returns(new EmailNotification("a@test.com", "S1", "B1"));
+          var ctx2 = Substitute.For<ConsumeContext<EmailNotification>>();
+          ctx2.Message.Returns(new EmailNotification("b@test.com", "S2", "B2"));
+          await consumer.Consume(ctx1);
+          await consumer.Consume(ctx2);
+          consumer.SentTo.Should().HaveCount(2);
+      }
+  }

@@ -1,0 +1,40 @@
+name: easy_efcore_009
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Event with properties: int Id, string Name, DateTime StartDate, bool IsCancelled
+  A DbContext class EventContext with:
+    DbSet<Event> Events { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class EventRepository with:
+    List<Event> GetUpcoming(EventContext context, DateTime from)
+  that returns non-cancelled events with StartDate >= from, ordered by StartDate.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EventRepositoryTests
+  {
+      [Fact]
+      public void GetUpcoming_ReturnsFilteredEvents()
+      {
+          using var context = new EventContext();
+          context.Database.EnsureCreated();
+          var now = DateTime.UtcNow;
+          context.Events.AddRange(
+              new Event { Name = "Past", StartDate = now.AddDays(-1), IsCancelled = false },
+              new Event { Name = "Future", StartDate = now.AddDays(1), IsCancelled = false },
+              new Event { Name = "Cancelled", StartDate = now.AddDays(2), IsCancelled = true });
+          context.SaveChanges();
+          var result = EventRepository.GetUpcoming(context, now);
+          result.Should().HaveCount(1);
+          result[0].Name.Should().Be("Future");
+      }
+  }

@@ -1,0 +1,123 @@
+name: hard_masstransit_008
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit saga for user onboarding with multiple async steps:
+  Messages:
+    record StartOnboarding(Guid UserId, string Email, string Plan);
+    record EmailVerified(Guid UserId);
+    record AccountProvisioned(Guid UserId, string AccountNumber);
+    record WelcomeEmailSent(Guid UserId);
+    record OnboardingCompleted(Guid UserId, string AccountNumber);
+    record OnboardingFailed(Guid UserId, string Reason);
+    record OnboardingTimeout(Guid UserId);
+
+  States: Started, EmailPending, AccountPending, WelcomeEmailPending, Completed, Failed.
+  OnboardingStateMachine : MassTransitStateMachine<OnboardingState>
+  Transitions:
+    Initially + StartOnboarding -> Started (send RequestEmailVerification command)
+    Started + EmailVerified -> EmailPending (send ProvisionAccount command)
+    EmailPending + AccountProvisioned -> AccountPending (send SendWelcomeEmail command)
+    AccountPending + WelcomeEmailSent -> Completed (publish OnboardingCompleted)
+    (any active state) + OnboardingFailed -> Failed
+
+  OnboardingState: Guid CorrelationId, string CurrentState, string Email, string Plan,
+    string? AccountNumber, DateTime StartedAt.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OnboardingStateMachineTests
+  {
+      [Fact]
+      public async Task StartOnboarding_TransitionsToStarted()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OnboardingState, OnboardingStateMachine>(new OnboardingStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartOnboarding(id, "user@example.com", "Pro"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Started).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EmailVerified_TransitionsToEmailPending()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OnboardingState, OnboardingStateMachine>(new OnboardingStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartOnboarding(id, "a@b.com", "Basic"));
+              await harness.InputQueueSendEndpoint.Send(new EmailVerified(id));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.EmailPending).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task FullFlow_TransitionsToCompleted()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OnboardingState, OnboardingStateMachine>(new OnboardingStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartOnboarding(id, "test@example.com", "Enterprise"));
+              await harness.InputQueueSendEndpoint.Send(new EmailVerified(id));
+              await harness.InputQueueSendEndpoint.Send(new AccountProvisioned(id, "ACC-12345"));
+              await harness.InputQueueSendEndpoint.Send(new WelcomeEmailSent(id));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Completed).Should().NotBeNull();
+              (await harness.Published.Any<OnboardingCompleted>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task OnboardingFailed_TransitionsToFailed()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OnboardingState, OnboardingStateMachine>(new OnboardingStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartOnboarding(id, "x@y.com", "Free"));
+              await harness.InputQueueSendEndpoint.Send(new OnboardingFailed(id, "Email bounce"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Failed).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SagaState_StoresEmailAndPlan()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<OnboardingState, OnboardingStateMachine>(new OnboardingStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new StartOnboarding(id, "stored@example.com", "Premium"));
+              var state = sagaHarness.Sagas.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Started);
+              state!.Email.Should().Be("stored@example.com");
+              state.Plan.Should().Be("Premium");
+          }
+          finally { await harness.Stop(); }
+      }
+  }

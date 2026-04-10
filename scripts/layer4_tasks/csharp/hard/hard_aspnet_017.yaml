@@ -1,0 +1,93 @@
+name: hard_aspnet_017
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A webhook dispatch system:
+  Record: WebhookSubscription(Guid Id, string EventType, string TargetUrl, bool IsActive).
+  Record: WebhookEvent(string EventType, object Payload, DateTime OccurredAt).
+  Interface IWebhookRegistry:
+    Task<Guid> SubscribeAsync(string eventType, string targetUrl, CancellationToken ct)
+    Task<bool> UnsubscribeAsync(Guid subscriptionId, CancellationToken ct)
+    Task<IReadOnlyList<WebhookSubscription>> GetSubscriptionsAsync(string eventType, CancellationToken ct)
+  Interface IWebhookDispatcher:
+    Task<DispatchResult> DispatchAsync(WebhookEvent evt, CancellationToken ct)
+  Record: DispatchResult(int TotalSubscribers, int SuccessCount, int FailureCount, IReadOnlyList<string> Errors).
+  Class InMemoryWebhookRegistry : IWebhookRegistry.
+  Class WebhookDispatcher(IWebhookRegistry registry, IHttpClientFactory httpClientFactory) : IWebhookDispatcher —
+    POSTs JSON payload to each active subscriber URL, collects results.
+  Return only valid C# code in a single file.
+test_code: |
+  public class WebhookDispatcherTests
+  {
+      [Fact]
+      public async Task Subscribe_CreatesSubscription()
+      {
+          var registry = new InMemoryWebhookRegistry();
+          var id = await registry.SubscribeAsync("order.created", "https://example.com/hook", CancellationToken.None);
+          var subs = await registry.GetSubscriptionsAsync("order.created", CancellationToken.None);
+          subs.Should().ContainSingle(s => s.Id == id);
+      }
+
+      [Fact]
+      public async Task Unsubscribe_RemovesSubscription()
+      {
+          var registry = new InMemoryWebhookRegistry();
+          var id = await registry.SubscribeAsync("order.created", "https://example.com/hook", CancellationToken.None);
+          await registry.UnsubscribeAsync(id, CancellationToken.None);
+          var subs = await registry.GetSubscriptionsAsync("order.created", CancellationToken.None);
+          subs.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task Unsubscribe_UnknownId_ReturnsFalse()
+      {
+          var registry = new InMemoryWebhookRegistry();
+          var result = await registry.UnsubscribeAsync(Guid.NewGuid(), CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task Dispatch_NoSubscribers_ReturnsZeroCounts()
+      {
+          var registry = new InMemoryWebhookRegistry();
+          var factory = new FakeHttpClientFactory(req => new HttpResponseMessage(System.Net.HttpStatusCode.OK));
+          var dispatcher = new WebhookDispatcher(registry, factory);
+          var result = await dispatcher.DispatchAsync(new("no.subs", new { }, DateTime.UtcNow), CancellationToken.None);
+          result.TotalSubscribers.Should().Be(0);
+          result.SuccessCount.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task Dispatch_WithSubscribers_PostsToEachUrl()
+      {
+          var registry = new InMemoryWebhookRegistry();
+          await registry.SubscribeAsync("user.created", "https://hook1.example.com", CancellationToken.None);
+          await registry.SubscribeAsync("user.created", "https://hook2.example.com", CancellationToken.None);
+          var factory = new FakeHttpClientFactory(req => new HttpResponseMessage(System.Net.HttpStatusCode.OK));
+          var dispatcher = new WebhookDispatcher(registry, factory);
+          var result = await dispatcher.DispatchAsync(new("user.created", new { Id = 1 }, DateTime.UtcNow), CancellationToken.None);
+          result.TotalSubscribers.Should().Be(2);
+          result.SuccessCount.Should().Be(2);
+          result.FailureCount.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task Dispatch_FailedDelivery_RecordsError()
+      {
+          var registry = new InMemoryWebhookRegistry();
+          await registry.SubscribeAsync("order.created", "https://fail.example.com", CancellationToken.None);
+          var factory = new FakeHttpClientFactory(req => new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError));
+          var dispatcher = new WebhookDispatcher(registry, factory);
+          var result = await dispatcher.DispatchAsync(new("order.created", new { }, DateTime.UtcNow), CancellationToken.None);
+          result.FailureCount.Should().Be(1);
+          result.Errors.Should().NotBeEmpty();
+      }
+  }

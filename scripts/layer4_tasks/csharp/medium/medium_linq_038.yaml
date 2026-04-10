@@ -1,0 +1,64 @@
+name: medium_linq_038
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Coupon with: string Code, string Type, decimal Value, DateTime Expiry.
+  A class CouponEngine with a constructor accepting IEnumerable<Coupon> coupons.
+  Expose:
+    decimal Apply(decimal price, string code, DateTime now)
+      — applies coupon to price: Type "Percent" reduces by Value%, Type "Fixed" reduces by Value.
+        Returns 0 if result would be negative.
+        Throws KeyNotFoundException if code does not exist.
+        Throws InvalidOperationException if coupon is expired (Expiry < now).
+    IEnumerable<Coupon> ValidCoupons(DateTime now) — unexpired coupons ordered by Expiry asc
+  Return only valid C# code in a single file.
+test_code: |
+  public class CouponEngineTests
+  {
+      private static readonly DateTime Now = new DateTime(2024,6,1,0,0,0,DateTimeKind.Utc);
+      private readonly Coupon[] _coupons = {
+          new("SAVE10","Percent", 10m, Now.AddDays(30)),
+          new("FLAT5",  "Fixed",   5m, Now.AddDays(10)),
+          new("OLD",    "Fixed",  20m, Now.AddDays(-1)),
+      };
+
+      [Fact]
+      public void Apply_PercentDiscount()
+      {
+          new CouponEngine(_coupons).Apply(100m, "SAVE10", Now).Should().Be(90m);
+      }
+
+      [Fact]
+      public void Apply_FixedDiscount()
+      {
+          new CouponEngine(_coupons).Apply(20m, "FLAT5", Now).Should().Be(15m);
+      }
+
+      [Fact]
+      public void Apply_ExpiredCoupon_Throws()
+      {
+          Action act = () => new CouponEngine(_coupons).Apply(100m, "OLD", Now);
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Apply_UnknownCode_Throws()
+      {
+          Action act = () => new CouponEngine(_coupons).Apply(100m, "NOPE", Now);
+          act.Should().Throw<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public void ValidCoupons_ReturnsTwoUnexpired()
+      {
+          new CouponEngine(_coupons).ValidCoupons(Now).Should().HaveCount(2);
+      }
+  }

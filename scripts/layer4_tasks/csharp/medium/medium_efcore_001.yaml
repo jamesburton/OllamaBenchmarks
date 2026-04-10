@@ -1,0 +1,62 @@
+name: medium_efcore_001
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class Customer with properties: int Id, string Name, string Email, DateTime CreatedAt.
+  A class AppDbContext : DbContext with DbSet<Customer> Customers.
+  A class CustomerRepository with constructor accepting AppDbContext.
+  Methods:
+    Task<Customer?> FindByEmailAsync(string email)
+    Task<IEnumerable<Customer>> GetRecentAsync(int count)
+    Task AddAsync(Customer customer)
+  GetRecentAsync returns the N most recent customers by CreatedAt descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CustomerRepositoryTests : IAsyncLifetime
+  {
+      private AppDbContext _db = null!;
+      private CustomerRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<AppDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new AppDbContext(opts);
+          _repo = new CustomerRepository(_db);
+          await _db.Database.EnsureCreatedAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task FindByEmail_Found()
+      {
+          await _repo.AddAsync(new Customer { Name = "Alice", Email = "alice@test.com", CreatedAt = DateTime.UtcNow });
+          var c = await _repo.FindByEmailAsync("alice@test.com");
+          c!.Name.Should().Be("Alice");
+      }
+
+      [Fact]
+      public async Task FindByEmail_NotFound_ReturnsNull()
+      {
+          (await _repo.FindByEmailAsync("x@x.com")).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task GetRecent_ReturnsNMostRecent()
+      {
+          for (int i = 1; i <= 5; i++)
+              await _repo.AddAsync(new Customer { Name = $"C{i}", Email = $"c{i}@test.com", CreatedAt = DateTime.UtcNow.AddMinutes(i) });
+          var recent = (await _repo.GetRecentAsync(3)).ToList();
+          recent.Should().HaveCount(3);
+          recent[0].Name.Should().Be("C5");
+      }
+  }

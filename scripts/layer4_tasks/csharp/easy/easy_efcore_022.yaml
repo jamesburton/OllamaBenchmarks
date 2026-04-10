@@ -1,0 +1,45 @@
+name: easy_efcore_022
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Coupon with properties: int Id, string Code, decimal Discount, bool IsUsed
+  A DbContext class CouponContext with:
+    DbSet<Coupon> Coupons { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class CouponRepository with:
+    Coupon? RedeemCoupon(CouponContext context, string code)
+  that finds an unused coupon by code (case-insensitive), marks it as used, saves, and returns it; or null if not found or already used.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CouponRepositoryTests
+  {
+      [Fact]
+      public void RedeemCoupon_ValidCode_ReturnsAndMarksUsed()
+      {
+          using var context = new CouponContext();
+          context.Database.EnsureCreated();
+          context.Coupons.Add(new Coupon { Code = "SAVE10", Discount = 10m, IsUsed = false });
+          context.SaveChanges();
+          var result = CouponRepository.RedeemCoupon(context, "save10");
+          result.Should().NotBeNull();
+          result!.IsUsed.Should().BeTrue();
+      }
+      [Fact]
+      public void RedeemCoupon_AlreadyUsed_ReturnsNull()
+      {
+          using var context = new CouponContext();
+          context.Database.EnsureCreated();
+          context.Coupons.Add(new Coupon { Code = "USED", Discount = 5m, IsUsed = true });
+          context.SaveChanges();
+          CouponRepository.RedeemCoupon(context, "USED").Should().BeNull();
+      }
+  }

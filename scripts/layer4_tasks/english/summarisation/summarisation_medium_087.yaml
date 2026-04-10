@@ -1,0 +1,18 @@
+name: summarisation_medium_087
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Large language models have demonstrated emergent capabilities in reasoning, coding, and creative writing that were not explicitly trained. Researchers debate whether these abilities reflect genuine understanding or sophisticated pattern matching. The answer has significant implications for how risks and benefits of advanced AI are assessed.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "language models"
+    - "AI"
+    - "reasoning"
+    - "emergent"
+  max_words: 25

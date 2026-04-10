@@ -1,0 +1,70 @@
+name: medium_efcore_019
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity TranslationKey with: int Id, string Key, string Description.
+  An entity Translation with: int Id, int TranslationKeyId, string LanguageCode, string Value.
+  A class LocalizationDbContext : DbContext with DbSets and one-to-many configured.
+  A class LocalizationRepository with constructor accepting LocalizationDbContext.
+  Methods:
+    Task<string?> GetTranslationAsync(string key, string languageCode)
+    Task<IDictionary<string, string>> GetAllForLanguageAsync(string languageCode)
+    Task UpsertTranslationAsync(string key, string languageCode, string value)
+  Return only valid C# code in a single file.
+test_code: |
+  public class LocalizationRepositoryTests : IAsyncLifetime
+  {
+      private LocalizationDbContext _db = null!;
+      private LocalizationRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<LocalizationDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new LocalizationDbContext(opts);
+          _repo = new LocalizationRepository(_db);
+          var tk = new TranslationKey { Key = "welcome", Description = "Welcome message" };
+          _db.Add(tk);
+          await _db.SaveChangesAsync();
+          _db.Add(new Translation { TranslationKeyId = tk.Id, LanguageCode = "en", Value = "Welcome" });
+          _db.Add(new Translation { TranslationKeyId = tk.Id, LanguageCode = "fr", Value = "Bienvenue" });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetTranslation_Found()
+      {
+          (await _repo.GetTranslationAsync("welcome", "fr")).Should().Be("Bienvenue");
+      }
+
+      [Fact]
+      public async Task GetTranslation_Missing_ReturnsNull()
+      {
+          (await _repo.GetTranslationAsync("welcome", "de")).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task GetAllForLanguage_ReturnsAll()
+      {
+          var result = await _repo.GetAllForLanguageAsync("en");
+          result.Should().ContainKey("welcome");
+          result["welcome"].Should().Be("Welcome");
+      }
+
+      [Fact]
+      public async Task UpsertTranslation_AddsNew()
+      {
+          await _repo.UpsertTranslationAsync("welcome", "de", "Willkommen");
+          (await _repo.GetTranslationAsync("welcome", "de")).Should().Be("Willkommen");
+      }
+  }

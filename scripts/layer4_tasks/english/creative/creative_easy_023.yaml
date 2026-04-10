@@ -1,0 +1,22 @@
+name: creative_easy_023
+category: english
+subcategory: creative
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of an old wooden sailing ship on the open sea.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "ship"
+    - "sail"
+    - "wooden"
+    - "sea"
+    - "ocean"
+    - "wind"
+    - "waves"
+    - "vessel"
+  min_words: 15
+  max_words: 60

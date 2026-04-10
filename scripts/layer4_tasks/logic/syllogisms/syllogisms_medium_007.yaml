@@ -1,0 +1,15 @@
+name: syllogisms_medium_007
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All cats are felines.
+  2. All felines are carnivores.
+  3. No carnivore is a vegetarian.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "No cat is a vegetarian."
+validator_config: {}

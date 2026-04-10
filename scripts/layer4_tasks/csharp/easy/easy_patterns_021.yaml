@@ -1,0 +1,36 @@
+name: easy_patterns_021
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Config with init-only setters:
+    string Host { get; init; }
+    int Port { get; init; }
+    bool UseSsl { get; init; }
+  and a static class ConfigHelper with:
+    string ToConnectionString(Config config)
+  that returns "{config.Host}:{config.Port}?ssl={config.UseSsl.ToString().ToLower()}"
+  Return only valid C# code in a single file.
+test_code: |
+  public class ConfigHelperTests
+  {
+      [Fact]
+      public void ToConnectionString_WithSsl()
+      {
+          var config = new Config { Host = "localhost", Port = 5432, UseSsl = true };
+          ConfigHelper.ToConnectionString(config).Should().Be("localhost:5432?ssl=true");
+      }
+      [Fact]
+      public void ToConnectionString_WithoutSsl()
+      {
+          var config = new Config { Host = "db.example.com", Port = 3306, UseSsl = false };
+          ConfigHelper.ToConnectionString(config).Should().Be("db.example.com:3306?ssl=false");
+      }
+  }

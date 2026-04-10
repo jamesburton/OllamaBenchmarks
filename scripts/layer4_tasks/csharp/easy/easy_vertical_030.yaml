@@ -1,0 +1,39 @@
+name: easy_vertical_030
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record FlightRoute(string Origin, string Destination, decimal BaseFare)
+  A class FlightSearch with:
+    void AddRoute(FlightRoute route)
+    List<FlightRoute> FindRoutes(string origin, string destination)
+    FlightRoute? CheapestRoute(string origin, string destination) returns route with lowest BaseFare or null if none
+  Return only valid C# code in a single file.
+test_code: |
+  public class FlightSearchTests
+  {
+      [Fact]
+      public void FindRoutes_ReturnsMatchingRoutes()
+      {
+          var search = new FlightSearch();
+          search.AddRoute(new FlightRoute("LHR", "JFK", 450m));
+          search.AddRoute(new FlightRoute("LHR", "JFK", 380m));
+          search.AddRoute(new FlightRoute("CDG", "JFK", 400m));
+          search.FindRoutes("LHR", "JFK").Should().HaveCount(2);
+      }
+      [Fact]
+      public void CheapestRoute_ReturnsMostAffordable()
+      {
+          var search = new FlightSearch();
+          search.AddRoute(new FlightRoute("LHR", "JFK", 450m));
+          search.AddRoute(new FlightRoute("LHR", "JFK", 380m));
+          search.CheapestRoute("LHR", "JFK")!.BaseFare.Should().Be(380m);
+      }
+  }

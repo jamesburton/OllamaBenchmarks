@@ -1,0 +1,65 @@
+name: medium_aspnet_008
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IProductRepository with methods:
+    Task<IEnumerable<Product>> GetAllAsync()
+    Task<Product?> GetByIdAsync(int id)
+    Task AddAsync(Product product)
+  A record Product(int Id, string Name, decimal Price).
+  A class ProductsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IProductRepository.
+  Implement CRUD actions: GET all, GET by id, POST (201), DELETE by id (204 or 404).
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductsControllerTests
+  {
+      [Fact]
+      public async Task GetAll_ReturnsProducts()
+      {
+          var repo = Substitute.For<IProductRepository>();
+          repo.GetAllAsync().Returns(new[] { new Product(1, "A", 10m) }.AsEnumerable());
+          var ctrl = new ProductsController(repo);
+          var result = await ctrl.GetAll() as OkObjectResult;
+          (result!.Value as IEnumerable<Product>).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task GetById_Found()
+      {
+          var repo = Substitute.For<IProductRepository>();
+          repo.GetByIdAsync(1).Returns(new Product(1, "A", 10m));
+          var ctrl = new ProductsController(repo);
+          var result = await ctrl.GetById(1) as OkObjectResult;
+          (result!.Value as Product)!.Name.Should().Be("A");
+      }
+
+      [Fact]
+      public async Task GetById_NotFound_Returns404()
+      {
+          var repo = Substitute.For<IProductRepository>();
+          repo.GetByIdAsync(99).Returns((Product?)null);
+          var ctrl = new ProductsController(repo);
+          var result = await ctrl.GetById(99);
+          result.Should().BeOfType<NotFoundResult>();
+      }
+
+      [Fact]
+      public async Task Post_AddsProduct_Returns201()
+      {
+          var repo = Substitute.For<IProductRepository>();
+          var ctrl = new ProductsController(repo);
+          var p = new Product(5, "B", 20m);
+          var result = await ctrl.Post(p) as CreatedAtActionResult;
+          result!.StatusCode.Should().Be(201);
+          await repo.Received(1).AddAsync(p);
+      }
+  }

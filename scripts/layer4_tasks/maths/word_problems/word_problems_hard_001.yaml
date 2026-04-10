@@ -1,0 +1,14 @@
+name: word_problems_hard_001
+category: maths
+subcategory: word_problems
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  Pipe A fills a tank in 6 hours, Pipe B in 8 hours, and Pipe C empties it in 12 hours. All three are open together. How many hours to fill the tank?
+  Reply with only the number.
+expected_answer: "4.8"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

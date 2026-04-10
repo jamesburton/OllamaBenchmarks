@@ -1,0 +1,22 @@
+name: rewriting_hard_053
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English suitable for a social media post:
+  'We are pleased to announce the commencement of our annual customer appreciation initiative.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "sale"
+    - "event"
+    - "appreciation"
+    - "customers"
+    - "annual"
+    - "started"
+  min_words: 5
+  max_words: 20

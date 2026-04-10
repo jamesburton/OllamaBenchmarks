@@ -1,0 +1,21 @@
+name: rewriting_easy_076
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'She opened the window. Fresh air came in.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "opened"
+    - "window"
+    - "fresh air"
+    - "flowed"
+    - "came"
+  min_words: 5
+  max_words: 20

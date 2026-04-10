@@ -1,0 +1,15 @@
+name: grammar_easy_074
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The alarm rang no one heard it.
+  B) The alarm rang, but no one heard it.
+  C) The alarm rang no one heard it though.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

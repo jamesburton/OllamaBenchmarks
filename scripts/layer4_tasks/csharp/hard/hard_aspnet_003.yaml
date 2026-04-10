@@ -1,0 +1,91 @@
+name: hard_aspnet_003
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A custom ASP.NET Core middleware pipeline for request correlation and error handling:
+  Class CorrelationIdMiddleware:
+    If request has header "X-Correlation-Id", uses it; otherwise generates a new Guid.
+    Sets "X-Correlation-Id" header on the response. Stores in HttpContext.Items["CorrelationId"].
+  Class GlobalExceptionMiddleware:
+    Catches all unhandled exceptions. Returns JSON response:
+      { "error": "Internal server error", "correlationId": "..." } with status 500.
+    If exception is ArgumentException returns 400 with the exception message.
+    If exception is KeyNotFoundException returns 404.
+  Class RequestTimingMiddleware:
+    Logs elapsed time to ILogger after response completes (no actual logging required,
+    just add "Timing:{ms}ms" to response headers for testing).
+  Static extension methods to register each middleware.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MiddlewarePipelineTests
+  {
+      private static WebApplication BuildApp(RequestDelegate handler)
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Logging.ClearProviders();
+          var app = builder.Build();
+          app.UseCorrelationId();
+          app.UseGlobalExceptionHandling();
+          app.UseRequestTiming();
+          app.Run(handler);
+          return app;
+      }
+
+      [Fact]
+      public async Task CorrelationId_GeneratedIfAbsent()
+      {
+          await using var app = BuildApp(ctx => { ctx.Response.StatusCode = 200; return Task.CompletedTask; });
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().ContainKey("X-Correlation-Id");
+      }
+
+      [Fact]
+      public async Task CorrelationId_PreservesProvidedValue()
+      {
+          await using var app = BuildApp(ctx => { ctx.Response.StatusCode = 200; return Task.CompletedTask; });
+          var req = new HttpRequestMessage(HttpMethod.Get, "/");
+          req.Headers.Add("X-Correlation-Id", "my-id-123");
+          var resp = await app.GetTestClient().SendAsync(req);
+          resp.Headers.GetValues("X-Correlation-Id").Should().Contain("my-id-123");
+      }
+
+      [Fact]
+      public async Task GlobalException_Returns500OnUnhandledException()
+      {
+          await using var app = BuildApp(_ => throw new Exception("oops"));
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.InternalServerError);
+      }
+
+      [Fact]
+      public async Task GlobalException_Returns400OnArgumentException()
+      {
+          await using var app = BuildApp(_ => throw new ArgumentException("bad arg"));
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+      }
+
+      [Fact]
+      public async Task GlobalException_Returns404OnKeyNotFoundException()
+      {
+          await using var app = BuildApp(_ => throw new KeyNotFoundException());
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+      }
+
+      [Fact]
+      public async Task RequestTiming_AddsTimingHeader()
+      {
+          await using var app = BuildApp(ctx => { ctx.Response.StatusCode = 200; return Task.CompletedTask; });
+          var resp = await app.GetTestClient().GetAsync("/");
+          resp.Headers.Should().ContainKey("Timing");
+      }
+  }

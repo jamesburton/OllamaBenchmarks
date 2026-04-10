@@ -1,0 +1,43 @@
+name: easy_efcore_002
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Category with properties: int Id, string Name
+  A DbContext class AppContext with:
+    DbSet<Category> Categories { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class CategoryRepository with:
+    Category? FindByName(AppContext context, string name)
+  that returns the first category matching the name (case-insensitive), or null.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CategoryRepositoryTests
+  {
+      [Fact]
+      public void FindByName_Found_ReturnsCategory()
+      {
+          using var context = new AppContext();
+          context.Database.EnsureCreated();
+          context.Categories.Add(new Category { Name = "Electronics" });
+          context.SaveChanges();
+          var result = CategoryRepository.FindByName(context, "electronics");
+          result.Should().NotBeNull();
+          result!.Name.Should().Be("Electronics");
+      }
+      [Fact]
+      public void FindByName_NotFound_ReturnsNull()
+      {
+          using var context = new AppContext();
+          context.Database.EnsureCreated();
+          CategoryRepository.FindByName(context, "Books").Should().BeNull();
+      }
+  }

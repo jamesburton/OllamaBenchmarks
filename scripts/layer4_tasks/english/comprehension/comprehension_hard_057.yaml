@@ -1,0 +1,26 @@
+name: comprehension_hard_057
+category: english
+subcategory: comprehension
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  William Shakespeare, writing in the late sixteenth and early seventeenth centuries, produced a body of work that has exerted a profound influence on English literature and language. His plays introduced hundreds of words and phrases that are now standard in everyday English, from 'bedroom' and 'lonely' to 'break the ice' and 'all that glitters is not gold'. Shakespeare's exploration of universal themes — jealousy, ambition, betrayal, love, and mortality — gives his work enduring relevance across cultures and centuries. His dramatic techniques, including the aside and the soliloquy, allowed audiences unprecedented access to characters' inner lives. Despite the archaic language and unfamiliar social contexts of many plays, Shakespeare's characters continue to resonate because their emotional struggles remain recognisably human. Critics debate whether the plays were written solely by Shakespeare or in collaboration with other writers, but this controversy has not diminished his status as the foremost figure in English literary tradition.
+  
+  Answer in one sentence:
+  What does the phrase 'foremost figure in English literary tradition' imply about other writers?
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "above"
+    - "beyond"
+    - "greatest"
+    - "comparison"
+    - "other"
+    - "literary"
+    - "tradition"
+  min_words: 8
+  max_words: 40

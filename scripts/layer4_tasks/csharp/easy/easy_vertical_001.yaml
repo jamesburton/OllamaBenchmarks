@@ -1,0 +1,38 @@
+name: easy_vertical_001
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Product(int Id, string Name, decimal Price)
+  An interface IProductRepository with methods:
+    void Add(Product product)
+    Product? GetById(int id)
+    List<Product> GetAll()
+  A class InMemoryProductRepository implementing IProductRepository using a List<Product>
+  Return only valid C# code in a single file.
+test_code: |
+  public class InMemoryProductRepositoryTests
+  {
+      [Fact]
+      public void Add_And_GetById_ReturnsProduct()
+      {
+          var repo = new InMemoryProductRepository();
+          repo.Add(new Product(1, "Widget", 9.99m));
+          repo.GetById(1)!.Name.Should().Be("Widget");
+      }
+      [Fact]
+      public void GetAll_ReturnsAllProducts()
+      {
+          var repo = new InMemoryProductRepository();
+          repo.Add(new Product(1, "A", 1m));
+          repo.Add(new Product(2, "B", 2m));
+          repo.GetAll().Should().HaveCount(2);
+      }
+  }

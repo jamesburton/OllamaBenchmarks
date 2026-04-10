@@ -1,0 +1,114 @@
+name: hard_masstransit_005
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit consumer with outbox pattern simulation:
+  Messages:
+    record ProcessPayment(Guid PaymentId, string CustomerId, decimal Amount, string Currency);
+    record PaymentProcessed(Guid PaymentId, string CustomerId, decimal Amount, DateTime ProcessedAt);
+    record PaymentFailed(Guid PaymentId, string Reason, DateTime FailedAt);
+    record SendReceipt(Guid PaymentId, string CustomerId, decimal Amount);
+
+  Class PaymentConsumer : IConsumer<ProcessPayment>:
+    If Amount <= 0: publish PaymentFailed.
+    If Currency != "GBP" and Currency != "USD" and Currency != "EUR": publish PaymentFailed.
+    Otherwise: publish PaymentProcessed and send SendReceipt command.
+    Track processed payment IDs in a static ConcurrentBag for idempotency check.
+
+  Class ReceiptConsumer : IConsumer<SendReceipt>:
+    Adds receipt to a static list. Publishes nothing.
+
+  Use MassTransit in-memory test harness.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaymentConsumerTests
+  {
+      [Fact]
+      public async Task ValidPayment_PublishesProcessed()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<PaymentConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ProcessPayment(NewId.NextGuid(), "C1", 100m, "GBP"));
+              (await harness.Published.Any<PaymentProcessed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ValidPayment_SendsReceipt()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<PaymentConsumer>();
+          harness.Consumer<ReceiptConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ProcessPayment(NewId.NextGuid(), "C2", 50m, "USD"));
+              await Task.Delay(300);
+              (await harness.Sent.Any<SendReceipt>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ZeroAmount_PublishesFailed()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<PaymentConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ProcessPayment(NewId.NextGuid(), "C3", 0m, "GBP"));
+              (await harness.Published.Any<PaymentFailed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task UnsupportedCurrency_PublishesFailed()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<PaymentConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ProcessPayment(NewId.NextGuid(), "C4", 100m, "JPY"));
+              (await harness.Published.Any<PaymentFailed>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task NegativeAmount_PublishesFailed()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<PaymentConsumer>();
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(
+                  new ProcessPayment(NewId.NextGuid(), "C5", -50m, "EUR"));
+              (await harness.Published.Any<PaymentFailed>()).Should().BeTrue();
+              (await harness.Published.Any<PaymentProcessed>()).Should().BeFalse();
+          }
+          finally { await harness.Stop(); }
+      }
+  }

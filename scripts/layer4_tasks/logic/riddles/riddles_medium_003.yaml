@@ -1,0 +1,18 @@
+name: riddles_medium_003
+category: logic
+subcategory: riddles
+difficulty: medium
+weight: 2
+validator_type: logic
+max_tokens: 64
+prompt: |
+  The person who makes it sells it. The person who buys it doesn't use it. The person who uses it doesn't know they're using it. What is it?
+  Reply with only the answer.
+expected_answer: "A coffin"
+validator_config:
+  accepted_answers:
+  - "A coffin"
+  - "coffin"
+  - "a coffin"
+  - "casket"
+  - "a casket"

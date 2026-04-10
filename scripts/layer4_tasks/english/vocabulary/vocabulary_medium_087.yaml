@@ -1,0 +1,16 @@
+name: vocabulary_medium_087
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The root 'graph' (as in 'biography') means:
+  A) Speak
+  B) Life
+  C) Write
+  D) See
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

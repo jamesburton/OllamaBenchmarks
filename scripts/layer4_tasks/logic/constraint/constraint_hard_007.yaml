@@ -1,0 +1,12 @@
+name: constraint_hard_007
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  A cipher maps each letter to a digit: A=1, B=2, ..., Z=26. The word CAB encodes to a three-digit number where each digit is its letter value.
+  What three-digit number does CAB encode to? Reply with only the number.
+expected_answer: "312"
+validator_config: {}

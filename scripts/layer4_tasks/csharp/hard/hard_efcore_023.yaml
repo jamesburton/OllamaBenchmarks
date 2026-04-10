@@ -1,0 +1,86 @@
+name: hard_efcore_023
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with temporal (bi-temporal) pattern simulated manually:
+  Entity: PolicyVersion(int Id, int PolicyId, string Coverage, decimal Premium,
+    DateOnly EffectiveFrom, DateOnly EffectiveTo, bool IsCurrent).
+  Entity: Policy(int Id, string PolicyNumber, string HolderId, List<PolicyVersion> Versions).
+  DbContext: InsuranceDbContext.
+  Class PolicyRepository(InsuranceDbContext db):
+    Task<Policy> CreateAsync(string policyNumber, string holderId, string coverage, decimal premium,
+      DateOnly effectiveFrom, CancellationToken ct)
+    Task<PolicyVersion> AmendAsync(int policyId, string newCoverage, decimal newPremium,
+      DateOnly effectiveFrom, CancellationToken ct) —
+      closes current version (sets EffectiveTo to effectiveFrom-1), creates new IsCurrent=true version.
+    Task<PolicyVersion?> GetVersionAtDateAsync(int policyId, DateOnly asOf, CancellationToken ct)
+    Task<Policy?> GetWithHistoryAsync(int policyId, CancellationToken ct) — all versions ordered by EffectiveFrom.
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PolicyRepositoryTests : IDisposable
+  {
+      private readonly InsuranceDbContext _db;
+      private readonly PolicyRepository _repo;
+
+      public PolicyRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<InsuranceDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new InsuranceDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new PolicyRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task Create_CreatesCurrentVersion()
+      {
+          var policy = await _repo.CreateAsync("POL-001", "holder1", "Basic", 100m, new DateOnly(2024,1,1), CancellationToken.None);
+          var versions = await _repo.GetWithHistoryAsync(policy.Id, CancellationToken.None);
+          versions!.Versions.Should().ContainSingle(v => v.IsCurrent);
+      }
+
+      [Fact]
+      public async Task Amend_ClosesOldVersionAndCreatesNew()
+      {
+          var policy = await _repo.CreateAsync("POL-002", "holder1", "Basic", 100m, new DateOnly(2024,1,1), CancellationToken.None);
+          await _repo.AmendAsync(policy.Id, "Comprehensive", 200m, new DateOnly(2024,6,1), CancellationToken.None);
+          var hist = await _repo.GetWithHistoryAsync(policy.Id, CancellationToken.None);
+          hist!.Versions.Should().HaveCount(2);
+          hist.Versions.Count(v => v.IsCurrent).Should().Be(1);
+          hist.Versions.First(v => v.IsCurrent).Coverage.Should().Be("Comprehensive");
+      }
+
+      [Fact]
+      public async Task GetVersionAtDate_BeforeAmendment_ReturnsOld()
+      {
+          var policy = await _repo.CreateAsync("POL-003", "h1", "Basic", 100m, new DateOnly(2024,1,1), CancellationToken.None);
+          await _repo.AmendAsync(policy.Id, "Enhanced", 150m, new DateOnly(2024,7,1), CancellationToken.None);
+          var v = await _repo.GetVersionAtDateAsync(policy.Id, new DateOnly(2024,3,1), CancellationToken.None);
+          v!.Coverage.Should().Be("Basic");
+      }
+
+      [Fact]
+      public async Task GetVersionAtDate_AfterAmendment_ReturnsNew()
+      {
+          var policy = await _repo.CreateAsync("POL-004", "h1", "Basic", 100m, new DateOnly(2024,1,1), CancellationToken.None);
+          await _repo.AmendAsync(policy.Id, "Enhanced", 150m, new DateOnly(2024,7,1), CancellationToken.None);
+          var v = await _repo.GetVersionAtDateAsync(policy.Id, new DateOnly(2024,9,1), CancellationToken.None);
+          v!.Coverage.Should().Be("Enhanced");
+      }
+
+      [Fact]
+      public async Task GetWithHistory_UnknownId_ReturnsNull()
+      {
+          (await _repo.GetWithHistoryAsync(9999, CancellationToken.None)).Should().BeNull();
+      }
+  }

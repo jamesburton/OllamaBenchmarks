@@ -1,0 +1,36 @@
+name: easy_patterns_033
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Switcher with a static method:
+    int ToScore(string grade)
+  that uses a switch expression to return:
+    "A" -> 4, "B" -> 3, "C" -> 2, "D" -> 1, _ -> 0
+  Return only valid C# code in a single file.
+test_code: |
+  public class SwitcherTests
+  {
+      [Fact]
+      public void ToScore_A_Returns4()
+      {
+          Switcher.ToScore("A").Should().Be(4);
+      }
+      [Fact]
+      public void ToScore_B_Returns3()
+      {
+          Switcher.ToScore("B").Should().Be(3);
+      }
+      [Fact]
+      public void ToScore_Unknown_Returns0()
+      {
+          Switcher.ToScore("F").Should().Be(0);
+      }
+  }

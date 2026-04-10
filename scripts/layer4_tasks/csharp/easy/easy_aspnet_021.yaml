@@ -1,0 +1,34 @@
+name: easy_aspnet_021
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class EndpointHandlers with a static method:
+    IResult GetHealth(bool isHealthy)
+  that returns Results.Ok(new { Status = "healthy" }) if isHealthy is true,
+  otherwise Results.StatusCode(503) with body new { Status = "unhealthy" }.
+  Use Results.Json for the unhealthy case with StatusCodes.Status503ServiceUnavailable.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EndpointHandlersTests
+  {
+      [Fact]
+      public void GetHealth_Healthy_ReturnsOk()
+      {
+          var result = EndpointHandlers.GetHealth(true);
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<object>>();
+      }
+      [Fact]
+      public void GetHealth_Unhealthy_ReturnsNonOk()
+      {
+          var result = EndpointHandlers.GetHealth(false);
+          result.Should().NotBeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<object>>();
+      }
+  }

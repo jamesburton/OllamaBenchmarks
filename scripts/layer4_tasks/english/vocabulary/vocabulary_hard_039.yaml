@@ -1,0 +1,16 @@
+name: vocabulary_hard_039
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'His obsequious manner irritated his colleagues', which word best replaces 'obsequious'?
+  A) Bold
+  B) Fawning
+  C) Distant
+  D) Assertive
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

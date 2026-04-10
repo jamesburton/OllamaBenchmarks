@@ -1,0 +1,39 @@
+name: easy_async_024
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncCollector with a static method:
+    async Task<int> CountAsync<T>(IAsyncEnumerable<T> source)
+  that counts all items in an async enumerable.
+  Use await foreach.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncCollectorTests
+  {
+      private static async IAsyncEnumerable<int> GetNumbers()
+      {
+          yield return 1;
+          yield return 2;
+          yield return 3;
+      }
+      [Fact]
+      public async Task CountAsync_ReturnsCount()
+      {
+          var result = await AsyncCollector.CountAsync(GetNumbers());
+          result.Should().Be(3);
+      }
+      [Fact]
+      public async Task CountAsync_EmptySource_ReturnsZero()
+      {
+          var result = await AsyncCollector.CountAsync(AsyncEnumerable.Empty<int>());
+          result.Should().Be(0);
+      }
+  }

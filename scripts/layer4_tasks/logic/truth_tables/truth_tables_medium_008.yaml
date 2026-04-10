@@ -1,0 +1,12 @@
+name: truth_tables_medium_008
+category: logic
+subcategory: truth_tables
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 64
+prompt: |
+  P=True, Q=False. Evaluate: (P AND Q) OR (NOT P AND NOT Q)
+  Reply with only True or False.
+expected_answer: "False"
+validator_config: {}

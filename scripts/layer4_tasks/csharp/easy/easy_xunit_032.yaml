@@ -1,0 +1,39 @@
+name: easy_xunit_032
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IPaymentGateway with method:
+    Task<bool> ChargeAsync(string cardToken, decimal amount)
+  A class CheckoutService with constructor taking IPaymentGateway, and async method:
+    Task<string> CheckoutAsync(string cardToken, decimal amount) returns "Success" if charge returns true, "Failed" otherwise
+  Return only valid C# code in a single file.
+test_code: |
+  public class CheckoutServiceTests
+  {
+      [Fact]
+      public async Task CheckoutAsync_SuccessfulCharge_ReturnsSuccess()
+      {
+          var gateway = Substitute.For<IPaymentGateway>();
+          gateway.ChargeAsync("tok_123", 50m).Returns(true);
+          var service = new CheckoutService(gateway);
+          var result = await service.CheckoutAsync("tok_123", 50m);
+          result.Should().Be("Success");
+      }
+      [Fact]
+      public async Task CheckoutAsync_FailedCharge_ReturnsFailed()
+      {
+          var gateway = Substitute.For<IPaymentGateway>();
+          gateway.ChargeAsync("tok_bad", 50m).Returns(false);
+          var service = new CheckoutService(gateway);
+          var result = await service.CheckoutAsync("tok_bad", 50m);
+          result.Should().Be("Failed");
+      }
+  }

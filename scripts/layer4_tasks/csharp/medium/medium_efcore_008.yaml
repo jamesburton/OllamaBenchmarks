@@ -1,0 +1,66 @@
+name: medium_efcore_008
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity BlogPost with: int Id, string Title, string Content, bool IsPublished, DateTime CreatedAt, DateTime? PublishedAt.
+  A class BlogDbContext : DbContext with DbSet<BlogPost> Posts.
+  A class BlogPostRepository with constructor accepting BlogDbContext.
+  Methods:
+    Task PublishAsync(int postId)
+    Task<IEnumerable<BlogPost>> GetPublishedAsync()
+    Task<IEnumerable<BlogPost>> GetDraftsAsync()
+    Task<BlogPost?> GetByIdAsync(int id)
+  PublishAsync sets IsPublished=true and PublishedAt=UtcNow.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BlogPostRepositoryTests : IAsyncLifetime
+  {
+      private BlogDbContext _db = null!;
+      private BlogPostRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<BlogDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new BlogDbContext(opts);
+          _repo = new BlogPostRepository(_db);
+          _db.Posts.AddRange(
+              new BlogPost { Title = "Draft 1", Content = "...", IsPublished = false, CreatedAt = DateTime.UtcNow },
+              new BlogPost { Title = "Published", Content = "...", IsPublished = true, CreatedAt = DateTime.UtcNow, PublishedAt = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetPublished_ReturnsOnlyPublished()
+      {
+          (await _repo.GetPublishedAsync()).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task GetDrafts_ReturnsOnlyDrafts()
+      {
+          (await _repo.GetDraftsAsync()).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task Publish_SetsPublishedFields()
+      {
+          var draft = _db.Posts.First(p => !p.IsPublished);
+          var before = DateTime.UtcNow.AddSeconds(-1);
+          await _repo.PublishAsync(draft.Id);
+          _db.ChangeTracker.Clear();
+          var post = await _repo.GetByIdAsync(draft.Id);
+          post!.IsPublished.Should().BeTrue();
+          post.PublishedAt.Should().BeAfter(before);
+      }
+  }

@@ -1,0 +1,41 @@
+name: easy_blazor_004
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class UserCardComponent that extends ComponentBase with:
+    [Parameter] string FirstName { get; set; } = ""
+    [Parameter] string LastName { get; set; } = ""
+    [Parameter] string Email { get; set; } = ""
+    string FullName => $"{FirstName} {LastName}".Trim()
+    bool HasEmail => !string.IsNullOrEmpty(Email)
+  Return only valid C# code in a single file.
+test_code: |
+  public class UserCardComponentTests
+  {
+      [Fact]
+      public void FullName_CombinesFirstAndLast()
+      {
+          var component = new UserCardComponent { FirstName = "John", LastName = "Doe" };
+          component.FullName.Should().Be("John Doe");
+      }
+      [Fact]
+      public void HasEmail_WithEmail_ReturnsTrue()
+      {
+          var component = new UserCardComponent { Email = "john@test.com" };
+          component.HasEmail.Should().BeTrue();
+      }
+      [Fact]
+      public void HasEmail_Empty_ReturnsFalse()
+      {
+          var component = new UserCardComponent();
+          component.HasEmail.Should().BeFalse();
+      }
+  }

@@ -1,0 +1,14 @@
+name: deduction_medium_009
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All successful students attend class regularly.
+  2. Sam does not attend class regularly.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "Sam is not a successful student."
+validator_config: {}

@@ -1,0 +1,16 @@
+name: riddles_easy_002
+category: logic
+subcategory: riddles
+difficulty: easy
+weight: 1
+validator_type: logic
+max_tokens: 64
+prompt: |
+  I have cities, but no houses live there. I have mountains, but no trees grow. I have water, but no fish swim. I have roads, but no cars drive. What am I?
+  Reply with only the answer.
+expected_answer: "A map"
+validator_config:
+  accepted_answers:
+  - "A map"
+  - "map"
+  - "a map"

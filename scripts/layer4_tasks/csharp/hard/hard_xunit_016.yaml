@@ -1,0 +1,95 @@
+name: hard_xunit_016
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing event sourcing aggregate:
+  Interface IDomainEvent: Guid AggregateId, long Version, DateTime OccurredAt.
+  Abstract class Aggregate:
+    IReadOnlyList<IDomainEvent> UncommittedEvents
+    long Version
+    void Apply(IDomainEvent evt): dispatches to correct handler, increments version.
+    void ClearUncommittedEvents()
+    void Load(IEnumerable<IDomainEvent> history): replays events.
+
+  Events: AccountOpened(Guid AccountId, string Owner, decimal InitialBalance, DateTime OccurredAt),
+    MoneyDeposited(Guid AccountId, decimal Amount, string Reference, DateTime OccurredAt),
+    MoneyWithdrawn(Guid AccountId, decimal Amount, string Reference, DateTime OccurredAt),
+    AccountClosed(Guid AccountId, string Reason, DateTime OccurredAt).
+
+  Class BankAccount : Aggregate:
+    static BankAccount Open(string owner, decimal initialBalance): raises AccountOpened.
+    void Deposit(decimal amount, string reference): raises MoneyDeposited.
+    void Withdraw(decimal amount, string reference): throws if insufficient funds; raises MoneyWithdrawn.
+    void Close(string reason): throws if already closed; raises AccountClosed.
+    decimal Balance, string Owner, bool IsClosed, long Version.
+  Return only valid C# code in a single file.
+test_code: |
+  public class BankAccountTests
+  {
+      [Fact]
+      public void Open_CreatesAccountWithBalance()
+      {
+          var account = BankAccount.Open("Alice", 1000m);
+          account.Owner.Should().Be("Alice");
+          account.Balance.Should().Be(1000m);
+          account.IsClosed.Should().BeFalse();
+      }
+
+      [Fact]
+      public void Open_RaisesAccountOpenedEvent()
+      {
+          var account = BankAccount.Open("Bob", 500m);
+          account.UncommittedEvents.Should().ContainSingle(e => e is AccountOpened);
+      }
+
+      [Fact]
+      public void Deposit_IncreasesBalance()
+      {
+          var account = BankAccount.Open("Carol", 100m);
+          account.ClearUncommittedEvents();
+          account.Deposit(50m, "REF-1");
+          account.Balance.Should().Be(150m);
+          account.UncommittedEvents.Should().ContainSingle(e => e is MoneyDeposited);
+      }
+
+      [Fact]
+      public void Withdraw_InsufficientFunds_Throws()
+      {
+          var account = BankAccount.Open("Dave", 50m);
+          var act = () => account.Withdraw(100m, "REF-X");
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Close_AlreadyClosed_Throws()
+      {
+          var account = BankAccount.Open("Eve", 0m);
+          account.Close("done");
+          var act = () => account.Close("again");
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Load_RebuildsStateFromHistory()
+      {
+          var id = Guid.NewGuid();
+          var events = new IDomainEvent[]
+          {
+              new AccountOpened(id, "Frank", 200m, DateTime.UtcNow),
+              new MoneyDeposited(id, 100m, "R1", DateTime.UtcNow),
+              new MoneyWithdrawn(id, 50m, "R2", DateTime.UtcNow)
+          };
+          var account = new BankAccount();
+          account.Load(events);
+          account.Balance.Should().Be(250m);
+          account.Version.Should().Be(3);
+      }
+  }

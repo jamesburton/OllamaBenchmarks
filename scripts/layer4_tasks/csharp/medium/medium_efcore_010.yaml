@@ -1,0 +1,65 @@
+name: medium_efcore_010
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Address with: int Id, int CustomerId, string Street, string City, string PostalCode, bool IsPrimary.
+  A class AddressDbContext : DbContext with DbSet<Address> Addresses.
+  A class AddressRepository with constructor accepting AddressDbContext.
+  Methods:
+    Task<IEnumerable<Address>> GetByCustomerAsync(int customerId)
+    Task<Address?> GetPrimaryAsync(int customerId)
+    Task SetPrimaryAsync(int addressId, int customerId)
+  SetPrimaryAsync sets IsPrimary=false for all customer addresses, then true for the specified one.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AddressRepositoryTests : IAsyncLifetime
+  {
+      private AddressDbContext _db = null!;
+      private AddressRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<AddressDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new AddressDbContext(opts);
+          _repo = new AddressRepository(_db);
+          _db.Addresses.AddRange(
+              new Address { Id = 1, CustomerId = 1, Street = "1 Main St", City = "A", PostalCode = "11", IsPrimary = true },
+              new Address { Id = 2, CustomerId = 1, Street = "2 Side St", City = "B", PostalCode = "22", IsPrimary = false },
+              new Address { Id = 3, CustomerId = 2, Street = "3 Other St", City = "C", PostalCode = "33", IsPrimary = true });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByCustomer_ReturnsCorrect()
+      {
+          (await _repo.GetByCustomerAsync(1)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetPrimary_ReturnsPrimary()
+      {
+          (await _repo.GetPrimaryAsync(1))!.Street.Should().Be("1 Main St");
+      }
+
+      [Fact]
+      public async Task SetPrimary_SwitchesPrimary()
+      {
+          await _repo.SetPrimaryAsync(2, 1);
+          _db.ChangeTracker.Clear();
+          var primary = await _repo.GetPrimaryAsync(1);
+          primary!.Id.Should().Be(2);
+          var old = await _db.Addresses.FindAsync(1);
+          old!.IsPrimary.Should().BeFalse();
+      }
+  }

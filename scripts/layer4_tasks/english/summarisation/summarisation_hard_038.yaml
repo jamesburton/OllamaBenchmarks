@@ -1,0 +1,18 @@
+name: summarisation_hard_038
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Synthetic biology is enabling the design of organisms with entirely novel metabolic pathways, creating potential applications in biosynthesis of pharmaceuticals, biodegradable plastics, and carbon capture. Xenobiological systems incorporating non-canonical amino acids may produce proteins with unprecedented functions. Biosafety frameworks are struggling to keep pace with the speed of engineering advances.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "synthetic biology"
+    - "metabolic"
+    - "biosafety"
+    - "proteins"
+  max_words: 25

@@ -1,0 +1,53 @@
+name: medium_async_045
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IFileProcessor with Task<ProcessResult> ProcessAsync(string filePath, CancellationToken ct = default).
+  ProcessResult is a record with string FilePath, bool Success, string? Error.
+  A class DirectoryScanner with constructor accepting IFileProcessor processor and int parallelism.
+  Exposes Task<ScanReport> ScanAsync(IEnumerable<string> filePaths, CancellationToken ct = default).
+  ScanReport is a record with int Total, int Succeeded, int Failed, IReadOnlyList<ProcessResult> Results.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DirectoryScannerTests
+  {
+      [Fact]
+      public async Task AllSucceed_ReportsCorrectly()
+      {
+          var proc = Substitute.For<IFileProcessor>();
+          proc.ProcessAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult(new ProcessResult(ci.Arg<string>(), true, null)));
+          var r = await new DirectoryScanner(proc, 2).ScanAsync(new[]{"a","b","c"});
+          r.Total.Should().Be(3);
+          r.Succeeded.Should().Be(3);
+          r.Failed.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task OneFailure_ReportedCorrectly()
+      {
+          var proc = Substitute.For<IFileProcessor>();
+          proc.ProcessAsync("bad", Arg.Any<CancellationToken>())
+              .Returns(Task.FromResult(new ProcessResult("bad", false, "err")));
+          proc.ProcessAsync("good", Arg.Any<CancellationToken>())
+              .Returns(Task.FromResult(new ProcessResult("good", true, null)));
+          var r = await new DirectoryScanner(proc, 2).ScanAsync(new[]{"good","bad"});
+          r.Failed.Should().Be(1);
+          r.Succeeded.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task Empty_ZeroTotal()
+      {
+          (await new DirectoryScanner(Substitute.For<IFileProcessor>(), 2)
+              .ScanAsync(Array.Empty<string>())).Total.Should().Be(0);
+      }
+  }

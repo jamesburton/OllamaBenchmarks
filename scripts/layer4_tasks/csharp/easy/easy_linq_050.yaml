@@ -1,0 +1,33 @@
+name: easy_linq_050
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Converter with a static method:
+    Dictionary<string, int> ToWordLengthMap(IEnumerable<string> items)
+  that creates a dictionary mapping each unique string to its length using LINQ ToDictionary.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ConverterTests
+  {
+      [Fact]
+      public void ToWordLengthMap_BasicCase()
+      {
+          var result = Converter.ToWordLengthMap(new[]{"hello","world","hi"});
+          result["hello"].Should().Be(5);
+          result["world"].Should().Be(5);
+          result["hi"].Should().Be(2);
+      }
+      [Fact]
+      public void ToWordLengthMap_Empty_ReturnsEmpty()
+      {
+          Converter.ToWordLengthMap(Array.Empty<string>()).Should().BeEmpty();
+      }
+  }

@@ -1,0 +1,53 @@
+name: medium_linq_033
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class RankedList<T> with a constructor accepting IEnumerable<T> items and Func<T, double> scoreSelector.
+  Expose:
+    IEnumerable<RankedItem<T>> Rank()
+  where RankedItem<T> is a class or record with: int Rank, T Item, double Score.
+  Rank starts at 1. Items with equal scores share the same rank (dense ranking).
+  Items ordered by Score descending.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RankedListTests
+  {
+      [Fact]
+      public void Rank_UniqueScores_CorrectRanks()
+      {
+          var result = new RankedList<string>(new[]{"A","B","C"}, s => s == "A" ? 10.0 : s == "B" ? 8.0 : 5.0)
+              .Rank().ToList();
+          result[0].Rank.Should().Be(1);
+          result[0].Item.Should().Be("A");
+          result[2].Rank.Should().Be(3);
+      }
+
+      [Fact]
+      public void Rank_TiedScores_ShareRank()
+      {
+          var result = new RankedList<int>(new[]{1,2,3}, _ => 5.0).Rank().ToList();
+          result.Should().AllSatisfy(r => r.Rank.Should().Be(1));
+      }
+
+      [Fact]
+      public void Rank_DenseRanking()
+      {
+          var items = new[]{("A",10.0),("B",10.0),("C",5.0)};
+          var result = new RankedList<(string,double)>(items, x => x.Item2).Rank().ToList();
+          result[2].Rank.Should().Be(2);
+      }
+
+      [Fact]
+      public void Rank_Empty_ReturnsEmpty()
+      {
+          new RankedList<int>(Array.Empty<int>(), _ => 0.0).Rank().Should().BeEmpty();
+      }
+  }

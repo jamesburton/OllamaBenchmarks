@@ -1,0 +1,80 @@
+name: medium_efcore_018
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Wishlist with: int Id, string UserId, string Name.
+  An entity WishlistItem with: int Id, int WishlistId, string ProductId, string ProductName, decimal Price, DateTime AddedAt.
+  A class WishlistDbContext : DbContext with DbSets and one-to-many relationship configured.
+  A class WishlistRepository with constructor accepting WishlistDbContext.
+  Methods:
+    Task<Wishlist?> GetWithItemsAsync(int wishlistId)
+    Task AddItemAsync(int wishlistId, WishlistItem item)
+    Task RemoveItemAsync(int wishlistItemId)
+    Task<decimal> GetTotalValueAsync(int wishlistId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class WishlistRepositoryTests : IAsyncLifetime
+  {
+      private WishlistDbContext _db = null!;
+      private WishlistRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<WishlistDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new WishlistDbContext(opts);
+          _repo = new WishlistRepository(_db);
+          _db.Add(new Wishlist
+          {
+              Id = 1,
+              UserId = "u1",
+              Name = "Birthday",
+              Items = new List<WishlistItem>
+              {
+                  new() { ProductId = "p1", ProductName = "Book", Price = 15m, AddedAt = DateTime.UtcNow },
+                  new() { ProductId = "p2", ProductName = "Toy", Price = 25m, AddedAt = DateTime.UtcNow }
+              }
+          });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetWithItems_IncludesItems()
+      {
+          var w = await _repo.GetWithItemsAsync(1);
+          w!.Items.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task AddItem_IncreasesCount()
+      {
+          await _repo.AddItemAsync(1, new WishlistItem { ProductId = "p3", ProductName = "Game", Price = 60m, AddedAt = DateTime.UtcNow });
+          _db.ChangeTracker.Clear();
+          (await _repo.GetWithItemsAsync(1))!.Items.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task RemoveItem_DecreasesCount()
+      {
+          var itemId = _db.Set<WishlistItem>().First().Id;
+          await _repo.RemoveItemAsync(itemId);
+          _db.ChangeTracker.Clear();
+          (await _repo.GetWithItemsAsync(1))!.Items.Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task GetTotalValue_CalculatesCorrectly()
+      {
+          (await _repo.GetTotalValueAsync(1)).Should().Be(40m);
+      }
+  }

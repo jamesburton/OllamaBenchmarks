@@ -1,0 +1,15 @@
+name: syllogisms_easy_007
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All planets orbit a star.
+  2. Earth is a planet.
+  3. The Sun is a star.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "Earth orbits a star."
+validator_config: {}

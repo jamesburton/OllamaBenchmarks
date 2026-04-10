@@ -1,0 +1,69 @@
+name: medium_aspnet_003
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record CreateOrderRequest(string CustomerId, List<string> Items).
+  A record OrderResponse(Guid OrderId, string CustomerId, List<string> Items, DateTime CreatedAt).
+  A static class OrderEndpoints with:
+    void MapOrderEndpoints(WebApplication app)
+  Register POST /orders accepting CreateOrderRequest, returning 201 Created with OrderResponse.
+  Generate a new Guid for OrderId, set CreatedAt = DateTime.UtcNow.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderEndpointTests
+  {
+      [Fact]
+      public async Task PostOrder_Returns201WithBody()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          OrderEndpoints.MapOrderEndpoints(app);
+          await app.StartAsync();
+          var client = app.GetTestClient();
+          var req = new CreateOrderRequest("cust1", new List<string> { "item1", "item2" });
+          var response = await client.PostAsJsonAsync("/orders", req);
+          response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+          var order = await response.Content.ReadFromJsonAsync<OrderResponse>();
+          order!.CustomerId.Should().Be("cust1");
+          order.Items.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task PostOrder_GeneratesUniqueId()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          OrderEndpoints.MapOrderEndpoints(app);
+          await app.StartAsync();
+          var client = app.GetTestClient();
+          var req = new CreateOrderRequest("cust2", new List<string> { "x" });
+          var r1 = await (await client.PostAsJsonAsync("/orders", req)).Content.ReadFromJsonAsync<OrderResponse>();
+          var r2 = await (await client.PostAsJsonAsync("/orders", req)).Content.ReadFromJsonAsync<OrderResponse>();
+          r1!.OrderId.Should().NotBe(r2!.OrderId);
+      }
+
+      [Fact]
+      public async Task PostOrder_SetsCreatedAt()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          OrderEndpoints.MapOrderEndpoints(app);
+          await app.StartAsync();
+          var client = app.GetTestClient();
+          var req = new CreateOrderRequest("cust3", new List<string>());
+          var before = DateTime.UtcNow.AddSeconds(-1);
+          var order = await (await client.PostAsJsonAsync("/orders", req)).Content.ReadFromJsonAsync<OrderResponse>();
+          order!.CreatedAt.Should().BeAfter(before);
+      }
+  }

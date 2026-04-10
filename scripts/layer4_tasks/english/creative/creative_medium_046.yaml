@@ -1,0 +1,22 @@
+name: creative_medium_046
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a crowded open-air market in a tropical city.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "market"
+    - "tropical"
+    - "crowd"
+    - "heat"
+    - "vendors"
+    - "vibrant"
+    - "colour"
+    - "noise"
+  min_words: 15
+  max_words: 60

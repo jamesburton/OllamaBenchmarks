@@ -1,0 +1,15 @@
+name: constraint_medium_014
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three pairs of socks: red pair, blue pair, green pair. Three drawers: top, middle, bottom.
+  Clues:
+  1. Blue socks are above the red socks.
+  2. Green socks are in the middle.
+  Where are the blue socks? Reply with only the position.
+expected_answer: "Top"
+validator_config: {}

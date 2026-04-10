@@ -1,0 +1,39 @@
+name: easy_vertical_028
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record WatchlistItem(string UserId, string MovieId, string Title)
+  A class Watchlist with:
+    void Add(WatchlistItem item)
+    void Remove(string userId, string movieId)
+    bool Contains(string userId, string movieId) returns true if item exists
+    List<WatchlistItem> GetForUser(string userId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class WatchlistTests
+  {
+      [Fact]
+      public void Add_And_Contains_Works()
+      {
+          var wl = new Watchlist();
+          wl.Add(new WatchlistItem("u1", "m1", "Inception"));
+          wl.Contains("u1", "m1").Should().BeTrue();
+          wl.Contains("u1", "m2").Should().BeFalse();
+      }
+      [Fact]
+      public void Remove_RemovesItem()
+      {
+          var wl = new Watchlist();
+          wl.Add(new WatchlistItem("u1", "m1", "Interstellar"));
+          wl.Remove("u1", "m1");
+          wl.GetForUser("u1").Should().BeEmpty();
+      }
+  }

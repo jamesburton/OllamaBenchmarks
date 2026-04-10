@@ -1,0 +1,33 @@
+name: easy_async_041
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class TaskHelper with a static method:
+    Task<T> WrapException<T>(Exception ex)
+  that returns a faulted task containing the given exception using Task.FromException<T>.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaskHelperTests
+  {
+      [Fact]
+      public async Task WrapException_TaskIsFaulted()
+      {
+          var task = TaskHelper.WrapException<int>(new ArgumentException("bad arg"));
+          await Assert.ThrowsAsync<ArgumentException>(() => task);
+      }
+      [Fact]
+      public async Task WrapException_ContainsMessage()
+      {
+          var task = TaskHelper.WrapException<string>(new InvalidOperationException("oops"));
+          var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => task);
+          ex.Message.Should().Be("oops");
+      }
+  }

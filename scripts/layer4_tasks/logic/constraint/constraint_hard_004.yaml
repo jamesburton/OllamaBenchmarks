@@ -1,0 +1,18 @@
+name: constraint_hard_004
+category: logic
+subcategory: constraint
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Four programmers work on four languages: Python, Java, C++, Rust.
+  Clues:
+  1. Alice does not use Python or Rust.
+  2. Bob uses a language that comes after Alice's alphabetically.
+  3. Carol uses Python.
+  4. Dave does not use Java.
+  5. Alice uses C++.
+  What language does Dave use? Reply with only the language.
+expected_answer: "Rust"
+validator_config: {}

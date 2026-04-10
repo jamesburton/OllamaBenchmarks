@@ -1,0 +1,44 @@
+name: easy_aspnet_014
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class PasswordRequest with:
+    [Required][MinLength(8)] string Password { get; set; }
+    [Required][Compare(nameof(Password))] string ConfirmPassword { get; set; }
+  Return only valid C# code in a single file.
+test_code: |
+  public class PasswordRequestTests
+  {
+      private static IList<ValidationResult> Validate(object obj)
+      {
+          var results = new List<ValidationResult>();
+          Validator.TryValidateObject(obj, new ValidationContext(obj), results, true);
+          return results;
+      }
+      [Fact]
+      public void ValidRequest_PassesValidation()
+      {
+          var req = new PasswordRequest { Password = "Secure123", ConfirmPassword = "Secure123" };
+          Validate(req).Should().BeEmpty();
+      }
+      [Fact]
+      public void ShortPassword_FailsValidation()
+      {
+          var req = new PasswordRequest { Password = "short", ConfirmPassword = "short" };
+          Validate(req).Should().NotBeEmpty();
+      }
+      [Fact]
+      public void PasswordMismatch_FailsValidation()
+      {
+          var req = new PasswordRequest { Password = "Password123", ConfirmPassword = "Different123" };
+          Validate(req).Should().NotBeEmpty();
+      }
+  }

@@ -1,0 +1,15 @@
+name: grammar_easy_053
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The childrens' toys were scattered.
+  B) The children's toys were scattered.
+  C) The childrens toys were scattered.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

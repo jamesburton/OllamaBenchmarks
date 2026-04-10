@@ -1,0 +1,18 @@
+name: summarisation_easy_085
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Internet access was restored to a remote island community after a fibre-optic cable was laid along the seabed. The project, funded by the government, gives 5,000 residents access to high-speed broadband for the first time. Local schools and businesses are expected to benefit significantly.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "internet"
+    - "broadband"
+    - "fibre"
+    - "community"
+  max_words: 25

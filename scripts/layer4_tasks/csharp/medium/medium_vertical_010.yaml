@@ -1,0 +1,59 @@
+name: medium_vertical_010
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for content moderation.
+  Include:
+    record ModerateContentCommand(Guid ContentId, string Text, string AuthorId)
+    record ModerateContentResult(Guid ContentId, bool IsApproved, string? RejectionReason)
+    class ModerateContentHandler with constructor accepting:
+      IEnumerable<string> bannedWords
+    Method: ModerateContentResult Handle(ModerateContentCommand command)
+    Approves if text contains no banned words (case-insensitive).
+    Rejects with reason listing found banned words.
+    Validates: Text not empty, AuthorId not empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ModerateContentHandlerTests
+  {
+      [Fact]
+      public void Handle_CleanContent_Approves()
+      {
+          var handler = new ModerateContentHandler(new[] { "spam", "hate" });
+          var result = handler.Handle(new ModerateContentCommand(Guid.NewGuid(), "Hello world!", "u1"));
+          result.IsApproved.Should().BeTrue();
+          result.RejectionReason.Should().BeNull();
+      }
+
+      [Fact]
+      public void Handle_ContainsBannedWord_Rejects()
+      {
+          var handler = new ModerateContentHandler(new[] { "spam", "hate" });
+          var result = handler.Handle(new ModerateContentCommand(Guid.NewGuid(), "This is spam content", "u1"));
+          result.IsApproved.Should().BeFalse();
+          result.RejectionReason.Should().Contain("spam");
+      }
+
+      [Fact]
+      public void Handle_CaseInsensitive_DetectsBannedWord()
+      {
+          var handler = new ModerateContentHandler(new[] { "spam" });
+          var result = handler.Handle(new ModerateContentCommand(Guid.NewGuid(), "SPAM here", "u1"));
+          result.IsApproved.Should().BeFalse();
+      }
+
+      [Fact]
+      public void Handle_EmptyText_Throws()
+      {
+          var handler = new ModerateContentHandler(new[] { "spam" });
+          handler.Invoking(h => h.Handle(new ModerateContentCommand(Guid.NewGuid(), "", "u1")))
+              .Should().Throw<ArgumentException>();
+      }
+  }

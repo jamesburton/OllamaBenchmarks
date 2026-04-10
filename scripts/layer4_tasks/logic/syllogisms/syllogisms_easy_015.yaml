@@ -1,0 +1,15 @@
+name: syllogisms_easy_015
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All cars have engines.
+  2. All things with engines use fuel.
+  3. My vehicle is a car.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "My vehicle uses fuel."
+validator_config: {}

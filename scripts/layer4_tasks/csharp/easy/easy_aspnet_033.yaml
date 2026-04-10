@@ -1,0 +1,43 @@
+name: easy_aspnet_033
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class LoggingOptions with:
+    string MinimumLevel { get; set; } = "Information"
+    bool EnableConsole { get; set; } = true
+    bool EnableFile { get; set; } = false
+    string? FilePath { get; set; }
+  and a static class LoggingOptionsHelper with:
+    bool RequiresFilePath(LoggingOptions options)
+  that returns true only if EnableFile is true and FilePath is null/empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LoggingOptionsHelperTests
+  {
+      [Fact]
+      public void RequiresFilePath_FileEnabled_NoPath_ReturnsTrue()
+      {
+          var opts = new LoggingOptions { EnableFile = true, FilePath = null };
+          LoggingOptionsHelper.RequiresFilePath(opts).Should().BeTrue();
+      }
+      [Fact]
+      public void RequiresFilePath_FileEnabled_WithPath_ReturnsFalse()
+      {
+          var opts = new LoggingOptions { EnableFile = true, FilePath = "/var/log/app.log" };
+          LoggingOptionsHelper.RequiresFilePath(opts).Should().BeFalse();
+      }
+      [Fact]
+      public void RequiresFilePath_FileDisabled_ReturnsFalse()
+      {
+          var opts = new LoggingOptions { EnableFile = false, FilePath = null };
+          LoggingOptionsHelper.RequiresFilePath(opts).Should().BeFalse();
+      }
+  }

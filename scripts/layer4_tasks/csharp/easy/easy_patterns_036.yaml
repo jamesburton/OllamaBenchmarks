@@ -1,0 +1,34 @@
+name: easy_patterns_036
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record:
+    record Money(decimal Amount, string Currency)
+  with operator overloading for +:
+    static Money operator+(Money a, Money b) — throws InvalidOperationException if currencies differ, otherwise returns new Money with summed amounts
+  Return only valid C# code in a single file.
+test_code: |
+  public class MoneyTests
+  {
+      [Fact]
+      public void Add_SameCurrency_ReturnsCombined()
+      {
+          var result = new Money(10m, "USD") + new Money(5m, "USD");
+          result.Amount.Should().Be(15m);
+          result.Currency.Should().Be("USD");
+      }
+      [Fact]
+      public void Add_DifferentCurrencies_Throws()
+      {
+          Action act = () => _ = new Money(10m, "USD") + new Money(5m, "EUR");
+          act.Should().Throw<InvalidOperationException>();
+      }
+  }

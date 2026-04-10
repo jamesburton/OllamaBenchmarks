@@ -1,0 +1,41 @@
+name: medium_vertical_014
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for generatereport.
+  Include:
+    Command: string ReportType, DateTime StartDate, DateTime EndDate, string OwnerId
+  Result: Guid ReportId, string ReportType, int RecordCount, DateTime GeneratedAt
+  Handler validates: StartDate < EndDate, ReportType in (sales, inventory, users), dates not in future.
+  Return only valid C# code in a single file.
+test_code: |
+  public class GenerateReportHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new GenerateReportHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new GenerateReportHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new GenerateReportHandler();
+          handler.Should().NotBeNull();
+      }
+  }

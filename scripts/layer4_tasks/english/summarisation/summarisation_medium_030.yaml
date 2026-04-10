@@ -1,0 +1,18 @@
+name: summarisation_medium_030
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Quantum computing has moved closer to practical application, with a new processor achieving quantum supremacy on specific computational tasks. Unlike classical computers, quantum systems exploit superposition and entanglement to perform certain calculations exponentially faster. Experts predict the technology will first impact drug discovery and materials science.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "quantum"
+    - "computing"
+    - "processor"
+    - "entanglement"
+  max_words: 25

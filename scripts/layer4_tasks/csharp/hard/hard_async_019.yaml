@@ -1,0 +1,89 @@
+name: hard_async_019
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncConcurrentDictionary<TKey, TValue> providing async-safe dictionary operations:
+    Task<TValue> GetOrAddAsync(TKey key, Func<TKey, CancellationToken, Task<TValue>> factory, CancellationToken ct)
+    Task<bool> TryUpdateAsync(TKey key, TValue newValue, TValue expectedValue) —
+      atomically updates if current value equals expectedValue. Returns success.
+    Task<(bool Found, TValue Value)> TryGetAsync(TKey key)
+    Task<TValue> AddOrUpdateAsync(TKey key, TValue addValue,
+      Func<TKey, TValue, CancellationToken, Task<TValue>> updateFactory, CancellationToken ct)
+    Task<bool> RemoveAsync(TKey key)
+    int Count
+  Thread-safe. GetOrAddAsync must not invoke factory multiple times for the same key concurrently.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncConcurrentDictionaryTests
+  {
+      [Fact]
+      public async Task GetOrAddAsync_ReturnsAddedValue()
+      {
+          var d = new AsyncConcurrentDictionary<string, int>();
+          var v = await d.GetOrAddAsync("k", (_, _) => Task.FromResult(5), CancellationToken.None);
+          v.Should().Be(5);
+      }
+
+      [Fact]
+      public async Task GetOrAddAsync_NoStampede()
+      {
+          var d = new AsyncConcurrentDictionary<string, int>();
+          int calls = 0;
+          var tasks = Enumerable.Range(0, 20).Select(_ =>
+              d.GetOrAddAsync("key", async (_, _) =>
+              {
+                  Interlocked.Increment(ref calls);
+                  await Task.Delay(10);
+                  return 42;
+              }, CancellationToken.None));
+          await Task.WhenAll(tasks);
+          calls.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task TryUpdateAsync_SucceedsWhenExpectedMatches()
+      {
+          var d = new AsyncConcurrentDictionary<int, string>();
+          await d.GetOrAddAsync(1, (_, _) => Task.FromResult("old"), CancellationToken.None);
+          var result = await d.TryUpdateAsync(1, "new", "old");
+          result.Should().BeTrue();
+          var (_, val) = await d.TryGetAsync(1);
+          val.Should().Be("new");
+      }
+
+      [Fact]
+      public async Task TryUpdateAsync_FailsWhenExpectedMismatch()
+      {
+          var d = new AsyncConcurrentDictionary<int, string>();
+          await d.GetOrAddAsync(1, (_, _) => Task.FromResult("actual"), CancellationToken.None);
+          var result = await d.TryUpdateAsync(1, "new", "wrong");
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task RemoveAsync_RemovesEntry()
+      {
+          var d = new AsyncConcurrentDictionary<string, int>();
+          await d.GetOrAddAsync("x", (_, _) => Task.FromResult(1), CancellationToken.None);
+          await d.RemoveAsync("x");
+          d.Count.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task AddOrUpdateAsync_UpdatesExistingValue()
+      {
+          var d = new AsyncConcurrentDictionary<string, int>();
+          await d.GetOrAddAsync("k", (_, _) => Task.FromResult(10), CancellationToken.None);
+          var result = await d.AddOrUpdateAsync("k", 0,
+              (_, old, _) => Task.FromResult(old + 5), CancellationToken.None);
+          result.Should().Be(15);
+      }
+  }

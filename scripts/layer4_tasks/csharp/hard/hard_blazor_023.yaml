@@ -1,0 +1,99 @@
+name: hard_blazor_023
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor component state machine (loading states):
+  Enum LoadState { Idle, Loading, Loaded, Error, Refreshing }
+  Records:
+    LoadResult<T>(T? Data, string? ErrorMessage, DateTime? LoadedAt)
+    LoadTransition(LoadState From, LoadState To, DateTime OccurredAt)
+
+  Class AsyncLoadStateMachine<T>:
+    LoadState CurrentState { get; private set; } = Idle
+    LoadResult<T>? LastResult { get; private set; }
+    IReadOnlyList<LoadTransition> TransitionHistory { get; }
+
+    Task<LoadResult<T>> LoadAsync(Func<CancellationToken, Task<T>> loader, CancellationToken ct):
+      Transitions Idle/Error -> Loading, executes loader.
+      On success: -> Loaded, stores result.
+      On exception: -> Error, stores error message.
+    Task<LoadResult<T>> RefreshAsync(Func<CancellationToken, Task<T>> loader, CancellationToken ct):
+      Transitions Loaded -> Refreshing, then -> Loaded on success or -> Error on failure.
+    bool CanLoad(): only when Idle or Error.
+    bool CanRefresh(): only when Loaded.
+    void Reset(): transitions to Idle.
+    event Action<LoadTransition>? OnTransition
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncLoadStateMachineTests
+  {
+      [Fact]
+      public void Initial_StateIsIdle()
+      {
+          var machine = new AsyncLoadStateMachine<string>();
+          machine.CurrentState.Should().Be(LoadState.Idle);
+          machine.CanLoad().Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task Load_Success_TransitionsToLoaded()
+      {
+          var machine = new AsyncLoadStateMachine<string>();
+          await machine.LoadAsync(_ => Task.FromResult("data"), CancellationToken.None);
+          machine.CurrentState.Should().Be(LoadState.Loaded);
+          machine.LastResult!.Data.Should().Be("data");
+      }
+
+      [Fact]
+      public async Task Load_Failure_TransitionsToError()
+      {
+          var machine = new AsyncLoadStateMachine<string>();
+          await machine.LoadAsync(_ => Task.FromException<string>(new Exception("oops")), CancellationToken.None);
+          machine.CurrentState.Should().Be(LoadState.Error);
+          machine.LastResult!.ErrorMessage.Should().Contain("oops");
+      }
+
+      [Fact]
+      public async Task Refresh_FromLoaded_Success_StaysLoaded()
+      {
+          var machine = new AsyncLoadStateMachine<int>();
+          await machine.LoadAsync(_ => Task.FromResult(1), CancellationToken.None);
+          await machine.RefreshAsync(_ => Task.FromResult(2), CancellationToken.None);
+          machine.CurrentState.Should().Be(LoadState.Loaded);
+          machine.LastResult!.Data.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task CanRefresh_OnlyWhenLoaded()
+      {
+          var machine = new AsyncLoadStateMachine<int>();
+          machine.CanRefresh().Should().BeFalse();
+          await machine.LoadAsync(_ => Task.FromResult(42), CancellationToken.None);
+          machine.CanRefresh().Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task Reset_TransitionsToIdle()
+      {
+          var machine = new AsyncLoadStateMachine<string>();
+          await machine.LoadAsync(_ => Task.FromResult("ok"), CancellationToken.None);
+          machine.Reset();
+          machine.CurrentState.Should().Be(LoadState.Idle);
+      }
+
+      [Fact]
+      public async Task TransitionHistory_RecordsTransitions()
+      {
+          var machine = new AsyncLoadStateMachine<string>();
+          await machine.LoadAsync(_ => Task.FromResult("x"), CancellationToken.None);
+          machine.TransitionHistory.Should().Contain(t => t.To == LoadState.Loaded);
+      }
+  }

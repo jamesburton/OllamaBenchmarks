@@ -1,0 +1,92 @@
+name: hard_aspnet_023
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A typed configuration with hot-reload support using IOptionsMonitor:
+  Class EmailServiceOptions: string SmtpHost, int SmtpPort (default 587), bool UseTls (default true),
+    string FromAddress, string FromName.
+  Class EmailServiceOptionsValidator : IValidateOptions<EmailServiceOptions>:
+    SmtpHost not empty, SmtpPort in range 1-65535, FromAddress contains "@".
+  Class EmailService(IOptionsMonitor<EmailServiceOptions> optionsMonitor):
+    Task<bool> SendAsync(string to, string subject, string body, CancellationToken ct) —
+      validates recipient email, uses current options to construct email metadata.
+      Returns false if options validation fails at send time.
+    EmailServiceOptions CurrentOptions — returns current options snapshot.
+    event EventHandler<EmailServiceOptions> OptionsChanged — raised when options change.
+  Static: AddEmailService(this IServiceCollection svc, Action<EmailServiceOptions> configure)
+  Return only valid C# code in a single file.
+test_code: |
+  public class EmailServiceTests
+  {
+      private static EmailService BuildService(Action<EmailServiceOptions> configure)
+      {
+          var svc = new ServiceCollection();
+          svc.AddEmailService(configure);
+          return svc.BuildServiceProvider().GetRequiredService<EmailService>();
+      }
+
+      [Fact]
+      public async Task SendAsync_ValidOptions_ReturnsTrue()
+      {
+          var svc = BuildService(o =>
+          {
+              o.SmtpHost = "smtp.example.com";
+              o.FromAddress = "noreply@example.com";
+              o.FromName = "Test";
+          });
+          var result = await svc.SendAsync("user@example.com", "Hello", "Body", CancellationToken.None);
+          result.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task SendAsync_InvalidRecipient_ReturnsFalse()
+      {
+          var svc = BuildService(o =>
+          {
+              o.SmtpHost = "smtp.example.com";
+              o.FromAddress = "noreply@example.com";
+              o.FromName = "Test";
+          });
+          var result = await svc.SendAsync("notanemail", "Hello", "Body", CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public void AddEmailService_ThrowsOnInvalidOptions()
+      {
+          var svc = new ServiceCollection();
+          svc.AddEmailService(o => o.SmtpHost = "");
+          var act = () => svc.BuildServiceProvider().GetRequiredService<EmailService>();
+          act.Should().Throw<OptionsValidationException>();
+      }
+
+      [Fact]
+      public void CurrentOptions_ReflectsConfiguration()
+      {
+          var svc = BuildService(o =>
+          {
+              o.SmtpHost = "mail.test.com";
+              o.FromAddress = "admin@test.com";
+              o.FromName = "Admin";
+              o.SmtpPort = 25;
+          });
+          svc.CurrentOptions.SmtpHost.Should().Be("mail.test.com");
+          svc.CurrentOptions.SmtpPort.Should().Be(25);
+      }
+
+      [Fact]
+      public async Task SendAsync_NullTo_ReturnsFalse()
+      {
+          var svc = BuildService(o => { o.SmtpHost = "smtp.test.com"; o.FromAddress = "a@b.com"; o.FromName = "A"; });
+          var result = await svc.SendAsync(null!, "S", "B", CancellationToken.None);
+          result.Should().BeFalse();
+      }
+  }

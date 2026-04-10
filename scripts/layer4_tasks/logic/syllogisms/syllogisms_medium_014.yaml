@@ -1,0 +1,15 @@
+name: syllogisms_medium_014
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All planets orbit stars.
+  2. Some stars have no planets.
+  3. Our Sun is a star with at least one planet.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "Our Sun has at least one planet orbiting it."
+validator_config: {}

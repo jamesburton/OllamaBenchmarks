@@ -1,0 +1,41 @@
+name: easy_patterns_023
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Range(int Min, int Max)
+  with a method:
+    bool Contains(int value) => value >= Min && value <= Max
+  and a static class RangeHelper with:
+    Range Merge(Range a, Range b)
+  that returns a new Range covering both ranges (min of mins, max of maxes).
+  Return only valid C# code in a single file.
+test_code: |
+  public class RangeHelperTests
+  {
+      [Fact]
+      public void Merge_OverlappingRanges()
+      {
+          var result = RangeHelper.Merge(new Range(1, 5), new Range(3, 8));
+          result.Min.Should().Be(1);
+          result.Max.Should().Be(8);
+      }
+      [Fact]
+      public void Contains_InRange_ReturnsTrue()
+      {
+          new Range(1, 10).Contains(5).Should().BeTrue();
+      }
+      [Fact]
+      public void Contains_OutOfRange_ReturnsFalse()
+      {
+          new Range(1, 10).Contains(11).Should().BeFalse();
+      }
+  }

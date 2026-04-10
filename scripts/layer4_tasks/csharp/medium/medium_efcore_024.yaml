@@ -1,0 +1,68 @@
+name: medium_efcore_024
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity MenuItem with: int Id, string Name, string Category, decimal Price, bool IsAvailable, int? CalorieCount.
+  A class MenuDbContext : DbContext with DbSet<MenuItem> MenuItems.
+  A class MenuRepository with constructor accepting MenuDbContext.
+  Methods:
+    Task<IEnumerable<MenuItem>> GetAvailableAsync()
+    Task<IEnumerable<MenuItem>> GetByCategoryAsync(string category)
+    Task<IEnumerable<MenuItem>> GetLowCalorieAsync(int maxCalories)
+    Task<IDictionary<string, decimal>> GetAveragePriceByCategoryAsync()
+  Return only valid C# code in a single file.
+test_code: |
+  public class MenuRepositoryTests : IAsyncLifetime
+  {
+      private MenuDbContext _db = null!;
+      private MenuRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<MenuDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new MenuDbContext(opts);
+          _repo = new MenuRepository(_db);
+          _db.MenuItems.AddRange(
+              new MenuItem { Name = "Salad", Category = "Starters", Price = 8m, IsAvailable = true, CalorieCount = 150 },
+              new MenuItem { Name = "Steak", Category = "Mains", Price = 25m, IsAvailable = true, CalorieCount = 800 },
+              new MenuItem { Name = "Cake", Category = "Desserts", Price = 7m, IsAvailable = false, CalorieCount = 400 },
+              new MenuItem { Name = "Soup", Category = "Starters", Price = 6m, IsAvailable = true, CalorieCount = 120 });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetAvailable_ExcludesUnavailable()
+      {
+          (await _repo.GetAvailableAsync()).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task GetByCategory_FiltersCorrectly()
+      {
+          (await _repo.GetByCategoryAsync("Starters")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetLowCalorie_FiltersCorrectly()
+      {
+          (await _repo.GetLowCalorieAsync(200)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetAveragePriceByCategory_CalculatesCorrectly()
+      {
+          var result = await _repo.GetAveragePriceByCategoryAsync();
+          result["Starters"].Should().BeApproximately(7m, 0.01m);
+      }
+  }

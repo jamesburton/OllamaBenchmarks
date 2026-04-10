@@ -1,0 +1,18 @@
+name: constraint_medium_002
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Five cards are labeled 1-5. Amy, Bob, Carol, Dan, Eve each hold one card.
+  Clues:
+  1. Amy holds an even card.
+  2. Bob holds card 3.
+  3. Carol holds a higher card than Dan.
+  4. Eve holds card 1.
+  5. Amy holds card 4.
+  What card does Carol hold? Reply with only the number.
+expected_answer: "5"
+validator_config: {}

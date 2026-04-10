@@ -1,0 +1,85 @@
+name: hard_aspnet_014
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A feature flag system integrated with IOptions:
+  Class FeatureFlagOptions: Dictionary<string, bool> Flags (default empty).
+  Interface IFeatureManager:
+    bool IsEnabled(string featureName)
+    void Override(string featureName, bool enabled) — runtime override.
+    IReadOnlyDictionary<string, bool> GetAllFlags()
+  Class FeatureManager : IFeatureManager — reads from IOptionsMonitor<FeatureFlagOptions>,
+    runtime overrides take precedence.
+  Attribute: [FeatureRequired(string featureName)] — applied to minimal API endpoints.
+  Class FeatureRequiredFilter : IEndpointFilter —
+    returns 503 with message "Feature disabled" if feature is not enabled.
+  Static: AddFeatureManagement(this IServiceCollection svc, Action<FeatureFlagOptions>? configure = null)
+  Endpoint extension: RequireFeature(this RouteHandlerBuilder builder, string feature) — applies filter.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FeatureManagerTests
+  {
+      [Fact]
+      public void IsEnabled_FlagEnabled_ReturnsTrue()
+      {
+          var opts = Options.Create(new FeatureFlagOptions { Flags = new() { ["MyFeature"] = true } });
+          IFeatureManager mgr = new FeatureManager(Mock.Of<IOptionsMonitor<FeatureFlagOptions>>(m =>
+              m.CurrentValue == new FeatureFlagOptions { Flags = new() { ["MyFeature"] = true } }));
+          mgr.IsEnabled("MyFeature").Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsEnabled_FlagDisabled_ReturnsFalse()
+      {
+          IFeatureManager mgr = new FeatureManager(Mock.Of<IOptionsMonitor<FeatureFlagOptions>>(m =>
+              m.CurrentValue == new FeatureFlagOptions { Flags = new() { ["MyFeature"] = false } }));
+          mgr.IsEnabled("MyFeature").Should().BeFalse();
+      }
+
+      [Fact]
+      public void IsEnabled_UnknownFlag_ReturnsFalse()
+      {
+          IFeatureManager mgr = new FeatureManager(Mock.Of<IOptionsMonitor<FeatureFlagOptions>>(m =>
+              m.CurrentValue == new FeatureFlagOptions()));
+          mgr.IsEnabled("Unknown").Should().BeFalse();
+      }
+
+      [Fact]
+      public void Override_TakesPrecedenceOverConfig()
+      {
+          IFeatureManager mgr = new FeatureManager(Mock.Of<IOptionsMonitor<FeatureFlagOptions>>(m =>
+              m.CurrentValue == new FeatureFlagOptions { Flags = new() { ["F"] = false } }));
+          mgr.Override("F", true);
+          mgr.IsEnabled("F").Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task FeatureRequiredEndpoint_FeatureDisabled_Returns503()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddFeatureManagement(o => o.Flags["TestFeature"] = false);
+          var app = builder.Build();
+          app.MapGet("/protected", () => "ok").RequireFeature("TestFeature");
+          var resp = await app.GetTestClient().GetAsync("/protected");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.ServiceUnavailable);
+      }
+
+      [Fact]
+      public async Task FeatureRequiredEndpoint_FeatureEnabled_Returns200()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddFeatureManagement(o => o.Flags["TestFeature"] = true);
+          var app = builder.Build();
+          app.MapGet("/protected", () => "ok").RequireFeature("TestFeature");
+          var resp = await app.GetTestClient().GetAsync("/protected");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+  }

@@ -1,0 +1,92 @@
+name: hard_async_018
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncSupervisor that restarts failing async workers:
+    Constructor: AsyncSupervisor(int maxRestarts, TimeSpan restartDelay)
+    Task SuperviseAsync(Func<CancellationToken, Task> worker, CancellationToken ct) —
+      runs the worker. If it throws (not OperationCanceledException), restarts it after
+      restartDelay up to maxRestarts times. If max restarts exceeded, throws last exception.
+      Stops if ct is cancelled.
+    int RestartCount — number of restarts so far.
+    event EventHandler<SupervisorRestartEventArgs> OnRestart — raised each time a restart occurs.
+  Record: SupervisorRestartEventArgs(int RestartNumber, Exception Reason).
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncSupervisorTests
+  {
+      [Fact]
+      public async Task SuperviseAsync_SuccessfulWorker_RunsOnce()
+      {
+          var sup = new AsyncSupervisor(3, TimeSpan.FromMilliseconds(1));
+          int runs = 0;
+          await sup.SuperviseAsync(_ => { runs++; return Task.CompletedTask; }, CancellationToken.None);
+          runs.Should().Be(1);
+          sup.RestartCount.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task SuperviseAsync_RestartsAfterFailure()
+      {
+          var sup = new AsyncSupervisor(3, TimeSpan.FromMilliseconds(1));
+          int runs = 0;
+          await sup.SuperviseAsync(_ =>
+          {
+              if (++runs < 3) throw new InvalidOperationException("fail");
+              return Task.CompletedTask;
+          }, CancellationToken.None);
+          runs.Should().Be(3);
+          sup.RestartCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task SuperviseAsync_ExceedsMaxRestarts_ThrowsLastException()
+      {
+          var sup = new AsyncSupervisor(2, TimeSpan.FromMilliseconds(1));
+          var act = async () => await sup.SuperviseAsync(
+              _ => throw new InvalidOperationException("persist"), CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("persist");
+      }
+
+      [Fact]
+      public async Task SuperviseAsync_OnRestart_EventRaised()
+      {
+          var sup = new AsyncSupervisor(3, TimeSpan.FromMilliseconds(1));
+          var events = new List<SupervisorRestartEventArgs>();
+          sup.OnRestart += (_, e) => events.Add(e);
+          int runs = 0;
+          await sup.SuperviseAsync(_ =>
+          {
+              if (++runs < 3) throw new Exception("e");
+              return Task.CompletedTask;
+          }, CancellationToken.None);
+          events.Should().HaveCount(2);
+          events[0].RestartNumber.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task SuperviseAsync_CancelledDuringDelay_StopsGracefully()
+      {
+          var sup = new AsyncSupervisor(10, TimeSpan.FromSeconds(5));
+          var cts = new CancellationTokenSource();
+          int runs = 0;
+          var act = async () => await sup.SuperviseAsync(_ =>
+          {
+              if (++runs == 1)
+              {
+                  cts.Cancel();
+                  throw new Exception("e");
+              }
+              return Task.CompletedTask;
+          }, cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+  }

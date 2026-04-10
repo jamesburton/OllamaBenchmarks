@@ -1,0 +1,17 @@
+name: riddles_medium_002
+category: logic
+subcategory: riddles
+difficulty: medium
+weight: 2
+validator_type: logic
+max_tokens: 64
+prompt: |
+  I'm light as a feather, but even the strongest person can't hold me for more than a few minutes. What am I?
+  Reply with only the answer.
+expected_answer: "Breath"
+validator_config:
+  accepted_answers:
+  - "Breath"
+  - "breath"
+  - "your breath"
+  - "air"

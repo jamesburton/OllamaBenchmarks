@@ -1,0 +1,22 @@
+name: creative_hard_063
+category: english
+subcategory: creative
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of grief that uses only physical sensations, with no direct mention of sadness or loss.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "heavy"
+    - "hollow"
+    - "breath"
+    - "cold"
+    - "still"
+    - "weight"
+    - "chest"
+    - "hands"
+  min_words: 15
+  max_words: 60

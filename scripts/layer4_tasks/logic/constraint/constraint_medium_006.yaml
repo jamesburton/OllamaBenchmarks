@@ -1,0 +1,16 @@
+name: constraint_medium_006
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Alice, Bob, Carol, Dave are in positions 1-4 of a queue.
+  Clues:
+  1. Alice is directly in front of Dave.
+  2. Bob is last.
+  3. Carol is not first.
+  What position is Carol? Reply with only the number.
+expected_answer: "2"
+validator_config: {}

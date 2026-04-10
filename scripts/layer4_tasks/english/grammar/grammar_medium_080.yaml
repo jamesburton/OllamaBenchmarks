@@ -1,0 +1,15 @@
+name: grammar_medium_080
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The budget was approved the team could now proceed with development this was good news.
+  B) The budget was approved; the team could now proceed with development, which was good news.
+  C) The budget was approved and the team could now proceed with development this was good news.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

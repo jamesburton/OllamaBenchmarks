@@ -1,0 +1,26 @@
+name: comprehension_medium_145
+category: english
+subcategory: comprehension
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Read the following passage carefully.
+  
+  Coral reefs, often called the rainforests of the sea, occupy less than one percent of the ocean floor yet support approximately 25 percent of all marine species. These ecosystems are built by tiny coral polyps that secrete calcium carbonate to form reef structures over thousands of years. Corals rely on a symbiotic relationship with photosynthetic algae called zooxanthellae, which live within coral tissue and provide up to 90 percent of the coral's energy. When water temperatures rise, corals expel their zooxanthellae in a stress response known as coral bleaching. Without the algae, corals lose their colour and primary energy source and may die if conditions do not improve. Climate change has triggered mass bleaching events of increasing frequency and severity, with the Great Barrier Reef having experienced five mass bleaching events since 1998. Local threats such as pollution, overfishing, and destructive fishing practices compound global warming stresses. Scientists estimate that 50 percent of the world's coral reefs have already been lost.
+  
+  Answer in one sentence:
+  What does the nickname 'rainforests of the sea' suggest about the importance of coral reefs?
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "biodiversity"
+    - "rich"
+    - "vital"
+    - "ecosystem"
+    - "parallel"
+    - "importance"
+    - "diverse"
+  min_words: 8
+  max_words: 40

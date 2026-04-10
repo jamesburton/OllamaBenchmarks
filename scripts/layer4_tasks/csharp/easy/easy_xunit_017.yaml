@@ -1,0 +1,37 @@
+name: easy_xunit_017
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncSetup that implements IAsyncLifetime with:
+    List<string> InitializedItems { get; } = new()
+    ValueTask InitializeAsync() adds "item1" and "item2" to InitializedItems
+    ValueTask DisposeAsync() clears InitializedItems
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncSetupTests : IAsyncLifetime
+  {
+      private AsyncSetup _setup = new();
+
+      public ValueTask InitializeAsync() => _setup.InitializeAsync();
+      public ValueTask DisposeAsync() => _setup.DisposeAsync();
+
+      [Fact]
+      public void InitializedItems_ContainsExpectedItems()
+      {
+          _setup.InitializedItems.Should().Contain("item1");
+          _setup.InitializedItems.Should().Contain("item2");
+      }
+      [Fact]
+      public void InitializedItems_HasCount2()
+      {
+          _setup.InitializedItems.Should().HaveCount(2);
+      }
+  }

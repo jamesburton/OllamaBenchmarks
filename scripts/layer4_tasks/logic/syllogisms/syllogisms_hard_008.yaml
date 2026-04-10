@@ -1,0 +1,16 @@
+name: syllogisms_hard_008
+category: logic
+subcategory: syllogisms
+difficulty: hard
+weight: 3
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. Some philosophers are scientists.
+  2. All scientists believe in evidence.
+  3. No one who believes in evidence ignores facts.
+  4. All who do not ignore facts are rational.
+  Are some philosophers rational? Reply with only: Yes or No.
+expected_answer: "Yes."
+validator_config: {}

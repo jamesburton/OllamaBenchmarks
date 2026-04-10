@@ -1,0 +1,14 @@
+name: deduction_medium_013
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If the server is running, the website is accessible.
+  2. The website is not accessible.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "The server is not running."
+validator_config: {}

@@ -1,0 +1,58 @@
+name: medium_async_013
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncEventEmitter<T> that emits events to registered handlers.
+  Expose:
+    void Subscribe(Func<T, CancellationToken, Task> handler)
+    Task EmitAsync(T payload, CancellationToken ct = default) — invokes all handlers in parallel
+    int SubscriberCount
+  Handlers are called concurrently. EmitAsync completes when all handlers complete.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncEventEmitterTests
+  {
+      [Fact]
+      public async Task EmitAsync_CallsAllHandlers()
+      {
+          var emitter = new AsyncEventEmitter<int>();
+          var received = new List<int>();
+          emitter.Subscribe(async (v, ct) => { await Task.Yield(); lock(received) received.Add(v); });
+          emitter.Subscribe(async (v, ct) => { await Task.Yield(); lock(received) received.Add(v * 2); });
+          await emitter.EmitAsync(5);
+          received.Should().BeEquivalentTo(new[]{5,10});
+      }
+
+      [Fact]
+      public async Task EmitAsync_NoSubscribers_Completes()
+      {
+          var emitter = new AsyncEventEmitter<string>();
+          await emitter.EmitAsync("test");
+      }
+
+      [Fact]
+      public void SubscriberCount_ReflectsSubscriptions()
+      {
+          var emitter = new AsyncEventEmitter<int>();
+          emitter.SubscriberCount.Should().Be(0);
+          emitter.Subscribe(async (v, ct) => await Task.Yield());
+          emitter.Subscribe(async (v, ct) => await Task.Yield());
+          emitter.SubscriberCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task EmitAsync_HandlerThrows_PropagatesException()
+      {
+          var emitter = new AsyncEventEmitter<int>();
+          emitter.Subscribe((v, ct) => Task.FromException(new InvalidOperationException("bad")));
+          await Assert.ThrowsAnyAsync<Exception>(() => emitter.EmitAsync(1));
+      }
+  }

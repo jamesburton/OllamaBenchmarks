@@ -1,0 +1,39 @@
+name: easy_xunit_037
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IClockService with method:
+    DateTime Now()
+  A class DailyGreeter with constructor taking IClockService, and method:
+    string Greet() returns "Good morning!" if hour < 12, "Good afternoon!" if hour < 18, else "Good evening!"
+  Return only valid C# code in a single file.
+test_code: |
+  public class DailyGreeterTests
+  {
+      [Theory]
+      [InlineData(8, "Good morning!")]
+      [InlineData(14, "Good afternoon!")]
+      [InlineData(20, "Good evening!")]
+      public void Greet_ReturnsCorrectGreeting(int hour, string expected)
+      {
+          var clock = Substitute.For<IClockService>();
+          clock.Now().Returns(new DateTime(2024, 1, 1, hour, 0, 0));
+          var greeter = new DailyGreeter(clock);
+          greeter.Greet().Should().Be(expected);
+      }
+      [Fact]
+      public void Greet_AtNoon_ReturnsAfternoon()
+      {
+          var clock = Substitute.For<IClockService>();
+          clock.Now().Returns(new DateTime(2024, 1, 1, 12, 0, 0));
+          new DailyGreeter(clock).Greet().Should().Be("Good afternoon!");
+      }
+  }

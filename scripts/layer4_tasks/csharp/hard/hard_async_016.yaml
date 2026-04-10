@@ -1,0 +1,77 @@
+name: hard_async_016
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncRateLimiter implementing token-bucket rate limiting:
+    Constructor: AsyncRateLimiter(int tokensPerSecond, int bucketCapacity)
+    Task WaitAsync(CancellationToken ct) — waits until a token is available, then consumes one.
+    Task<bool> TryAcquireAsync(TimeSpan timeout, CancellationToken ct) — attempts to acquire
+      within timeout. Returns true on success, false on timeout.
+    int AvailableTokens — current available token count (approximate).
+    void Replenish(int count) — manually adds tokens up to bucketCapacity (for testing).
+  If ct is cancelled while waiting, throws OperationCanceledException.
+  Token replenishment happens automatically over time (tokensPerSecond tokens per second).
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncRateLimiterTests
+  {
+      [Fact]
+      public async Task WaitAsync_AcquiresToken()
+      {
+          var limiter = new AsyncRateLimiter(10, 10);
+          limiter.Replenish(5);
+          await limiter.WaitAsync(CancellationToken.None);
+          limiter.AvailableTokens.Should().Be(4);
+      }
+
+      [Fact]
+      public async Task TryAcquireAsync_SucceedsWhenTokenAvailable()
+      {
+          var limiter = new AsyncRateLimiter(10, 10);
+          limiter.Replenish(1);
+          var result = await limiter.TryAcquireAsync(TimeSpan.FromMilliseconds(100), CancellationToken.None);
+          result.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task TryAcquireAsync_TimesOutWhenNoTokens()
+      {
+          var limiter = new AsyncRateLimiter(1, 1);
+          var result = await limiter.TryAcquireAsync(TimeSpan.FromMilliseconds(30), CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task WaitAsync_Cancelled_ThrowsOperationCancelled()
+      {
+          var limiter = new AsyncRateLimiter(1, 1);
+          var cts = new CancellationTokenSource(50);
+          var act = async () => await limiter.WaitAsync(cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+
+      [Fact]
+      public async Task Replenish_DoesNotExceedCapacity()
+      {
+          var limiter = new AsyncRateLimiter(5, 5);
+          limiter.Replenish(100);
+          limiter.AvailableTokens.Should().Be(5);
+      }
+
+      [Fact]
+      public async Task WaitAsync_AutoReplenish_EventuallySucceeds()
+      {
+          var limiter = new AsyncRateLimiter(10, 1);
+          await limiter.WaitAsync(CancellationToken.None);
+          var cts = new CancellationTokenSource(500);
+          await limiter.WaitAsync(cts.Token);
+      }
+  }

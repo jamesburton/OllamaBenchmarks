@@ -1,0 +1,89 @@
+name: hard_efcore_011
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core table-per-hierarchy (TPH) inheritance:
+  Base entity: Vehicle(int Id, string Make, string Model, int Year, decimal Price, string VehicleType).
+  Derived: Car(int Id, int Doors, string FuelType),
+           Truck(int Id, decimal PayloadTons, bool HasTrailer),
+           Motorcycle(int Id, string Style, bool HasSidecar).
+  DbContext: VehicleDbContext — configure TPH with discriminator "VehicleType".
+  Class VehicleRepository(VehicleDbContext db):
+    Task<Vehicle> AddAsync(Vehicle vehicle, CancellationToken ct)
+    Task<IReadOnlyList<Car>> GetCarsAsync(string? fuelType = null, CancellationToken ct = default)
+    Task<IReadOnlyList<Truck>> GetTrucksAsync(decimal? minPayload = null, CancellationToken ct = default)
+    Task<VehicleStats> GetStatsAsync(CancellationToken ct) — total count, avg price, count per type.
+  Record: VehicleStats(int TotalCount, decimal AveragePrice, int CarCount, int TruckCount, int MotorcycleCount).
+  Use SQLite in-memory with seeded data.
+  Return only valid C# code in a single file.
+test_code: |
+  public class VehicleRepositoryTests : IDisposable
+  {
+      private readonly VehicleDbContext _db;
+      private readonly VehicleRepository _repo;
+
+      public VehicleRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<VehicleDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new VehicleDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new VehicleRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task AddCar_CanRetrieveAsCar()
+      {
+          await _repo.AddAsync(new Car { Make = "Toyota", Model = "Corolla", Year = 2022, Price = 20000m, Doors = 4, FuelType = "Petrol" }, CancellationToken.None);
+          var cars = await _repo.GetCarsAsync(ct: CancellationToken.None);
+          cars.Should().ContainSingle(c => c.Model == "Corolla");
+      }
+
+      [Fact]
+      public async Task GetCars_FiltersByFuelType()
+      {
+          await _repo.AddAsync(new Car { Make = "Tesla",  Model = "Model3", Year = 2023, Price = 40000m, Doors = 4, FuelType = "Electric" }, CancellationToken.None);
+          await _repo.AddAsync(new Car { Make = "Honda",  Model = "Civic",  Year = 2022, Price = 22000m, Doors = 4, FuelType = "Petrol" },   CancellationToken.None);
+          var electric = await _repo.GetCarsAsync("Electric", CancellationToken.None);
+          electric.Should().ContainSingle(c => c.Model == "Model3");
+      }
+
+      [Fact]
+      public async Task GetTrucks_FiltersByMinPayload()
+      {
+          await _repo.AddAsync(new Truck { Make = "Ford", Model = "F750",  Year = 2021, Price = 60000m, PayloadTons = 5m,  HasTrailer = false }, CancellationToken.None);
+          await _repo.AddAsync(new Truck { Make = "MAN",  Model = "TGX",   Year = 2020, Price = 90000m, PayloadTons = 25m, HasTrailer = true  }, CancellationToken.None);
+          var heavy = await _repo.GetTrucksAsync(10m, CancellationToken.None);
+          heavy.Should().ContainSingle(t => t.Model == "TGX");
+      }
+
+      [Fact]
+      public async Task GetStats_CountsCorrectly()
+      {
+          await _repo.AddAsync(new Car        { Make = "A", Model = "X", Year = 2020, Price = 10000m, Doors = 2, FuelType = "Diesel" }, CancellationToken.None);
+          await _repo.AddAsync(new Truck      { Make = "B", Model = "Y", Year = 2021, Price = 50000m, PayloadTons = 3m, HasTrailer = false }, CancellationToken.None);
+          await _repo.AddAsync(new Motorcycle { Make = "C", Model = "Z", Year = 2022, Price = 8000m, Style = "Sport", HasSidecar = false }, CancellationToken.None);
+          var stats = await _repo.GetStatsAsync(CancellationToken.None);
+          stats.TotalCount.Should().Be(3);
+          stats.CarCount.Should().Be(1);
+          stats.TruckCount.Should().Be(1);
+          stats.MotorcycleCount.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task GetStats_Empty_AllZeroCounts()
+      {
+          var stats = await _repo.GetStatsAsync(CancellationToken.None);
+          stats.TotalCount.Should().Be(0);
+          stats.AveragePrice.Should().Be(0m);
+      }
+  }

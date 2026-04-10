@@ -1,0 +1,22 @@
+name: rewriting_medium_093
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'The CEO resigned unexpectedly. The share price dropped. Investors panicked.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "CEO"
+    - "resigned"
+    - "share price"
+    - "investors"
+    - "panicked"
+    - "dropped"
+  min_words: 8
+  max_words: 30

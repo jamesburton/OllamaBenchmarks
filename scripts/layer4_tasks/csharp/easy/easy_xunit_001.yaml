@@ -1,0 +1,29 @@
+name: easy_xunit_001
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class MathHelper with a static method:
+    int Add(int a, int b) returns a + b
+  Return only valid C# code in a single file.
+test_code: |
+  public class MathHelperTests
+  {
+      [Fact]
+      public void Add_ReturnsSum()
+      {
+          MathHelper.Add(3, 4).Should().Be(7);
+      }
+      [Fact]
+      public void Add_NegativeNumbers()
+      {
+          MathHelper.Add(-1, -2).Should().Be(-3);
+      }
+  }

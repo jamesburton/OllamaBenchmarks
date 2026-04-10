@@ -1,0 +1,23 @@
+name: technical_medium_049
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a developer-facing error message for a failed database connection that includes the likely cause and a suggested fix.
+  Keep it under 40 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "database"
+    - "connection"
+    - "failed"
+    - "check"
+    - "credentials"
+    - "host"
+    - "port"
+    - "error"
+  min_words: 8
+  max_words: 40

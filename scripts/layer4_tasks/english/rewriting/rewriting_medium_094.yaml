@@ -1,0 +1,21 @@
+name: rewriting_medium_094
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'She learned to code. She built her own app. The app was downloaded 10,000 times.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "learned"
+    - "code"
+    - "app"
+    - "downloaded"
+    - "built"
+  min_words: 8
+  max_words: 30

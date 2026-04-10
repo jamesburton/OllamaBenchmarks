@@ -1,0 +1,15 @@
+name: syllogisms_medium_015
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All vampires are immortal.
+  2. All immortals fear nothing.
+  3. No one who fears nothing can be threatened.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "No vampire can be threatened."
+validator_config: {}

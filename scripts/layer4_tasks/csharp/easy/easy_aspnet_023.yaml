@@ -1,0 +1,42 @@
+name: easy_aspnet_023
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ResponseMapper with a static method:
+    ProblemDetails FromException(Exception ex)
+  that creates a ProblemDetails:
+    - Status 400 for ArgumentException
+    - Status 404 for KeyNotFoundException
+    - Status 500 for any other exception
+  Title should be the exception type name, Detail should be ex.Message.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ResponseMapperTests
+  {
+      [Fact]
+      public void FromException_ArgumentException_Returns400()
+      {
+          var result = ResponseMapper.FromException(new ArgumentException("bad arg"));
+          result.Status.Should().Be(400);
+      }
+      [Fact]
+      public void FromException_KeyNotFoundException_Returns404()
+      {
+          var result = ResponseMapper.FromException(new KeyNotFoundException("not found"));
+          result.Status.Should().Be(404);
+      }
+      [Fact]
+      public void FromException_OtherException_Returns500()
+      {
+          var result = ResponseMapper.FromException(new Exception("oops"));
+          result.Status.Should().Be(500);
+      }
+  }

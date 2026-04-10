@@ -1,0 +1,37 @@
+name: easy_async_047
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Dispatcher with a static method:
+    async Task DispatchAsync(IEnumerable<Func<Task>> handlers)
+  that invokes each handler sequentially and awaits it.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DispatcherTests
+  {
+      [Fact]
+      public async Task DispatchAsync_InvokesAllHandlers()
+      {
+          var results = new List<int>();
+          var handlers = new Func<Task>[]{
+              () => { results.Add(1); return Task.CompletedTask; },
+              () => { results.Add(2); return Task.CompletedTask; },
+              () => { results.Add(3); return Task.CompletedTask; }
+          };
+          await Dispatcher.DispatchAsync(handlers);
+          results.Should().BeEquivalentTo(new[]{1,2,3}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public async Task DispatchAsync_EmptyHandlers_Completes()
+      {
+          await Dispatcher.DispatchAsync(Array.Empty<Func<Task>>());
+      }
+  }

@@ -1,0 +1,38 @@
+name: easy_async_042
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncConditional with a static method:
+    async Task<TResult> IfElseAsync<TResult>(bool condition, Func<Task<TResult>> ifTrue, Func<Task<TResult>> ifFalse)
+  that awaits ifTrue if condition is true, otherwise awaits ifFalse.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncConditionalTests
+  {
+      [Fact]
+      public async Task IfElseAsync_ConditionTrue_ReturnsIfTrue()
+      {
+          var result = await AsyncConditional.IfElseAsync(
+              true,
+              () => Task.FromResult("yes"),
+              () => Task.FromResult("no"));
+          result.Should().Be("yes");
+      }
+      [Fact]
+      public async Task IfElseAsync_ConditionFalse_ReturnsIfFalse()
+      {
+          var result = await AsyncConditional.IfElseAsync(
+              false,
+              () => Task.FromResult("yes"),
+              () => Task.FromResult("no"));
+          result.Should().Be("no");
+      }
+  }

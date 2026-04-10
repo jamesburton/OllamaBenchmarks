@@ -1,0 +1,34 @@
+name: easy_masstransit_001
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record OrderCreated(Guid OrderId, string CustomerName, decimal Total)
+  A consumer class OrderCreatedConsumer that implements IConsumer<OrderCreated>:
+    Has a public List<OrderCreated> Received = new()
+    Consume method adds the message to Received and returns Task.CompletedTask
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class OrderCreatedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_AddsToReceived()
+      {
+          var consumer = new OrderCreatedConsumer();
+          var message = new OrderCreated(Guid.NewGuid(), "Alice", 100m);
+          var context = Substitute.For<ConsumeContext<OrderCreated>>();
+          context.Message.Returns(message);
+          await consumer.Consume(context);
+          consumer.Received.Should().HaveCount(1);
+          consumer.Received[0].CustomerName.Should().Be("Alice");
+      }
+  }

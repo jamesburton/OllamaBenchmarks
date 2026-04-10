@@ -1,0 +1,31 @@
+name: easy_linq_054
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Filter with a static method:
+    List<string> WhereContains(IEnumerable<string> items, string keyword)
+  that returns strings that contain the keyword (case-insensitive) using LINQ Where + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FilterTests
+  {
+      [Fact]
+      public void WhereContains_BasicCase()
+      {
+          var result = Filter.WhereContains(new[]{"Hello World","Foo Bar","Hello Foo"}, "hello");
+          result.Should().BeEquivalentTo(new[]{"Hello World","Hello Foo"}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void WhereContains_NoMatch_ReturnsEmpty()
+      {
+          Filter.WhereContains(new[]{"cat","dog"}, "xyz").Should().BeEmpty();
+      }
+  }

@@ -1,0 +1,36 @@
+name: easy_patterns_012
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class NullHelper with a static method:
+    int GetLength(string? text)
+  that returns the length of the string using null-conditional operator ?. returning 0 if null.
+  Use: text?.Length ?? 0
+  Return only valid C# code in a single file.
+test_code: |
+  public class NullHelperTests
+  {
+      [Fact]
+      public void GetLength_NonNull_ReturnsLength()
+      {
+          NullHelper.GetLength("hello").Should().Be(5);
+      }
+      [Fact]
+      public void GetLength_Null_ReturnsZero()
+      {
+          NullHelper.GetLength(null).Should().Be(0);
+      }
+      [Fact]
+      public void GetLength_Empty_ReturnsZero()
+      {
+          NullHelper.GetLength("").Should().Be(0);
+      }
+  }

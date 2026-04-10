@@ -1,0 +1,17 @@
+name: vocabulary_hard_057
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word has the most POSITIVE connotation in an academic context?
+  A) Pedantic
+  B) Rigorous
+  C) Nitpicking
+  D) Meticulous
+  D) Both B and D
+  Reply with only the letter.
+expected_answer: "D"
+validator_config: {}

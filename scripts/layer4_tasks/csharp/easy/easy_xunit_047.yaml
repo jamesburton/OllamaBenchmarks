@@ -1,0 +1,38 @@
+name: easy_xunit_047
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IHashService with method:
+    string Hash(string input)
+  A class PasswordManager with constructor taking IHashService, and methods:
+    string HashPassword(string password) returns hash of password
+    bool VerifyPassword(string password, string hash) returns true if Hash(password) equals hash
+  Return only valid C# code in a single file.
+test_code: |
+  public class PasswordManagerTests
+  {
+      [Fact]
+      public void HashPassword_CallsHashService()
+      {
+          var hashService = Substitute.For<IHashService>();
+          hashService.Hash("secret").Returns("hashed_secret");
+          var manager = new PasswordManager(hashService);
+          manager.HashPassword("secret").Should().Be("hashed_secret");
+      }
+      [Fact]
+      public void VerifyPassword_MatchingHash_ReturnsTrue()
+      {
+          var hashService = Substitute.For<IHashService>();
+          hashService.Hash("mypass").Returns("abc123");
+          var manager = new PasswordManager(hashService);
+          manager.VerifyPassword("mypass", "abc123").Should().BeTrue();
+      }
+  }

@@ -1,0 +1,17 @@
+name: constraint_medium_005
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Four boxes are colored red, green, blue, yellow. They contain: apples, bananas, cherries, dates.
+  Clues:
+  1. The red box contains apples.
+  2. The green box does not contain bananas.
+  3. The blue box contains dates.
+  4. The yellow box does not contain apples.
+  What does the green box contain? Reply with only the fruit.
+expected_answer: "Cherries"
+validator_config: {}

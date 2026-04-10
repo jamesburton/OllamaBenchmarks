@@ -1,0 +1,58 @@
+name: medium_vertical_005
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for processing refunds.
+  Include:
+    record ProcessRefundCommand(Guid OrderId, decimal Amount, string Reason)
+    record ProcessRefundResult(Guid RefundId, Guid OrderId, decimal Amount, string Status)
+    class ProcessRefundHandler with constructor accepting:
+      Func<Guid, decimal> getOrderTotal (simulates DB lookup)
+    Method: Task<ProcessRefundResult> HandleAsync(ProcessRefundCommand command)
+    Validates: Amount > 0, Amount <= order total (throws InvalidOperationException if exceeds).
+    Reason must not be empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProcessRefundHandlerTests
+  {
+      [Fact]
+      public async Task HandleAsync_ValidRefund_ReturnsApproved()
+      {
+          var handler = new ProcessRefundHandler(orderId => 100m);
+          var cmd = new ProcessRefundCommand(Guid.NewGuid(), 50m, "Defective item");
+          var result = await handler.HandleAsync(cmd);
+          result.Status.Should().Be("Approved");
+          result.Amount.Should().Be(50m);
+      }
+
+      [Fact]
+      public async Task HandleAsync_ExceedsOrderTotal_Throws()
+      {
+          var handler = new ProcessRefundHandler(orderId => 50m);
+          var cmd = new ProcessRefundCommand(Guid.NewGuid(), 100m, "Reason");
+          await handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_ZeroAmount_Throws()
+      {
+          var handler = new ProcessRefundHandler(orderId => 100m);
+          var cmd = new ProcessRefundCommand(Guid.NewGuid(), 0m, "Reason");
+          await handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_EmptyReason_Throws()
+      {
+          var handler = new ProcessRefundHandler(orderId => 100m);
+          var cmd = new ProcessRefundCommand(Guid.NewGuid(), 10m, "");
+          await handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+  }

@@ -1,0 +1,18 @@
+name: summarisation_medium_068
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The role of social media platforms in shaping political opinion has prompted regulatory attention, with the EU's Digital Services Act requiring large platforms to assess and mitigate systemic risks including electoral interference. Critics argue that algorithmic amplification of polarising content is structurally incompatible with informed democratic deliberation. Platform companies dispute the causal relationship between algorithmic design and political outcomes.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "social media"
+    - "algorithm"
+    - "elections"
+    - "regulation"
+  max_words: 25

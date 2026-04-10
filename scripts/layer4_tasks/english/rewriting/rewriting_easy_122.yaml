@@ -1,0 +1,22 @@
+name: rewriting_easy_122
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'She told her sister she was wrong.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "told"
+    - "wrong"
+    - "sister"
+    - "said"
+    - "her"
+    - "that"
+  min_words: 5
+  max_words: 20

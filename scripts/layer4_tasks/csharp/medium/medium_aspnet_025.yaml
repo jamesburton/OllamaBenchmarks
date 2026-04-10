@@ -1,0 +1,58 @@
+name: medium_aspnet_025
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record VersionInfo(string Version, string Environment, DateTime BuildTime).
+  A class VersionController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IConfiguration.
+  Action: GET api/version — reads "AppVersion" and "ASPNETCORE_ENVIRONMENT" from configuration and returns VersionInfo.
+  Return only valid C# code in a single file.
+test_code: |
+  public class VersionControllerTests
+  {
+      [Fact]
+      public void Get_ReturnsVersionInfo()
+      {
+          var config = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+              .AddInMemoryCollection(new Dictionary<string, string?>
+              {
+                  ["AppVersion"] = "1.2.3",
+                  ["ASPNETCORE_ENVIRONMENT"] = "Production"
+              }).Build();
+          var ctrl = new VersionController(config);
+          var result = ctrl.Get() as OkObjectResult;
+          var info = result!.Value as VersionInfo;
+          info!.Version.Should().Be("1.2.3");
+          info.Environment.Should().Be("Production");
+      }
+
+      [Fact]
+      public void Get_SetsBuildTime()
+      {
+          var before = DateTime.UtcNow.AddSeconds(-1);
+          var config = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+              .AddInMemoryCollection(new Dictionary<string, string?>()).Build();
+          var ctrl = new VersionController(config);
+          var result = ctrl.Get() as OkObjectResult;
+          var info = result!.Value as VersionInfo;
+          info!.BuildTime.Should().BeAfter(before);
+      }
+
+      [Fact]
+      public void Get_MissingConfig_UsesDefaults()
+      {
+          var config = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+              .AddInMemoryCollection(new Dictionary<string, string?>()).Build();
+          var ctrl = new VersionController(config);
+          var result = ctrl.Get() as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+      }
+  }

@@ -1,0 +1,36 @@
+name: easy_patterns_046
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A positional record:
+    record Size(int Width, int Height)
+  and a static class SizeHelper with:
+    Size Scale(Size size, double factor)
+  that scales both dimensions by factor (rounding to nearest int) and returns new Size.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SizeHelperTests
+  {
+      [Fact]
+      public void Scale_DoublesSize()
+      {
+          var result = SizeHelper.Scale(new Size(100, 50), 2.0);
+          result.Width.Should().Be(200);
+          result.Height.Should().Be(100);
+      }
+      [Fact]
+      public void Scale_HalfSize()
+      {
+          var result = SizeHelper.Scale(new Size(100, 60), 0.5);
+          result.Width.Should().Be(50);
+          result.Height.Should().Be(30);
+      }
+  }

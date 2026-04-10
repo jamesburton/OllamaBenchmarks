@@ -1,0 +1,16 @@
+name: constraint_easy_005
+category: logic
+subcategory: constraint
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Amy, Beth, and Chris each drink one of: tea, coffee, juice.
+  Clues:
+  1. Amy does not drink coffee.
+  2. Beth drinks tea.
+  3. Chris does not drink tea.
+  What does Amy drink? Reply with only the drink.
+expected_answer: "Juice"
+validator_config: {}

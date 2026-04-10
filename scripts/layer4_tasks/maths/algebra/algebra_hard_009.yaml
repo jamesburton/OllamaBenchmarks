@@ -1,0 +1,16 @@
+name: algebra_hard_009
+category: maths
+subcategory: algebra
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Solve the system:
+    5x - 2y = 11
+    3x + y = 10
+  Reply with only the value of x.
+expected_answer: "3"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

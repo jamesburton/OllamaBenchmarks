@@ -1,0 +1,16 @@
+name: vocabulary_medium_073
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word is most appropriate in a FORMAL legal document?
+  A) About
+  B) Regarding
+  C) Concerning
+  D) Pertaining to
+  Reply with only the letter.
+expected_answer: "D"
+validator_config: {}

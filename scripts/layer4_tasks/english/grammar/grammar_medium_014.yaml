@@ -1,0 +1,15 @@
+name: grammar_medium_014
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The majority of the work have been completed.
+  B) The majority of the work has been completed.
+  C) The majority of the work are being completed.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

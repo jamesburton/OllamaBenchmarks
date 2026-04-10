@@ -1,0 +1,123 @@
+name: hard_masstransit_004
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  A MassTransit saga for a shipment lifecycle with 4+ states:
+  Messages:
+    record CreateShipment(Guid ShipmentId, string Origin, string Destination, decimal WeightKg);
+    record ShipmentPickedUp(Guid ShipmentId, DateTime PickedUpAt);
+    record ShipmentInTransit(Guid ShipmentId, string CurrentLocation);
+    record ShipmentDelivered(Guid ShipmentId, DateTime DeliveredAt);
+    record ShipmentLost(Guid ShipmentId, string Reason);
+
+  States: Created, PickedUp, InTransit, Delivered, Lost.
+  Saga: ShipmentStateMachine : MassTransitStateMachine<ShipmentSagaState>
+  Transitions:
+    Initially + CreateShipment -> Created
+    Created + ShipmentPickedUp -> PickedUp
+    PickedUp + ShipmentInTransit -> InTransit
+    InTransit + ShipmentDelivered -> Delivered (Final)
+    (Created | PickedUp | InTransit) + ShipmentLost -> Lost (Final)
+
+  ShipmentSagaState : SagaStateMachineInstance:
+    Guid CorrelationId, string CurrentState, string Origin, string Destination,
+    decimal WeightKg, DateTime? PickedUpAt, DateTime? DeliveredAt, string? LostReason.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ShipmentStateMachineTests
+  {
+      [Fact]
+      public async Task CreateShipment_TransitionsToCreated()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<ShipmentSagaState, ShipmentStateMachine>(new ShipmentStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new CreateShipment(id, "London", "Paris", 5.0m));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Created).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task PickedUp_TransitionsToPickedUp()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<ShipmentSagaState, ShipmentStateMachine>(new ShipmentStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new CreateShipment(id, "A", "B", 1m));
+              await harness.InputQueueSendEndpoint.Send(new ShipmentPickedUp(id, DateTime.UtcNow));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.PickedUp).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task FullDeliveryFlow_TransitionsToDelivered()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<ShipmentSagaState, ShipmentStateMachine>(new ShipmentStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new CreateShipment(id, "X", "Y", 2m));
+              await harness.InputQueueSendEndpoint.Send(new ShipmentPickedUp(id, DateTime.UtcNow));
+              await harness.InputQueueSendEndpoint.Send(new ShipmentInTransit(id, "Dover"));
+              await harness.InputQueueSendEndpoint.Send(new ShipmentDelivered(id, DateTime.UtcNow));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Delivered).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task Lost_FromInTransit_TransitionsToLost()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<ShipmentSagaState, ShipmentStateMachine>(new ShipmentStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new CreateShipment(id, "A", "B", 3m));
+              await harness.InputQueueSendEndpoint.Send(new ShipmentPickedUp(id, DateTime.UtcNow));
+              await harness.InputQueueSendEndpoint.Send(new ShipmentInTransit(id, "Channel"));
+              await harness.InputQueueSendEndpoint.Send(new ShipmentLost(id, "Customs seized"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Lost).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SagaState_StoresOriginAndDestination()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<ShipmentSagaState, ShipmentStateMachine>(new ShipmentStateMachine());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new CreateShipment(id, "Berlin", "Madrid", 7.5m));
+              var state = sagaHarness.Sagas.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.Created);
+              state!.Origin.Should().Be("Berlin");
+              state.Destination.Should().Be("Madrid");
+          }
+          finally { await harness.Stop(); }
+      }
+  }

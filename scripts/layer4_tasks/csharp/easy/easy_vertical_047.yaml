@@ -1,0 +1,43 @@
+name: easy_vertical_047
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record MenuItem(string Id, string Name, decimal Price, bool IsAvailable)
+  An interface IMenuRepository with methods:
+    Task AddAsync(MenuItem item)
+    Task<List<MenuItem>> GetAvailableAsync()
+    Task<MenuItem?> GetByIdAsync(string id)
+    Task UpdateAsync(MenuItem item)
+  A class MenuService with constructor taking IMenuRepository, and async method:
+    Task ToggleAvailabilityAsync(string itemId) loads item, toggles IsAvailable using 'with', saves
+  Return only valid C# code in a single file.
+test_code: |
+  public class MenuServiceTests
+  {
+      [Fact]
+      public async Task ToggleAvailabilityAsync_TogglesFromAvailableToUnavailable()
+      {
+          var repo = Substitute.For<IMenuRepository>();
+          repo.GetByIdAsync("item1").Returns(new MenuItem("item1", "Burger", 9.99m, true));
+          var service = new MenuService(repo);
+          await service.ToggleAvailabilityAsync("item1");
+          await repo.Received(1).UpdateAsync(Arg.Is<MenuItem>(m => !m.IsAvailable));
+      }
+      [Fact]
+      public async Task ToggleAvailabilityAsync_NotFound_DoesNotCallUpdate()
+      {
+          var repo = Substitute.For<IMenuRepository>();
+          repo.GetByIdAsync("none").Returns((MenuItem?)null);
+          var service = new MenuService(repo);
+          await service.ToggleAvailabilityAsync("none");
+          await repo.DidNotReceive().UpdateAsync(Arg.Any<MenuItem>());
+      }
+  }

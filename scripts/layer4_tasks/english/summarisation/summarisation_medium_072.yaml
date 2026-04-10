@@ -1,0 +1,18 @@
+name: summarisation_medium_072
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The question of national sovereignty versus global governance has become increasingly fraught in the context of climate change, pandemic response, and technology regulation. Multilateral institutions struggle to enforce compliance without enforcement mechanisms, while nationalist governments resist ceding authority to supranational bodies. Effective global governance may require new institutional designs that balance accountability with effectiveness.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "sovereignty"
+    - "governance"
+    - "multilateral"
+    - "climate"
+  max_words: 25

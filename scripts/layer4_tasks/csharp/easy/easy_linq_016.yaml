@@ -1,0 +1,31 @@
+name: easy_linq_016
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Combiner with a static method:
+    List<int> Concat(IEnumerable<int> first, IEnumerable<int> second)
+  that concatenates two sequences using LINQ Concat + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CombinerTests
+  {
+      [Fact]
+      public void Concat_BasicCase()
+      {
+          var result = Combiner.Concat(new[]{1,2,3}, new[]{4,5,6});
+          result.Should().BeEquivalentTo(new[]{1,2,3,4,5,6}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void Concat_EmptyFirst_ReturnsSecond()
+      {
+          Combiner.Concat(Array.Empty<int>(), new[]{1,2}).Should().BeEquivalentTo(new[]{1,2}, cfg => cfg.WithStrictOrdering());
+      }
+  }

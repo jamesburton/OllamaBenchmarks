@@ -1,0 +1,58 @@
+name: medium_xunit_005
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class RomanNumeralConverter with:
+    string ToRoman(int number)
+    int FromRoman(string roman)
+  Supports 1-3999. Throws ArgumentOutOfRangeException for out-of-range values.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RomanNumeralConverterTests
+  {
+      private readonly RomanNumeralConverter _converter = new();
+
+      [Theory]
+      [InlineData(1, "I")]
+      [InlineData(4, "IV")]
+      [InlineData(9, "IX")]
+      [InlineData(14, "XIV")]
+      [InlineData(40, "XL")]
+      [InlineData(1994, "MCMXCIV")]
+      [InlineData(3999, "MMMCMXCIX")]
+      public void ToRoman_ReturnsCorrectValue(int number, string expected)
+      {
+          _converter.ToRoman(number).Should().Be(expected);
+      }
+
+      [Fact]
+      public void ToRoman_OutOfRange_Throws()
+      {
+          _converter.Invoking(c => c.ToRoman(0)).Should().Throw<ArgumentOutOfRangeException>();
+          _converter.Invoking(c => c.ToRoman(4000)).Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void FromRoman_ReturnsCorrectValue()
+      {
+          _converter.FromRoman("XIV").Should().Be(14);
+          _converter.FromRoman("MCMXCIV").Should().Be(1994);
+      }
+
+      [Fact]
+      public void RoundTrip_IsConsistent()
+      {
+          for (int i = 1; i <= 100; i++)
+          {
+              _converter.FromRoman(_converter.ToRoman(i)).Should().Be(i);
+          }
+      }
+  }

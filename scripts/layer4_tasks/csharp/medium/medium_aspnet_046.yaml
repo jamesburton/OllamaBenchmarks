@@ -1,0 +1,59 @@
+name: medium_aspnet_046
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record DataExport(Guid Id, string Format, string Status, DateTime RequestedAt, DateTime? CompletedAt).
+  A class ExportsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<DataExport> (for testability).
+  Actions:
+    POST api/exports — creates export with Status="Pending", returns 202 Accepted
+    GET api/exports/{id}/status — returns export or 404
+    PUT api/exports/{id}/complete — sets Status="Completed" and CompletedAt=UtcNow, 404 if not found
+  Return only valid C# code in a single file.
+test_code: |
+  public class ExportsControllerTests
+  {
+      [Fact]
+      public void Create_Returns202WithPending()
+      {
+          var ctrl = new ExportsController(new List<DataExport>());
+          var result = ctrl.Create("csv") as AcceptedAtActionResult ?? ctrl.Create("csv") as ObjectResult;
+          result.Should().NotBeNull();
+          result!.StatusCode.Should().Be(202);
+      }
+
+      [Fact]
+      public void GetStatus_Found()
+      {
+          var id = Guid.NewGuid();
+          var ctrl = new ExportsController(new List<DataExport> { new(id, "csv", "Pending", DateTime.UtcNow, null) });
+          var result = ctrl.GetStatus(id) as OkObjectResult;
+          (result!.Value as DataExport)!.Status.Should().Be("Pending");
+      }
+
+      [Fact]
+      public void GetStatus_NotFound_Returns404()
+      {
+          var ctrl = new ExportsController(new List<DataExport>());
+          ctrl.GetStatus(Guid.NewGuid()).Should().BeOfType<NotFoundResult>();
+      }
+
+      [Fact]
+      public void Complete_SetsStatusAndTime()
+      {
+          var id = Guid.NewGuid();
+          var ctrl = new ExportsController(new List<DataExport> { new(id, "json", "Pending", DateTime.UtcNow, null) });
+          ctrl.Complete(id);
+          var export = ((ctrl.GetStatus(id) as OkObjectResult)!.Value as DataExport)!;
+          export.Status.Should().Be("Completed");
+          export.CompletedAt.Should().NotBeNull();
+      }
+  }

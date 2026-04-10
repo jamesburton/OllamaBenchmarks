@@ -1,0 +1,56 @@
+name: medium_masstransit_034
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record ConsentUpdated(Guid UserId, bool MarketingConsent, bool AnalyticsConsent, DateTime UpdatedAt).
+  A consumer ConsentUpdatedConsumer implementing IConsumer<ConsentUpdated>.
+  Constructor accepts IConsentService service.
+  Interface IConsentService with: Task UpdateAsync(Guid userId, bool marketing, bool analytics).
+  In Consume: calls the service method with appropriate message properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record ConsentUpdated(Guid UserId, bool MarketingConsent, bool AnalyticsConsent, DateTime UpdatedAt); }
+  global using Contracts;
+
+  public class ConsentUpdatedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IConsentService>();
+          var consumer = new ConsentUpdatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<ConsentUpdated>>();
+          ctx.Message.Returns(new ConsentUpdated(Guid.NewGuid(), true, true, DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).UpdateAsync(Arg.Any<Guid>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IConsentService>();
+          var consumer = new ConsentUpdatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<ConsentUpdated>>();
+          ctx.Message.Returns(new ConsentUpdated(Guid.NewGuid(), true, true, DateTime.UtcNow));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IConsentService>();
+          var consumer = new ConsentUpdatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<ConsentUpdated>>();
+          ctx.Message.Returns(new ConsentUpdated(Guid.NewGuid(), true, true, DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).UpdateAsync(Arg.Any<Guid>(), Arg.Any<object>());
+      }
+  }

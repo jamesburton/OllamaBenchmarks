@@ -1,0 +1,58 @@
+name: medium_aspnet_049
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record DocumentDto(Guid Id, string Title, string Content, IEnumerable<string> Tags, DateTime LastModified).
+  A class DocumentsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<DocumentDto> (for testability).
+  Actions:
+    GET api/documents — all documents
+    GET api/documents/search?q=term — full-text search in Title and Content
+    GET api/documents/tag/{tag} — documents with specific tag
+    GET api/documents/{id} — by id or 404
+  Return only valid C# code in a single file.
+test_code: |
+  public class DocumentsControllerTests
+  {
+      private DocumentsController MakeController() => new(new List<DocumentDto>
+      {
+          new(Guid.Parse("00000000-0000-0000-0000-000000000001"), "Hello World", "This is a test document", new[] { "intro", "test" }, DateTime.UtcNow),
+          new(Guid.Parse("00000000-0000-0000-0000-000000000002"), "Advanced C#", "Delegates and events in C#", new[] { "csharp", "advanced" }, DateTime.UtcNow),
+          new(Guid.Parse("00000000-0000-0000-0000-000000000003"), "ASP.NET Guide", "Building APIs with ASP.NET Core", new[] { "aspnet", "csharp" }, DateTime.UtcNow)
+      });
+
+      [Fact]
+      public void GetAll_ReturnsAll()
+      {
+          (MakeController().GetAll() as OkObjectResult)!.Value.Should().BeAssignableTo<IEnumerable<DocumentDto>>()
+              .Which.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void Search_FindsInTitle()
+      {
+          var result = MakeController().Search("Hello") as OkObjectResult;
+          (result!.Value as IEnumerable<DocumentDto>).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void GetByTag_ReturnsTaggedDocs()
+      {
+          var result = MakeController().GetByTag("csharp") as OkObjectResult;
+          (result!.Value as IEnumerable<DocumentDto>).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void GetById_NotFound_Returns404()
+      {
+          MakeController().GetById(Guid.NewGuid()).Should().BeOfType<NotFoundResult>();
+      }
+  }

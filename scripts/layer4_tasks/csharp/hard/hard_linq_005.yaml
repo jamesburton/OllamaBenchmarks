@@ -1,0 +1,96 @@
+name: hard_linq_005
+category: csharp_hard
+subcategory: linq
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Records: StockTick(string Symbol, DateTime Timestamp, decimal Price).
+  A class TechnicalAnalyser with constructor accepting IEnumerable<StockTick> ticks.
+  Methods:
+    IEnumerable<OhlcBar> ComputeDailyOhlc(string symbol) — groups ticks by Date for the
+      given symbol and computes Open (first price), High, Low, Close (last price) per day.
+      Orders by Date ascending.
+    IEnumerable<MovingAverage> ComputeSma(string symbol, int windowSize) — computes simple
+      moving average over the closing prices of daily bars, outputting Date and Sma.
+      Only emit windows of full size. Orders by Date ascending.
+    decimal ComputeVolatility(string symbol) — standard deviation of daily close prices
+      (population std dev). Returns 0 if fewer than 2 data points.
+  Records: OhlcBar(DateOnly Date, decimal Open, decimal High, decimal Low, decimal Close),
+           MovingAverage(DateOnly Date, decimal Sma).
+  Return only valid C# code in a single file.
+test_code: |
+  public class TechnicalAnalyserTests
+  {
+      private static readonly DateTime D1 = new(2024,1,2,9,0,0);
+      private static readonly DateTime D2 = new(2024,1,3,9,0,0);
+      private static readonly DateTime D3 = new(2024,1,4,9,0,0);
+      private static readonly List<StockTick> Ticks = new()
+      {
+          new("ACME", D1.AddHours(0), 100m),
+          new("ACME", D1.AddHours(1), 105m),
+          new("ACME", D1.AddHours(2), 98m),
+          new("ACME", D1.AddHours(3), 102m),
+          new("ACME", D2.AddHours(0), 104m),
+          new("ACME", D2.AddHours(1), 108m),
+          new("ACME", D2.AddHours(2), 106m),
+          new("ACME", D3.AddHours(0), 110m),
+          new("ACME", D3.AddHours(1), 115m),
+          new("ACME", D3.AddHours(2), 112m),
+      };
+
+      [Fact]
+      public void ComputeDailyOhlc_ReturnsThreeBars()
+      {
+          var bars = new TechnicalAnalyser(Ticks).ComputeDailyOhlc("ACME").ToList();
+          bars.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void ComputeDailyOhlc_FirstBarCorrect()
+      {
+          var bar = new TechnicalAnalyser(Ticks).ComputeDailyOhlc("ACME").First();
+          bar.Open.Should().Be(100m);
+          bar.High.Should().Be(105m);
+          bar.Low.Should().Be(98m);
+          bar.Close.Should().Be(102m);
+      }
+
+      [Fact]
+      public void ComputeDailyOhlc_UnknownSymbolReturnsEmpty()
+      {
+          new TechnicalAnalyser(Ticks).ComputeDailyOhlc("UNKNOWN").Should().BeEmpty();
+      }
+
+      [Fact]
+      public void ComputeSma_Window2_CorrectCount()
+      {
+          var sma = new TechnicalAnalyser(Ticks).ComputeSma("ACME", 2).ToList();
+          sma.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void ComputeSma_FirstValueCorrect()
+      {
+          var sma = new TechnicalAnalyser(Ticks).ComputeSma("ACME", 2).ToList();
+          sma[0].Sma.Should().Be((102m + 106m) / 2);
+      }
+
+      [Fact]
+      public void ComputeVolatility_NonZeroForValidData()
+      {
+          var vol = new TechnicalAnalyser(Ticks).ComputeVolatility("ACME");
+          vol.Should().BeGreaterThan(0m);
+      }
+
+      [Fact]
+      public void ComputeVolatility_UnknownSymbolReturnsZero()
+      {
+          new TechnicalAnalyser(Ticks).ComputeVolatility("XYZ").Should().Be(0m);
+      }
+  }

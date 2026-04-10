@@ -1,0 +1,16 @@
+name: vocabulary_medium_029
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'She was known for her tenacious pursuit of justice', which word best replaces 'tenacious'?
+  A) Fleeting
+  B) Persistent
+  C) Reluctant
+  D) Mild
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

@@ -1,0 +1,22 @@
+name: rewriting_easy_130
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'Police help dog bite victims.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "police"
+    - "help"
+    - "bitten"
+    - "dog"
+    - "assist"
+    - "victims"
+  min_words: 4
+  max_words: 15

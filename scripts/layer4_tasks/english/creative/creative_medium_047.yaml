@@ -1,0 +1,22 @@
+name: creative_medium_047
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a parent watching their child perform on stage for the first time.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "parent"
+    - "child"
+    - "stage"
+    - "watching"
+    - "proud"
+    - "nervous"
+    - "performance"
+    - "first"
+  min_words: 15
+  max_words: 60

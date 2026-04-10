@@ -1,0 +1,58 @@
+name: medium_linq_011
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class SetOperations with two constructors parameters: IEnumerable<int> setA, IEnumerable<int> setB.
+  Expose:
+    IEnumerable<int> Union()      — union of both sets, ordered ascending
+    IEnumerable<int> Intersect()  — elements in both sets, ordered ascending
+    IEnumerable<int> ExceptA()    — elements in A not in B, ordered ascending
+    IEnumerable<int> SymmetricDifference() — elements in either but not both, ordered ascending
+  Return only valid C# code in a single file.
+test_code: |
+  public class SetOperationsTests
+  {
+      private static SetOperations Make(int[] a, int[] b) => new(a, b);
+
+      [Fact]
+      public void Union_CombinesAndDeduplicates()
+      {
+          Make(new[]{1,2,3}, new[]{2,3,4}).Union()
+              .Should().BeEquivalentTo(new[]{1,2,3,4}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void Intersect_CommonElements()
+      {
+          Make(new[]{1,2,3,4}, new[]{2,4,6}).Intersect()
+              .Should().BeEquivalentTo(new[]{2,4}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void ExceptA_OnlyInA()
+      {
+          Make(new[]{1,2,3}, new[]{2,3,4}).ExceptA()
+              .Should().BeEquivalentTo(new[]{1}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void SymmetricDifference_Correct()
+      {
+          Make(new[]{1,2,3}, new[]{2,3,4}).SymmetricDifference()
+              .Should().BeEquivalentTo(new[]{1,4}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void Union_EmptySets_ReturnsEmpty()
+      {
+          Make(Array.Empty<int>(), Array.Empty<int>()).Union().Should().BeEmpty();
+      }
+  }

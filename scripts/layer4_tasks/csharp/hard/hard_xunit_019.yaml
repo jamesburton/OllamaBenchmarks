@@ -1,0 +1,102 @@
+name: hard_xunit_019
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing observable/reactive patterns:
+  Interface IObservable<T> (custom, not System.IObservable):
+    void Subscribe(Action<T> onNext, Action<Exception>? onError = null, Action? onCompleted = null)
+    void Unsubscribe(Action<T> onNext)
+
+  Class SimpleSubject<T> : IObservable<T>:
+    void OnNext(T value): notifies all subscribers.
+    void OnError(Exception error): notifies all error handlers.
+    void OnCompleted(): notifies completion, subsequent OnNext ignored.
+    bool IsCompleted { get; }
+    int SubscriberCount { get; }
+
+  Class ObservableExtensions:
+    static SimpleSubject<TResult> Select<T, TResult>(SimpleSubject<T> source, Func<T, TResult> selector)
+    static SimpleSubject<T> Where<T>(SimpleSubject<T> source, Func<T, bool> predicate)
+    static SimpleSubject<T> Take<T>(SimpleSubject<T> source, int count)
+  Return only valid C# code in a single file.
+test_code: |
+  public class SimpleSubjectTests
+  {
+      [Fact]
+      public void OnNext_NotifiesSubscribers()
+      {
+          var subject = new SimpleSubject<int>();
+          var received = new List<int>();
+          subject.Subscribe(received.Add);
+          subject.OnNext(1);
+          subject.OnNext(2);
+          received.Should().BeEquivalentTo(new[] { 1, 2 });
+      }
+
+      [Fact]
+      public void Unsubscribe_StopsNotifications()
+      {
+          var subject = new SimpleSubject<string>();
+          var received = new List<string>();
+          Action<string> handler = received.Add;
+          subject.Subscribe(handler);
+          subject.OnNext("a");
+          subject.Unsubscribe(handler);
+          subject.OnNext("b");
+          received.Should().ContainSingle("a");
+      }
+
+      [Fact]
+      public void OnCompleted_SubsequentOnNextIgnored()
+      {
+          var subject = new SimpleSubject<int>();
+          var received = new List<int>();
+          subject.Subscribe(received.Add);
+          subject.OnNext(1);
+          subject.OnCompleted();
+          subject.OnNext(2);
+          received.Should().ContainSingle(1);
+          subject.IsCompleted.Should().BeTrue();
+      }
+
+      [Fact]
+      public void Select_TransformsValues()
+      {
+          var source = new SimpleSubject<int>();
+          var mapped = ObservableExtensions.Select(source, x => x * 2);
+          var received = new List<int>();
+          mapped.Subscribe(received.Add);
+          source.OnNext(5);
+          received.Should().ContainSingle(10);
+      }
+
+      [Fact]
+      public void Where_FiltersValues()
+      {
+          var source = new SimpleSubject<int>();
+          var filtered = ObservableExtensions.Where(source, x => x > 3);
+          var received = new List<int>();
+          filtered.Subscribe(received.Add);
+          source.OnNext(1); source.OnNext(5); source.OnNext(2); source.OnNext(4);
+          received.Should().BeEquivalentTo(new[] { 5, 4 });
+      }
+
+      [Fact]
+      public void Take_LimitsCount()
+      {
+          var source = new SimpleSubject<int>();
+          var limited = ObservableExtensions.Take(source, 2);
+          var received = new List<int>();
+          limited.Subscribe(received.Add);
+          source.OnNext(1); source.OnNext(2); source.OnNext(3);
+          received.Should().HaveCount(2);
+      }
+  }

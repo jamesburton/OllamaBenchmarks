@@ -1,0 +1,61 @@
+name: medium_async_002
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IJobRunner with method: Task<int> RunAsync(string jobId, CancellationToken ct = default)
+  A class ThrottledJobScheduler with constructor accepting IJobRunner runner and int maxConcurrency.
+  Expose:
+    Task<int[]> RunAllAsync(IEnumerable<string> jobIds, CancellationToken ct = default)
+  that runs all jobs with at most maxConcurrency running simultaneously using SemaphoreSlim.
+  Returns results in order corresponding to input jobIds.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ThrottledJobSchedulerTests
+  {
+      [Fact]
+      public async Task RunAllAsync_ReturnsResultsInOrder()
+      {
+          var runner = Substitute.For<IJobRunner>();
+          runner.RunAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(ci => Task.FromResult(int.Parse(ci.Arg<string>())));
+          var result = await new ThrottledJobScheduler(runner, 2).RunAllAsync(new[]{"1","2","3"});
+          result.Should().BeEquivalentTo(new[]{1,2,3}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public async Task RunAllAsync_EmptyInput_ReturnsEmpty()
+      {
+          var runner = Substitute.For<IJobRunner>();
+          var result = await new ThrottledJobScheduler(runner, 2).RunAllAsync(Array.Empty<string>());
+          result.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task RunAllAsync_CancelledToken_Throws()
+      {
+          var cts = new CancellationTokenSource();
+          var runner = Substitute.For<IJobRunner>();
+          runner.RunAsync(Arg.Any<string>(), Arg.Any<CancellationToken>())
+              .Returns(async ci => { await Task.Delay(1000, ci.Arg<CancellationToken>()); return 0; });
+          cts.CancelAfter(50);
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+              new ThrottledJobScheduler(runner, 1).RunAllAsync(new[]{"a","b","c","d"}, cts.Token));
+      }
+
+      [Fact]
+      public async Task RunAllAsync_AllJobsRun()
+      {
+          var runner = Substitute.For<IJobRunner>();
+          runner.RunAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns(Task.FromResult(0));
+          await new ThrottledJobScheduler(runner, 3).RunAllAsync(new[]{"a","b","c","d","e"});
+          await runner.Received(5).RunAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
+      }
+  }

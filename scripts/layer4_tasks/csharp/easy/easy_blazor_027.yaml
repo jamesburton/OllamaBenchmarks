@@ -1,0 +1,34 @@
+name: easy_blazor_027
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class BadgeComponent that extends ComponentBase with:
+    [Parameter] int Count { get; set; }
+    [Parameter] int MaxDisplay { get; set; } = 99
+    string DisplayText => Count > MaxDisplay ? $"{MaxDisplay}+" : Count.ToString()
+    bool HasItems => Count > 0
+  Return only valid C# code in a single file.
+test_code: |
+  public class BadgeComponentTests
+  {
+      [Fact]
+      public void DisplayText_ShowsCountWhenBelowMax()
+      {
+          var c = new BadgeComponent { Count = 5, MaxDisplay = 99 };
+          c.DisplayText.Should().Be("5");
+      }
+      [Fact]
+      public void DisplayText_ShowsPlusWhenAboveMax()
+      {
+          var c = new BadgeComponent { Count = 150, MaxDisplay = 99 };
+          c.DisplayText.Should().Be("99+");
+      }
+  }

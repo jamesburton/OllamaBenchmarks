@@ -1,0 +1,14 @@
+name: number_theory_hard_003
+category: maths
+subcategory: number_theory
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  What is 7^1000 mod 100?
+  Reply with only the number.
+expected_answer: "1"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

@@ -1,0 +1,56 @@
+name: medium_masstransit_032
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record FeatureFlagChanged(string FlagName, bool OldValue, bool NewValue, string ChangedBy).
+  A consumer FeatureFlagChangedConsumer implementing IConsumer<FeatureFlagChanged>.
+  Constructor accepts IFlagChangeNotifier service.
+  Interface IFlagChangeNotifier with: Task NotifyAsync(string flagName, bool newValue).
+  In Consume: calls the service method with appropriate message properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record FeatureFlagChanged(string FlagName, bool OldValue, bool NewValue, string ChangedBy); }
+  global using Contracts;
+
+  public class FeatureFlagChangedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IFlagChangeNotifier>();
+          var consumer = new FeatureFlagChangedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<FeatureFlagChanged>>();
+          ctx.Message.Returns(new FeatureFlagChanged("test", true, true, "test"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).NotifyAsync(Arg.Any<string>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IFlagChangeNotifier>();
+          var consumer = new FeatureFlagChangedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<FeatureFlagChanged>>();
+          ctx.Message.Returns(new FeatureFlagChanged("test", true, true, "test"));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IFlagChangeNotifier>();
+          var consumer = new FeatureFlagChangedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<FeatureFlagChanged>>();
+          ctx.Message.Returns(new FeatureFlagChanged("test", true, true, "test"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).NotifyAsync(Arg.Any<string>(), Arg.Any<object>());
+      }
+  }

@@ -1,0 +1,91 @@
+name: hard_blazor_004
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor cascading authentication state service:
+  Records:
+    UserClaims(string UserId, string Email, string Role, IReadOnlyList<string> Permissions)
+    AuthState(bool IsAuthenticated, UserClaims? User, string? Error)
+
+  Interface IAuthStateProvider:
+    AuthState GetCurrentState()
+    Task<AuthState> SignInAsync(string email, string password, CancellationToken ct)
+    Task SignOutAsync(CancellationToken ct)
+    event Action<AuthState>? OnStateChanged
+
+  Class InMemoryAuthStateProvider : IAuthStateProvider:
+    Seeded users: admin@app.com/Admin123!, user@app.com/User123!
+    Admin has Role="Admin", Permissions=["read","write","delete"]
+    User has Role="User", Permissions=["read"]
+    SignInAsync: returns authenticated state if credentials match, error state if not.
+    SignOutAsync: resets to unauthenticated state.
+    Fires OnStateChanged on sign in/out.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InMemoryAuthStateProviderTests
+  {
+      private readonly IAuthStateProvider _provider = new InMemoryAuthStateProvider();
+
+      [Fact]
+      public void InitialState_IsNotAuthenticated()
+      {
+          _provider.GetCurrentState().IsAuthenticated.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task SignIn_ValidCredentials_ReturnsAuthenticatedState()
+      {
+          var state = await _provider.SignInAsync("admin@app.com", "Admin123!", CancellationToken.None);
+          state.IsAuthenticated.Should().BeTrue();
+          state.User.Should().NotBeNull();
+          state.User!.Email.Should().Be("admin@app.com");
+      }
+
+      [Fact]
+      public async Task SignIn_InvalidCredentials_ReturnsErrorState()
+      {
+          var state = await _provider.SignInAsync("admin@app.com", "wrong", CancellationToken.None);
+          state.IsAuthenticated.Should().BeFalse();
+          state.Error.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public async Task SignOut_ResetsState()
+      {
+          await _provider.SignInAsync("user@app.com", "User123!", CancellationToken.None);
+          await _provider.SignOutAsync(CancellationToken.None);
+          _provider.GetCurrentState().IsAuthenticated.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task Admin_HasDeletePermission()
+      {
+          var state = await _provider.SignInAsync("admin@app.com", "Admin123!", CancellationToken.None);
+          state.User!.Permissions.Should().Contain("delete");
+      }
+
+      [Fact]
+      public async Task User_DoesNotHaveDeletePermission()
+      {
+          var state = await _provider.SignInAsync("user@app.com", "User123!", CancellationToken.None);
+          state.User!.Permissions.Should().NotContain("delete");
+      }
+
+      [Fact]
+      public async Task SignIn_FiresStateChangedEvent()
+      {
+          AuthState? capturedState = null;
+          _provider.OnStateChanged += s => capturedState = s;
+          await _provider.SignInAsync("user@app.com", "User123!", CancellationToken.None);
+          capturedState.Should().NotBeNull();
+          capturedState!.IsAuthenticated.Should().BeTrue();
+      }
+  }

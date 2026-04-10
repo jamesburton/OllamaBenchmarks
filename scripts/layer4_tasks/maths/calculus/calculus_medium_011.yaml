@@ -1,0 +1,13 @@
+name: calculus_medium_011
+category: maths
+subcategory: calculus
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Evaluate: integral of x^2 dx from 0 to 3. Reply with only the number.
+expected_answer: "9"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

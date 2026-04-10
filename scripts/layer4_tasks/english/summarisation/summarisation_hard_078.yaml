@@ -1,0 +1,18 @@
+name: summarisation_hard_078
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The concept of sovereignty has been fundamentally contested by the Responsibility to Protect doctrine, which holds that the international community has a duty to intervene when states commit mass atrocities against their own populations. Implementation has been selective and politically contentious, with permanent UN Security Council members blocking action where their interests are engaged. Critics argue R2P has become a rhetorical device that legitimises selective intervention without consistent application.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "sovereignty"
+    - "Responsibility to Protect"
+    - "intervention"
+    - "atrocities"
+  max_words: 25

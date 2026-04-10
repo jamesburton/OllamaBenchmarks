@@ -1,0 +1,41 @@
+name: easy_aspnet_034
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class EndpointHandlers with a static method:
+    IResult GetUserById(int id, string? role)
+  that:
+    - Returns Results.BadRequest("Invalid id") if id <= 0
+    - Returns Results.Forbid() if role is not "admin" and not "user"
+    - Returns Results.Ok(new { Id = id, Role = role }) otherwise
+  Return only valid C# code in a single file.
+test_code: |
+  public class EndpointHandlersTests
+  {
+      [Fact]
+      public void GetUserById_Valid_ReturnsOk()
+      {
+          var result = EndpointHandlers.GetUserById(1, "admin");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<object>>();
+      }
+      [Fact]
+      public void GetUserById_InvalidId_ReturnsBadRequest()
+      {
+          var result = EndpointHandlers.GetUserById(0, "admin");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.BadRequest<string>>();
+      }
+      [Fact]
+      public void GetUserById_InvalidRole_ReturnsForbid()
+      {
+          var result = EndpointHandlers.GetUserById(1, "superuser");
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.ForbidHttpResult>();
+      }
+  }

@@ -1,0 +1,14 @@
+name: word_problems_easy_004
+category: maths
+subcategory: word_problems
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  A recipe uses 2 cups of flour for 12 cookies. How many cups of flour are needed for 36 cookies?
+  Reply with only the number.
+expected_answer: "6"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

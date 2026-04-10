@@ -1,0 +1,14 @@
+name: sequences_medium_009
+category: logic
+subcategory: sequences
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 64
+prompt: |
+  What is the 10th term of the Fibonacci sequence (starting 1, 1, 2, 3, ...)?
+  Reply with only the number.
+expected_answer: "55"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

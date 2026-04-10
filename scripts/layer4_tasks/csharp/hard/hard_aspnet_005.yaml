@@ -1,0 +1,106 @@
+name: hard_aspnet_005
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A minimal API with DataAnnotations validation and problem details:
+  Records:
+    CreateOrderRequest(string CustomerId, IReadOnlyList<OrderLineRequest> Lines)
+    OrderLineRequest(string ProductId, int Quantity, decimal UnitPrice)
+    OrderResponse(Guid Id, string CustomerId, decimal Total, DateTime CreatedAt)
+  Validation rules: CustomerId not empty; Lines not empty; each Quantity > 0; UnitPrice > 0.
+  Class OrderValidator with method ValidationResult Validate(CreateOrderRequest req) —
+    returns list of field errors.
+  Interface IOrderService:
+    Task<OrderResponse> PlaceOrderAsync(CreateOrderRequest req, CancellationToken ct)
+  Class InMemoryOrderService : IOrderService.
+  Static class OrderEndpoints with MapOrderEndpoints(this WebApplication app):
+    POST /orders — validates request, returns 422 with problem details on validation failure,
+      201 with OrderResponse on success.
+    GET /orders/{id} — returns 404 if not found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderEndpointsTests
+  {
+      private static WebApplication BuildApp()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.Services.AddSingleton<IOrderService, InMemoryOrderService>();
+          var app = builder.Build();
+          app.MapOrderEndpoints();
+          return app;
+      }
+
+      [Fact]
+      public async Task Post_ValidOrder_Returns201()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().PostAsJsonAsync("/orders",
+              new CreateOrderRequest("CUST-1", new[]{ new OrderLineRequest("SKU-1", 2, 9.99m) }));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+      }
+
+      [Fact]
+      public async Task Post_EmptyCustomerId_Returns422()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().PostAsJsonAsync("/orders",
+              new CreateOrderRequest("", new[]{ new OrderLineRequest("SKU-1", 1, 5m) }));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.UnprocessableEntity);
+      }
+
+      [Fact]
+      public async Task Post_EmptyLines_Returns422()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().PostAsJsonAsync("/orders",
+              new CreateOrderRequest("C1", Array.Empty<OrderLineRequest>()));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.UnprocessableEntity);
+      }
+
+      [Fact]
+      public async Task Post_ZeroQuantity_Returns422()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().PostAsJsonAsync("/orders",
+              new CreateOrderRequest("C1", new[]{ new OrderLineRequest("SKU-1", 0, 5m) }));
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.UnprocessableEntity);
+      }
+
+      [Fact]
+      public async Task Get_ExistingOrder_Returns200()
+      {
+          await using var app = BuildApp();
+          var client = app.GetTestClient();
+          var order = await (await client.PostAsJsonAsync("/orders",
+              new CreateOrderRequest("C1", new[]{ new OrderLineRequest("P1", 1, 10m) })))
+              .Content.ReadFromJsonAsync<OrderResponse>();
+          var resp = await client.GetAsync($"/orders/{order!.Id}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+      }
+
+      [Fact]
+      public async Task Get_NonExistentOrder_Returns404()
+      {
+          await using var app = BuildApp();
+          var resp = await app.GetTestClient().GetAsync($"/orders/{Guid.NewGuid()}");
+          resp.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+      }
+
+      [Fact]
+      public async Task Post_ValidOrder_TotalIsCalculated()
+      {
+          await using var app = BuildApp();
+          var order = await (await app.GetTestClient().PostAsJsonAsync("/orders",
+              new CreateOrderRequest("C1", new[]{ new OrderLineRequest("P1", 3, 10m) })))
+              .Content.ReadFromJsonAsync<OrderResponse>();
+          order!.Total.Should().Be(30m);
+      }
+  }

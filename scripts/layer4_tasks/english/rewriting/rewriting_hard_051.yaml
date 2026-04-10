@@ -1,0 +1,23 @@
+name: rewriting_hard_051
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal spoken English, as if explaining to a friend:
+  'The implementation of the new procurement policy necessitates a comprehensive review of all existing supplier contracts prior to renewal.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "new"
+    - "policy"
+    - "contracts"
+    - "suppliers"
+    - "before"
+    - "check"
+    - "review"
+  min_words: 8
+  max_words: 35

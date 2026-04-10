@@ -1,0 +1,17 @@
+name: riddles_easy_009
+category: logic
+subcategory: riddles
+difficulty: easy
+weight: 1
+validator_type: logic
+max_tokens: 64
+prompt: |
+  What can travel around the world while staying in a corner?
+  Reply with only the answer.
+expected_answer: "A stamp"
+validator_config:
+  accepted_answers:
+  - "A stamp"
+  - "stamp"
+  - "a stamp"
+  - "postage stamp"

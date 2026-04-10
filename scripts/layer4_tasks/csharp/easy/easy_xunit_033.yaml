@@ -1,0 +1,35 @@
+name: easy_xunit_033
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Primes with static methods:
+    bool IsPrime(int n) returns true if n is prime (n < 2 returns false)
+    List<int> GetPrimesUpTo(int max) returns all primes up to and including max
+  Return only valid C# code in a single file.
+test_code: |
+  public class PrimesTests
+  {
+      [Theory]
+      [InlineData(2, true)]
+      [InlineData(3, true)]
+      [InlineData(4, false)]
+      [InlineData(1, false)]
+      [InlineData(17, true)]
+      public void IsPrime_ReturnsCorrectResult(int n, bool expected)
+      {
+          Primes.IsPrime(n).Should().Be(expected);
+      }
+      [Fact]
+      public void GetPrimesUpTo_ReturnsCorrectPrimes()
+      {
+          Primes.GetPrimesUpTo(10).Should().Equal(2, 3, 5, 7);
+      }
+  }

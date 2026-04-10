@@ -1,0 +1,20 @@
+name: rewriting_medium_108
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'There are a number of factors that need to be taken into consideration.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "factors"
+    - "consider"
+    - "several"
+    - "many"
+  min_words: 3
+  max_words: 12

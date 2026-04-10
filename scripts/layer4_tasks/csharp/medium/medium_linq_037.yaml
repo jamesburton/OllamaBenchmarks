@@ -1,0 +1,56 @@
+name: medium_linq_037
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Project with: int Id, string Name, DateTime Start, DateTime? End, string Status.
+  A class ProjectPortfolio with a constructor accepting IEnumerable<Project> projects.
+  Expose:
+    IEnumerable<Project> Active(DateTime asOf) — projects where Start <= asOf and (End is null or End > asOf)
+    IEnumerable<Project> CompletedIn(int year) — projects where Status == "Completed" and End.Year == year
+    TimeSpan? AverageDuration() — average duration of completed projects; null if none
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProjectPortfolioTests
+  {
+      private static readonly DateTime Now = new DateTime(2024,6,1,0,0,0,DateTimeKind.Utc);
+      private readonly Project[] _projects = {
+          new(1,"Alpha",  new DateTime(2023,1,1), new DateTime(2023,12,31), "Completed"),
+          new(2,"Beta",   new DateTime(2024,1,1), null,                     "Active"),
+          new(3,"Gamma",  new DateTime(2024,3,1), new DateTime(2024,5,1),   "Completed"),
+          new(4,"Delta",  new DateTime(2024,7,1), null,                     "Active"),
+      };
+
+      [Fact]
+      public void Active_AsOfJune2024_ReturnsBeta()
+      {
+          var result = new ProjectPortfolio(_projects).Active(Now).ToList();
+          result.Should().ContainSingle(p => p.Name == "Beta");
+          result.Should().NotContain(p => p.Name == "Delta");
+      }
+
+      [Fact]
+      public void CompletedIn2024_ReturnsGamma()
+      {
+          new ProjectPortfolio(_projects).CompletedIn(2024).Should().ContainSingle(p => p.Name == "Gamma");
+      }
+
+      [Fact]
+      public void AverageDuration_NotNull()
+      {
+          new ProjectPortfolio(_projects).AverageDuration().Should().NotBeNull();
+      }
+
+      [Fact]
+      public void AverageDuration_NoCompletedProjects_ReturnsNull()
+      {
+          new ProjectPortfolio(new[]{ new Project(1,"X",Now,null,"Active") }).AverageDuration().Should().BeNull();
+      }
+  }

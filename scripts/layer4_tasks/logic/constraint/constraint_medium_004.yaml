@@ -1,0 +1,18 @@
+name: constraint_medium_004
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three athletes - Ann, Ben, Cal - compete in swimming, running, and cycling.
+  They placed 1st, 2nd, 3rd overall.
+  Clues:
+  1. The swimmer placed 1st.
+  2. Ben does not swim.
+  3. Cal placed 2nd.
+  4. Ann does not cycle.
+  Who placed 1st? Reply with only the name.
+expected_answer: "Ann"
+validator_config: {}

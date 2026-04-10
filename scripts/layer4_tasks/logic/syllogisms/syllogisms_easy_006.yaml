@@ -1,0 +1,15 @@
+name: syllogisms_easy_006
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. No reptiles are warm-blooded.
+  2. All snakes are reptiles.
+  3. Sly is a snake.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "Sly is not warm-blooded."
+validator_config: {}

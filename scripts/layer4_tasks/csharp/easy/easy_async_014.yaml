@@ -1,0 +1,38 @@
+name: easy_async_014
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Sequencer with a static method:
+    async Task<List<T>> RunSequentialAsync<T>(IEnumerable<Func<Task<T>>> factories)
+  that runs each factory one at a time (sequentially, not in parallel) and collects results.
+  Use a foreach loop with await.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SequencerTests
+  {
+      [Fact]
+      public async Task RunSequentialAsync_ReturnsAllResults()
+      {
+          var factories = new Func<Task<int>>[]{
+              () => Task.FromResult(1),
+              () => Task.FromResult(2),
+              () => Task.FromResult(3)
+          };
+          var result = await Sequencer.RunSequentialAsync(factories);
+          result.Should().BeEquivalentTo(new[]{1,2,3}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public async Task RunSequentialAsync_EmptyList_ReturnsEmpty()
+      {
+          var result = await Sequencer.RunSequentialAsync(Array.Empty<Func<Task<string>>>());
+          result.Should().BeEmpty();
+      }
+  }

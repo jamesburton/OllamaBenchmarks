@@ -1,0 +1,40 @@
+name: easy_vertical_016
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Vote(string UserId, string CandidateId)
+  A class Election with:
+    void CastVote(Vote vote)
+    Dictionary<string, int> GetResults() returns vote counts per candidate
+    string? Winner() returns candidateId with most votes, or null if no votes
+    bool HasVoted(string userId) returns true if userId has already voted
+  Return only valid C# code in a single file.
+test_code: |
+  public class ElectionTests
+  {
+      [Fact]
+      public void Winner_ReturnsTopCandidate()
+      {
+          var election = new Election();
+          election.CastVote(new Vote("u1", "Alice"));
+          election.CastVote(new Vote("u2", "Alice"));
+          election.CastVote(new Vote("u3", "Bob"));
+          election.Winner().Should().Be("Alice");
+      }
+      [Fact]
+      public void HasVoted_ReturnsTrueAfterVoting()
+      {
+          var election = new Election();
+          election.CastVote(new Vote("u1", "Alice"));
+          election.HasVoted("u1").Should().BeTrue();
+          election.HasVoted("u2").Should().BeFalse();
+      }
+  }

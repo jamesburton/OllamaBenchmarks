@@ -1,0 +1,28 @@
+name: easy_aspnet_007
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class ProblemDetailsFactory with a static method:
+    ProblemDetails CreateBadRequest(string detail)
+  that creates a ProblemDetails with Status=400, Title="Bad Request", Detail=detail.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProblemDetailsFactoryTests
+  {
+      [Fact]
+      public void CreateBadRequest_ReturnsCorrectProblemDetails()
+      {
+          var result = ProblemDetailsFactory.CreateBadRequest("Invalid input");
+          result.Status.Should().Be(400);
+          result.Title.Should().Be("Bad Request");
+          result.Detail.Should().Be("Invalid input");
+      }
+  }

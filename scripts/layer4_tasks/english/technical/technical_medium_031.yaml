@@ -1,0 +1,23 @@
+name: technical_medium_031
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for a class method that validates a configuration dictionary.
+  Include Args, Returns, Raises, and an Example section.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Returns:"
+    - "Raises:"
+    - "Example:"
+    - "validate"
+    - "config"
+    - "dictionary"
+    - "raises"
+  min_words: 10
+  max_words: 80

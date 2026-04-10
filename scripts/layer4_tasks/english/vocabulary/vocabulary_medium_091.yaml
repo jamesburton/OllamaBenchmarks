@@ -1,0 +1,16 @@
+name: vocabulary_medium_091
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The root 'aqu' (as in 'aquatic') means:
+  A) Fire
+  B) Earth
+  C) Air
+  D) Water
+  Reply with only the letter.
+expected_answer: "D"
+validator_config: {}

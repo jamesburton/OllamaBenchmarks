@@ -1,0 +1,63 @@
+name: medium_efcore_002
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  Entity classes: Category(int Id, string Name) and Product(int Id, string Name, decimal Price, int CategoryId, Category Category).
+  A class ShopDbContext : DbContext with DbSet<Product> Products and DbSet<Category> Categories.
+  A class ProductQueryService with constructor accepting ShopDbContext.
+  Methods:
+    Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId)
+    Task<IEnumerable<Product>> GetByPriceRangeAsync(decimal min, decimal max)
+    Task<Product?> GetCheapestInCategoryAsync(int categoryId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductQueryServiceTests : IAsyncLifetime
+  {
+      private ShopDbContext _db = null!;
+      private ProductQueryService _svc = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<ShopDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new ShopDbContext(opts);
+          _svc = new ProductQueryService(_db);
+          _db.Categories.AddRange(new Category { Id = 1, Name = "Electronics" }, new Category { Id = 2, Name = "Books" });
+          _db.Products.AddRange(
+              new Product { Name = "Phone", Price = 500m, CategoryId = 1 },
+              new Product { Name = "Tablet", Price = 300m, CategoryId = 1 },
+              new Product { Name = "Novel", Price = 15m, CategoryId = 2 });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByCategory_ReturnsFiltered()
+      {
+          var products = await _svc.GetByCategoryAsync(1);
+          products.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetByPriceRange_FiltersCorrectly()
+      {
+          var products = await _svc.GetByPriceRangeAsync(100m, 400m);
+          products.Should().HaveCount(1).And.Contain(p => p.Name == "Tablet");
+      }
+
+      [Fact]
+      public async Task GetCheapestInCategory_ReturnsCheapest()
+      {
+          var p = await _svc.GetCheapestInCategoryAsync(1);
+          p!.Name.Should().Be("Tablet");
+      }
+  }

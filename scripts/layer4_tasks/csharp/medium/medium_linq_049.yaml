@@ -1,0 +1,65 @@
+name: medium_linq_049
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record PricePoint with: DateTime Date, decimal Price.
+  A class PriceTimeSeries with a constructor accepting IEnumerable<PricePoint> points.
+  Expose (points assumed already sorted by Date ascending):
+    IEnumerable<PricePoint> MovingAverage(int windowSize)
+      — for each point with enough history, returns a new PricePoint with the average of the last windowSize prices
+    decimal PercentChange(DateTime from, DateTime to)
+      — percent change from Price at 'from' to Price at 'to'; throws KeyNotFoundException if either date missing
+    (decimal Min, decimal Max) Range()
+  Return only valid C# code in a single file.
+test_code: |
+  public class PriceTimeSeriesTests
+  {
+      private static readonly DateTime D0 = new DateTime(2024,1,1,0,0,0,DateTimeKind.Utc);
+      private readonly PricePoint[] _points;
+      public PriceTimeSeriesTests()
+      {
+          _points = Enumerable.Range(0,5).Select(i => new PricePoint(D0.AddDays(i), 10m + i)).ToArray();
+      }
+
+      [Fact]
+      public void MovingAverage_Window3_CorrectCount()
+      {
+          new PriceTimeSeries(_points).MovingAverage(3).Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void MovingAverage_FirstValueCorrect()
+      {
+          var result = new PriceTimeSeries(_points).MovingAverage(3).First();
+          result.Price.Should().Be(11m); // avg of 10,11,12
+      }
+
+      [Fact]
+      public void PercentChange_CorrectValue()
+      {
+          new PriceTimeSeries(_points).PercentChange(D0, D0.AddDays(4)).Should().Be(40m);
+      }
+
+      [Fact]
+      public void PercentChange_MissingDate_Throws()
+      {
+          Action act = () => new PriceTimeSeries(_points).PercentChange(D0, D0.AddDays(99));
+          act.Should().Throw<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public void Range_MinMaxCorrect()
+      {
+          var (min, max) = new PriceTimeSeries(_points).Range();
+          min.Should().Be(10m);
+          max.Should().Be(14m);
+      }
+  }

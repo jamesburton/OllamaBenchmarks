@@ -1,0 +1,18 @@
+name: summarisation_hard_095
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The alignment problem in AI safety concerns ensuring that the objective functions optimised by machine learning systems faithfully represent human values across novel contexts that were not foreseen at training time. Techniques such as reinforcement learning from human feedback (RLHF) provide empirical approximations of preference but are vulnerable to reward hacking and value misspecification. The difficulty is compounded by the illegibility of large neural network representations to human interpretation.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "alignment"
+    - "AI safety"
+    - "RLHF"
+    - "values"
+  max_words: 25

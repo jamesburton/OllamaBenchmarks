@@ -1,0 +1,56 @@
+name: medium_async_021
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IAsyncInitializable with method: ValueTask InitializeAsync(CancellationToken ct = default)
+  A class ServiceActivator implementing IAsyncLifetime (xUnit v3: InitializeAsync and DisposeAsync both return ValueTask).
+  Constructor accepts IAsyncInitializable service.
+  InitializeAsync calls service.InitializeAsync.
+  DisposeAsync should call (service as IAsyncDisposable)?.DisposeAsync() if applicable.
+  Expose:
+    bool IsInitialized { get; private set; }
+  Set to true after InitializeAsync completes.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ServiceActivatorTests
+  {
+      [Fact]
+      public async Task InitializeAsync_SetsIsInitialized()
+      {
+          var svc = Substitute.For<IAsyncInitializable>();
+          svc.InitializeAsync(Arg.Any<CancellationToken>()).Returns(ValueTask.CompletedTask);
+          var activator = new ServiceActivator(svc);
+          await activator.InitializeAsync();
+          activator.IsInitialized.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task InitializeAsync_CallsServiceInit()
+      {
+          var svc = Substitute.For<IAsyncInitializable>();
+          svc.InitializeAsync(Arg.Any<CancellationToken>()).Returns(ValueTask.CompletedTask);
+          var activator = new ServiceActivator(svc);
+          await activator.InitializeAsync();
+          await svc.Received(1).InitializeAsync(Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task DisposeAsync_DisposableService_CallsDispose()
+      {
+          var svc = Substitute.For<IAsyncInitializable, IAsyncDisposable>();
+          ((IAsyncInitializable)svc).InitializeAsync(Arg.Any<CancellationToken>()).Returns(ValueTask.CompletedTask);
+          ((IAsyncDisposable)svc).DisposeAsync().Returns(ValueTask.CompletedTask);
+          var activator = new ServiceActivator(svc);
+          await activator.InitializeAsync();
+          await activator.DisposeAsync();
+          await ((IAsyncDisposable)svc).Received(1).DisposeAsync();
+      }
+  }

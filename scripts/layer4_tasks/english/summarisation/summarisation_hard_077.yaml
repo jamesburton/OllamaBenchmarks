@@ -1,0 +1,18 @@
+name: summarisation_hard_077
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Democratic backsliding through incremental constitutional manipulation — sometimes called autocratisation — is harder to detect and reverse than sudden coups because each individual step remains formally legal. Incumbent governments hollow out institutions by packing courts, restricting press freedom, and amending electoral laws in ways that entrench their advantage. International responses are typically too slow and insufficiently coordinated to halt the process before consolidation.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "autocratisation"
+    - "courts"
+    - "press freedom"
+    - "electoral"
+  max_words: 25

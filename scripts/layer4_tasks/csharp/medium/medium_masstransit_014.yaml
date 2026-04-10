@@ -1,0 +1,56 @@
+name: medium_masstransit_014
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record SupportTicketCreated(Guid TicketId, string CustomerId, string Subject, int Priority).
+  A consumer TicketCreatedConsumer implementing IConsumer<SupportTicketCreated>.
+  Constructor accepts ITicketRouter service.
+  Interface ITicketRouter with: Task RouteAsync(Guid ticketId, int priority).
+  In Consume: calls service.RouteAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record SupportTicketCreated(Guid TicketId, string CustomerId, string Subject, int Priority); }
+  global using Contracts;
+
+  public class TicketCreatedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<ITicketRouter>();
+          var consumer = new TicketCreatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SupportTicketCreated>>();
+          ctx.Message.Returns(new SupportTicketCreated(Guid.NewGuid(), "Cus", "Sub", 1));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RouteAsync(Arg.Any<Guid ticketId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<ITicketRouter>();
+          var consumer = new TicketCreatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SupportTicketCreated>>();
+          ctx.Message.Returns(new SupportTicketCreated(Guid.NewGuid(), "Cus", "Sub", 1));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<ITicketRouter>();
+          var consumer = new TicketCreatedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<SupportTicketCreated>>();
+          ctx.Message.Returns(new SupportTicketCreated(Guid.NewGuid(), "Cust", "Subj", 2));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RouteAsync(Arg.Any<Guid ticketId>(), Arg.Any<object>());
+      }
+  }

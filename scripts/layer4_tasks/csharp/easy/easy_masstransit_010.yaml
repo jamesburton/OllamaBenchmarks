@@ -1,0 +1,41 @@
+name: easy_masstransit_010
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record PasswordResetRequested(string UserId, string Token, DateTime ExpiresAt)
+  A consumer class PasswordResetConsumer that implements IConsumer<PasswordResetRequested>:
+    Has a public List<string> TokensSent = new()
+    Consume method adds message.Token to TokensSent only if ExpiresAt > DateTime.UtcNow
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class PasswordResetConsumerTests
+  {
+      [Fact]
+      public async Task Consume_FutureExpiry_AddsToken()
+      {
+          var consumer = new PasswordResetConsumer();
+          var context = Substitute.For<ConsumeContext<PasswordResetRequested>>();
+          context.Message.Returns(new PasswordResetRequested("u1", "tok-abc", DateTime.UtcNow.AddHours(1)));
+          await consumer.Consume(context);
+          consumer.TokensSent.Should().Contain("tok-abc");
+      }
+      [Fact]
+      public async Task Consume_ExpiredToken_DoesNotAdd()
+      {
+          var consumer = new PasswordResetConsumer();
+          var context = Substitute.For<ConsumeContext<PasswordResetRequested>>();
+          context.Message.Returns(new PasswordResetRequested("u1", "tok-old", DateTime.UtcNow.AddHours(-1)));
+          await consumer.Consume(context);
+          consumer.TokensSent.Should().BeEmpty();
+      }
+  }

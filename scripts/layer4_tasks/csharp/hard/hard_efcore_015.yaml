@@ -1,0 +1,105 @@
+name: hard_efcore_015
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core with a generic repository pattern and specification:
+  Generic interface IRepository<T> where T : class:
+    Task<T?> GetByIdAsync(int id, CancellationToken ct)
+    Task<IReadOnlyList<T>> GetAllAsync(CancellationToken ct)
+    Task<IReadOnlyList<T>> FindAsync(ISpecification<T> spec, CancellationToken ct)
+    Task<T> AddAsync(T entity, CancellationToken ct)
+    Task UpdateAsync(T entity, CancellationToken ct)
+    Task<bool> DeleteAsync(int id, CancellationToken ct)
+  Interface ISpecification<T>: Expression<Func<T, bool>> Criteria, IReadOnlyList<Expression<Func<T, object>>> Includes.
+  Class BaseSpecification<T> : ISpecification<T> with builder methods.
+  Class EfRepository<T>(DbContext db) : IRepository<T> — generic EF implementation.
+  Entities: Event(int Id, string Name, string Venue, DateTime StartDate, int Capacity, int TicketsSold).
+  DbContext: EventDbContext.
+  Specifications: UpcomingEventsSpec, AvailableEventsSpec(has tickets left).
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class GenericRepositoryTests : IDisposable
+  {
+      private readonly EventDbContext _db;
+      private readonly IRepository<Event> _repo;
+
+      public GenericRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<EventDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new EventDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new EfRepository<Event>(_db);
+          SeedData();
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          _db.Events.AddRange(
+              new Event { Name = "Concert A", Venue = "Arena",   StartDate = DateTime.UtcNow.AddDays(10),  Capacity = 100, TicketsSold = 80 },
+              new Event { Name = "Concert B", Venue = "Stadium", StartDate = DateTime.UtcNow.AddDays(30),  Capacity = 500, TicketsSold = 500 },
+              new Event { Name = "Old Show",  Venue = "Hall",    StartDate = DateTime.UtcNow.AddDays(-5),  Capacity = 200, TicketsSold = 150 }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task GetById_ReturnsCorrectEntity()
+      {
+          var first = _db.Events.First();
+          var found = await _repo.GetByIdAsync(first.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.Name.Should().Be(first.Name);
+      }
+
+      [Fact]
+      public async Task GetAll_ReturnsAllEntities()
+      {
+          var all = await _repo.GetAllAsync(CancellationToken.None);
+          all.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task FindAsync_UpcomingEventsSpec_FiltersCorrectly()
+      {
+          var spec = new UpcomingEventsSpec();
+          var result = await _repo.FindAsync(spec, CancellationToken.None);
+          result.Should().HaveCount(2);
+          result.Should().NotContain(e => e.Name == "Old Show");
+      }
+
+      [Fact]
+      public async Task FindAsync_AvailableEventsSpec_FiltersCorrectly()
+      {
+          var spec = new AvailableEventsSpec();
+          var result = await _repo.FindAsync(spec, CancellationToken.None);
+          result.Should().NotContain(e => e.Name == "Concert B");
+      }
+
+      [Fact]
+      public async Task Add_Then_GetById()
+      {
+          var evt = await _repo.AddAsync(new Event { Name = "New", Venue = "V", StartDate = DateTime.UtcNow.AddDays(5), Capacity = 50, TicketsSold = 0 }, CancellationToken.None);
+          var found = await _repo.GetByIdAsync(evt.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task Delete_RemovesEntity()
+      {
+          var first = _db.Events.First();
+          var result = await _repo.DeleteAsync(first.Id, CancellationToken.None);
+          result.Should().BeTrue();
+          (await _repo.GetByIdAsync(first.Id, CancellationToken.None)).Should().BeNull();
+      }
+  }

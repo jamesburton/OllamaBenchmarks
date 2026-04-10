@@ -1,0 +1,108 @@
+name: hard_efcore_008
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core multi-table query with complex includes and projections:
+  Entities: School(int Id, string Name, string City), Teacher(int Id, string Name, string Subject,
+    int SchoolId), Student(int Id, string Name, int GradeLevel, int SchoolId),
+    Grade(int Id, int StudentId, int TeacherId, decimal Score, string Term).
+  DbContext: EducationDbContext.
+  Class EducationRepository(EducationDbContext db):
+    Task<SchoolSummary> GetSchoolSummaryAsync(int schoolId, CancellationToken ct) —
+      includes total students, teachers, average grade.
+    Task<IReadOnlyList<TeacherPerformance>> GetTeacherPerformanceAsync(int schoolId, CancellationToken ct) —
+      per teacher: Name, Subject, StudentCount (distinct students graded), AverageScore.
+    Task<IReadOnlyList<StudentReport>> GetStudentReportsAsync(int gradeLevel, CancellationToken ct) —
+      per student: Name, GradeLevel, all their grades with teacher names, overall average.
+  Records: SchoolSummary(string Name, int StudentCount, int TeacherCount, double AverageGrade),
+           TeacherPerformance(string Name, string Subject, int StudentCount, double AverageScore),
+           StudentReport(string Name, int GradeLevel, double AverageScore).
+  Use SQLite in-memory with seeded data.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EducationRepositoryTests : IDisposable
+  {
+      private readonly EducationDbContext _db;
+      private readonly EducationRepository _repo;
+
+      public EducationRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<EducationDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new EducationDbContext(opts);
+          _db.Database.EnsureCreated();
+          SeedData();
+          _repo = new EducationRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private void SeedData()
+      {
+          var school = new School { Name = "Springfield High", City = "Springfield" };
+          _db.Schools.Add(school);
+          _db.SaveChanges();
+          var t1 = new Teacher { Name = "Mr. Smith", Subject = "Math",    SchoolId = school.Id };
+          var t2 = new Teacher { Name = "Ms. Jones", Subject = "Science", SchoolId = school.Id };
+          _db.Teachers.AddRange(t1, t2);
+          var s1 = new Student { Name = "Alice", GradeLevel = 10, SchoolId = school.Id };
+          var s2 = new Student { Name = "Bob",   GradeLevel = 10, SchoolId = school.Id };
+          var s3 = new Student { Name = "Carol",  GradeLevel = 11, SchoolId = school.Id };
+          _db.Students.AddRange(s1, s2, s3);
+          _db.SaveChanges();
+          _db.Grades.AddRange(
+              new Grade { StudentId = s1.Id, TeacherId = t1.Id, Score = 90m, Term = "Fall" },
+              new Grade { StudentId = s2.Id, TeacherId = t1.Id, Score = 80m, Term = "Fall" },
+              new Grade { StudentId = s3.Id, TeacherId = t2.Id, Score = 85m, Term = "Fall" }
+          );
+          _db.SaveChanges();
+      }
+
+      [Fact]
+      public async Task GetSchoolSummary_ReturnsCorrectCounts()
+      {
+          var summary = await _repo.GetSchoolSummaryAsync(
+              _db.Schools.First().Id, CancellationToken.None);
+          summary.StudentCount.Should().Be(3);
+          summary.TeacherCount.Should().Be(2);
+      }
+
+      [Fact]
+      public async Task GetSchoolSummary_AverageGradeCorrect()
+      {
+          var summary = await _repo.GetSchoolSummaryAsync(
+              _db.Schools.First().Id, CancellationToken.None);
+          summary.AverageGrade.Should().BeApproximately((90.0+80.0+85.0)/3.0, 0.01);
+      }
+
+      [Fact]
+      public async Task GetTeacherPerformance_MathTeacher()
+      {
+          var result = await _repo.GetTeacherPerformanceAsync(
+              _db.Schools.First().Id, CancellationToken.None);
+          var math = result.First(t => t.Subject == "Math");
+          math.StudentCount.Should().Be(2);
+          math.AverageScore.Should().BeApproximately(85.0, 0.01);
+      }
+
+      [Fact]
+      public async Task GetStudentReports_FiltersGradeLevel()
+      {
+          var result = await _repo.GetStudentReportsAsync(11, CancellationToken.None);
+          result.Should().ContainSingle(s => s.Name == "Carol");
+      }
+
+      [Fact]
+      public async Task GetStudentReports_GradeLevel10_TwoStudents()
+      {
+          var result = await _repo.GetStudentReportsAsync(10, CancellationToken.None);
+          result.Should().HaveCount(2);
+      }
+  }

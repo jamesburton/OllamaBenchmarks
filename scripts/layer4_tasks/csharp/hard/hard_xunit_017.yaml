@@ -1,0 +1,109 @@
+name: hard_xunit_017
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit builder pattern and fluent assertions:
+  Records:
+    QueryBuilder result: SqlQuery(string Sql, IReadOnlyList<(string Name, object Value)> Parameters)
+
+  Class SqlQueryBuilder:
+    Fluent API:
+    SqlQueryBuilder Select(params string[] columns)
+    SqlQueryBuilder From(string table)
+    SqlQueryBuilder Where(string condition, string paramName, object value)
+    SqlQueryBuilder OrderBy(string column, bool descending = false)
+    SqlQueryBuilder Limit(int count)
+    SqlQueryBuilder Offset(int skip)
+    SqlQueryBuilder Join(string table, string condition)
+    SqlQuery Build(): returns complete SQL and parameters.
+      Throws InvalidOperationException if From not set.
+
+  Tests validate: full query, missing From, multiple WHERE, JOIN, LIMIT/OFFSET, ordering.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SqlQueryBuilderTests
+  {
+      [Fact]
+      public void Build_WithoutFrom_Throws()
+      {
+          var act = () => new SqlQueryBuilder().Select("id").Build();
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Build_SimpleSelect_GeneratesCorrectSql()
+      {
+          var query = new SqlQueryBuilder()
+              .Select("id", "name")
+              .From("users")
+              .Build();
+          query.Sql.Should().Contain("SELECT");
+          query.Sql.Should().Contain("users");
+      }
+
+      [Fact]
+      public void Build_Where_AddsParameterizedCondition()
+      {
+          var query = new SqlQueryBuilder()
+              .Select("*")
+              .From("orders")
+              .Where("status = @status", "status", "active")
+              .Build();
+          query.Parameters.Should().Contain(p => p.Name == "@status" && p.Value.Equals("active"));
+      }
+
+      [Fact]
+      public void Build_MultipleWhere_CombinesWithAnd()
+      {
+          var query = new SqlQueryBuilder()
+              .Select("*")
+              .From("orders")
+              .Where("status = @s", "s", "active")
+              .Where("total > @t", "t", 100m)
+              .Build();
+          query.Sql.Should().Contain("AND");
+      }
+
+      [Fact]
+      public void Build_OrderByDesc_GeneratesDescendingOrder()
+      {
+          var query = new SqlQueryBuilder()
+              .Select("*")
+              .From("products")
+              .OrderBy("price", descending: true)
+              .Build();
+          query.Sql.Should().Contain("DESC");
+      }
+
+      [Fact]
+      public void Build_LimitAndOffset_IncludedInSql()
+      {
+          var query = new SqlQueryBuilder()
+              .Select("id")
+              .From("items")
+              .Limit(10)
+              .Offset(20)
+              .Build();
+          query.Sql.Should().Contain("10");
+          query.Sql.Should().Contain("20");
+      }
+
+      [Fact]
+      public void Build_Join_IncludesJoinClause()
+      {
+          var query = new SqlQueryBuilder()
+              .Select("o.id", "c.name")
+              .From("orders o")
+              .Join("customers c", "o.customer_id = c.id")
+              .Build();
+          query.Sql.Should().Contain("JOIN");
+      }
+  }

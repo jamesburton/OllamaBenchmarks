@@ -1,0 +1,22 @@
+name: technical_hard_018
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Known Limitations' section for a machine learning model that has specific input constraints.
+  Keep it under 100 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "limitation"
+    - "input"
+    - "constraint"
+    - "accuracy"
+    - "model"
+    - "not supported"
+    - "requirement"
+  min_words: 12
+  max_words: 100

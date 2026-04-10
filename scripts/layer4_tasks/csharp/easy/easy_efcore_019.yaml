@@ -1,0 +1,44 @@
+name: easy_efcore_019
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Review with properties: int Id, int ProductId, int Rating, string Comment
+  A DbContext class ReviewContext with:
+    DbSet<Review> Reviews { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class ReviewRepository with:
+    double GetAverageRating(ReviewContext context, int productId)
+  that returns the average rating for the given product, or 0 if no reviews.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReviewRepositoryTests
+  {
+      [Fact]
+      public void GetAverageRating_BasicCase()
+      {
+          using var context = new ReviewContext();
+          context.Database.EnsureCreated();
+          context.Reviews.AddRange(
+              new Review { ProductId = 1, Rating = 4, Comment = "Good" },
+              new Review { ProductId = 1, Rating = 2, Comment = "Bad" },
+              new Review { ProductId = 2, Rating = 5, Comment = "Great" });
+          context.SaveChanges();
+          ReviewRepository.GetAverageRating(context, 1).Should().Be(3.0);
+      }
+      [Fact]
+      public void GetAverageRating_NoReviews_ReturnsZero()
+      {
+          using var context = new ReviewContext();
+          context.Database.EnsureCreated();
+          ReviewRepository.GetAverageRating(context, 99).Should().Be(0.0);
+      }
+  }

@@ -1,0 +1,38 @@
+name: easy_xunit_038
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncCounter that implements IAsyncLifetime with:
+    int Value { get; private set; }
+    ValueTask InitializeAsync() sets Value = 10
+    ValueTask DisposeAsync() sets Value = 0
+    void Increment() increments Value by 1
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncCounterTests : IAsyncLifetime
+  {
+      private readonly AsyncCounter _counter = new();
+
+      public ValueTask InitializeAsync() => _counter.InitializeAsync();
+      public ValueTask DisposeAsync() => _counter.DisposeAsync();
+
+      [Fact]
+      public void Value_AfterInit_IsTen()
+      {
+          _counter.Value.Should().Be(10);
+      }
+      [Fact]
+      public void Increment_IncreasesValue()
+      {
+          _counter.Increment();
+          _counter.Value.Should().Be(11);
+      }
+  }

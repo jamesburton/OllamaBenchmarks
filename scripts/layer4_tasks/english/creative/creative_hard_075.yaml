@@ -1,0 +1,22 @@
+name: creative_hard_075
+category: english
+subcategory: creative
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of silence that feels different from ordinary quiet.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "silence"
+    - "different"
+    - "weight"
+    - "thick"
+    - "presence"
+    - "not quiet"
+    - "tension"
+    - "absence"
+  min_words: 15
+  max_words: 60

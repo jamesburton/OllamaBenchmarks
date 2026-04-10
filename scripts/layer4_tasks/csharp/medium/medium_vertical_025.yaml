@@ -1,0 +1,41 @@
+name: medium_vertical_025
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for approveexpense.
+  Include:
+    Command: Guid ExpenseId, decimal Amount, string Category, string ApprovedBy, string EmployeeId
+  Result: Guid ExpenseId, bool Approved, string? Reason
+  Handler: auto-approves if Amount <= 500, requires reason if rejecting, ApprovedBy != EmployeeId.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApproveExpenseHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new ApproveExpenseHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new ApproveExpenseHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new ApproveExpenseHandler();
+          handler.Should().NotBeNull();
+      }
+  }

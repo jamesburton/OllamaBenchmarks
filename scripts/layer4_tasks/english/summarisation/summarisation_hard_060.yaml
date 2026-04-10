@@ -1,0 +1,18 @@
+name: summarisation_hard_060
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Matchday revenue now represents a diminishing share of total club income for elite football clubs, displaced by broadcasting rights and commercial partnerships. This structural shift has decoupled financial performance from local fan engagement, accelerating gentrification of stadia, ticket price inflation, and the marginalisation of traditional working-class supporters. The concept of supporter ownership as a governance model is gaining political traction in response.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "broadcasting"
+    - "revenue"
+    - "supporters"
+    - "ownership"
+  max_words: 25

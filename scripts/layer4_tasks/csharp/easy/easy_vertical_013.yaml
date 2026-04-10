@@ -1,0 +1,39 @@
+name: easy_vertical_013
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Message(string From, string To, string Body, DateTime SentAt)
+  A class Inbox with:
+    void Receive(Message message)
+    List<Message> GetFrom(string sender) returns messages from given sender
+    List<Message> GetUnread() returns last 5 messages ordered by SentAt descending
+    int Count => total number of messages
+  Return only valid C# code in a single file.
+test_code: |
+  public class InboxTests
+  {
+      [Fact]
+      public void GetFrom_FiltersCorrectly()
+      {
+          var inbox = new Inbox();
+          inbox.Receive(new Message("alice", "me", "Hi", DateTime.UtcNow));
+          inbox.Receive(new Message("bob", "me", "Hello", DateTime.UtcNow));
+          inbox.GetFrom("alice").Should().HaveCount(1);
+      }
+      [Fact]
+      public void GetUnread_ReturnsAtMostFive()
+      {
+          var inbox = new Inbox();
+          for (int i = 0; i < 7; i++)
+              inbox.Receive(new Message("sender", "me", $"msg{i}", DateTime.UtcNow.AddMinutes(i)));
+          inbox.GetUnread().Should().HaveCount(5);
+      }
+  }

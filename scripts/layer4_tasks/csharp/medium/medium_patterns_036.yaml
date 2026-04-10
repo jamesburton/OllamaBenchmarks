@@ -1,0 +1,35 @@
+name: medium_patterns_036
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record SemVer with int Major, int Minor, int Patch implementing IComparable<SemVer>.
+    static SemVer Parse(string s) — parses "major.minor.patch"
+    override string ToString()
+    Comparison operators <, >, <=, >=, ==, !=
+  Return only valid C# code in a single file.
+test_code: |
+  public class SemVerTests
+  {
+      [Fact]
+      public void Parse_Valid() { var v = SemVer.Parse("1.2.3"); v.Major.Should().Be(1); v.Minor.Should().Be(2); v.Patch.Should().Be(3); }
+
+      [Fact]
+      public void GreaterMajor_Greater() { (SemVer.Parse("2.0.0") > SemVer.Parse("1.9.9")).Should().BeTrue(); }
+
+      [Fact]
+      public void SameVersionEqual() { (SemVer.Parse("1.0.0") == SemVer.Parse("1.0.0")).Should().BeTrue(); }
+
+      [Fact]
+      public void ToString_Format() { SemVer.Parse("3.2.1").ToString().Should().Be("3.2.1"); }
+
+      [Fact]
+      public void HigherMinor_Greater() { (SemVer.Parse("1.5.0") > SemVer.Parse("1.4.9")).Should().BeTrue(); }
+  }

@@ -1,0 +1,16 @@
+name: vocabulary_medium_021
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'Her eloquent speech moved the audience', which word best replaces 'eloquent'?
+  A) Loud
+  B) Articulate
+  C) Confusing
+  D) Brief
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

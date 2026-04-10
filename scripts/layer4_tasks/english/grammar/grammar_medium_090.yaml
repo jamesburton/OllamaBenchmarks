@@ -1,0 +1,15 @@
+name: grammar_medium_090
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) After completing the survey, participants were asked to submit forms and leaving the room.
+  B) After completing the survey, participants were asked to submit forms and leave the room.
+  C) After they complete the survey, participants were asked to submit forms and leave the room.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

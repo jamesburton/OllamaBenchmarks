@@ -1,0 +1,38 @@
+name: easy_async_044
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncFibonacci with a static method:
+    async Task<int> FibAsync(int n)
+  that computes the nth Fibonacci number (0-indexed: Fib(0)=0, Fib(1)=1) using async recursion via Task.FromResult.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncFibonacciTests
+  {
+      [Fact]
+      public async Task FibAsync_BaseCase0()
+      {
+          var result = await AsyncFibonacci.FibAsync(0);
+          result.Should().Be(0);
+      }
+      [Fact]
+      public async Task FibAsync_BaseCase1()
+      {
+          var result = await AsyncFibonacci.FibAsync(1);
+          result.Should().Be(1);
+      }
+      [Fact]
+      public async Task FibAsync_Fib7()
+      {
+          var result = await AsyncFibonacci.FibAsync(7);
+          result.Should().Be(13);
+      }
+  }

@@ -1,0 +1,15 @@
+name: grammar_easy_035
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Either you attend the meeting or sending an email.
+  B) Either you attend the meeting or you send an email.
+  C) Either attending the meeting or you send an email.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

@@ -1,0 +1,15 @@
+name: syllogisms_easy_019
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All diamonds are gems.
+  2. All gems are valuable.
+  3. This stone is a diamond.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "This stone is valuable."
+validator_config: {}

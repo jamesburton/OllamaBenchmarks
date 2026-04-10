@@ -1,0 +1,117 @@
+name: hard_masstransit_017
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit scheduled/delayed message consumer:
+  Messages:
+    record SendReminder(Guid ReminderId, string UserId, string Message, DateTime ScheduledFor);
+    record ReminderSent(Guid ReminderId, string UserId, DateTime SentAt);
+    record ReminderCancelled(Guid ReminderId);
+
+  Interface IReminderStore:
+    Task<bool> IsActiveAsync(Guid reminderId, CancellationToken ct)
+    Task MarkSentAsync(Guid reminderId, CancellationToken ct)
+
+  Class ReminderConsumer : IConsumer<SendReminder>:
+    Constructor takes IReminderStore.
+    Check IsActiveAsync; if not active, do nothing (cancelled).
+    If active, call MarkSentAsync then publish ReminderSent.
+
+  Class CancelReminderConsumer : IConsumer<ReminderCancelled>:
+    Has a HashSet<Guid> of cancelled IDs (static for test simplicity).
+    Marks the reminder as cancelled.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReminderConsumerTests
+  {
+      [Fact]
+      public async Task ActiveReminder_PublishesReminderSent()
+      {
+          var store = Substitute.For<IReminderStore>();
+          store.IsActiveAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(true);
+          store.MarkSentAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new ReminderConsumer(store));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SendReminder(Guid.NewGuid(), "u1", "Hello", DateTime.UtcNow));
+              await Task.Delay(200);
+              (await harness.Published.Any<ReminderSent>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task InactiveReminder_DoesNotPublish()
+      {
+          var store = Substitute.For<IReminderStore>();
+          store.IsActiveAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(false);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new ReminderConsumer(store));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SendReminder(Guid.NewGuid(), "u2", "Skip me", DateTime.UtcNow));
+              await Task.Delay(200);
+              (await harness.Published.Any<ReminderSent>()).Should().BeFalse();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ActiveReminder_CallsMarkSent()
+      {
+          var store = Substitute.For<IReminderStore>();
+          store.IsActiveAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(true);
+          store.MarkSentAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new ReminderConsumer(store));
+          await harness.Start();
+          try
+          {
+              var id = Guid.NewGuid();
+              await harness.InputQueueSendEndpoint.Send(new SendReminder(id, "u3", "Reminder!", DateTime.UtcNow));
+              await Task.Delay(200);
+              await store.Received(1).MarkSentAsync(id, Arg.Any<CancellationToken>());
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ReminderSent_ContainsCorrectUserId()
+      {
+          var store = Substitute.For<IReminderStore>();
+          store.IsActiveAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(true);
+          store.MarkSentAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var harness = new InMemoryTestHarness();
+          harness.Consumer(() => new ReminderConsumer(store));
+          await harness.Start();
+          try
+          {
+              await harness.InputQueueSendEndpoint.Send(new SendReminder(Guid.NewGuid(), "specific-user", "msg", DateTime.UtcNow));
+              await Task.Delay(200);
+              var msg = harness.Published.Select<ReminderSent>().First().Context.Message;
+              msg.UserId.Should().Be("specific-user");
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task CancelReminderConsumer_CanBeInstantiated()
+      {
+          var consumer = new CancelReminderConsumer();
+          consumer.Should().NotBeNull();
+      }
+  }

@@ -1,0 +1,95 @@
+name: hard_efcore_002
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A soft-delete repository pattern with EF Core:
+  Entity: Article(int Id, string Title, string Content, string Author, DateTime CreatedAt,
+    bool IsDeleted, DateTime? DeletedAt).
+  DbContext: ArticleDbContext — configure global query filter to exclude deleted articles.
+  Class ArticleRepository(ArticleDbContext db):
+    Task<Article> CreateAsync(Article article, CancellationToken ct)
+    Task<Article?> GetAsync(int id, CancellationToken ct) — respects soft-delete filter.
+    Task<IReadOnlyList<Article>> GetAllAsync(CancellationToken ct) — respects filter.
+    Task<bool> SoftDeleteAsync(int id, CancellationToken ct) — sets IsDeleted=true, DeletedAt=now.
+    Task<IReadOnlyList<Article>> GetDeletedAsync(CancellationToken ct) — bypasses filter with IgnoreQueryFilters().
+    Task<bool> RestoreAsync(int id, CancellationToken ct) — clears IsDeleted and DeletedAt.
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SoftDeleteRepositoryTests : IDisposable
+  {
+      private readonly ArticleDbContext _db;
+      private readonly ArticleRepository _repo;
+
+      public SoftDeleteRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<ArticleDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new ArticleDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new ArticleRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task Create_And_Get_Works()
+      {
+          var a = await _repo.CreateAsync(new Article { Title = "Hello", Content = "World", Author = "Alice", CreatedAt = DateTime.UtcNow }, CancellationToken.None);
+          var found = await _repo.GetAsync(a.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.Title.Should().Be("Hello");
+      }
+
+      [Fact]
+      public async Task SoftDelete_ExcludesFromGet()
+      {
+          var a = await _repo.CreateAsync(new Article { Title = "T", Content = "C", Author = "B", CreatedAt = DateTime.UtcNow }, CancellationToken.None);
+          await _repo.SoftDeleteAsync(a.Id, CancellationToken.None);
+          var found = await _repo.GetAsync(a.Id, CancellationToken.None);
+          found.Should().BeNull();
+      }
+
+      [Fact]
+      public async Task SoftDelete_ExcludesFromGetAll()
+      {
+          var a = await _repo.CreateAsync(new Article { Title = "T", Content = "C", Author = "B", CreatedAt = DateTime.UtcNow }, CancellationToken.None);
+          await _repo.SoftDeleteAsync(a.Id, CancellationToken.None);
+          var all = await _repo.GetAllAsync(CancellationToken.None);
+          all.Should().NotContain(x => x.Id == a.Id);
+      }
+
+      [Fact]
+      public async Task GetDeleted_ReturnsDeletedItems()
+      {
+          var a = await _repo.CreateAsync(new Article { Title = "Del", Content = "C", Author = "B", CreatedAt = DateTime.UtcNow }, CancellationToken.None);
+          await _repo.SoftDeleteAsync(a.Id, CancellationToken.None);
+          var deleted = await _repo.GetDeletedAsync(CancellationToken.None);
+          deleted.Should().Contain(x => x.Id == a.Id);
+      }
+
+      [Fact]
+      public async Task Restore_MakesItemVisible()
+      {
+          var a = await _repo.CreateAsync(new Article { Title = "R", Content = "C", Author = "B", CreatedAt = DateTime.UtcNow }, CancellationToken.None);
+          await _repo.SoftDeleteAsync(a.Id, CancellationToken.None);
+          await _repo.RestoreAsync(a.Id, CancellationToken.None);
+          var found = await _repo.GetAsync(a.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.IsDeleted.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task SoftDelete_NonExistent_ReturnsFalse()
+      {
+          var result = await _repo.SoftDeleteAsync(9999, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+  }

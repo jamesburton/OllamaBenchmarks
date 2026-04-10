@@ -1,0 +1,22 @@
+name: rewriting_easy_085
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'The car stopped. The road was icy.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "car"
+    - "stopped"
+    - "icy"
+    - "road"
+    - "because"
+    - "since"
+  min_words: 5
+  max_words: 15

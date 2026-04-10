@@ -1,0 +1,47 @@
+name: easy_blazor_002
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class CounterComponent that extends ComponentBase with:
+    int Count { get; private set; } = 0
+    void Increment() — increases Count by 1
+    void Decrement() — decreases Count by 1 (minimum 0)
+    void Reset() — sets Count to 0
+  Return only valid C# code in a single file.
+test_code: |
+  public class CounterComponentTests
+  {
+      [Fact]
+      public void Increment_IncreasesCount()
+      {
+          var component = new CounterComponent();
+          component.Increment();
+          component.Increment();
+          component.Count.Should().Be(2);
+      }
+      [Fact]
+      public void Decrement_DecreasesCount_NotBelowZero()
+      {
+          var component = new CounterComponent();
+          component.Increment();
+          component.Decrement();
+          component.Decrement();
+          component.Count.Should().Be(0);
+      }
+      [Fact]
+      public void Reset_SetsToZero()
+      {
+          var component = new CounterComponent();
+          component.Increment();
+          component.Reset();
+          component.Count.Should().Be(0);
+      }
+  }

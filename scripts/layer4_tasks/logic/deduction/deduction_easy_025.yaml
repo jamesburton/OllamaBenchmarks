@@ -1,0 +1,14 @@
+name: deduction_easy_025
+category: logic
+subcategory: deduction
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If it snows, schools close.
+  2. If schools close, children stay home.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "If it snows, children stay home."
+validator_config: {}

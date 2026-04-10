@@ -1,0 +1,56 @@
+name: medium_masstransit_038
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record BudgetThresholdReached(string DepartmentId, string BudgetId, decimal Spent, decimal Limit).
+  A consumer BudgetThresholdConsumer implementing IConsumer<BudgetThresholdReached>.
+  Constructor accepts IBudgetAlertService service.
+  Interface IBudgetAlertService with: Task SendAlertAsync(string departmentId, decimal spent, decimal limit).
+  In Consume: calls the service method with appropriate message properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record BudgetThresholdReached(string DepartmentId, string BudgetId, decimal Spent, decimal Limit); }
+  global using Contracts;
+
+  public class BudgetThresholdConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IBudgetAlertService>();
+          var consumer = new BudgetThresholdConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<BudgetThresholdReached>>();
+          ctx.Message.Returns(new BudgetThresholdReached("test", "test", 1m, 1m));
+          await consumer.Consume(ctx);
+          await svc.Received(1).SendAlertAsync(Arg.Any<string>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IBudgetAlertService>();
+          var consumer = new BudgetThresholdConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<BudgetThresholdReached>>();
+          ctx.Message.Returns(new BudgetThresholdReached("test", "test", 1m, 1m));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IBudgetAlertService>();
+          var consumer = new BudgetThresholdConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<BudgetThresholdReached>>();
+          ctx.Message.Returns(new BudgetThresholdReached("test", "test", 1m, 1m));
+          await consumer.Consume(ctx);
+          await svc.Received(1).SendAlertAsync(Arg.Any<string>(), Arg.Any<object>());
+      }
+  }

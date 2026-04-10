@@ -1,0 +1,15 @@
+name: grammar_easy_016
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Between you and I, the plan failed.
+  B) Between you and me, the plan failed.
+  C) Between yourself and I, the plan failed.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

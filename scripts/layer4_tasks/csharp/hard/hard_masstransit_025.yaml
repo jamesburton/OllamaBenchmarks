@@ -1,0 +1,123 @@
+name: hard_masstransit_025
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit distributed transaction saga (2-phase commit simulation):
+  Messages:
+    record BeginTransaction(Guid TransactionId, string SourceAccount, string TargetAccount, decimal Amount);
+    record DebitPrepared(Guid TransactionId);
+    record CreditPrepared(Guid TransactionId);
+    record TransactionCommitted(Guid TransactionId, string SourceAccount, string TargetAccount, decimal Amount);
+    record TransactionRolledBack(Guid TransactionId, string Reason);
+    record PrepareFailed(Guid TransactionId, string Step, string Reason);
+
+  States: Initiated, DebitPending, CreditPending, Committing, Committed, RolledBack.
+  TransferSaga : MassTransitStateMachine<TransferState>
+  Transitions:
+    Initially + BeginTransaction -> Initiated (send DebitPrepared to self)
+    Initiated + DebitPrepared -> DebitPending (send CreditPrepared to self)
+    DebitPending + CreditPrepared -> CreditPending (publish TransactionCommitted)
+    CreditPending -> Committed
+    (any active) + PrepareFailed -> RolledBack (publish TransactionRolledBack)
+
+  TransferState: Guid CorrelationId, string CurrentState, string SourceAccount,
+    string TargetAccount, decimal Amount, DateTime InitiatedAt.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TransferSagaTests
+  {
+      [Fact]
+      public async Task BeginTransaction_TransitionsToInitiated()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<TransferState, TransferSaga>(new TransferSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new BeginTransaction(id, "ACC-001", "ACC-002", 500m));
+              await Task.Delay(100);
+              var saga = sagaHarness.Sagas.Contains(id);
+              saga.Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task FullFlow_PublishesTransactionCommitted()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<TransferState, TransferSaga>(new TransferSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new BeginTransaction(id, "ACC-010", "ACC-020", 1000m));
+              await Task.Delay(500);
+              (await harness.Published.Any<TransactionCommitted>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task PrepareFailed_TransitionsToRolledBack()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<TransferState, TransferSaga>(new TransferSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new BeginTransaction(id, "ACC-030", "ACC-040", 250m));
+              await harness.InputQueueSendEndpoint.Send(new PrepareFailed(id, "debit", "Insufficient funds"));
+              sagaHarness.Created.ContainsInState(id, sagaHarness.Machine, sagaHarness.Machine.RolledBack).Should().NotBeNull();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task PrepareFailed_PublishesTransactionRolledBack()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<TransferState, TransferSaga>(new TransferSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new BeginTransaction(id, "A", "B", 100m));
+              await harness.InputQueueSendEndpoint.Send(new PrepareFailed(id, "credit", "Account frozen"));
+              (await harness.Published.Any<TransactionRolledBack>()).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task SagaState_StoresAccounts()
+      {
+          var harness = new InMemoryTestHarness();
+          var sagaHarness = harness.StateMachineSaga<TransferState, TransferSaga>(new TransferSaga());
+          await harness.Start();
+          try
+          {
+              var id = NewId.NextGuid();
+              await harness.InputQueueSendEndpoint.Send(new BeginTransaction(id, "SRC-999", "DST-999", 42m));
+              await Task.Delay(100);
+              var state = sagaHarness.Sagas.Contains(id);
+              state!.SourceAccount.Should().Be("SRC-999");
+              state.TargetAccount.Should().Be("DST-999");
+              state.Amount.Should().Be(42m);
+          }
+          finally { await harness.Stop(); }
+      }
+  }

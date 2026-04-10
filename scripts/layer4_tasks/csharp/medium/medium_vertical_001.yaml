@@ -1,0 +1,65 @@
+name: medium_vertical_001
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for managing products.
+  Include:
+    record CreateProductCommand(string Name, decimal Price, int Stock)
+    record CreateProductResult(Guid Id, string Name, decimal Price)
+    class CreateProductHandler with method:
+      Task<CreateProductResult> HandleAsync(CreateProductCommand command)
+    Validates: Name not empty, Price > 0, Stock >= 0. Throws ArgumentException on invalid input.
+    Generates a new Guid for the product Id.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CreateProductHandlerTests
+  {
+      private readonly CreateProductHandler _handler = new();
+
+      [Fact]
+      public async Task HandleAsync_ValidCommand_ReturnsResult()
+      {
+          var cmd = new CreateProductCommand("Widget", 9.99m, 100);
+          var result = await _handler.HandleAsync(cmd);
+          result.Should().NotBeNull();
+          result.Id.Should().NotBe(Guid.Empty);
+          result.Name.Should().Be("Widget");
+      }
+
+      [Fact]
+      public async Task HandleAsync_EmptyName_ThrowsArgumentException()
+      {
+          var cmd = new CreateProductCommand("", 9.99m, 10);
+          await _handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_NegativePrice_ThrowsArgumentException()
+      {
+          var cmd = new CreateProductCommand("Widget", -1m, 10);
+          await _handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_NegativeStock_ThrowsArgumentException()
+      {
+          var cmd = new CreateProductCommand("Widget", 9.99m, -1);
+          await _handler.Invoking(h => h.HandleAsync(cmd)).Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task HandleAsync_TwoCalls_GenerateDifferentIds()
+      {
+          var cmd = new CreateProductCommand("Widget", 9.99m, 5);
+          var r1 = await _handler.HandleAsync(cmd);
+          var r2 = await _handler.HandleAsync(cmd);
+          r1.Id.Should().NotBe(r2.Id);
+      }
+  }

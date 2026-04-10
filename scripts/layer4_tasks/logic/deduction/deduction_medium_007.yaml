@@ -1,0 +1,15 @@
+name: deduction_medium_007
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All squares have equal sides.
+  2. All shapes with equal sides and right angles are squares.
+  3. Shape Z has equal sides and right angles.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "Shape Z is a square."
+validator_config: {}

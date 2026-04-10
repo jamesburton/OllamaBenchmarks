@@ -1,0 +1,33 @@
+name: easy_linq_018
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Flattener with a static method:
+    List<int> Flatten(IEnumerable<IEnumerable<int>> nested)
+  that flattens a nested collection of integers using LINQ SelectMany + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FlattenerTests
+  {
+      [Fact]
+      public void Flatten_BasicCase()
+      {
+          var input = new[]{new[]{1,2}, new[]{3,4}, new[]{5}};
+          var result = Flattener.Flatten(input);
+          result.Should().BeEquivalentTo(new[]{1,2,3,4,5}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void Flatten_EmptyInner_SkipsEmpty()
+      {
+          var input = new[]{new[]{1,2}, Array.Empty<int>(), new[]{3}};
+          Flattener.Flatten(input).Should().BeEquivalentTo(new[]{1,2,3}, cfg => cfg.WithStrictOrdering());
+      }
+  }

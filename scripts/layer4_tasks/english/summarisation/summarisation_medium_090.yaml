@@ -1,0 +1,18 @@
+name: summarisation_medium_090
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The transition from IPv4 to IPv6 addressing has been slower than anticipated, partly because network address translation (NAT) extended the useful life of the older protocol. IPv6 offers a vastly larger address space essential for the growth of Internet of Things devices. ISPs and enterprise networks face significant migration costs and compatibility challenges.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "IPv6"
+    - "internet"
+    - "IoT"
+    - "addressing"
+  max_words: 25

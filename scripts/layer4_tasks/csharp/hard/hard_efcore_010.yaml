@@ -1,0 +1,92 @@
+name: hard_efcore_010
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core many-to-many with explicit join entity:
+  Entities: Book(int Id, string Title, string Isbn, decimal Price, List<BookAuthor> BookAuthors),
+  Author(int Id, string Name, string Bio, List<BookAuthor> BookAuthors),
+  BookAuthor(int BookId, Book Book, int AuthorId, Author Author, string Role, DateTime AddedAt).
+  DbContext: LibraryDbContext — configure many-to-many via BookAuthor with composite key.
+  Class LibraryRepository(LibraryDbContext db):
+    Task<Book> AddBookAsync(Book book, CancellationToken ct)
+    Task<Author> AddAuthorAsync(Author author, CancellationToken ct)
+    Task AddAuthorToBookAsync(int bookId, int authorId, string role, CancellationToken ct)
+    Task<Book?> GetBookWithAuthorsAsync(int bookId, CancellationToken ct)
+    Task<IReadOnlyList<Book>> GetBooksByAuthorAsync(int authorId, CancellationToken ct)
+    Task<IReadOnlyList<Author>> GetCoAuthorsAsync(int authorId, CancellationToken ct) —
+      authors who share at least one book with the given author.
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LibraryRepositoryTests : IDisposable
+  {
+      private readonly LibraryDbContext _db;
+      private readonly LibraryRepository _repo;
+
+      public LibraryRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<LibraryDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new LibraryDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new LibraryRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task AddAuthorToBook_Links_Correctly()
+      {
+          var book   = await _repo.AddBookAsync(new Book { Title = "C# Guide", Isbn = "123", Price = 39m }, CancellationToken.None);
+          var author = await _repo.AddAuthorAsync(new Author { Name = "Alice", Bio = "Developer" }, CancellationToken.None);
+          await _repo.AddAuthorToBookAsync(book.Id, author.Id, "Primary", CancellationToken.None);
+          var found = await _repo.GetBookWithAuthorsAsync(book.Id, CancellationToken.None);
+          found!.BookAuthors.Should().ContainSingle(ba => ba.AuthorId == author.Id);
+      }
+
+      [Fact]
+      public async Task GetBooksByAuthor_ReturnsCorrectBooks()
+      {
+          var a = await _repo.AddAuthorAsync(new Author { Name = "Bob", Bio = "" }, CancellationToken.None);
+          var b1 = await _repo.AddBookAsync(new Book { Title = "Book1", Isbn = "1", Price = 10m }, CancellationToken.None);
+          var b2 = await _repo.AddBookAsync(new Book { Title = "Book2", Isbn = "2", Price = 20m }, CancellationToken.None);
+          await _repo.AddAuthorToBookAsync(b1.Id, a.Id, "P", CancellationToken.None);
+          await _repo.AddAuthorToBookAsync(b2.Id, a.Id, "P", CancellationToken.None);
+          var result = await _repo.GetBooksByAuthorAsync(a.Id, CancellationToken.None);
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetCoAuthors_ReturnsSharedAuthors()
+      {
+          var a1 = await _repo.AddAuthorAsync(new Author { Name = "Alice", Bio = "" }, CancellationToken.None);
+          var a2 = await _repo.AddAuthorAsync(new Author { Name = "Bob",   Bio = "" }, CancellationToken.None);
+          var book = await _repo.AddBookAsync(new Book { Title = "Joint", Isbn = "J1", Price = 15m }, CancellationToken.None);
+          await _repo.AddAuthorToBookAsync(book.Id, a1.Id, "P", CancellationToken.None);
+          await _repo.AddAuthorToBookAsync(book.Id, a2.Id, "S", CancellationToken.None);
+          var coAuthors = await _repo.GetCoAuthorsAsync(a1.Id, CancellationToken.None);
+          coAuthors.Should().Contain(a => a.Name == "Bob");
+          coAuthors.Should().NotContain(a => a.Name == "Alice");
+      }
+
+      [Fact]
+      public async Task GetBookWithAuthors_UnknownId_ReturnsNull()
+      {
+          (await _repo.GetBookWithAuthorsAsync(9999, CancellationToken.None)).Should().BeNull();
+      }
+
+      [Fact]
+      public async Task GetCoAuthors_NoSharedBooks_ReturnsEmpty()
+      {
+          var a1 = await _repo.AddAuthorAsync(new Author { Name = "Solo", Bio = "" }, CancellationToken.None);
+          var coAuthors = await _repo.GetCoAuthorsAsync(a1.Id, CancellationToken.None);
+          coAuthors.Should().BeEmpty();
+      }
+  }

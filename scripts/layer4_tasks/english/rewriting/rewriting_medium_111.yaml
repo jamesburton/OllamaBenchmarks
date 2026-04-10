@@ -1,0 +1,21 @@
+name: rewriting_medium_111
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite more concisely:
+  'It has been brought to our attention that a significant number of customers have experienced difficulties.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "customers"
+    - "difficulties"
+    - "many"
+    - "experienced"
+    - "reported"
+  min_words: 4
+  max_words: 15

@@ -1,0 +1,97 @@
+name: hard_patterns_012
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A composite pattern for a file system tree:
+  Abstract class FileSystemNode(string Name):
+    abstract long Size { get; }
+    abstract IEnumerable<FileSystemNode> Children { get; }
+    abstract void Accept(IFileSystemVisitor visitor)
+  Class FileNode(string Name, long SizeBytes) : FileSystemNode
+  Class DirectoryNode(string Name) : FileSystemNode:
+    void Add(FileSystemNode node)
+    void Remove(FileSystemNode node) — throws if not found.
+    override long Size — total size of all children recursively.
+    override IEnumerable<FileSystemNode> Children
+  Interface IFileSystemVisitor: void VisitFile(FileNode), void VisitDirectory(DirectoryNode)
+  Class SizeCalculatorVisitor — computes total size via traversal.
+  Class FileCountVisitor — counts FileNodes only.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FileSystemCompositeTests
+  {
+      private static DirectoryNode BuildTree()
+      {
+          var root = new DirectoryNode("root");
+          var docs = new DirectoryNode("docs");
+          docs.Add(new FileNode("readme.txt", 1000));
+          docs.Add(new FileNode("notes.txt", 2000));
+          root.Add(docs);
+          root.Add(new FileNode("config.json", 500));
+          return root;
+      }
+
+      [Fact]
+      public void DirectorySize_IsSumOfChildren()
+      {
+          BuildTree().Size.Should().Be(3500L);
+      }
+
+      [Fact]
+      public void FileCountVisitor_CountsFilesOnly()
+      {
+          var visitor = new FileCountVisitor();
+          BuildTree().Accept(visitor);
+          visitor.Count.Should().Be(3);
+      }
+
+      [Fact]
+      public void SizeCalculatorVisitor_MatchesDirectSize()
+      {
+          var visitor = new SizeCalculatorVisitor();
+          BuildTree().Accept(visitor);
+          visitor.TotalSize.Should().Be(3500L);
+      }
+
+      [Fact]
+      public void Remove_NodeExists_RemovesIt()
+      {
+          var dir = new DirectoryNode("d");
+          var file = new FileNode("f.txt", 100);
+          dir.Add(file);
+          dir.Remove(file);
+          dir.Size.Should().Be(0L);
+      }
+
+      [Fact]
+      public void Remove_NodeNotFound_ThrowsException()
+      {
+          var dir = new DirectoryNode("d");
+          var act = () => dir.Remove(new FileNode("ghost.txt", 0));
+          act.Should().Throw<Exception>();
+      }
+
+      [Fact]
+      public void EmptyDirectory_SizeIsZero()
+      {
+          new DirectoryNode("empty").Size.Should().Be(0L);
+      }
+
+      [Fact]
+      public void NestedDirectories_SizeIsRecursive()
+      {
+          var root = new DirectoryNode("root");
+          var inner = new DirectoryNode("inner");
+          inner.Add(new FileNode("deep.bin", 9999));
+          root.Add(inner);
+          root.Size.Should().Be(9999L);
+      }
+  }

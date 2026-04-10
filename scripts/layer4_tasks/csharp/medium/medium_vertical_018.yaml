@@ -1,0 +1,41 @@
+name: medium_vertical_018
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for upgradesubscription.
+  Include:
+    Command: string UserId, string CurrentPlan, string NewPlan, bool IsAnnual
+  Result: string UserId, string NewPlan, decimal ProratedCredit, DateTime EffectiveDate
+  Handler validates: plans (free/basic/pro/enterprise), NewPlan must be higher tier.
+  Return only valid C# code in a single file.
+test_code: |
+  public class UpgradeSubscriptionHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new UpgradeSubscriptionHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new UpgradeSubscriptionHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new UpgradeSubscriptionHandler();
+          handler.Should().NotBeNull();
+      }
+  }

@@ -1,0 +1,44 @@
+name: easy_masstransit_005
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record InventoryUpdated(string ProductId, int NewQuantity, string Warehouse)
+  A consumer class InventoryUpdatedConsumer that implements IConsumer<InventoryUpdated>:
+    Has a public Dictionary<string, int> Inventory = new()
+    Consume method stores/updates ProductId -> NewQuantity in Inventory
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class InventoryUpdatedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_UpdatesInventory()
+      {
+          var consumer = new InventoryUpdatedConsumer();
+          var context = Substitute.For<ConsumeContext<InventoryUpdated>>();
+          context.Message.Returns(new InventoryUpdated("PROD-001", 50, "WH-1"));
+          await consumer.Consume(context);
+          consumer.Inventory["PROD-001"].Should().Be(50);
+      }
+      [Fact]
+      public async Task Consume_OverwritesExisting()
+      {
+          var consumer = new InventoryUpdatedConsumer();
+          var ctx1 = Substitute.For<ConsumeContext<InventoryUpdated>>();
+          ctx1.Message.Returns(new InventoryUpdated("P1", 10, "WH-1"));
+          var ctx2 = Substitute.For<ConsumeContext<InventoryUpdated>>();
+          ctx2.Message.Returns(new InventoryUpdated("P1", 25, "WH-1"));
+          await consumer.Consume(ctx1);
+          await consumer.Consume(ctx2);
+          consumer.Inventory["P1"].Should().Be(25);
+      }
+  }

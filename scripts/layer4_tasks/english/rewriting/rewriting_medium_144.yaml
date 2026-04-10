@@ -1,0 +1,22 @@
+name: rewriting_medium_144
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity:
+  'The survey results, whilst broadly positive, do not necessarily reflect the views of all stakeholders who were not included in the sample.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "survey"
+    - "positive"
+    - "not all"
+    - "stakeholders"
+    - "sample"
+    - "excluded"
+  min_words: 5
+  max_words: 25

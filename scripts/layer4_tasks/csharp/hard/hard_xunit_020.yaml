@@ -1,0 +1,81 @@
+name: hard_xunit_020
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit property-based style testing with test data factories:
+  Class TestDataFactory:
+    static IEnumerable<object[]> ValidEmails(): generates 10 valid emails.
+    static IEnumerable<object[]> InvalidEmails(): generates 10 invalid emails.
+    static IEnumerable<object[]> PhoneNumbers(): generates (input, expected_normalized) pairs.
+
+  Class InputValidator:
+    bool IsValidEmail(string email): RFC 5322 basic validation.
+    bool IsValidPhone(string phone): accepts +1-XXX-XXX-XXXX, (XXX) XXX-XXXX, XXXXXXXXXX.
+    string NormalizePhone(string phone): strips all non-digits, formats as +1XXXXXXXXXX if 10 digits.
+    bool IsValidPostalCode(string code, string country):
+      "US": 5 digits or 5+4.
+      "UK": A1 1AA format.
+      "CA": A1A 1A1 format.
+
+  Tests use [MemberData] from TestDataFactory, plus [InlineData] for postal codes.
+  Return only valid C# code in a single file.
+test_code: |
+  public class InputValidatorTests
+  {
+      private readonly InputValidator _validator = new();
+
+      [Theory]
+      [MemberData(nameof(TestDataFactory.ValidEmails), MemberType = typeof(TestDataFactory))]
+      public void ValidEmails_AreAccepted(string email)
+      {
+          _validator.IsValidEmail(email).Should().BeTrue();
+      }
+
+      [Theory]
+      [MemberData(nameof(TestDataFactory.InvalidEmails), MemberType = typeof(TestDataFactory))]
+      public void InvalidEmails_AreRejected(string email)
+      {
+          _validator.IsValidEmail(email).Should().BeFalse();
+      }
+
+      [Theory]
+      [InlineData("12345", "US", true)]
+      [InlineData("12345-6789", "US", true)]
+      [InlineData("1234", "US", false)]
+      [InlineData("SW1A 1AA", "UK", true)]
+      [InlineData("K1A 0A6", "CA", true)]
+      public void PostalCode_Validation(string code, string country, bool expected)
+      {
+          _validator.IsValidPostalCode(code, country).Should().Be(expected);
+      }
+
+      [Fact]
+      public void NormalizePhone_TenDigits_FormatsCorrectly()
+      {
+          var normalized = _validator.NormalizePhone("5551234567");
+          normalized.Should().Be("+15551234567");
+      }
+
+      [Fact]
+      public void IsValidPhone_ValidFormats_Accepted()
+      {
+          _validator.IsValidPhone("+1-555-123-4567").Should().BeTrue();
+          _validator.IsValidPhone("(555) 123-4567").Should().BeTrue();
+          _validator.IsValidPhone("5551234567").Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsValidPhone_InvalidFormat_Rejected()
+      {
+          _validator.IsValidPhone("123").Should().BeFalse();
+          _validator.IsValidPhone("not-a-phone").Should().BeFalse();
+      }
+  }

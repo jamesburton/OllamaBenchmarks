@@ -1,0 +1,99 @@
+name: hard_aspnet_013
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A scoped service lifetime demonstration with DbContext-like pattern:
+  Interface IUnitOfWork: IDisposable
+    IProductRepository Products { get; }
+    IOrderRepository Orders { get; }
+    Task<int> CommitAsync(CancellationToken ct)
+  Interface IProductRepository:
+    Task<Product?> FindAsync(int id, CancellationToken ct)
+    Task AddAsync(Product product, CancellationToken ct)
+  Interface IOrderRepository:
+    Task<Order?> FindAsync(int id, CancellationToken ct)
+    Task AddAsync(Order order, CancellationToken ct)
+  Records: Product(int Id, string Name, decimal Price), Order(int Id, int ProductId, int Qty, decimal Total).
+  Class InMemoryUnitOfWork : IUnitOfWork — scoped lifetime, changes committed atomically.
+  Class OrderCreationService(IUnitOfWork uow):
+    Task<Order> CreateOrderAsync(int productId, int qty, CancellationToken ct)
+      — finds product, throws KeyNotFoundException if not found,
+        creates order with Total=Price*Qty, adds to repository, commits.
+  Return only valid C# code in a single file.
+test_code: |
+  public class UnitOfWorkTests
+  {
+      private static IUnitOfWork CreateUow(IEnumerable<Product>? products = null)
+      {
+          var uow = new InMemoryUnitOfWork();
+          foreach (var p in products ?? Array.Empty<Product>())
+              uow.Products.AddAsync(p, CancellationToken.None).Wait();
+          uow.CommitAsync(CancellationToken.None).Wait();
+          return uow;
+      }
+
+      [Fact]
+      public async Task CreateOrder_ValidProduct_CreatesOrder()
+      {
+          var uow = CreateUow(new[] { new Product(1, "Widget", 9.99m) });
+          var svc = new OrderCreationService(uow);
+          var order = await svc.CreateOrderAsync(1, 3, CancellationToken.None);
+          order.Total.Should().Be(29.97m);
+          order.ProductId.Should().Be(1);
+      }
+
+      [Fact]
+      public async Task CreateOrder_UnknownProduct_ThrowsKeyNotFoundException()
+      {
+          var uow = CreateUow();
+          var svc = new OrderCreationService(uow);
+          var act = async () => await svc.CreateOrderAsync(99, 1, CancellationToken.None);
+          await act.Should().ThrowAsync<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public async Task CreateOrder_PersistedAfterCommit()
+      {
+          var uow = CreateUow(new[] { new Product(1, "Item", 5m) });
+          var svc = new OrderCreationService(uow);
+          var order = await svc.CreateOrderAsync(1, 2, CancellationToken.None);
+          var found = await uow.Orders.FindAsync(order.Id, CancellationToken.None);
+          found.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task CommitAsync_ReturnsChangeCount()
+      {
+          var uow = new InMemoryUnitOfWork();
+          await uow.Products.AddAsync(new Product(1, "A", 1m), CancellationToken.None);
+          var count = await uow.CommitAsync(CancellationToken.None);
+          count.Should().BeGreaterThan(0);
+      }
+
+      [Fact]
+      public async Task Dispose_UnitOfWork_DoesNotThrow()
+      {
+          var uow = CreateUow();
+          var act = () => { uow.Dispose(); };
+          act.Should().NotThrow();
+      }
+
+      [Fact]
+      public async Task FindProduct_AfterAdd_ReturnsProduct()
+      {
+          var uow = new InMemoryUnitOfWork();
+          await uow.Products.AddAsync(new Product(42, "Test", 100m), CancellationToken.None);
+          await uow.CommitAsync(CancellationToken.None);
+          var found = await uow.Products.FindAsync(42, CancellationToken.None);
+          found.Should().NotBeNull();
+          found!.Name.Should().Be("Test");
+      }
+  }

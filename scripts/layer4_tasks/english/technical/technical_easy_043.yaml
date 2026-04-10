@@ -1,0 +1,22 @@
+name: technical_easy_043
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a clear error message for when a required field is left blank.
+  Keep it under 15 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "required"
+    - "field"
+    - "empty"
+    - "please"
+    - "fill"
+    - "blank"
+    - "cannot"
+  min_words: 5
+  max_words: 15

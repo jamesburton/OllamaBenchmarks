@@ -1,0 +1,18 @@
+name: summarisation_hard_059
+category: english
+subcategory: summarisation
+difficulty: hard
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The tension between national federation autonomy and supranational sports governance has been highlighted by disputes over transgender inclusion policies. The Court of Arbitration for Sport has issued inconsistent rulings, and the science underpinning testosterone threshold regulations is disputed. Individual sporting bodies have adopted divergent policies, creating an uneven competitive landscape.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "transgender"
+    - "testosterone"
+    - "inclusion"
+    - "governance"
+  max_words: 25

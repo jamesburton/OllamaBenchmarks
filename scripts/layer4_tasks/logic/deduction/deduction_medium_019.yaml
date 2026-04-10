@@ -1,0 +1,15 @@
+name: deduction_medium_019
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All bachelors are unmarried.
+  2. All unmarried adults are single.
+  3. James is a bachelor.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "James is single."
+validator_config: {}

@@ -1,0 +1,52 @@
+name: medium_patterns_033
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class NullableChain<T> where T : struct for chaining nullable operations.
+  Expose:
+    static NullableChain<T> From(T? value)
+    NullableChain<TOut> Select<TOut>(Func<T, TOut?> f) where TOut : struct
+    NullableChain<T> Where(Func<T, bool> predicate)
+    T? Value
+  Return only valid C# code in a single file.
+test_code: |
+  public class NullableChainTests
+  {
+      [Fact]
+      public void From_Value_HasValue()
+      {
+          NullableChain<int>.From(5).Value.Should().Be(5);
+      }
+
+      [Fact]
+      public void From_Null_NoValue()
+      {
+          NullableChain<int>.From(null).Value.Should().BeNull();
+      }
+
+      [Fact]
+      public void Select_TransformsValue()
+      {
+          NullableChain<int>.From(5).Select(x => (int?)(x * 2)).Value.Should().Be(10);
+      }
+
+      [Fact]
+      public void Where_False_ReturnsNull()
+      {
+          NullableChain<int>.From(3).Where(x => x > 10).Value.Should().BeNull();
+      }
+
+      [Fact]
+      public void Select_OnNull_PropagatesNull()
+      {
+          NullableChain<int>.From(null).Select(x => (int?)(x * 2)).Value.Should().BeNull();
+      }
+  }

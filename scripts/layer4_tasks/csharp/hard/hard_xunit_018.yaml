@@ -1,0 +1,99 @@
+name: hard_xunit_018
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit testing strategy pattern with dependency injection:
+  Interface IReportGenerator:
+    Task<ReportResult> GenerateAsync(ReportRequest request, CancellationToken ct)
+
+  Records:
+    ReportRequest(string ReportType, DateTime From, DateTime To, Dictionary<string, object> Parameters)
+    ReportResult(string ReportType, byte[] Content, string ContentType, string FileName, int RecordCount)
+
+  Class SalesReportGenerator : IReportGenerator: generates CSV sales data.
+  Class InventoryReportGenerator : IReportGenerator: generates JSON inventory snapshot.
+  Class PdfReportDecorator(IReportGenerator inner) : IReportGenerator:
+    Wraps result: ContentType becomes "application/pdf", appends ".pdf" to FileName.
+
+  Class ReportDispatcher:
+    Constructor takes Dictionary<string, IReportGenerator>.
+    Task<ReportResult> DispatchAsync(ReportRequest request, CancellationToken ct):
+      Finds generator by ReportType (case-insensitive).
+      Throws KeyNotFoundException if type unknown.
+
+  Tests use NSubstitute for generators.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ReportDispatcherTests
+  {
+      private ReportResult MakeResult(string type) =>
+          new(type, new byte[] { 1 }, "text/csv", $"{type}.csv", 10);
+
+      [Fact]
+      public async Task Dispatch_KnownType_CallsCorrectGenerator()
+      {
+          var gen = Substitute.For<IReportGenerator>();
+          gen.GenerateAsync(Arg.Any<ReportRequest>(), Arg.Any<CancellationToken>())
+              .Returns(MakeResult("sales"));
+          var dispatcher = new ReportDispatcher(new Dictionary<string, IReportGenerator>
+              { ["sales"] = gen });
+          var req = new ReportRequest("sales", DateTime.UtcNow.AddDays(-7), DateTime.UtcNow, new());
+          await dispatcher.DispatchAsync(req, CancellationToken.None);
+          await gen.Received(1).GenerateAsync(Arg.Any<ReportRequest>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Dispatch_UnknownType_ThrowsKeyNotFoundException()
+      {
+          var dispatcher = new ReportDispatcher(new Dictionary<string, IReportGenerator>());
+          var req = new ReportRequest("unknown", DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, new());
+          var act = async () => await dispatcher.DispatchAsync(req, CancellationToken.None);
+          await act.Should().ThrowAsync<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public async Task Dispatch_CaseInsensitive_FindsGenerator()
+      {
+          var gen = Substitute.For<IReportGenerator>();
+          gen.GenerateAsync(Arg.Any<ReportRequest>(), Arg.Any<CancellationToken>())
+              .Returns(MakeResult("inventory"));
+          var dispatcher = new ReportDispatcher(new Dictionary<string, IReportGenerator>
+              { ["inventory"] = gen });
+          var req = new ReportRequest("INVENTORY", DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, new());
+          await dispatcher.DispatchAsync(req, CancellationToken.None);
+          await gen.Received(1).GenerateAsync(Arg.Any<ReportRequest>(), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task PdfDecorator_ChangeContentType()
+      {
+          var inner = Substitute.For<IReportGenerator>();
+          inner.GenerateAsync(Arg.Any<ReportRequest>(), Arg.Any<CancellationToken>())
+              .Returns(new ReportResult("sales", new byte[] { 1 }, "text/csv", "report.csv", 5));
+          var decorator = new PdfReportDecorator(inner);
+          var result = await decorator.GenerateAsync(
+              new ReportRequest("sales", DateTime.UtcNow.AddDays(-1), DateTime.UtcNow, new()),
+              CancellationToken.None);
+          result.ContentType.Should().Be("application/pdf");
+          result.FileName.Should().EndWith(".pdf");
+      }
+
+      [Fact]
+      public async Task SalesReportGenerator_ProducesResult()
+      {
+          var gen = new SalesReportGenerator();
+          var result = await gen.GenerateAsync(
+              new ReportRequest("sales", DateTime.UtcNow.AddDays(-30), DateTime.UtcNow, new()),
+              CancellationToken.None);
+          result.Should().NotBeNull();
+          result.Content.Should().NotBeEmpty();
+      }
+  }

@@ -1,0 +1,18 @@
+name: summarisation_medium_092
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Ransomware attacks on critical infrastructure — including hospitals, water systems, and power grids — have increased dramatically in recent years. Criminal groups operating from jurisdictions that tolerate cybercrime have extorted billions of dollars. Cybersecurity agencies recommend regular backups, network segmentation, and multi-factor authentication as primary defences.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "ransomware"
+    - "cybersecurity"
+    - "infrastructure"
+    - "attack"
+  max_words: 25

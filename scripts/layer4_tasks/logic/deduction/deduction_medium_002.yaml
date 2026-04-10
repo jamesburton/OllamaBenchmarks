@@ -1,0 +1,14 @@
+name: deduction_medium_002
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If a function is differentiable, it is continuous.
+  2. f(x) is differentiable.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "f(x) is continuous."
+validator_config: {}

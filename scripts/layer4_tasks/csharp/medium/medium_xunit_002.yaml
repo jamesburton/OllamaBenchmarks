@@ -1,0 +1,51 @@
+name: medium_xunit_002
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class FizzBuzz with:
+    string Convert(int number)
+  Rules: returns "FizzBuzz" if divisible by 15, "Fizz" if by 3, "Buzz" if by 5, else the number as string.
+    IEnumerable<string> ConvertRange(int start, int end)
+  Returns the sequence for the range [start, end] inclusive.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FizzBuzzTests
+  {
+      private readonly FizzBuzz _fb = new();
+
+      [Theory]
+      [InlineData(1, "1")]
+      [InlineData(3, "Fizz")]
+      [InlineData(5, "Buzz")]
+      [InlineData(15, "FizzBuzz")]
+      [InlineData(30, "FizzBuzz")]
+      [InlineData(9, "Fizz")]
+      public void Convert_ReturnsCorrectValue(int input, string expected)
+      {
+          _fb.Convert(input).Should().Be(expected);
+      }
+
+      [Fact]
+      public void ConvertRange_ReturnsCorrectSequence()
+      {
+          var result = _fb.ConvertRange(1, 5).ToList();
+          result.Should().BeEquivalentTo(new[] { "1", "2", "Fizz", "4", "Buzz" }, o => o.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void ConvertRange_IncludesBothEndpoints()
+      {
+          var result = _fb.ConvertRange(13, 16).ToList();
+          result[0].Should().Be("13");
+          result[2].Should().Be("FizzBuzz");
+          result[3].Should().Be("16");
+      }
+  }

@@ -1,0 +1,15 @@
+name: deduction_medium_004
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If it is a weekday, the office is open.
+  2. If the office is open, you can get help.
+  3. Today is Tuesday.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "You can get help today."
+validator_config: {}

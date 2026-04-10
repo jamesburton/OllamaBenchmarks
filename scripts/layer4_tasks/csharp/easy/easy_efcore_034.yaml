@@ -1,0 +1,40 @@
+name: easy_efcore_034
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Metric with properties: int Id, string Name, double Value, DateTime RecordedAt
+  A DbContext class MetricContext with:
+    DbSet<Metric> Metrics { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class MetricRepository with:
+    (double Min, double Max, double Avg) GetStats(MetricContext context, string name)
+  that returns min, max, and average values for a named metric. Throws InvalidOperationException if no data.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MetricRepositoryTests
+  {
+      [Fact]
+      public void GetStats_ReturnsCorrectStats()
+      {
+          using var context = new MetricContext();
+          context.Database.EnsureCreated();
+          context.Metrics.AddRange(
+              new Metric { Name = "cpu", Value = 10.0, RecordedAt = DateTime.UtcNow },
+              new Metric { Name = "cpu", Value = 50.0, RecordedAt = DateTime.UtcNow },
+              new Metric { Name = "cpu", Value = 90.0, RecordedAt = DateTime.UtcNow });
+          context.SaveChanges();
+          var (min, max, avg) = MetricRepository.GetStats(context, "cpu");
+          min.Should().Be(10.0);
+          max.Should().Be(90.0);
+          avg.Should().Be(50.0);
+      }
+  }

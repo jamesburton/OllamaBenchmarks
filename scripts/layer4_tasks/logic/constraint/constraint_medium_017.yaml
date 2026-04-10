@@ -1,0 +1,17 @@
+name: constraint_medium_017
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Alice, Bob, Carol, Dave must be assigned tasks: code, test, review, deploy (one each).
+  Clues:
+  1. Alice does not code or deploy.
+  2. Bob codes.
+  3. Dave does not test.
+  4. Carol does not review.
+  What task does Dave do? Reply with only the task.
+expected_answer: "Deploy"
+validator_config: {}

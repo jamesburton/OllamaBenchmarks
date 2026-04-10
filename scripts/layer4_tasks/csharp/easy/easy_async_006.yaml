@@ -1,0 +1,33 @@
+name: easy_async_006
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Fetcher with a static method:
+    async Task<List<int>> FetchAllAsync(IEnumerable<Task<int>> tasks)
+  that awaits all tasks in parallel using Task.WhenAll and returns the results as a list.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FetcherTests
+  {
+      [Fact]
+      public async Task FetchAllAsync_ReturnsAllResults()
+      {
+          var tasks = new[]{Task.FromResult(1), Task.FromResult(2), Task.FromResult(3)};
+          var result = await Fetcher.FetchAllAsync(tasks);
+          result.Should().BeEquivalentTo(new[]{1,2,3});
+      }
+      [Fact]
+      public async Task FetchAllAsync_EmptyTasks_ReturnsEmpty()
+      {
+          var result = await Fetcher.FetchAllAsync(Array.Empty<Task<int>>());
+          result.Should().BeEmpty();
+      }
+  }

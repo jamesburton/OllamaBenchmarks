@@ -1,0 +1,21 @@
+name: rewriting_hard_146
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity and precision, cutting the word count by at least half:
+  'The fundamental underlying premise upon which this entire theoretical framework is constructed is the assumption that the behaviour of rational actors in market conditions will, under normal circumstances, tend towards equilibrium over time.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "rational"
+    - "market"
+    - "equilibrium"
+    - "assumes"
+    - "framework"
+  min_words: 5
+  max_words: 25

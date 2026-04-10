@@ -1,0 +1,98 @@
+name: hard_patterns_004
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A fluent builder pattern for constructing HTTP request specifications:
+  Class HttpRequestBuilder with fluent methods:
+    HttpRequestBuilder WithMethod(string method)
+    HttpRequestBuilder WithUrl(string url)
+    HttpRequestBuilder WithHeader(string name, string value)
+    HttpRequestBuilder WithQueryParam(string name, string value)
+    HttpRequestBuilder WithJsonBody<T>(T body)
+    HttpRequestBuilder WithTimeout(TimeSpan timeout)
+    HttpRequestSpec Build() — validates that Method and Url are set; throws
+      InvalidOperationException if either is missing.
+  Record: HttpRequestSpec(string Method, string Url, IReadOnlyDictionary<string,string> Headers,
+    IReadOnlyDictionary<string,string> QueryParams, string? Body, TimeSpan? Timeout).
+  The builder must be immutable (each With method returns a new instance).
+  Return only valid C# code in a single file.
+test_code: |
+  public class HttpRequestBuilderTests
+  {
+      [Fact]
+      public void Build_BasicGetRequest()
+      {
+          var spec = new HttpRequestBuilder()
+              .WithMethod("GET")
+              .WithUrl("https://api.example.com/data")
+              .Build();
+          spec.Method.Should().Be("GET");
+          spec.Url.Should().Be("https://api.example.com/data");
+      }
+
+      [Fact]
+      public void Build_WithHeaders_IncludesHeaders()
+      {
+          var spec = new HttpRequestBuilder()
+              .WithMethod("GET")
+              .WithUrl("https://api.example.com")
+              .WithHeader("Authorization", "Bearer token")
+              .Build();
+          spec.Headers.Should().ContainKey("Authorization");
+      }
+
+      [Fact]
+      public void Build_WithQueryParams_AppendsParams()
+      {
+          var spec = new HttpRequestBuilder()
+              .WithMethod("GET")
+              .WithUrl("https://api.example.com")
+              .WithQueryParam("page", "1")
+              .WithQueryParam("size", "10")
+              .Build();
+          spec.QueryParams.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Build_WithBody_SetsBody()
+      {
+          var spec = new HttpRequestBuilder()
+              .WithMethod("POST")
+              .WithUrl("https://api.example.com")
+              .WithJsonBody(new { Name = "Test" })
+              .Build();
+          spec.Body.Should().NotBeNullOrEmpty();
+      }
+
+      [Fact]
+      public void Build_MissingMethod_ThrowsInvalidOperationException()
+      {
+          var act = () => new HttpRequestBuilder().WithUrl("https://example.com").Build();
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Build_MissingUrl_ThrowsInvalidOperationException()
+      {
+          var act = () => new HttpRequestBuilder().WithMethod("GET").Build();
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Builder_IsImmutable_ChainDoesNotMutatePrevious()
+      {
+          var base_ = new HttpRequestBuilder().WithMethod("GET").WithUrl("https://example.com");
+          var with1 = base_.WithHeader("X-A", "1");
+          var with2 = base_.WithHeader("X-B", "2");
+          with1.Build().Headers.Should().NotContainKey("X-B");
+          with2.Build().Headers.Should().NotContainKey("X-A");
+      }
+  }

@@ -1,0 +1,31 @@
+name: easy_linq_045
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Mapper with a static method:
+    List<int> SelectAbsoluteValues(IEnumerable<int> numbers)
+  that returns the absolute value of each number using LINQ Select + Math.Abs + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MapperTests
+  {
+      [Fact]
+      public void SelectAbsoluteValues_BasicCase()
+      {
+          var result = Mapper.SelectAbsoluteValues(new[]{-3,1,-5,2});
+          result.Should().BeEquivalentTo(new[]{3,1,5,2}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void SelectAbsoluteValues_AllPositive_ReturnsSame()
+      {
+          Mapper.SelectAbsoluteValues(new[]{1,2,3}).Should().BeEquivalentTo(new[]{1,2,3}, cfg => cfg.WithStrictOrdering());
+      }
+  }

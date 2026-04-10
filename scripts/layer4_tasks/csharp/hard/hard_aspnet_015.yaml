@@ -1,0 +1,97 @@
+name: hard_aspnet_015
+category: csharp_hard
+subcategory: aspnet
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A search API with complex filtering, sorting, and pagination:
+  Record: SearchRequest(string? Query, string? Category, decimal? MinPrice, decimal? MaxPrice,
+    string SortBy, bool SortDescending, int Page, int PageSize).
+  Record: SearchResult(IReadOnlyList<ProductSummary> Items, int TotalCount, int Page, int TotalPages).
+  Record: ProductSummary(int Id, string Name, string Category, decimal Price).
+  Class ProductSearchEngine with constructor accepting IEnumerable<ProductSummary>:
+    SearchResult Search(SearchRequest request) —
+      filters by Query (case-insensitive name contains), Category (exact), MinPrice, MaxPrice.
+      Sorts by "name", "price", "category" fields; defaults to "name" ascending.
+      Paginates results (1-based page).
+      Validates: Page >= 1, PageSize 1-100; throws ArgumentOutOfRangeException on invalid.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductSearchEngineTests
+  {
+      private static readonly List<ProductSummary> Products = new()
+      {
+          new(1, "Apple iPhone",  "Electronics", 999m),
+          new(2, "Samsung Galaxy","Electronics", 799m),
+          new(3, "Running Shoes", "Footwear",     89m),
+          new(4, "Tennis Shoes",  "Footwear",     59m),
+          new(5, "C# Book",       "Books",        45m),
+          new(6, "Python Book",   "Books",        39m),
+      };
+      private readonly ProductSearchEngine _engine = new(Products);
+
+      [Fact]
+      public void Search_ByQuery_FiltersCorrectly()
+      {
+          var result = _engine.Search(new("shoes", null, null, null, "name", false, 1, 10));
+          result.Items.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Search_ByCategory_FiltersCorrectly()
+      {
+          var result = _engine.Search(new(null, "Books", null, null, "name", false, 1, 10));
+          result.Items.Should().HaveCount(2);
+          result.Items.Should().AllSatisfy(p => p.Category.Should().Be("Books"));
+      }
+
+      [Fact]
+      public void Search_ByPriceRange_FiltersCorrectly()
+      {
+          var result = _engine.Search(new(null, null, 50m, 100m, "price", false, 1, 10));
+          result.Items.Should().AllSatisfy(p => { p.Price.Should().BeGreaterThanOrEqualTo(50m); p.Price.Should().BeLessThanOrEqualTo(100m); });
+      }
+
+      [Fact]
+      public void Search_SortByPriceDescending_OrdersCorrectly()
+      {
+          var result = _engine.Search(new(null, null, null, null, "price", true, 1, 10));
+          result.Items.Select(p => p.Price).Should().BeInDescendingOrder();
+      }
+
+      [Fact]
+      public void Search_Pagination_ReturnsCorrectPage()
+      {
+          var result = _engine.Search(new(null, null, null, null, "name", false, 2, 2));
+          result.Items.Should().HaveCount(2);
+          result.Page.Should().Be(2);
+          result.TotalPages.Should().Be(3);
+      }
+
+      [Fact]
+      public void Search_InvalidPage_ThrowsArgumentOutOfRangeException()
+      {
+          var act = () => _engine.Search(new(null, null, null, null, "name", false, 0, 10));
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void Search_InvalidPageSize_ThrowsArgumentOutOfRangeException()
+      {
+          var act = () => _engine.Search(new(null, null, null, null, "name", false, 1, 200));
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void Search_EmptyQuery_ReturnsAll()
+      {
+          var result = _engine.Search(new(null, null, null, null, "name", false, 1, 100));
+          result.TotalCount.Should().Be(6);
+      }
+  }

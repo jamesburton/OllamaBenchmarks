@@ -1,0 +1,24 @@
+name: technical_hard_019
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Migration Guide' section for upgrading from version 2 to version 3 of an API.
+  Highlight breaking changes.
+  Keep it under 100 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "migration"
+    - "breaking"
+    - "upgrade"
+    - "v2"
+    - "v3"
+    - "change"
+    - "replace"
+    - "deprecated"
+  min_words: 12
+  max_words: 100

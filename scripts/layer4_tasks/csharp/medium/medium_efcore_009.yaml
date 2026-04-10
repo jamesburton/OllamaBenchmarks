@@ -1,0 +1,70 @@
+name: medium_efcore_009
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Payment with: int Id, string CustomerId, decimal Amount, string Currency, string Method, DateTime PaidAt.
+  A class PaymentDbContext : DbContext with DbSet<Payment> Payments.
+  A class PaymentAnalytics with constructor accepting PaymentDbContext.
+  Methods:
+    Task<decimal> GetTotalByCustomerAsync(string customerId)
+    Task<IDictionary<string, decimal>> GetTotalByCurrencyAsync()
+    Task<IDictionary<string, int>> GetCountByMethodAsync()
+    Task<IEnumerable<Payment>> GetLargePaymentsAsync(decimal threshold)
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaymentAnalyticsTests : IAsyncLifetime
+  {
+      private PaymentDbContext _db = null!;
+      private PaymentAnalytics _analytics = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<PaymentDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new PaymentDbContext(opts);
+          _analytics = new PaymentAnalytics(_db);
+          _db.Payments.AddRange(
+              new Payment { CustomerId = "c1", Amount = 100m, Currency = "USD", Method = "card", PaidAt = DateTime.UtcNow },
+              new Payment { CustomerId = "c1", Amount = 200m, Currency = "EUR", Method = "paypal", PaidAt = DateTime.UtcNow },
+              new Payment { CustomerId = "c2", Amount = 50m, Currency = "USD", Method = "card", PaidAt = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetTotalByCustomer_CorrectSum()
+      {
+          (await _analytics.GetTotalByCustomerAsync("c1")).Should().Be(300m);
+      }
+
+      [Fact]
+      public async Task GetTotalByCurrency_GroupsCorrectly()
+      {
+          var result = await _analytics.GetTotalByCurrencyAsync();
+          result["USD"].Should().Be(150m);
+          result["EUR"].Should().Be(200m);
+      }
+
+      [Fact]
+      public async Task GetCountByMethod_GroupsCorrectly()
+      {
+          var result = await _analytics.GetCountByMethodAsync();
+          result["card"].Should().Be(2);
+          result["paypal"].Should().Be(1);
+      }
+
+      [Fact]
+      public async Task GetLargePayments_FiltersCorrectly()
+      {
+          (await _analytics.GetLargePaymentsAsync(100m)).Should().HaveCount(1);
+      }
+  }

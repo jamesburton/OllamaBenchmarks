@@ -1,0 +1,56 @@
+name: medium_masstransit_017
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record RefundRequested(Guid RefundId, Guid OrderId, decimal Amount, string Reason).
+  A consumer RefundRequestedConsumer implementing IConsumer<RefundRequested>.
+  Constructor accepts IRefundProcessor service.
+  Interface IRefundProcessor with: Task ProcessAsync(Guid refundId, decimal amount).
+  In Consume: calls service.ProcessAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record RefundRequested(Guid RefundId, Guid OrderId, decimal Amount, string Reason); }
+  global using Contracts;
+
+  public class RefundRequestedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IRefundProcessor>();
+          var consumer = new RefundRequestedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<RefundRequested>>();
+          ctx.Message.Returns(new RefundRequested(Guid.NewGuid(), Guid.NewGuid(), 1, "Rea"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).ProcessAsync(Arg.Any<Guid refundId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IRefundProcessor>();
+          var consumer = new RefundRequestedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<RefundRequested>>();
+          ctx.Message.Returns(new RefundRequested(Guid.NewGuid(), Guid.NewGuid(), 1, "Rea"));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IRefundProcessor>();
+          var consumer = new RefundRequestedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<RefundRequested>>();
+          ctx.Message.Returns(new RefundRequested(Guid.NewGuid(), Guid.NewGuid(), 2, "Reas"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).ProcessAsync(Arg.Any<Guid refundId>(), Arg.Any<object>());
+      }
+  }

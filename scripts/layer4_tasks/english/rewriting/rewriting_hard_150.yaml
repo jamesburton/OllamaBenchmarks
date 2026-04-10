@@ -1,0 +1,21 @@
+name: rewriting_hard_150
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity and directness:
+  'At this stage it would appear that there may be some concerns relating to the degree to which the proposed methodology adequately addresses the identified research gaps.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "methodology"
+    - "concerns"
+    - "research gaps"
+    - "addresses"
+    - "adequately"
+  min_words: 4
+  max_words: 20

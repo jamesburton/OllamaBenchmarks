@@ -1,0 +1,62 @@
+name: medium_linq_026
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record MenuItem with: int Id, string Name, string Section, decimal Price, bool Vegetarian.
+  A class MenuAnalysis with a constructor accepting IEnumerable<MenuItem> items.
+  Expose:
+    IEnumerable<MenuItem> VegetarianUnder(decimal maxPrice) — vegetarian items under maxPrice, ordered by Price asc
+    Dictionary<string, decimal> AveragePriceBySection()
+    IEnumerable<MenuItem> CheapestPerSection() — cheapest item in each section
+  Return only valid C# code in a single file.
+test_code: |
+  public class MenuAnalysisTests
+  {
+      private readonly MenuItem[] _items = {
+          new(1, "Salad",     "Starters", 5.50m,  true),
+          new(2, "Soup",      "Starters", 4.00m,  true),
+          new(3, "Steak",     "Mains",    18.00m, false),
+          new(4, "Risotto",   "Mains",    12.00m, true),
+          new(5, "Ice Cream", "Desserts", 4.50m,  true),
+      };
+
+      [Fact]
+      public void VegetarianUnder10_ReturnsFour()
+      {
+          new MenuAnalysis(_items).VegetarianUnder(10m).Should().HaveCount(4);
+      }
+
+      [Fact]
+      public void VegetarianUnder10_OrderedByPrice()
+      {
+          var result = new MenuAnalysis(_items).VegetarianUnder(10m).ToList();
+          result.Select(i => i.Price).Should().BeInAscendingOrder();
+      }
+
+      [Fact]
+      public void AveragePriceBySection_StartersCorrect()
+      {
+          new MenuAnalysis(_items).AveragePriceBySection()["Starters"].Should().Be(4.75m);
+      }
+
+      [Fact]
+      public void CheapestPerSection_ReturnsThreeSections()
+      {
+          new MenuAnalysis(_items).CheapestPerSection().Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void CheapestPerSection_MainsIsRisotto()
+      {
+          var result = new MenuAnalysis(_items).CheapestPerSection();
+          result.First(i => i.Section == "Mains").Name.Should().Be("Risotto");
+      }
+  }

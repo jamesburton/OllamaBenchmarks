@@ -1,0 +1,94 @@
+name: hard_blazor_011
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor wizard/multi-step form service:
+  Records:
+    WizardStep(int StepNumber, string Title, bool IsCompleted, bool IsActive)
+    PersonalInfo(string FirstName, string LastName, string Email)
+    AddressInfo(string Street, string City, string PostalCode, string Country)
+    PlanSelection(string PlanId, string PlanName, decimal MonthlyPrice)
+    WizardState(PersonalInfo? Personal, AddressInfo? Address, PlanSelection? Plan, int CurrentStep)
+
+  Class WizardService:
+    WizardState GetState()
+    IReadOnlyList<WizardStep> GetSteps()
+    bool CanGoBack()
+    bool CanGoForward()
+    void SetPersonalInfo(PersonalInfo info): sets personal, marks step 1 complete if valid.
+    void SetAddressInfo(AddressInfo info): sets address, marks step 2 complete if valid (all fields required).
+    void SetPlanSelection(PlanSelection plan): marks step 3 complete.
+    bool GoNext(): advances step if current step is complete. Returns false if cannot advance.
+    bool GoBack(): goes back. Returns false if at first step.
+    bool IsComplete(): all 3 steps done.
+  Return only valid C# code in a single file.
+test_code: |
+  public class WizardServiceTests
+  {
+      private readonly WizardService _wizard = new();
+
+      [Fact]
+      public void Initial_CurrentStepIsOne()
+      {
+          _wizard.GetState().CurrentStep.Should().Be(1);
+      }
+
+      [Fact]
+      public void SetPersonalInfo_MarksStep1Complete()
+      {
+          _wizard.SetPersonalInfo(new PersonalInfo("John", "Doe", "j@d.com"));
+          _wizard.GetSteps().First(s => s.StepNumber == 1).IsCompleted.Should().BeTrue();
+      }
+
+      [Fact]
+      public void GoNext_WithCompleteStep_AdvancesStep()
+      {
+          _wizard.SetPersonalInfo(new PersonalInfo("A", "B", "a@b.com"));
+          var result = _wizard.GoNext();
+          result.Should().BeTrue();
+          _wizard.GetState().CurrentStep.Should().Be(2);
+      }
+
+      [Fact]
+      public void GoNext_WithIncompleteStep_ReturnsFalse()
+      {
+          var result = _wizard.GoNext();
+          result.Should().BeFalse();
+          _wizard.GetState().CurrentStep.Should().Be(1);
+      }
+
+      [Fact]
+      public void GoBack_FromFirstStep_ReturnsFalse()
+      {
+          var result = _wizard.GoBack();
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public void GoBack_FromSecondStep_ReturnsToFirst()
+      {
+          _wizard.SetPersonalInfo(new PersonalInfo("A", "B", "a@b.com"));
+          _wizard.GoNext();
+          _wizard.GoBack();
+          _wizard.GetState().CurrentStep.Should().Be(1);
+      }
+
+      [Fact]
+      public void IsComplete_AllStepsDone_ReturnsTrue()
+      {
+          _wizard.SetPersonalInfo(new PersonalInfo("A", "B", "a@b.com"));
+          _wizard.GoNext();
+          _wizard.SetAddressInfo(new AddressInfo("123 St", "City", "12345", "US"));
+          _wizard.GoNext();
+          _wizard.SetPlanSelection(new PlanSelection("pro", "Pro Plan", 29.99m));
+          _wizard.IsComplete().Should().BeTrue();
+      }
+  }

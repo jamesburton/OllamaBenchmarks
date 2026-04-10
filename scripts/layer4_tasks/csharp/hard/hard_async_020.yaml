@@ -1,0 +1,94 @@
+name: hard_async_020
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncHealthChecker that monitors multiple services:
+    Constructor: AsyncHealthChecker(IReadOnlyList<HealthCheck> checks, TimeSpan timeout)
+    Task<HealthReport> CheckAllAsync(CancellationToken ct) — runs all checks concurrently
+      with the given timeout per check. Each check that exceeds timeout is marked Degraded.
+      Exceptions mark the check as Unhealthy. Returns overall status (Healthy if all pass,
+      Degraded if any degraded, Unhealthy if any unhealthy).
+    Task<HealthReport> CheckCriticalAsync(CancellationToken ct) — only runs checks marked
+      IsCritical=true.
+  Record: HealthCheck(string Name, Func<CancellationToken, Task<bool>> Check, bool IsCritical).
+  Record: HealthResult(string Name, HealthStatus Status, string? Error, TimeSpan Duration).
+  Record: HealthReport(IReadOnlyList<HealthResult> Results, HealthStatus Overall).
+  Enum: HealthStatus { Healthy, Degraded, Unhealthy }.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncHealthCheckerTests
+  {
+      [Fact]
+      public async Task CheckAllAsync_AllHealthy_ReturnsHealthy()
+      {
+          var checks = new[]
+          {
+              new HealthCheck("svc1", _ => Task.FromResult(true),  true),
+              new HealthCheck("svc2", _ => Task.FromResult(true),  false),
+          };
+          var checker = new AsyncHealthChecker(checks, TimeSpan.FromSeconds(1));
+          var report = await checker.CheckAllAsync(CancellationToken.None);
+          report.Overall.Should().Be(HealthStatus.Healthy);
+      }
+
+      [Fact]
+      public async Task CheckAllAsync_OneUnhealthy_ReturnsUnhealthy()
+      {
+          var checks = new[]
+          {
+              new HealthCheck("ok",  _ => Task.FromResult(true),   false),
+              new HealthCheck("bad", _ => throw new Exception("down"), false),
+          };
+          var checker = new AsyncHealthChecker(checks, TimeSpan.FromSeconds(1));
+          var report = await checker.CheckAllAsync(CancellationToken.None);
+          report.Overall.Should().Be(HealthStatus.Unhealthy);
+          report.Results.First(r => r.Name == "bad").Status.Should().Be(HealthStatus.Unhealthy);
+      }
+
+      [Fact]
+      public async Task CheckAllAsync_SlowCheck_MarkedDegraded()
+      {
+          var checks = new[]
+          {
+              new HealthCheck("slow", async ct => { await Task.Delay(500, ct); return true; }, false),
+          };
+          var checker = new AsyncHealthChecker(checks, TimeSpan.FromMilliseconds(50));
+          var report = await checker.CheckAllAsync(CancellationToken.None);
+          report.Results[0].Status.Should().Be(HealthStatus.Degraded);
+          report.Overall.Should().Be(HealthStatus.Degraded);
+      }
+
+      [Fact]
+      public async Task CheckCriticalAsync_SkipsNonCritical()
+      {
+          var checks = new[]
+          {
+              new HealthCheck("critical", _ => Task.FromResult(true),  true),
+              new HealthCheck("optional", _ => throw new Exception(), false),
+          };
+          var checker = new AsyncHealthChecker(checks, TimeSpan.FromSeconds(1));
+          var report = await checker.CheckCriticalAsync(CancellationToken.None);
+          report.Results.Should().ContainSingle(r => r.Name == "critical");
+          report.Overall.Should().Be(HealthStatus.Healthy);
+      }
+
+      [Fact]
+      public async Task CheckAllAsync_ResultsDurationIsPositive()
+      {
+          var checks = new[]
+          {
+              new HealthCheck("svc", _ => Task.FromResult(true), false),
+          };
+          var report = await new AsyncHealthChecker(checks, TimeSpan.FromSeconds(1))
+              .CheckAllAsync(CancellationToken.None);
+          report.Results[0].Duration.Should().BeGreaterThanOrEqualTo(TimeSpan.Zero);
+      }
+  }

@@ -1,0 +1,32 @@
+name: easy_linq_006
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Finder with a static method:
+    string? Last(IEnumerable<string> items, string suffix)
+  that returns the last item ending with the given suffix, or null if none found.
+  Use LINQ LastOrDefault.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FinderTests
+  {
+      [Fact]
+      public void Last_ReturnsLastMatch()
+      {
+          var result = Finder.Last(new[]{"dog","log","cat"}, "og");
+          result.Should().Be("log");
+      }
+      [Fact]
+      public void Last_NoMatch_ReturnsNull()
+      {
+          Finder.Last(new[]{"cat","dog"}, "x").Should().BeNull();
+      }
+  }

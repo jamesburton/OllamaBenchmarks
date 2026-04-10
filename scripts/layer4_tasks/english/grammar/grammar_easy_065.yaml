@@ -1,0 +1,15 @@
+name: grammar_easy_065
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) He did not study; he failed the test.
+  B) He did not study, he failed the test.
+  C) He did not study he failed the test.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

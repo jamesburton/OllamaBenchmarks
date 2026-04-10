@@ -1,0 +1,42 @@
+name: easy_aspnet_026
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ApiKeyOptions with:
+    [Required] string ApiKey { get; set; }
+    string[] AllowedIps { get; set; } = Array.Empty<string>()
+    bool RequireHttps { get; set; } = true
+  and a static class ApiKeyHelper with:
+    bool IsKeyValid(ApiKeyOptions options, string providedKey)
+  that returns true if providedKey equals options.ApiKey (case-sensitive) and ApiKey is non-empty.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ApiKeyHelperTests
+  {
+      [Fact]
+      public void IsKeyValid_MatchingKey_ReturnsTrue()
+      {
+          var opts = new ApiKeyOptions { ApiKey = "secret-key-123" };
+          ApiKeyHelper.IsKeyValid(opts, "secret-key-123").Should().BeTrue();
+      }
+      [Fact]
+      public void IsKeyValid_WrongKey_ReturnsFalse()
+      {
+          var opts = new ApiKeyOptions { ApiKey = "secret-key-123" };
+          ApiKeyHelper.IsKeyValid(opts, "wrong-key").Should().BeFalse();
+      }
+      [Fact]
+      public void IsKeyValid_EmptyStoredKey_ReturnsFalse()
+      {
+          var opts = new ApiKeyOptions { ApiKey = "" };
+          ApiKeyHelper.IsKeyValid(opts, "").Should().BeFalse();
+      }
+  }

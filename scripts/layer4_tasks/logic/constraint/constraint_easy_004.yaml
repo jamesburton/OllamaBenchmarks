@@ -1,0 +1,16 @@
+name: constraint_easy_004
+category: logic
+subcategory: constraint
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three people - X, Y, Z - scored 1st, 2nd, 3rd in a race.
+  Clues:
+  1. X did not come 1st.
+  2. Z came 2nd.
+  3. Y did not come 3rd.
+  Who came 1st? Reply with only the name.
+expected_answer: "Y"
+validator_config: {}

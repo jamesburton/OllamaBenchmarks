@@ -1,0 +1,13 @@
+name: statistics_easy_014
+category: maths
+subcategory: statistics
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  A die is rolled. What is the probability of rolling an even number? Reply with only the decimal.
+expected_answer: "0.5"
+validator_config:
+  tolerance: 0.01
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

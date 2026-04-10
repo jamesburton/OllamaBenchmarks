@@ -1,0 +1,15 @@
+name: grammar_medium_013
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Statistics is a challenging subject.
+  B) Statistics are a challenging subject.
+  C) Statistics were a challenging subject.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

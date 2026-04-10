@@ -1,0 +1,56 @@
+name: medium_linq_028
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class PathAnalyser with a constructor accepting IEnumerable<string> filePaths.
+  All paths use forward slash. Expose:
+    Dictionary<string, List<string>> ByExtension() — groups file names by extension (e.g. ".cs", ".json")
+    IEnumerable<string> InDirectory(string dir) — file paths whose parent directory equals dir
+    IEnumerable<DirectoryCount> DirectoryCounts() — each unique directory with its file count, ordered by Count desc
+  DirectoryCount is a record with: string Directory, int Count.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PathAnalyserTests
+  {
+      private readonly string[] _paths = {
+          "src/Program.cs",
+          "src/App.cs",
+          "test/Unit.cs",
+          "src/config.json",
+          "test/config.json",
+      };
+
+      [Fact]
+      public void ByExtension_TwoExtensions()
+      {
+          new PathAnalyser(_paths).ByExtension().Keys.Should().BeEquivalentTo(new[]{".cs",".json"});
+      }
+
+      [Fact]
+      public void ByExtension_CsHasThreeFiles()
+      {
+          new PathAnalyser(_paths).ByExtension()[".cs"].Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void InDirectory_SrcHasThreeFiles()
+      {
+          new PathAnalyser(_paths).InDirectory("src").Should().HaveCount(3);
+      }
+
+      [Fact]
+      public void DirectoryCounts_SrcFirst()
+      {
+          var result = new PathAnalyser(_paths).DirectoryCounts().ToList();
+          result[0].Directory.Should().Be("src");
+          result[0].Count.Should().Be(3);
+      }
+  }

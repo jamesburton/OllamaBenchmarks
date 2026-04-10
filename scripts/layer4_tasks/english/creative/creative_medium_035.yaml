@@ -1,0 +1,22 @@
+name: creative_medium_035
+category: english
+subcategory: creative
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a forest after a heavy rainstorm.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "forest"
+    - "rain"
+    - "wet"
+    - "dripping"
+    - "silence"
+    - "fresh"
+    - "mist"
+    - "aftermath"
+  min_words: 15
+  max_words: 60

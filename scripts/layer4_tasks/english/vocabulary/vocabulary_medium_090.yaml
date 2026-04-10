@@ -1,0 +1,16 @@
+name: vocabulary_medium_090
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The root 'dict' (as in 'predict') comes from Latin and means:
+  A) Write
+  B) Say
+  C) Know
+  D) Rule
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

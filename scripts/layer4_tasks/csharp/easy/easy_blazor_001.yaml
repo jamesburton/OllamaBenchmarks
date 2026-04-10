@@ -1,0 +1,32 @@
+name: easy_blazor_001
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class GreeterComponent that extends ComponentBase with:
+    [Parameter] string Name { get; set; } = "World"
+    string Greeting => $"Hello, {Name}!"
+  Return only valid C# code in a single file.
+test_code: |
+  public class GreeterComponentTests
+  {
+      [Fact]
+      public void Greeting_DefaultName_ReturnsHelloWorld()
+      {
+          var component = new GreeterComponent();
+          component.Greeting.Should().Be("Hello, World!");
+      }
+      [Fact]
+      public void Greeting_CustomName_ReturnsCustomGreeting()
+      {
+          var component = new GreeterComponent { Name = "Alice" };
+          component.Greeting.Should().Be("Hello, Alice!");
+      }
+  }

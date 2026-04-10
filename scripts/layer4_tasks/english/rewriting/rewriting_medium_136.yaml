@@ -1,0 +1,21 @@
+name: rewriting_medium_136
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite for clarity and conciseness:
+  'The reason why the project failed was due to the fact that communication between team members was not adequate enough.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "failed"
+    - "communication"
+    - "inadequate"
+    - "team"
+    - "because"
+  min_words: 5
+  max_words: 20

@@ -1,0 +1,61 @@
+name: medium_linq_010
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Ticket with: int Id, string Status, int Priority, DateTime Created.
+  A class TicketQueue with a constructor accepting IEnumerable<Ticket> tickets.
+  Expose:
+    IEnumerable<Ticket> OpenByPriority() — tickets where Status == "Open", ordered by Priority desc then Created asc
+    Dictionary<string, int> StatusCounts() — count of tickets per Status
+    IEnumerable<Ticket> OlderThan(TimeSpan age, DateTime now) — tickets whose Created is older than now - age
+  Return only valid C# code in a single file.
+test_code: |
+  public class TicketQueueTests
+  {
+      private static readonly DateTime Base = new DateTime(2024,1,10,0,0,0,DateTimeKind.Utc);
+      private readonly Ticket[] _tickets = {
+          new(1, "Open",   3, Base.AddDays(-5)),
+          new(2, "Open",   1, Base.AddDays(-1)),
+          new(3, "Closed", 2, Base.AddDays(-10)),
+          new(4, "Open",   3, Base.AddDays(-3)),
+          new(5, "Pending",1, Base.AddDays(-2)),
+      };
+
+      [Fact]
+      public void OpenByPriority_OnlyOpenTickets()
+      {
+          new TicketQueue(_tickets).OpenByPriority().Should().AllSatisfy(t => t.Status.Should().Be("Open"));
+      }
+
+      [Fact]
+      public void OpenByPriority_OrderedByPriorityDescThenCreatedAsc()
+      {
+          var result = new TicketQueue(_tickets).OpenByPriority().ToList();
+          result[0].Priority.Should().Be(3);
+          result[0].Id.Should().Be(1);
+          result[1].Id.Should().Be(4);
+      }
+
+      [Fact]
+      public void StatusCounts_CorrectCounts()
+      {
+          var counts = new TicketQueue(_tickets).StatusCounts();
+          counts["Open"].Should().Be(3);
+          counts["Closed"].Should().Be(1);
+          counts["Pending"].Should().Be(1);
+      }
+
+      [Fact]
+      public void OlderThan_ReturnsTwoTickets()
+      {
+          new TicketQueue(_tickets).OlderThan(TimeSpan.FromDays(4), Base).Should().HaveCount(2);
+      }
+  }

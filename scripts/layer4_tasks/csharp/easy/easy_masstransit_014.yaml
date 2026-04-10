@@ -1,0 +1,35 @@
+name: easy_masstransit_014
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record TaskCompleted(Guid TaskId, string AssignedTo, TimeSpan Duration)
+  A consumer class TaskCompletedConsumer that implements IConsumer<TaskCompleted>:
+    Has a public TimeSpan TotalDuration = TimeSpan.Zero
+    Consume method adds message.Duration to TotalDuration
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class TaskCompletedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_AccumulatesDuration()
+      {
+          var consumer = new TaskCompletedConsumer();
+          var ctx1 = Substitute.For<ConsumeContext<TaskCompleted>>();
+          ctx1.Message.Returns(new TaskCompleted(Guid.NewGuid(), "alice", TimeSpan.FromMinutes(30)));
+          var ctx2 = Substitute.For<ConsumeContext<TaskCompleted>>();
+          ctx2.Message.Returns(new TaskCompleted(Guid.NewGuid(), "bob", TimeSpan.FromMinutes(45)));
+          await consumer.Consume(ctx1);
+          await consumer.Consume(ctx2);
+          consumer.TotalDuration.Should().Be(TimeSpan.FromMinutes(75));
+      }
+  }

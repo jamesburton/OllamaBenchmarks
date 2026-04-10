@@ -1,0 +1,18 @@
+name: summarisation_easy_083
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A social media platform has announced new privacy settings that give users more control over who can see their posts. The changes come after pressure from regulators and user groups. Users will be prompted to review their privacy preferences when they next log in.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "privacy"
+    - "social media"
+    - "users"
+    - "settings"
+  max_words: 25

@@ -1,0 +1,15 @@
+name: syllogisms_medium_005
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All even numbers are divisible by 2.
+  2. All multiples of 4 are even.
+  3. All multiples of 8 are multiples of 4.
+  Is 24 (a multiple of 8) divisible by 2? Reply with only: Yes or No.
+expected_answer: "Yes."
+validator_config: {}

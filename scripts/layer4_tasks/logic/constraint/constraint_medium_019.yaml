@@ -1,0 +1,12 @@
+name: constraint_medium_019
+category: logic
+subcategory: constraint
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Five people each work on different days Mon-Fri. Andy works Monday. Beth works the day after Andy. Carl works Thursday. Diana does not work Wednesday or Friday. Eve works on the remaining day.
+  What day does Diana work? Reply with only the day.
+expected_answer: "Tuesday"
+validator_config: {}

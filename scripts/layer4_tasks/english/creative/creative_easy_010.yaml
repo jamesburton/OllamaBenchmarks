@@ -1,0 +1,22 @@
+name: creative_easy_010
+category: english
+subcategory: creative
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of an empty theatre just before a performance begins.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "theatre"
+    - "quiet"
+    - "seats"
+    - "stage"
+    - "curtain"
+    - "lights"
+    - "audience"
+    - "empty"
+  min_words: 15
+  max_words: 60

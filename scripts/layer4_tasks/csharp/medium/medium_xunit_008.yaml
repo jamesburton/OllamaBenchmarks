@@ -1,0 +1,70 @@
+name: medium_xunit_008
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Scheduler with:
+    void Schedule(string name, TimeSpan delay, Action action)
+    void Cancel(string name)
+    bool IsPending(string name)
+    void AdvanceTime(TimeSpan duration)
+  AdvanceTime triggers all actions whose delay has elapsed.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SchedulerTests
+  {
+      [Fact]
+      public void AdvanceTime_TriggersAction_WhenDelayElapsed()
+      {
+          var scheduler = new Scheduler();
+          var executed = false;
+          scheduler.Schedule("task1", TimeSpan.FromSeconds(5), () => executed = true);
+          scheduler.AdvanceTime(TimeSpan.FromSeconds(5));
+          executed.Should().BeTrue();
+      }
+
+      [Fact]
+      public void AdvanceTime_DoesNotTrigger_BeforeDelay()
+      {
+          var scheduler = new Scheduler();
+          var executed = false;
+          scheduler.Schedule("task1", TimeSpan.FromSeconds(10), () => executed = true);
+          scheduler.AdvanceTime(TimeSpan.FromSeconds(5));
+          executed.Should().BeFalse();
+      }
+
+      [Fact]
+      public void Cancel_PreventsExecution()
+      {
+          var scheduler = new Scheduler();
+          var executed = false;
+          scheduler.Schedule("task1", TimeSpan.FromSeconds(5), () => executed = true);
+          scheduler.Cancel("task1");
+          scheduler.AdvanceTime(TimeSpan.FromSeconds(10));
+          executed.Should().BeFalse();
+      }
+
+      [Fact]
+      public void IsPending_ReturnsTrueForScheduled()
+      {
+          var scheduler = new Scheduler();
+          scheduler.Schedule("t", TimeSpan.FromSeconds(1), () => { });
+          scheduler.IsPending("t").Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsPending_ReturnsFalseAfterExecution()
+      {
+          var scheduler = new Scheduler();
+          scheduler.Schedule("t", TimeSpan.FromSeconds(1), () => { });
+          scheduler.AdvanceTime(TimeSpan.FromSeconds(2));
+          scheduler.IsPending("t").Should().BeFalse();
+      }
+  }

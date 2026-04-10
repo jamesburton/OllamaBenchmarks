@@ -1,0 +1,22 @@
+name: creative_easy_001
+category: english
+subcategory: creative
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a busy city street at midday.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "cars"
+    - "people"
+    - "noise"
+    - "street"
+    - "traffic"
+    - "crowd"
+    - "bustling"
+    - "busy"
+  min_words: 15
+  max_words: 60

@@ -1,0 +1,66 @@
+name: medium_aspnet_001
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ProductDto(int Id, string Name, decimal Price).
+  A static class ProductEndpoints with method:
+    void MapProductEndpoints(WebApplication app)
+  Register GET /products returning a hardcoded list of 3 ProductDto.
+  Register GET /products/{id} returning the matching product or 404.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProductEndpointTests
+  {
+      [Fact]
+      public async Task GetProducts_ReturnsThreeItems()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          ProductEndpoints.MapProductEndpoints(app);
+          await app.StartAsync();
+          var client = app.GetTestClient();
+          var response = await client.GetAsync("/products");
+          response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          var items = await response.Content.ReadFromJsonAsync<List<ProductDto>>();
+          items.Should().HaveCount(3);
+      }
+
+      [Fact]
+      public async Task GetProduct_ById_ReturnsCorrectItem()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          ProductEndpoints.MapProductEndpoints(app);
+          await app.StartAsync();
+          var client = app.GetTestClient();
+          var all = await (await client.GetAsync("/products")).Content.ReadFromJsonAsync<List<ProductDto>>();
+          var first = all![0];
+          var response = await client.GetAsync($"/products/{first.Id}");
+          response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+          var item = await response.Content.ReadFromJsonAsync<ProductDto>();
+          item!.Id.Should().Be(first.Id);
+      }
+
+      [Fact]
+      public async Task GetProduct_NotFound_Returns404()
+      {
+          var builder = WebApplication.CreateBuilder();
+          builder.WebHost.UseTestServer();
+          var app = builder.Build();
+          ProductEndpoints.MapProductEndpoints(app);
+          await app.StartAsync();
+          var client = app.GetTestClient();
+          var response = await client.GetAsync("/products/99999");
+          response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+      }
+  }

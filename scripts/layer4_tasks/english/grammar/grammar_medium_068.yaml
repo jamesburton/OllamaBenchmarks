@@ -1,0 +1,15 @@
+name: grammar_medium_068
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) The project ran over budget, consequently the board demanded a review.
+  B) The project ran over budget; consequently, the board demanded a review.
+  C) The project ran over budget: consequently the board demanded a review.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

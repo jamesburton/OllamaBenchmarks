@@ -1,0 +1,16 @@
+name: vocabulary_hard_099
+category: english
+subcategory: vocabulary
+difficulty: hard
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  The word 'boycott' entered English because of actions against which person?
+  A) Captain Charles Boycott
+  B) Lord William Boycott
+  C) Sir Edward Boycott
+  D) John Boycott
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

@@ -1,0 +1,15 @@
+name: grammar_easy_017
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) She is taller than him.
+  B) She is taller than he.
+  C) She is taller then him.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

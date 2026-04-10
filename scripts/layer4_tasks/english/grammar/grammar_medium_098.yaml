@@ -1,0 +1,15 @@
+name: grammar_medium_098
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) She tried to effect change within the organisation.
+  B) She tried to affect change within the organisation.
+  C) She tried to have an affect change within the organisation.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

@@ -1,0 +1,70 @@
+name: medium_efcore_030
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Reward with: int Id, string UserId, int Points, string Reason, DateTime EarnedAt.
+  A class RewardDbContext : DbContext with DbSet<Reward> Rewards.
+  A class RewardRepository with constructor accepting RewardDbContext.
+  Methods:
+    Task<int> GetTotalPointsAsync(string userId)
+    Task AddRewardAsync(string userId, int points, string reason)
+    Task<IEnumerable<Reward>> GetHistoryAsync(string userId)
+    Task<IDictionary<string, int>> GetLeaderboardAsync(int top)
+  GetLeaderboardAsync returns top N users by total points.
+  Return only valid C# code in a single file.
+test_code: |
+  public class RewardRepositoryTests : IAsyncLifetime
+  {
+      private RewardDbContext _db = null!;
+      private RewardRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<RewardDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new RewardDbContext(opts);
+          _repo = new RewardRepository(_db);
+          _db.Rewards.AddRange(
+              new Reward { UserId = "u1", Points = 100, Reason = "purchase", EarnedAt = DateTime.UtcNow },
+              new Reward { UserId = "u1", Points = 50, Reason = "review", EarnedAt = DateTime.UtcNow },
+              new Reward { UserId = "u2", Points = 200, Reason = "referral", EarnedAt = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetTotalPoints_SumsCorrectly()
+      {
+          (await _repo.GetTotalPointsAsync("u1")).Should().Be(150);
+      }
+
+      [Fact]
+      public async Task AddReward_StoresEntry()
+      {
+          await _repo.AddRewardAsync("u1", 25, "bonus");
+          (await _repo.GetTotalPointsAsync("u1")).Should().Be(175);
+      }
+
+      [Fact]
+      public async Task GetHistory_ReturnsUserRewards()
+      {
+          (await _repo.GetHistoryAsync("u1")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetLeaderboard_ReturnsTopN()
+      {
+          var board = await _repo.GetLeaderboardAsync(2);
+          board.Should().HaveCount(2);
+          board.First().Value.Should().BeGreaterThanOrEqualTo(board.Last().Value);
+      }
+  }

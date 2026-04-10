@@ -1,0 +1,23 @@
+name: technical_hard_037
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for a generator function that streams large file contents in chunks.
+  Include Args, Yields, Raises, and a note on memory efficiency.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Yields:"
+    - "Raises:"
+    - "generator"
+    - "chunk"
+    - "stream"
+    - "memory"
+    - "file"
+  min_words: 12
+  max_words: 100

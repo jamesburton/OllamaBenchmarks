@@ -1,0 +1,45 @@
+name: easy_blazor_029
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class ImageCarouselComponent that extends ComponentBase with:
+    [Parameter] List<string> ImageUrls { get; set; } = new()
+    int CurrentIndex { get; set; } = 0
+    string CurrentImage => ImageUrls.Count > 0 ? ImageUrls[CurrentIndex] : ""
+    void Next() increments CurrentIndex, wrapping around to 0 when reaching the end
+    void Previous() decrements CurrentIndex, wrapping around to the last index when going below 0
+  Return only valid C# code in a single file.
+test_code: |
+  public class ImageCarouselComponentTests
+  {
+      [Fact]
+      public void Next_WrapsAroundToFirst()
+      {
+          var c = new ImageCarouselComponent
+          {
+              ImageUrls = new List<string> { "a.jpg", "b.jpg", "c.jpg" },
+              CurrentIndex = 2
+          };
+          c.Next();
+          c.CurrentIndex.Should().Be(0);
+      }
+      [Fact]
+      public void Previous_WrapsAroundToLast()
+      {
+          var c = new ImageCarouselComponent
+          {
+              ImageUrls = new List<string> { "a.jpg", "b.jpg", "c.jpg" },
+              CurrentIndex = 0
+          };
+          c.Previous();
+          c.CurrentIndex.Should().Be(2);
+      }
+  }

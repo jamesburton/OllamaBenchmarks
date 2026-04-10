@@ -1,0 +1,23 @@
+name: technical_easy_008
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Troubleshooting' section for a command-line tool that sometimes fails to connect.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "troubleshoot"
+    - "connection"
+    - "error"
+    - "check"
+    - "firewall"
+    - "network"
+    - "port"
+    - "retry"
+  min_words: 10
+  max_words: 80

@@ -1,0 +1,35 @@
+name: easy_masstransit_025
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record ContentPublished(Guid ContentId, string Title, string[] Tags)
+  A consumer class ContentPublishedConsumer that implements IConsumer<ContentPublished>:
+    Has a public HashSet<string> AllTags = new()
+    Consume method adds all Tags from the message to AllTags
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class ContentPublishedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CollectsAllTags()
+      {
+          var consumer = new ContentPublishedConsumer();
+          var ctx1 = Substitute.For<ConsumeContext<ContentPublished>>();
+          ctx1.Message.Returns(new ContentPublished(Guid.NewGuid(), "Post 1", new[]{"csharp","dotnet"}));
+          var ctx2 = Substitute.For<ConsumeContext<ContentPublished>>();
+          ctx2.Message.Returns(new ContentPublished(Guid.NewGuid(), "Post 2", new[]{"dotnet","azure"}));
+          await consumer.Consume(ctx1);
+          await consumer.Consume(ctx2);
+          consumer.AllTags.Should().BeEquivalentTo(new[]{"csharp","dotnet","azure"});
+      }
+  }

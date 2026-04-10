@@ -1,0 +1,14 @@
+name: deduction_medium_011
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If the code compiles, it has no syntax errors.
+  2. The code has syntax errors.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "The code does not compile."
+validator_config: {}

@@ -1,0 +1,15 @@
+name: syllogisms_medium_008
+category: logic
+subcategory: syllogisms
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All squares are rectangles.
+  2. All rectangles are parallelograms.
+  3. No parallelogram is a circle.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "No square is a circle."
+validator_config: {}

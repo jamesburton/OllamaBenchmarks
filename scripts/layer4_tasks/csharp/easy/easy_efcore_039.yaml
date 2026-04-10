@@ -1,0 +1,44 @@
+name: easy_efcore_039
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class UserProfile with properties: int Id, string UserId, string Bio, string AvatarUrl, DateTime UpdatedAt
+  A DbContext class ProfileContext with:
+    DbSet<UserProfile> Profiles { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class ProfileRepository with:
+    UserProfile CreateOrUpdate(ProfileContext context, string userId, string bio, string avatarUrl)
+  that creates a new profile or updates the existing one's bio and avatarUrl.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ProfileRepositoryTests
+  {
+      [Fact]
+      public void CreateOrUpdate_CreatesNewProfile()
+      {
+          using var context = new ProfileContext();
+          context.Database.EnsureCreated();
+          var result = ProfileRepository.CreateOrUpdate(context, "u1", "Hello", "https://img.com/a.jpg");
+          result.UserId.Should().Be("u1");
+          context.Profiles.Should().HaveCount(1);
+      }
+      [Fact]
+      public void CreateOrUpdate_UpdatesExisting()
+      {
+          using var context = new ProfileContext();
+          context.Database.EnsureCreated();
+          ProfileRepository.CreateOrUpdate(context, "u1", "Old bio", "old.jpg");
+          ProfileRepository.CreateOrUpdate(context, "u1", "New bio", "new.jpg");
+          context.Profiles.Should().HaveCount(1);
+          context.Profiles.First().Bio.Should().Be("New bio");
+      }
+  }

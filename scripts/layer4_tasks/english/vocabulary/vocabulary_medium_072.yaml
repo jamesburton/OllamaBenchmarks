@@ -1,0 +1,16 @@
+name: vocabulary_medium_072
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which phrase is appropriate for an INFORMAL conversation?
+  A) 'I would like to request'
+  B) 'Please be advised'
+  C) 'Can you sort this out?'
+  D) 'Pursuant to our discussion'
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

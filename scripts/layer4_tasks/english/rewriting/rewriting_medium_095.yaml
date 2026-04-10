@@ -1,0 +1,21 @@
+name: rewriting_medium_095
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'The athlete trained for four years. She qualified for the Olympics. She won a bronze medal.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "trained"
+    - "qualified"
+    - "Olympics"
+    - "bronze"
+    - "medal"
+  min_words: 8
+  max_words: 30

@@ -1,0 +1,56 @@
+name: medium_masstransit_023
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record ContentPublished(Guid ContentId, string AuthorId, string Title, IEnumerable<string> Tags).
+  A consumer ContentPublishedConsumer implementing IConsumer<ContentPublished>.
+  Constructor accepts ISearchIndexer service.
+  Interface ISearchIndexer with: Task IndexAsync(Guid contentId, string title, IEnumerable<string> tags).
+  In Consume: calls service.IndexAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record ContentPublished(Guid ContentId, string AuthorId, string Title, IEnumerable<string> Tags); }
+  global using Contracts;
+
+  public class ContentPublishedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<ISearchIndexer>();
+          var consumer = new ContentPublishedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<ContentPublished>>();
+          ctx.Message.Returns(new ContentPublished(Guid.NewGuid(), "Aut", "Tit", new string[]{}));
+          await consumer.Consume(ctx);
+          await svc.Received(1).IndexAsync(Arg.Any<Guid contentId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<ISearchIndexer>();
+          var consumer = new ContentPublishedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<ContentPublished>>();
+          ctx.Message.Returns(new ContentPublished(Guid.NewGuid(), "Aut", "Tit", new string[]{}));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<ISearchIndexer>();
+          var consumer = new ContentPublishedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<ContentPublished>>();
+          ctx.Message.Returns(new ContentPublished(Guid.NewGuid(), "Auth", "Titl", new string[]{}));
+          await consumer.Consume(ctx);
+          await svc.Received(1).IndexAsync(Arg.Any<Guid contentId>(), Arg.Any<object>());
+      }
+  }

@@ -1,0 +1,34 @@
+name: easy_async_007
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Loader with a static method:
+    async Task<string> LoadWithFallbackAsync(Task<string> primary, string fallback)
+  that awaits the primary task; if it throws any exception, returns the fallback string instead.
+  Use try/catch.
+  Return only valid C# code in a single file.
+test_code: |
+  public class LoaderTests
+  {
+      [Fact]
+      public async Task LoadWithFallbackAsync_ReturnsValue_WhenSucceeds()
+      {
+          var result = await Loader.LoadWithFallbackAsync(Task.FromResult("hello"), "fallback");
+          result.Should().Be("hello");
+      }
+      [Fact]
+      public async Task LoadWithFallbackAsync_ReturnsFallback_WhenThrows()
+      {
+          var failing = Task.FromException<string>(new Exception("oops"));
+          var result = await Loader.LoadWithFallbackAsync(failing, "fallback");
+          result.Should().Be("fallback");
+      }
+  }

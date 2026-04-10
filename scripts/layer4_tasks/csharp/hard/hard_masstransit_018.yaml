@@ -1,0 +1,113 @@
+name: hard_masstransit_018
+category: csharp_hard
+subcategory: masstransit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  namespace Contracts;
+  global using Contracts;
+
+  MassTransit request client with IConsumer and response types:
+  Messages:
+    record ValidateAddress(Guid RequestId, string Street, string City, string PostalCode, string Country);
+    record AddressValid(Guid RequestId, string NormalizedAddress);
+    record AddressInvalid(Guid RequestId, IReadOnlyList<string> Errors);
+
+  Class AddressValidationConsumer : IConsumer<ValidateAddress>:
+    Validates: Street not empty, City not empty, PostalCode matches pattern "^\d{5}$" or "\w{2,4}\d{1,2}$",
+    Country is 2-letter ISO code.
+    If all valid: respond with AddressValid (normalize to uppercase).
+    If any errors: respond with AddressInvalid with list of error messages.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AddressValidationConsumerTests
+  {
+      [Fact]
+      public async Task ValidAddress_RespondsWithAddressValid()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<AddressValidationConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<ValidateAddress>();
+              var response = await client.GetResponse<AddressValid, AddressInvalid>(
+                  new ValidateAddress(Guid.NewGuid(), "123 Main St", "Springfield", "12345", "US"));
+              response.Is(out Response<AddressValid> valid).Should().BeTrue();
+              valid.Message.NormalizedAddress.Should().NotBeNullOrEmpty();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task EmptyStreet_RespondsWithAddressInvalid()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<AddressValidationConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<ValidateAddress>();
+              var response = await client.GetResponse<AddressValid, AddressInvalid>(
+                  new ValidateAddress(Guid.NewGuid(), "", "Springfield", "12345", "US"));
+              response.Is(out Response<AddressInvalid> invalid).Should().BeTrue();
+              invalid.Message.Errors.Should().NotBeEmpty();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task InvalidPostalCode_RespondsWithErrors()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<AddressValidationConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<ValidateAddress>();
+              var response = await client.GetResponse<AddressValid, AddressInvalid>(
+                  new ValidateAddress(Guid.NewGuid(), "456 Oak Ave", "Portland", "BADZIP", "US"));
+              response.Is(out Response<AddressInvalid> _).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task InvalidCountry_RespondsWithErrors()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<AddressValidationConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<ValidateAddress>();
+              var response = await client.GetResponse<AddressValid, AddressInvalid>(
+                  new ValidateAddress(Guid.NewGuid(), "789 Elm St", "Dallas", "75001", "UNITED STATES"));
+              response.Is(out Response<AddressInvalid> _).Should().BeTrue();
+          }
+          finally { await harness.Stop(); }
+      }
+
+      [Fact]
+      public async Task ValidAddress_NormalizedToUpperCase()
+      {
+          var harness = new InMemoryTestHarness();
+          harness.Consumer<AddressValidationConsumer>();
+          await harness.Start();
+          try
+          {
+              var client = harness.CreateRequestClient<ValidateAddress>();
+              var response = await client.GetResponse<AddressValid, AddressInvalid>(
+                  new ValidateAddress(Guid.NewGuid(), "lower st", "city", "98765", "CA"));
+              response.Is(out Response<AddressValid> valid).Should().BeTrue();
+              valid.Message.NormalizedAddress.Should().Be(valid.Message.NormalizedAddress.ToUpperInvariant());
+          }
+          finally { await harness.Stop(); }
+      }
+  }

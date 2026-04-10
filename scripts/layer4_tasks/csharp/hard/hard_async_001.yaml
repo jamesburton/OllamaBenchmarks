@@ -1,0 +1,73 @@
+name: hard_async_001
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class DataProcessor that implements a producer-consumer pipeline using
+  System.Threading.Channels.Channel<T>.
+  The class has:
+    Task ProduceAsync(IEnumerable<int> items, CancellationToken ct) — writes items to
+      a bounded channel (capacity 10), then completes the writer.
+    Task<List<int>> ConsumeAsync(Func<int, int> transform, CancellationToken ct) —
+      reads all items from the channel, applies transform, collects results.
+    Task<List<int>> RunPipelineAsync(IEnumerable<int> items, Func<int, int> transform,
+      CancellationToken ct) — runs producer and consumer concurrently and returns results.
+  Use Channel.CreateBounded<int> with BoundedChannelFullMode.Wait.
+  CancellationToken cancellation should stop both producer and consumer gracefully.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DataProcessorTests
+  {
+      [Fact]
+      public async Task RunPipeline_TransformsAllItems()
+      {
+          var input = Enumerable.Range(1, 20).ToList();
+          var processor = new DataProcessor();
+          var result = await processor.RunPipelineAsync(input, x => x * 2, CancellationToken.None);
+          result.Should().HaveCount(20);
+          result.Should().OnlyContain(x => x % 2 == 0);
+      }
+
+      [Fact]
+      public async Task RunPipeline_EmptyInput_ReturnsEmpty()
+      {
+          var processor = new DataProcessor();
+          var result = await processor.RunPipelineAsync(Array.Empty<int>(), x => x, CancellationToken.None);
+          result.Should().BeEmpty();
+      }
+
+      [Fact]
+      public async Task RunPipeline_CancellationStopsPipeline()
+      {
+          var cts = new CancellationTokenSource();
+          var processor = new DataProcessor();
+          var input = Enumerable.Range(1, 1000);
+          cts.CancelAfter(50);
+          var act = async () => await processor.RunPipelineAsync(input, x => { Task.Delay(10).Wait(); return x; }, cts.Token);
+          await act.Should().ThrowAsync<OperationCanceledException>();
+      }
+
+      [Fact]
+      public async Task RunPipeline_LargeInput_AllProcessed()
+      {
+          var input = Enumerable.Range(1, 100).ToList();
+          var result = await new DataProcessor().RunPipelineAsync(input, x => x + 1, CancellationToken.None);
+          result.Should().HaveCount(100);
+      }
+
+      [Fact]
+      public async Task RunPipeline_TransformThrows_PropagatesException()
+      {
+          var processor = new DataProcessor();
+          var act = async () => await processor.RunPipelineAsync(
+              new[] { 1 }, x => throw new InvalidOperationException("boom"), CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+  }

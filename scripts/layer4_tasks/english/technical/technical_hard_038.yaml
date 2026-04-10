@@ -1,0 +1,23 @@
+name: technical_hard_038
+category: english
+subcategory: technical
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a JSDoc comment for a higher-order function that creates a memoised version of any pure function.
+  Include @template, @param, @returns tags and a brief example.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "@param"
+    - "@returns"
+    - "@template"
+    - "memoize"
+    - "cache"
+    - "pure function"
+    - "higher-order"
+    - "returns"
+  min_words: 12
+  max_words: 100

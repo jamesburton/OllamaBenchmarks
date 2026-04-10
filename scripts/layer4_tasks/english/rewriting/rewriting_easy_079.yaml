@@ -1,0 +1,21 @@
+name: rewriting_easy_079
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'It was raining. She carried an umbrella.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "raining"
+    - "umbrella"
+    - "because"
+    - "so"
+    - "since"
+  min_words: 5
+  max_words: 15

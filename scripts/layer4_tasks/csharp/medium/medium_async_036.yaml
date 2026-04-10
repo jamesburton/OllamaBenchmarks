@@ -1,0 +1,60 @@
+name: medium_async_036
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncRetryPolicy with constructor accepting int maxAttempts and Func<int, TimeSpan> delaySelector.
+  Exposes Task<T> ExecuteAsync<T>(Func<int, CancellationToken, Task<T>> operation, CancellationToken ct = default).
+  Passes 1-based attempt number. Retries on Exception. Does not retry OperationCanceledException.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncRetryPolicyTests
+  {
+      [Fact]
+      public async Task FirstAttempt_Succeeds()
+      {
+          var policy = new AsyncRetryPolicy(3, _ => TimeSpan.Zero);
+          (await policy.ExecuteAsync(async (a, ct) => { await Task.Yield(); return a; })).Should().Be(1);
+      }
+
+      [Fact]
+      public async Task RetriesToSuccess()
+      {
+          int calls = 0;
+          var policy = new AsyncRetryPolicy(3, _ => TimeSpan.Zero);
+          var result = await policy.ExecuteAsync(async (_, ct) => {
+              calls++; await Task.Yield();
+              if (calls < 3) throw new Exception("retry");
+              return 99;
+          });
+          result.Should().Be(99);
+          calls.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task ExhaustsAttempts_Throws()
+      {
+          await Assert.ThrowsAsync<InvalidOperationException>(() =>
+              new AsyncRetryPolicy(2, _ => TimeSpan.Zero).ExecuteAsync<int>(
+                  (_, ct) => Task.FromException<int>(new InvalidOperationException())));
+      }
+
+      [Fact]
+      public async Task Cancelled_NoRetry()
+      {
+          int calls = 0;
+          var cts = new CancellationTokenSource();
+          cts.Cancel();
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+              new AsyncRetryPolicy(5, _ => TimeSpan.Zero).ExecuteAsync<int>(
+                  async (_, ct) => { calls++; ct.ThrowIfCancellationRequested(); return 0; }, cts.Token));
+          calls.Should().Be(1);
+      }
+  }

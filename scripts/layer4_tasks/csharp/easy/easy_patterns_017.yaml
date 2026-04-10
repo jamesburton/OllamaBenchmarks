@@ -1,0 +1,35 @@
+name: easy_patterns_017
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class NullCoalesceHelper with a static method:
+    int SumOrZero(int? a, int? b)
+  that returns the sum of the two nullable ints, treating null as zero using the null-coalescing operator.
+  Return only valid C# code in a single file.
+test_code: |
+  public class NullCoalesceHelperTests
+  {
+      [Fact]
+      public void SumOrZero_BothNonNull()
+      {
+          NullCoalesceHelper.SumOrZero(3, 4).Should().Be(7);
+      }
+      [Fact]
+      public void SumOrZero_FirstNull()
+      {
+          NullCoalesceHelper.SumOrZero(null, 4).Should().Be(4);
+      }
+      [Fact]
+      public void SumOrZero_BothNull()
+      {
+          NullCoalesceHelper.SumOrZero(null, null).Should().Be(0);
+      }
+  }

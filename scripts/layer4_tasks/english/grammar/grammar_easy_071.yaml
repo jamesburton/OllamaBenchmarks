@@ -1,0 +1,15 @@
+name: grammar_easy_071
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which sentence is a run-on?
+  A) I went to the store I bought milk.
+  B) I went to the store and bought milk.
+  C) I went to the store; I bought milk.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

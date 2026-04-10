@@ -1,0 +1,22 @@
+name: creative_hard_067
+category: english
+subcategory: creative
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of a place that was once full of life but is now completely abandoned.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "empty"
+    - "once"
+    - "silence"
+    - "faded"
+    - "decay"
+    - "forgotten"
+    - "absence"
+    - "was"
+  min_words: 15
+  max_words: 60

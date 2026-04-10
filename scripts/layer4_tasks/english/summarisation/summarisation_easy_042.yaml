@@ -1,0 +1,18 @@
+name: summarisation_easy_042
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A 19-year-old swimmer broke the world record in the 100-metre freestyle at the national championships. She completed the race in 51.7 seconds, shaving 0.3 seconds off the previous record. Coaches say she is on track to compete at the next Olympic Games.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "swimmer"
+    - "record"
+    - "freestyle"
+    - "Olympic"
+  max_words: 25

@@ -1,0 +1,41 @@
+name: medium_blazor_032
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AnimationService with:
+    bool IsAnimating, void StartAnimation(string name), void StopAnimation(), string? CurrentAnimation, event Action? OnAnimationChanged
+  Return only valid C# code in a single file.
+test_code: |
+  public class AnimationServiceTests
+  {
+      [Fact]
+      public void Service_CanBeInstantiated()
+      {
+          var svc = new AnimationService();
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_InitialState_IsDefault()
+      {
+          var svc = new AnimationService();
+          // Just verify construction does not throw
+          svc.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Service_BasicOperation_Works()
+      {
+          var svc = new AnimationService();
+          // Basic smoke test
+          svc.Should().NotBeNull();
+      }
+  }

@@ -1,0 +1,15 @@
+name: syllogisms_easy_004
+category: logic
+subcategory: syllogisms
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Premises:
+  1. All fish live in water.
+  2. No land-dwellers live in water.
+  3. A salmon is a fish.
+  Conclusion? Reply with only the conclusion.
+expected_answer: "A salmon is not a land-dweller."
+validator_config: {}

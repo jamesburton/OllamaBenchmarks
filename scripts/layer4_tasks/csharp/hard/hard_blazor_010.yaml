@@ -1,0 +1,96 @@
+name: hard_blazor_010
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor theme and preferences service:
+  Enum ColorTheme { Light, Dark, System }
+  Enum FontSize { Small, Medium, Large }
+  Records:
+    UserPreferences(string UserId, ColorTheme Theme, FontSize FontSize, bool CompactMode,
+      string Language, bool EmailNotifications)
+    PreferencesUpdate(ColorTheme? Theme, FontSize? FontSize, bool? CompactMode,
+      string? Language, bool? EmailNotifications)
+
+  Interface IPreferencesStore:
+    Task<UserPreferences?> GetAsync(string userId, CancellationToken ct)
+    Task SaveAsync(UserPreferences prefs, CancellationToken ct)
+
+  Class UserPreferencesService(IPreferencesStore store):
+    Task<UserPreferences> GetOrDefaultAsync(string userId, CancellationToken ct):
+      Returns stored or new default (Light, Medium, false, "en", true).
+    Task<UserPreferences> UpdateAsync(string userId, PreferencesUpdate update, CancellationToken ct):
+      Applies non-null fields from update, saves, returns updated.
+    event Action<string, UserPreferences>? OnPreferencesChanged
+  Return only valid C# code in a single file.
+test_code: |
+  public class UserPreferencesServiceTests
+  {
+      private IPreferencesStore CreateStore() => Substitute.For<IPreferencesStore>();
+
+      [Fact]
+      public async Task GetOrDefault_NoStoredPrefs_ReturnsDefaults()
+      {
+          var store = CreateStore();
+          store.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((UserPreferences?)null);
+          var svc = new UserPreferencesService(store);
+          var prefs = await svc.GetOrDefaultAsync("u1", CancellationToken.None);
+          prefs.Theme.Should().Be(ColorTheme.Light);
+          prefs.Language.Should().Be("en");
+      }
+
+      [Fact]
+      public async Task GetOrDefault_StoredPrefs_ReturnsStored()
+      {
+          var store = CreateStore();
+          var stored = new UserPreferences("u1", ColorTheme.Dark, FontSize.Large, true, "fr", false);
+          store.GetAsync("u1", Arg.Any<CancellationToken>()).Returns(stored);
+          var svc = new UserPreferencesService(store);
+          var prefs = await svc.GetOrDefaultAsync("u1", CancellationToken.None);
+          prefs.Theme.Should().Be(ColorTheme.Dark);
+          prefs.Language.Should().Be("fr");
+      }
+
+      [Fact]
+      public async Task Update_AppliesNonNullFields()
+      {
+          var store = CreateStore();
+          store.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((UserPreferences?)null);
+          store.SaveAsync(Arg.Any<UserPreferences>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var svc = new UserPreferencesService(store);
+          var updated = await svc.UpdateAsync("u2", new PreferencesUpdate(ColorTheme.Dark, null, null, null, null), CancellationToken.None);
+          updated.Theme.Should().Be(ColorTheme.Dark);
+          updated.FontSize.Should().Be(FontSize.Medium);
+      }
+
+      [Fact]
+      public async Task Update_SavesUpdatedPreferences()
+      {
+          var store = CreateStore();
+          store.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((UserPreferences?)null);
+          store.SaveAsync(Arg.Any<UserPreferences>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var svc = new UserPreferencesService(store);
+          await svc.UpdateAsync("u3", new PreferencesUpdate(null, FontSize.Large, null, null, null), CancellationToken.None);
+          await store.Received(1).SaveAsync(Arg.Is<UserPreferences>(p => p.FontSize == FontSize.Large), Arg.Any<CancellationToken>());
+      }
+
+      [Fact]
+      public async Task Update_FiresOnPreferencesChanged()
+      {
+          var store = CreateStore();
+          store.GetAsync(Arg.Any<string>(), Arg.Any<CancellationToken>()).Returns((UserPreferences?)null);
+          store.SaveAsync(Arg.Any<UserPreferences>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
+          var svc = new UserPreferencesService(store);
+          string? changedUserId = null;
+          svc.OnPreferencesChanged += (uid, _) => changedUserId = uid;
+          await svc.UpdateAsync("u4", new PreferencesUpdate(ColorTheme.System, null, null, null, null), CancellationToken.None);
+          changedUserId.Should().Be("u4");
+      }
+  }

@@ -1,0 +1,31 @@
+name: easy_linq_020
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Mapper with a static method:
+    List<string> SelectUpperCase(IEnumerable<string> items)
+  that returns each string converted to upper case using LINQ Select + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class MapperTests
+  {
+      [Fact]
+      public void SelectUpperCase_BasicCase()
+      {
+          var result = Mapper.SelectUpperCase(new[]{"hello","world"});
+          result.Should().BeEquivalentTo(new[]{"HELLO","WORLD"}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void SelectUpperCase_EmptySource_ReturnsEmpty()
+      {
+          Mapper.SelectUpperCase(Array.Empty<string>()).Should().BeEmpty();
+      }
+  }

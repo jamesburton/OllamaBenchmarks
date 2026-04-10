@@ -1,0 +1,40 @@
+name: easy_vertical_032
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Player(string Id, string Username, int Level)
+  A record Achievement(string PlayerId, string Name, DateTime UnlockedAt)
+  A class GameProfile with:
+    void AddPlayer(Player player)
+    void UnlockAchievement(Achievement achievement)
+    List<Achievement> GetAchievements(string playerId)
+    int AchievementCount(string playerId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class GameProfileTests
+  {
+      [Fact]
+      public void UnlockAchievement_AddsAchievement()
+      {
+          var profile = new GameProfile();
+          profile.AddPlayer(new Player("p1", "Hero", 5));
+          profile.UnlockAchievement(new Achievement("p1", "First Blood", DateTime.UtcNow));
+          profile.AchievementCount("p1").Should().Be(1);
+      }
+      [Fact]
+      public void GetAchievements_ReturnsPlayerAchievements()
+      {
+          var profile = new GameProfile();
+          profile.UnlockAchievement(new Achievement("p1", "Winner", DateTime.UtcNow));
+          profile.UnlockAchievement(new Achievement("p2", "Loser", DateTime.UtcNow));
+          profile.GetAchievements("p1").Should().HaveCount(1);
+      }
+  }

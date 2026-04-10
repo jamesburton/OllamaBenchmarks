@@ -1,0 +1,26 @@
+name: easy_aspnet_001
+category: csharp_easy
+subcategory: aspnet
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class EndpointHandlers with a static method:
+    IResult GetPing()
+  that returns Results.Ok("pong").
+  Return only valid C# code in a single file.
+test_code: |
+  public class EndpointHandlersTests
+  {
+      [Fact]
+      public void GetPing_ReturnsOkWithPong()
+      {
+          var result = EndpointHandlers.GetPing();
+          result.Should().BeOfType<Microsoft.AspNetCore.Http.HttpResults.Ok<string>>();
+      }
+  }

@@ -1,0 +1,23 @@
+name: technical_medium_029
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a Python docstring for a function that fetches paginated data from a REST API and returns a list of records.
+  Include Args, Returns, and Raises sections.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "Args:"
+    - "Returns:"
+    - "Raises:"
+    - "API"
+    - "paginated"
+    - "records"
+    - "request"
+    - "exception"
+  min_words: 10
+  max_words: 80

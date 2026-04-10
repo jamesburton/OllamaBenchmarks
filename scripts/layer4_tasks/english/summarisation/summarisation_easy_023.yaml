@@ -1,0 +1,18 @@
+name: summarisation_easy_023
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A team of astronomers has detected water vapour in the atmosphere of a planet outside our solar system. This marks the first confirmed presence of water in an exoplanet's atmosphere. The discovery raises the possibility that the planet could support some form of life.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "water"
+    - "exoplanet"
+    - "atmosphere"
+    - "life"
+  max_words: 25

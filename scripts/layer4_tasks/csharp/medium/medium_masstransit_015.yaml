@@ -1,0 +1,56 @@
+name: medium_masstransit_015
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record BackupCompleted(Guid BackupId, string Database, bool Success, long SizeBytes).
+  A consumer BackupCompletedConsumer implementing IConsumer<BackupCompleted>.
+  Constructor accepts IBackupMonitor service.
+  Interface IBackupMonitor with: Task RecordResultAsync(Guid backupId, bool success).
+  In Consume: calls service.RecordResultAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record BackupCompleted(Guid BackupId, string Database, bool Success, long SizeBytes); }
+  global using Contracts;
+
+  public class BackupCompletedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IBackupMonitor>();
+          var consumer = new BackupCompletedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<BackupCompleted>>();
+          ctx.Message.Returns(new BackupCompleted(Guid.NewGuid(), "Dat", true, 1));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RecordResultAsync(Arg.Any<Guid backupId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IBackupMonitor>();
+          var consumer = new BackupCompletedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<BackupCompleted>>();
+          ctx.Message.Returns(new BackupCompleted(Guid.NewGuid(), "Dat", true, 1));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IBackupMonitor>();
+          var consumer = new BackupCompletedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<BackupCompleted>>();
+          ctx.Message.Returns(new BackupCompleted(Guid.NewGuid(), "Data", false, 2));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RecordResultAsync(Arg.Any<Guid backupId>(), Arg.Any<object>());
+      }
+  }

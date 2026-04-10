@@ -1,0 +1,79 @@
+name: hard_patterns_003
+category: csharp_hard
+subcategory: patterns
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A strategy pattern for discount calculation:
+  Interface IDiscountStrategy with method decimal Calculate(decimal originalPrice, int quantity).
+  Implementations:
+    NoDiscount — returns 0.
+    PercentageDiscount(decimal percent) — returns originalPrice * percent / 100 * quantity.
+    BulkDiscount(int minQuantity, decimal discountPerUnit) — if quantity >= minQuantity,
+      returns discountPerUnit * quantity, else 0.
+    TieredDiscount(IReadOnlyList<DiscountTier> tiers) — applies highest matching tier.
+  Record: DiscountTier(int MinQuantity, decimal DiscountPercent).
+  Class PricingEngine with constructor accepting IDiscountStrategy:
+    decimal ComputeTotal(decimal unitPrice, int quantity) — total after discount.
+    decimal ComputeDiscount(decimal unitPrice, int quantity) — discount amount.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PricingEngineTests
+  {
+      [Fact]
+      public void NoDiscount_TotalIsFullPrice()
+      {
+          var engine = new PricingEngine(new NoDiscount());
+          engine.ComputeTotal(10m, 5).Should().Be(50m);
+          engine.ComputeDiscount(10m, 5).Should().Be(0m);
+      }
+
+      [Fact]
+      public void PercentageDiscount_ReducesTotalCorrectly()
+      {
+          var engine = new PricingEngine(new PercentageDiscount(20m));
+          engine.ComputeDiscount(100m, 3).Should().Be(60m);
+          engine.ComputeTotal(100m, 3).Should().Be(240m);
+      }
+
+      [Fact]
+      public void BulkDiscount_BelowMin_NoDiscount()
+      {
+          var engine = new PricingEngine(new BulkDiscount(5, 2m));
+          engine.ComputeDiscount(10m, 3).Should().Be(0m);
+      }
+
+      [Fact]
+      public void BulkDiscount_AtMin_AppliesDiscount()
+      {
+          var engine = new PricingEngine(new BulkDiscount(5, 2m));
+          engine.ComputeDiscount(10m, 5).Should().Be(10m);
+          engine.ComputeTotal(10m, 5).Should().Be(40m);
+      }
+
+      [Fact]
+      public void TieredDiscount_AppliesHighestTier()
+      {
+          var tiers = new[]
+          {
+              new DiscountTier(5,  10m),
+              new DiscountTier(10, 20m),
+          };
+          var engine = new PricingEngine(new TieredDiscount(tiers));
+          engine.ComputeDiscount(100m, 10).Should().Be(200m);
+      }
+
+      [Fact]
+      public void TieredDiscount_BelowAllTiers_NoDiscount()
+      {
+          var tiers = new[] { new DiscountTier(5, 10m) };
+          var engine = new PricingEngine(new TieredDiscount(tiers));
+          engine.ComputeDiscount(100m, 2).Should().Be(0m);
+      }
+  }

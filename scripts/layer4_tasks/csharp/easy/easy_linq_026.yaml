@@ -1,0 +1,30 @@
+name: easy_linq_026
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Checker with a static method:
+    bool ContainsValue(IEnumerable<int> numbers, int value)
+  that returns true if any element equals the given value using LINQ Any.
+  Return only valid C# code in a single file.
+test_code: |
+  public class CheckerTests
+  {
+      [Fact]
+      public void ContainsValue_Found_ReturnsTrue()
+      {
+          Checker.ContainsValue(new[]{1,2,3,4}, 3).Should().BeTrue();
+      }
+      [Fact]
+      public void ContainsValue_NotFound_ReturnsFalse()
+      {
+          Checker.ContainsValue(new[]{1,2,3}, 9).Should().BeFalse();
+      }
+  }

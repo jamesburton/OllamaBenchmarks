@@ -1,0 +1,32 @@
+name: easy_linq_024
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Pager with a static method:
+    List<T> TakeFirst<T>(IEnumerable<T> items, int count)
+  that returns the first count items using LINQ Take + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PagerTests
+  {
+      [Fact]
+      public void TakeFirst_BasicCase()
+      {
+          var result = Pager.TakeFirst(new[]{1,2,3,4,5}, 3);
+          result.Should().BeEquivalentTo(new[]{1,2,3}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void TakeFirst_CountExceedsLength_ReturnsAll()
+      {
+          var result = Pager.TakeFirst(new[]{1,2}, 10);
+          result.Should().BeEquivalentTo(new[]{1,2}, cfg => cfg.WithStrictOrdering());
+      }
+  }

@@ -1,0 +1,94 @@
+name: hard_vertical_020
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + optimistic concurrency + service layer for ticket system:
+  Entity:
+    SupportTicket(int Id, string Subject, string Description, string CustomerId, string AssigneeId,
+      string Status, string Priority, DateTime CreatedAt, DateTime UpdatedAt, byte[] RowVersion)
+    TicketComment(int Id, int TicketId, string AuthorId, string Content, DateTime CreatedAt)
+  DbContext: TicketDbContext (SQLite in-memory, RowVersion concurrency token).
+
+  Records:
+    CreateTicketCommand(string Subject, string Description, string CustomerId, string Priority)
+    AssignTicketCommand(int TicketId, string AssigneeId, string AssignedBy)
+    ResolveTicketCommand(int TicketId, string ResolvedBy, string Resolution)
+    AddCommentCommand(int TicketId, string AuthorId, string Content)
+    TicketDto(int Id, string Subject, string Status, string Priority, string CustomerId, string AssigneeId, int CommentCount, DateTime UpdatedAt)
+
+  Class TicketService(TicketDbContext db):
+    Task<TicketDto> CreateAsync(CreateTicketCommand cmd, CancellationToken ct): Status="Open".
+    Task<TicketDto?> AssignAsync(AssignTicketCommand cmd, CancellationToken ct)
+    Task<TicketDto?> ResolveAsync(ResolveTicketCommand cmd, CancellationToken ct): Status="Resolved".
+    Task<TicketComment> AddCommentAsync(AddCommentCommand cmd, CancellationToken ct)
+    Task<IReadOnlyList<TicketDto>> GetOpenTicketsAsync(string? assigneeId, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class TicketServiceTests : IDisposable
+  {
+      private readonly TicketDbContext _db;
+      private readonly TicketService _svc;
+
+      public TicketServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<TicketDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new TicketDbContext(opts);
+          _db.Database.EnsureCreated();
+          _svc = new TicketService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task CreateTicket_StatusIsOpen()
+      {
+          var cmd = new CreateTicketCommand("Login broken", "Can't log in", "cust-1", "High");
+          var ticket = await _svc.CreateAsync(cmd, CancellationToken.None);
+          ticket.Status.Should().Be("Open");
+          ticket.Priority.Should().Be("High");
+      }
+
+      [Fact]
+      public async Task AssignTicket_UpdatesAssignee()
+      {
+          var created = await _svc.CreateAsync(new CreateTicketCommand("T", "D", "c1", "Low"), CancellationToken.None);
+          var assigned = await _svc.AssignAsync(new AssignTicketCommand(created.Id, "agent-1", "manager-1"), CancellationToken.None);
+          assigned!.AssigneeId.Should().Be("agent-1");
+      }
+
+      [Fact]
+      public async Task ResolveTicket_StatusIsResolved()
+      {
+          var created = await _svc.CreateAsync(new CreateTicketCommand("T2", "D2", "c2", "Medium"), CancellationToken.None);
+          var resolved = await _svc.ResolveAsync(new ResolveTicketCommand(created.Id, "agent-2", "Fixed"), CancellationToken.None);
+          resolved!.Status.Should().Be("Resolved");
+      }
+
+      [Fact]
+      public async Task AddComment_PersistsComment()
+      {
+          var created = await _svc.CreateAsync(new CreateTicketCommand("T3", "D3", "c3", "Low"), CancellationToken.None);
+          var comment = await _svc.AddCommentAsync(new AddCommentCommand(created.Id, "agent-3", "Looking into it"), CancellationToken.None);
+          comment.Content.Should().Be("Looking into it");
+          comment.TicketId.Should().Be(created.Id);
+      }
+
+      [Fact]
+      public async Task GetOpenTickets_FiltersByAssignee()
+      {
+          var t1 = await _svc.CreateAsync(new CreateTicketCommand("T4", "D", "c4", "Low"), CancellationToken.None);
+          var t2 = await _svc.CreateAsync(new CreateTicketCommand("T5", "D", "c5", "Low"), CancellationToken.None);
+          await _svc.AssignAsync(new AssignTicketCommand(t1.Id, "agent-x", "mgr"), CancellationToken.None);
+          await _svc.AssignAsync(new AssignTicketCommand(t2.Id, "agent-y", "mgr"), CancellationToken.None);
+          var tickets = await _svc.GetOpenTicketsAsync("agent-x", CancellationToken.None);
+          tickets.Should().AllSatisfy(t => t.AssigneeId.Should().Be("agent-x"));
+      }
+  }

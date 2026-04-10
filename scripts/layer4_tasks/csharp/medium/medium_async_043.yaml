@@ -1,0 +1,50 @@
+name: medium_async_043
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An interface IInventoryService with:
+    Task<int> GetStockAsync(int productId, CancellationToken ct = default)
+    Task<bool> ReserveAsync(int productId, int quantity, CancellationToken ct = default)
+  A class OrderFulfillment with constructor accepting IInventoryService inventory.
+  Exposes Task<FulfillmentResult> FulfillAsync(int productId, int quantity, CancellationToken ct = default).
+  FulfillmentResult is a record with bool Success, string Message.
+  Returns failure if stock < quantity; succeeds after reserving.
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderFulfillmentTests
+  {
+      [Fact]
+      public async Task InStock_Succeeds()
+      {
+          var inv = Substitute.For<IInventoryService>();
+          inv.GetStockAsync(1, Arg.Any<CancellationToken>()).Returns(Task.FromResult(10));
+          inv.ReserveAsync(1, 5, Arg.Any<CancellationToken>()).Returns(Task.FromResult(true));
+          (await new OrderFulfillment(inv).FulfillAsync(1, 5)).Success.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task InsufficientStock_Fails()
+      {
+          var inv = Substitute.For<IInventoryService>();
+          inv.GetStockAsync(1, Arg.Any<CancellationToken>()).Returns(Task.FromResult(2));
+          (await new OrderFulfillment(inv).FulfillAsync(1, 5)).Success.Should().BeFalse();
+          await inv.DidNotReceiveWithAnyArgs().ReserveAsync(default, default, default);
+      }
+
+      [Fact]
+      public async Task ReserveFails_ReturnsFalse()
+      {
+          var inv = Substitute.For<IInventoryService>();
+          inv.GetStockAsync(1, Arg.Any<CancellationToken>()).Returns(Task.FromResult(10));
+          inv.ReserveAsync(1, 5, Arg.Any<CancellationToken>()).Returns(Task.FromResult(false));
+          (await new OrderFulfillment(inv).FulfillAsync(1, 5)).Success.Should().BeFalse();
+      }
+  }

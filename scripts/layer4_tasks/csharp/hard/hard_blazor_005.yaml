@@ -1,0 +1,90 @@
+name: hard_blazor_005
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor component parameter lifecycle service:
+  Records:
+    ComponentParams(int Id, string Title, bool IsVisible, IReadOnlyList<string> Tags)
+    LifecycleEvent(string EventName, DateTime OccurredAt, string? Details)
+
+  Class ComponentLifecycleTracker:
+    void OnParametersSet(ComponentParams current, ComponentParams? previous):
+      Records "ParametersSet" event.
+      If Id changed: records "IdChanged" event.
+      If Title changed: records "TitleChanged" event.
+      If Tags changed (different count or content): records "TagsChanged" event.
+    void OnInitialized(ComponentParams initial): records "Initialized" event.
+    void OnAfterRender(bool firstRender): records "AfterRender" event with firstRender detail.
+    void OnDispose(): records "Disposed" event.
+    IReadOnlyList<LifecycleEvent> GetEvents()
+    void Clear()
+  Return only valid C# code in a single file.
+test_code: |
+  public class ComponentLifecycleTrackerTests
+  {
+      private readonly ComponentLifecycleTracker _tracker = new();
+
+      [Fact]
+      public void OnInitialized_RecordsEvent()
+      {
+          var p = new ComponentParams(1, "Title", true, new[] { "a" });
+          _tracker.OnInitialized(p);
+          _tracker.GetEvents().Should().Contain(e => e.EventName == "Initialized");
+      }
+
+      [Fact]
+      public void OnParametersSet_NoChange_RecordsParametersSetOnly()
+      {
+          var p = new ComponentParams(1, "T", true, Array.Empty<string>());
+          _tracker.OnParametersSet(p, p);
+          _tracker.GetEvents().Should().ContainSingle(e => e.EventName == "ParametersSet");
+      }
+
+      [Fact]
+      public void OnParametersSet_IdChange_RecordsIdChangedEvent()
+      {
+          var prev = new ComponentParams(1, "T", true, Array.Empty<string>());
+          var curr = new ComponentParams(2, "T", true, Array.Empty<string>());
+          _tracker.OnParametersSet(curr, prev);
+          _tracker.GetEvents().Should().Contain(e => e.EventName == "IdChanged");
+      }
+
+      [Fact]
+      public void OnParametersSet_TagsChange_RecordsTagsChangedEvent()
+      {
+          var prev = new ComponentParams(1, "T", true, new[] { "x" });
+          var curr = new ComponentParams(1, "T", true, new[] { "x", "y" });
+          _tracker.OnParametersSet(curr, prev);
+          _tracker.GetEvents().Should().Contain(e => e.EventName == "TagsChanged");
+      }
+
+      [Fact]
+      public void OnAfterRender_FirstRender_RecordsEvent()
+      {
+          _tracker.OnAfterRender(true);
+          _tracker.GetEvents().Should().Contain(e => e.EventName == "AfterRender");
+      }
+
+      [Fact]
+      public void OnDispose_RecordsEvent()
+      {
+          _tracker.OnDispose();
+          _tracker.GetEvents().Should().Contain(e => e.EventName == "Disposed");
+      }
+
+      [Fact]
+      public void Clear_RemovesAllEvents()
+      {
+          _tracker.OnInitialized(new ComponentParams(1, "T", true, Array.Empty<string>()));
+          _tracker.Clear();
+          _tracker.GetEvents().Should().BeEmpty();
+      }
+  }

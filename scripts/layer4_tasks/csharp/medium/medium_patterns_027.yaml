@@ -1,0 +1,51 @@
+name: medium_patterns_027
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class MultiMap<TKey, TValue> backed by Dictionary<TKey, List<TValue>>.
+  Expose:
+    void Add(TKey key, TValue value)
+    IReadOnlyList<TValue> Get(TKey key) — empty list if absent
+    bool Remove(TKey key, TValue value) — removes first matching
+    IEnumerable<TKey> Keys
+    int TotalCount
+  Return only valid C# code in a single file.
+test_code: |
+  public class MultiMapTests
+  {
+      [Fact]
+      public void Add_And_Get()
+      {
+          var map = new MultiMap<string,int>();
+          map.Add("a",1); map.Add("a",2);
+          map.Get("a").Should().BeEquivalentTo(new[]{1,2});
+      }
+
+      [Fact]
+      public void Get_Missing_Empty() { new MultiMap<string,int>().Get("x").Should().BeEmpty(); }
+
+      [Fact]
+      public void Remove_RemovesValue()
+      {
+          var map = new MultiMap<string,int>();
+          map.Add("a",1); map.Add("a",2);
+          map.Remove("a",1).Should().BeTrue();
+          map.Get("a").Should().ContainSingle(v => v == 2);
+      }
+
+      [Fact]
+      public void TotalCount_SumsAll()
+      {
+          var map = new MultiMap<string,int>();
+          map.Add("a",1); map.Add("a",2); map.Add("b",3);
+          map.TotalCount.Should().Be(3);
+      }
+  }

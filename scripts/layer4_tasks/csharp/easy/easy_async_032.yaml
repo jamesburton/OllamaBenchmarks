@@ -1,0 +1,32 @@
+name: easy_async_032
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class AsyncValidator with a static method:
+    async Task<bool> ValidateAsync(string input, Func<string, Task<bool>> validator)
+  that awaits the validator function and returns its result.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncValidatorTests
+  {
+      [Fact]
+      public async Task ValidateAsync_ValidInput_ReturnsTrue()
+      {
+          var result = await AsyncValidator.ValidateAsync("hello", s => Task.FromResult(s.Length > 3));
+          result.Should().BeTrue();
+      }
+      [Fact]
+      public async Task ValidateAsync_InvalidInput_ReturnsFalse()
+      {
+          var result = await AsyncValidator.ValidateAsync("hi", s => Task.FromResult(s.Length > 3));
+          result.Should().BeFalse();
+      }
+  }

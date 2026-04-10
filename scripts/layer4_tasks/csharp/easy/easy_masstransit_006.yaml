@@ -1,0 +1,34 @@
+name: easy_masstransit_006
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record ShipmentTracking(Guid ShipmentId, string Status, string Location)
+  A consumer class ShipmentTrackingConsumer that implements IConsumer<ShipmentTracking>:
+    Has a public List<string> StatusUpdates = new()
+    Consume method adds "{message.ShipmentId}: {message.Status} at {message.Location}" to StatusUpdates
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class ShipmentTrackingConsumerTests
+  {
+      [Fact]
+      public async Task Consume_FormatsStatusUpdate()
+      {
+          var consumer = new ShipmentTrackingConsumer();
+          var id = Guid.Parse("00000000-0000-0000-0000-000000000001");
+          var context = Substitute.For<ConsumeContext<ShipmentTracking>>();
+          context.Message.Returns(new ShipmentTracking(id, "In Transit", "Chicago"));
+          await consumer.Consume(context);
+          consumer.StatusUpdates[0].Should().Contain("In Transit");
+          consumer.StatusUpdates[0].Should().Contain("Chicago");
+      }
+  }

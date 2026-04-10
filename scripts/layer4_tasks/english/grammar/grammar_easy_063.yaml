@@ -1,0 +1,15 @@
+name: grammar_easy_063
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which sentence contains a comma splice?
+  A) I was tired, so I went to bed early.
+  B) I was tired, I went to bed early.
+  C) I was tired; therefore, I went to bed early.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

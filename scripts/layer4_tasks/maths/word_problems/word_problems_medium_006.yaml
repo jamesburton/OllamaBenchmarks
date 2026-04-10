@@ -1,0 +1,14 @@
+name: word_problems_medium_006
+category: maths
+subcategory: word_problems
+difficulty: medium
+weight: 2
+validator_type: numeric
+max_tokens: 256
+prompt: |
+  A runner covers 400 meters in 50 seconds. What is their speed in meters per second?
+  Reply with only the number.
+expected_answer: "8"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

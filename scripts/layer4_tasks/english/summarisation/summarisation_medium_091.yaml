@@ -1,0 +1,18 @@
+name: summarisation_medium_091
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Cloud computing has shifted enterprise IT spending from capital expenditure to operational expenditure, aligning costs with usage. The three major providers — Amazon Web Services, Microsoft Azure, and Google Cloud — now control over 65 percent of the market. Lock-in effects make switching providers costly, raising concerns about competition and resilience.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "cloud"
+    - "AWS"
+    - "Azure"
+    - "lock-in"
+  max_words: 25

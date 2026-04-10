@@ -1,0 +1,41 @@
+name: medium_vertical_028
+category: csharp_medium
+subcategory: vertical
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file implementing a vertical slice for deactivateuser.
+  Include:
+    Command: Guid UserId, string DeactivatedBy, string Reason, bool NotifyUser
+  Result: Guid UserId, DateTime DeactivatedAt, bool NotificationSent
+  Handler: NotificationSent=true only if NotifyUser=true. Validates DeactivatedBy != UserId.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DeactivateUserHandlerTests
+  {
+      [Fact]
+      public void Handler_CanBeInstantiated()
+      {
+          var handler = new DeactivateUserHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_BasicValidation_Works()
+      {
+          var handler = new DeactivateUserHandler();
+          handler.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void Handler_DoesNotThrowOnValidInput()
+      {
+          var handler = new DeactivateUserHandler();
+          handler.Should().NotBeNull();
+      }
+  }

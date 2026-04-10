@@ -1,0 +1,59 @@
+name: medium_linq_029
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Appointment with: int Id, string DoctorId, DateTime Start, TimeSpan Duration.
+  A class ScheduleConflictDetector with a constructor accepting IEnumerable<Appointment> appointments.
+  Expose:
+    IEnumerable<(Appointment A, Appointment B)> FindConflicts()
+      — pairs of appointments for the same DoctorId whose time ranges overlap
+        (end of A > start of B when A.Start <= B.Start)
+    bool HasConflicts() — true if any conflicts exist
+  Return only valid C# code in a single file.
+test_code: |
+  public class ScheduleConflictDetectorTests
+  {
+      private static readonly DateTime D = new DateTime(2024,1,1,9,0,0,DateTimeKind.Utc);
+      private readonly Appointment[] _noConflicts = {
+          new(1,"DrA", D,              TimeSpan.FromHours(1)),
+          new(2,"DrA", D.AddHours(1),  TimeSpan.FromHours(1)),
+      };
+      private readonly Appointment[] _conflicts = {
+          new(1,"DrA", D,              TimeSpan.FromHours(2)),
+          new(2,"DrA", D.AddHours(1),  TimeSpan.FromHours(1)),
+          new(3,"DrB", D,              TimeSpan.FromHours(1)),
+      };
+
+      [Fact]
+      public void HasConflicts_NoOverlap_ReturnsFalse()
+      {
+          new ScheduleConflictDetector(_noConflicts).HasConflicts().Should().BeFalse();
+      }
+
+      [Fact]
+      public void HasConflicts_Overlap_ReturnsTrue()
+      {
+          new ScheduleConflictDetector(_conflicts).HasConflicts().Should().BeTrue();
+      }
+
+      [Fact]
+      public void FindConflicts_OneConflict()
+      {
+          new ScheduleConflictDetector(_conflicts).FindConflicts().Should().HaveCount(1);
+      }
+
+      [Fact]
+      public void FindConflicts_DifferentDoctors_NoConflict()
+      {
+          var appts = new[]{ new Appointment(1,"DrA",D,TimeSpan.FromHours(2)), new Appointment(2,"DrB",D,TimeSpan.FromHours(2)) };
+          new ScheduleConflictDetector(appts).HasConflicts().Should().BeFalse();
+      }
+  }

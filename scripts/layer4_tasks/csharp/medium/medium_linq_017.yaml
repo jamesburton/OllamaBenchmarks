@@ -1,0 +1,55 @@
+name: medium_linq_017
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record WordFrequency with: string Word, int Count.
+  A class TextAnalyser with a constructor accepting string text.
+  Expose:
+    IEnumerable<WordFrequency> TopWords(int n)
+      — splits text on whitespace, lowercases, counts frequency of each word,
+        returns top n by Count descending, then Word ascending as tiebreaker
+    Dictionary<char, int> LetterFrequency()
+      — counts occurrences of each letter (a-z), ignoring spaces and punctuation
+  Return only valid C# code in a single file.
+test_code: |
+  public class TextAnalyserTests
+  {
+      [Fact]
+      public void TopWords_ReturnsCorrectTop()
+      {
+          var result = new TextAnalyser("the cat sat on the mat the cat").TopWords(2).ToList();
+          result[0].Word.Should().Be("the");
+          result[0].Count.Should().Be(3);
+          result[1].Word.Should().Be("cat");
+      }
+
+      [Fact]
+      public void TopWords_NGreaterThanVocab_ReturnsAll()
+      {
+          var result = new TextAnalyser("hello world").TopWords(100).ToList();
+          result.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void LetterFrequency_CountsCorrectly()
+      {
+          var freq = new TextAnalyser("hello").LetterFrequency();
+          freq['l'].Should().Be(2);
+          freq['h'].Should().Be(1);
+      }
+
+      [Fact]
+      public void LetterFrequency_IgnoresSpaces()
+      {
+          var freq = new TextAnalyser("a b c").LetterFrequency();
+          freq.Keys.Should().NotContain(' ');
+      }
+  }

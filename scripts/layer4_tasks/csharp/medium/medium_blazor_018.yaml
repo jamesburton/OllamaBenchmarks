@@ -1,0 +1,51 @@
+name: medium_blazor_018
+category: csharp_medium
+subcategory: blazor
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ClipboardService with:
+    string? ClipboardContent, event Action? OnClipboardChanged, void SetContent(string), void Clear()
+  Return only valid C# code in a single file.
+test_code: |
+  public class ClipboardServiceTests
+  {
+      [Fact]
+      public void SetContent_StoresContent()
+      {
+          var svc = new ClipboardService();
+          svc.SetContent("hello");
+          svc.ClipboardContent.Should().Be("hello");
+      }
+
+      [Fact]
+      public void Clear_RemovesContent()
+      {
+          var svc = new ClipboardService();
+          svc.SetContent("data");
+          svc.Clear();
+          svc.ClipboardContent.Should().BeNull();
+      }
+
+      [Fact]
+      public void SetContent_FiresEvent()
+      {
+          var svc = new ClipboardService();
+          var fired = false;
+          svc.OnClipboardChanged += () => fired = true;
+          svc.SetContent("x");
+          fired.Should().BeTrue();
+      }
+
+      [Fact]
+      public void DefaultContent_IsNull()
+      {
+          new ClipboardService().ClipboardContent.Should().BeNull();
+      }
+  }

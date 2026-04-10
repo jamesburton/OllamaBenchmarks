@@ -1,0 +1,56 @@
+name: medium_masstransit_022
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record DeviceRegistered(Guid DeviceId, string OwnerId, string DeviceType, string FirmwareVersion).
+  A consumer DeviceRegisteredConsumer implementing IConsumer<DeviceRegistered>.
+  Constructor accepts IDeviceRegistry service.
+  Interface IDeviceRegistry with: Task RegisterAsync(Guid deviceId, string deviceType).
+  In Consume: calls service.RegisterAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record DeviceRegistered(Guid DeviceId, string OwnerId, string DeviceType, string FirmwareVersion); }
+  global using Contracts;
+
+  public class DeviceRegisteredConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IDeviceRegistry>();
+          var consumer = new DeviceRegisteredConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DeviceRegistered>>();
+          ctx.Message.Returns(new DeviceRegistered(Guid.NewGuid(), "Own", "Dev", "Fir"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RegisterAsync(Arg.Any<Guid deviceId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IDeviceRegistry>();
+          var consumer = new DeviceRegisteredConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DeviceRegistered>>();
+          ctx.Message.Returns(new DeviceRegistered(Guid.NewGuid(), "Own", "Dev", "Fir"));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IDeviceRegistry>();
+          var consumer = new DeviceRegisteredConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<DeviceRegistered>>();
+          ctx.Message.Returns(new DeviceRegistered(Guid.NewGuid(), "Owne", "Devi", "Firm"));
+          await consumer.Consume(ctx);
+          await svc.Received(1).RegisterAsync(Arg.Any<Guid deviceId>(), Arg.Any<object>());
+      }
+  }

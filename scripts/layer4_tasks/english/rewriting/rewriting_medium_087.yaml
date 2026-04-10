@@ -1,0 +1,21 @@
+name: rewriting_medium_087
+category: english
+subcategory: rewriting
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Combine into one fluent sentence:
+  'She had worked at the company for ten years. She was passed over for promotion. She decided to resign.'
+  Write only the combined sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "ten years"
+    - "promotion"
+    - "resigned"
+    - "passed over"
+    - "decided"
+  min_words: 8
+  max_words: 30

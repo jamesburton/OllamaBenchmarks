@@ -1,0 +1,104 @@
+name: hard_vertical_002
+category: csharp_hard
+subcategory: vertical
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core + service layer for order management with SQLite in-memory:
+  Entities:
+    Customer(int Id, string Name, string Email, DateTime CreatedAt, List<Order> Orders)
+    Order(int Id, int CustomerId, Customer Customer, string Status, decimal Total,
+      DateTime CreatedAt, List<OrderLine> Lines)
+    OrderLine(int Id, int OrderId, string ProductName, int Quantity, decimal UnitPrice)
+
+  DbContext: OrderDbContext (configures relationships, uses SQLite in-memory).
+
+  Class OrderService(OrderDbContext db):
+    Task<Order> CreateOrderAsync(int customerId, IReadOnlyList<(string product, int qty, decimal price)> lines, CancellationToken ct):
+      Throws ArgumentException if customer not found.
+      Creates Order with Status="Pending", calculates Total.
+    Task<bool> CancelOrderAsync(int orderId, CancellationToken ct):
+      Returns false if not found. Throws InvalidOperationException if Status is "Shipped".
+      Sets Status="Cancelled".
+    Task<Order?> GetOrderAsync(int orderId, CancellationToken ct): includes Lines.
+    Task<IReadOnlyList<Order>> GetCustomerOrdersAsync(int customerId, CancellationToken ct)
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderServiceTests : IDisposable
+  {
+      private readonly OrderDbContext _db;
+      private readonly OrderService _svc;
+
+      public OrderServiceTests()
+      {
+          var opts = new DbContextOptionsBuilder<OrderDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new OrderDbContext(opts);
+          _db.Database.EnsureCreated();
+          _db.Customers.Add(new Customer { Name = "Alice", Email = "a@b.com", CreatedAt = DateTime.UtcNow });
+          _db.SaveChanges();
+          _svc = new OrderService(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      [Fact]
+      public async Task CreateOrder_ValidCustomer_CreatesWithLines()
+      {
+          var custId = _db.Customers.First().Id;
+          var order = await _svc.CreateOrderAsync(custId, new[] { ("Widget", 2, 9.99m) }, CancellationToken.None);
+          order.Lines.Should().HaveCount(1);
+          order.Total.Should().Be(19.98m);
+          order.Status.Should().Be("Pending");
+      }
+
+      [Fact]
+      public async Task CreateOrder_UnknownCustomer_ThrowsArgumentException()
+      {
+          var act = async () => await _svc.CreateOrderAsync(9999, new[] { ("X", 1, 1m) }, CancellationToken.None);
+          await act.Should().ThrowAsync<ArgumentException>();
+      }
+
+      [Fact]
+      public async Task CancelOrder_UpdatesStatus()
+      {
+          var custId = _db.Customers.First().Id;
+          var order = await _svc.CreateOrderAsync(custId, new[] { ("A", 1, 5m) }, CancellationToken.None);
+          var result = await _svc.CancelOrderAsync(order.Id, CancellationToken.None);
+          result.Should().BeTrue();
+          (await _svc.GetOrderAsync(order.Id, CancellationToken.None))!.Status.Should().Be("Cancelled");
+      }
+
+      [Fact]
+      public async Task CancelOrder_NotFound_ReturnsFalse()
+      {
+          var result = await _svc.CancelOrderAsync(9999, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task CancelOrder_Shipped_ThrowsInvalidOperation()
+      {
+          var custId = _db.Customers.First().Id;
+          var order = await _svc.CreateOrderAsync(custId, new[] { ("B", 1, 3m) }, CancellationToken.None);
+          order.Status = "Shipped";
+          await _db.SaveChangesAsync();
+          var act = async () => await _svc.CancelOrderAsync(order.Id, CancellationToken.None);
+          await act.Should().ThrowAsync<InvalidOperationException>();
+      }
+
+      [Fact]
+      public async Task GetCustomerOrders_ReturnsOnlyThatCustomer()
+      {
+          var custId = _db.Customers.First().Id;
+          await _svc.CreateOrderAsync(custId, new[] { ("A", 1, 1m) }, CancellationToken.None);
+          await _svc.CreateOrderAsync(custId, new[] { ("B", 2, 2m) }, CancellationToken.None);
+          var orders = await _svc.GetCustomerOrdersAsync(custId, CancellationToken.None);
+          orders.Should().HaveCount(2);
+      }
+  }

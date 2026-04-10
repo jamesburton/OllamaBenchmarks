@@ -1,0 +1,36 @@
+name: easy_patterns_022
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class StringHelper with a static method:
+    string Repeat(string s, int times)
+  that uses a collection expression and string.Concat to repeat the string.
+  For example, Repeat("ab", 3) returns "ababab".
+  Return only valid C# code in a single file.
+test_code: |
+  public class StringHelperTests
+  {
+      [Fact]
+      public void Repeat_BasicCase()
+      {
+          StringHelper.Repeat("ab", 3).Should().Be("ababab");
+      }
+      [Fact]
+      public void Repeat_Once_ReturnsSame()
+      {
+          StringHelper.Repeat("hello", 1).Should().Be("hello");
+      }
+      [Fact]
+      public void Repeat_Zero_ReturnsEmpty()
+      {
+          StringHelper.Repeat("hello", 0).Should().Be("");
+      }
+  }

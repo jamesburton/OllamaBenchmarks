@@ -1,0 +1,71 @@
+name: medium_efcore_004
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  Entities: Tag(int Id, string Name) and Article(int Id, string Title, string Content, ICollection<Tag> Tags).
+  A class BlogDbContext : DbContext with DbSets and many-to-many Tag-Article configuration.
+  A class ArticleRepository with constructor accepting BlogDbContext.
+  Methods:
+    Task<IEnumerable<Article>> GetByTagAsync(string tagName)
+    Task<Article?> GetWithTagsAsync(int articleId)
+    Task AddTagToArticleAsync(int articleId, string tagName)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ArticleRepositoryTests : IAsyncLifetime
+  {
+      private BlogDbContext _db = null!;
+      private ArticleRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<BlogDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new BlogDbContext(opts);
+          _repo = new ArticleRepository(_db);
+          var csharp = new Tag { Name = "csharp" };
+          var dotnet = new Tag { Name = "dotnet" };
+          _db.Articles.Add(new Article { Title = "Intro to C#", Content = "...", Tags = new List<Tag> { csharp, dotnet } });
+          _db.Articles.Add(new Article { Title = "EF Core Tips", Content = "...", Tags = new List<Tag> { dotnet } });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByTag_FiltersCorrectly()
+      {
+          (await _repo.GetByTagAsync("csharp")).Should().HaveCount(1);
+      }
+
+      [Fact]
+      public async Task GetByTag_SharedTag_ReturnsBoth()
+      {
+          (await _repo.GetByTagAsync("dotnet")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetWithTags_IncludesTags()
+      {
+          var id = _db.Articles.First().Id;
+          var article = await _repo.GetWithTagsAsync(id);
+          article!.Tags.Should().NotBeEmpty();
+      }
+
+      [Fact]
+      public async Task AddTagToArticle_AddsTag()
+      {
+          var id = _db.Articles.First().Id;
+          await _repo.AddTagToArticleAsync(id, "new-tag");
+          _db.ChangeTracker.Clear();
+          var article = await _db.Articles.Include(a => a.Tags).FirstAsync(a => a.Id == id);
+          article.Tags.Should().Contain(t => t.Name == "new-tag");
+      }
+  }

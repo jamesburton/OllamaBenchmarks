@@ -1,0 +1,65 @@
+name: medium_efcore_012
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity AuditEntry with: int Id, string EntityName, string EntityId, string Action, string ChangedBy, string Changes, DateTime Timestamp.
+  A class AuditDbContext : DbContext with DbSet<AuditEntry> AuditLog.
+  A class AuditRepository with constructor accepting AuditDbContext.
+  Methods:
+    Task LogAsync(string entityName, string entityId, string action, string changedBy, string changes)
+    Task<IEnumerable<AuditEntry>> GetForEntityAsync(string entityName, string entityId)
+    Task<IEnumerable<AuditEntry>> GetByUserAsync(string changedBy)
+    Task<IEnumerable<AuditEntry>> GetRecentAsync(int count)
+  Return only valid C# code in a single file.
+test_code: |
+  public class AuditRepositoryTests : IAsyncLifetime
+  {
+      private AuditDbContext _db = null!;
+      private AuditRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<AuditDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new AuditDbContext(opts);
+          _repo = new AuditRepository(_db);
+          await _repo.LogAsync("Order", "1", "Create", "alice", "{}");
+          await _repo.LogAsync("Order", "1", "Update", "bob", "{status: shipped}");
+          await _repo.LogAsync("Product", "5", "Delete", "alice", "{}");
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetForEntity_ReturnsCorrect()
+      {
+          (await _repo.GetForEntityAsync("Order", "1")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetByUser_FiltersCorrectly()
+      {
+          (await _repo.GetByUserAsync("alice")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetRecent_ReturnsN()
+      {
+          (await _repo.GetRecentAsync(2)).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task Log_StoresEntry()
+      {
+          await _repo.LogAsync("Invoice", "99", "Create", "carol", "{}");
+          (await _repo.GetForEntityAsync("Invoice", "99")).Should().HaveCount(1);
+      }
+  }

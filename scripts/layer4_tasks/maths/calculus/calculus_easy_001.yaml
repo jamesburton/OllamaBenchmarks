@@ -1,0 +1,13 @@
+name: calculus_easy_001
+category: maths
+subcategory: calculus
+difficulty: easy
+weight: 1
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Find the derivative of f(x) = 3x^2. What is f'(x) when written as ax^b? Reply with only the coefficient a.
+expected_answer: "6"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

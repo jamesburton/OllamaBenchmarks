@@ -1,0 +1,15 @@
+name: deduction_medium_003
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. No reptiles are warm-blooded.
+  2. All warm-blooded animals are mammals or birds.
+  3. A snake is a reptile.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "A snake is not warm-blooded."
+validator_config: {}

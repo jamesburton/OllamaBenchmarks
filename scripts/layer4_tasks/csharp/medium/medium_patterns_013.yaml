@@ -1,0 +1,54 @@
+name: medium_patterns_013
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class Specification<T> with:
+    static Specification<T> Create(Func<T, bool> predicate)
+    bool IsSatisfiedBy(T candidate)
+    Specification<T> And(Specification<T> other)
+    Specification<T> Or(Specification<T> other)
+    Specification<T> Not()
+  Return only valid C# code in a single file.
+test_code: |
+  public class SpecificationTests
+  {
+      [Fact]
+      public void IsSatisfiedBy_MatchingPredicate()
+      {
+          var spec = Specification<int>.Create(x => x > 5);
+          spec.IsSatisfiedBy(10).Should().BeTrue();
+          spec.IsSatisfiedBy(3).Should().BeFalse();
+      }
+
+      [Fact]
+      public void And_BothTrue_True()
+      {
+          var even = Specification<int>.Create(x => x % 2 == 0);
+          var pos  = Specification<int>.Create(x => x > 0);
+          even.And(pos).IsSatisfiedBy(4).Should().BeTrue();
+          even.And(pos).IsSatisfiedBy(-2).Should().BeFalse();
+      }
+
+      [Fact]
+      public void Or_EitherTrue_True()
+      {
+          var s1 = Specification<int>.Create(x => x < 0);
+          var s2 = Specification<int>.Create(x => x > 100);
+          s1.Or(s2).IsSatisfiedBy(-1).Should().BeTrue();
+          s1.Or(s2).IsSatisfiedBy(50).Should().BeFalse();
+      }
+
+      [Fact]
+      public void Not_Inverts()
+      {
+          Specification<string>.Create(string.IsNullOrEmpty).Not().IsSatisfiedBy("hello").Should().BeTrue();
+      }
+  }

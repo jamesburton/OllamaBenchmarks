@@ -1,0 +1,51 @@
+name: medium_async_046
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncObservable<T> for push-based event notifications.
+  Exposes IDisposable Subscribe(Func<T, Task> observer), Task PublishAsync(T value, CancellationToken ct = default), int SubscriberCount.
+  Unsubscribing (disposing the IDisposable) removes the observer.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncObservableTests
+  {
+      [Fact]
+      public async Task PublishAsync_NotifiesAll()
+      {
+          var obs = new AsyncObservable<int>();
+          var bag = new System.Collections.Concurrent.ConcurrentBag<int>();
+          obs.Subscribe(async v => { await Task.Yield(); bag.Add(v); });
+          obs.Subscribe(async v => { await Task.Yield(); bag.Add(v * 10); });
+          await obs.PublishAsync(5);
+          bag.Should().Contain(5).And.Contain(50);
+      }
+
+      [Fact]
+      public async Task Unsubscribe_RemovesObserver()
+      {
+          var obs = new AsyncObservable<string>();
+          var received = new List<string>();
+          var sub = obs.Subscribe(async v => { await Task.Yield(); received.Add(v); });
+          sub.Dispose();
+          await obs.PublishAsync("hello");
+          received.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void SubscriberCount_Tracks()
+      {
+          var obs = new AsyncObservable<int>();
+          var s = obs.Subscribe(_ => Task.CompletedTask);
+          obs.SubscriberCount.Should().Be(1);
+          s.Dispose();
+          obs.SubscriberCount.Should().Be(0);
+      }
+  }

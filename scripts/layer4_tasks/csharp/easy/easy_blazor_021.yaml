@@ -1,0 +1,40 @@
+name: easy_blazor_021
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class DropdownComponent that extends ComponentBase with:
+    [Parameter] List<string> Options { get; set; } = new()
+    string SelectedOption { get; set; } = ""
+    bool IsOpen { get; set; } = false
+    void Open() sets IsOpen = true
+    void Close() sets IsOpen = false
+    void Select(string option) sets SelectedOption = option and calls Close()
+  Return only valid C# code in a single file.
+test_code: |
+  public class DropdownComponentTests
+  {
+      [Fact]
+      public void Select_SetsSelectedOptionAndCloses()
+      {
+          var c = new DropdownComponent { Options = new List<string> { "A", "B" } };
+          c.Open();
+          c.Select("B");
+          c.SelectedOption.Should().Be("B");
+          c.IsOpen.Should().BeFalse();
+      }
+      [Fact]
+      public void Open_SetsIsOpenTrue()
+      {
+          var c = new DropdownComponent();
+          c.Open();
+          c.IsOpen.Should().BeTrue();
+      }
+  }

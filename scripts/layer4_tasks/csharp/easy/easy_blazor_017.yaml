@@ -1,0 +1,38 @@
+name: easy_blazor_017
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class PaginationComponent that extends ComponentBase with:
+    [Parameter] int TotalItems { get; set; }
+    [Parameter] int PageSize { get; set; } = 10
+    int CurrentPage { get; set; } = 1
+    int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize)
+    void NextPage() increments CurrentPage if CurrentPage < TotalPages
+    void PreviousPage() decrements CurrentPage if CurrentPage > 1
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaginationComponentTests
+  {
+      [Fact]
+      public void TotalPages_CalculatesCorrectly()
+      {
+          var c = new PaginationComponent { TotalItems = 25, PageSize = 10 };
+          c.TotalPages.Should().Be(3);
+      }
+      [Fact]
+      public void NextPage_DoesNotExceedTotalPages()
+      {
+          var c = new PaginationComponent { TotalItems = 10, PageSize = 10, CurrentPage = 1 };
+          c.NextPage();
+          c.NextPage();
+          c.CurrentPage.Should().Be(1);
+      }
+  }

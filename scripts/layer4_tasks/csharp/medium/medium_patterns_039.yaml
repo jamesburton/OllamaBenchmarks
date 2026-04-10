@@ -1,0 +1,40 @@
+name: medium_patterns_039
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  Extension methods on Nullable<T> in a static class NullableExtensions:
+    TOut? Select<T, TOut>(this T? source, Func<T, TOut> selector) where T : struct where TOut : struct
+    T? Where<T>(this T? source, Func<T, bool> predicate) where T : struct
+    T GetValueOrThrow<T>(this T? source, string message) where T : struct
+  Return only valid C# code in a single file.
+test_code: |
+  public class NullableExtensionsTests
+  {
+      [Fact]
+      public void Select_HasValue_Transforms() { int? v=5; v.Select(x=>x*2).Should().Be(10); }
+
+      [Fact]
+      public void Select_Null_ReturnsNull() { int? v=null; v.Select(x=>x*2).Should().BeNull(); }
+
+      [Fact]
+      public void Where_True_ReturnsValue() { int? v=10; v.Where(x=>x>5).Should().Be(10); }
+
+      [Fact]
+      public void Where_False_ReturnsNull() { int? v=3; v.Where(x=>x>5).Should().BeNull(); }
+
+      [Fact]
+      public void GetValueOrThrow_Null_Throws()
+      {
+          int? v=null;
+          Action act = () => v.GetValueOrThrow("missing!");
+          act.Should().Throw<InvalidOperationException>().WithMessage("missing!");
+      }
+  }

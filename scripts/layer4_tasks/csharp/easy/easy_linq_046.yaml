@@ -1,0 +1,31 @@
+name: easy_linq_046
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Finder with a static method:
+    int? SingleOrNull(IEnumerable<int> numbers, int value)
+  that returns the value as nullable int if exactly one element equals value, otherwise null.
+  Use LINQ SingleOrDefault (returns 0 for no match), so handle the "not found" case by checking first with Any.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FinderTests
+  {
+      [Fact]
+      public void SingleOrNull_ExactlyOne_ReturnsValue()
+      {
+          Finder.SingleOrNull(new[]{1,2,3}, 2).Should().Be(2);
+      }
+      [Fact]
+      public void SingleOrNull_NotFound_ReturnsNull()
+      {
+          Finder.SingleOrNull(new[]{1,2,3}, 9).Should().BeNull();
+      }
+  }

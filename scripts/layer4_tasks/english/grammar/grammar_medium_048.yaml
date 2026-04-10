@@ -1,0 +1,15 @@
+name: grammar_medium_048
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Having been delayed by traffic, the meeting began without the CEO.
+  B) Having been delayed by traffic, the CEO arrived after the meeting began.
+  C) Having been delayed by traffic, the start of the meeting proceeded without the CEO.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

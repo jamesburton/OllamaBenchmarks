@@ -1,0 +1,37 @@
+name: easy_blazor_005
+category: csharp_easy
+subcategory: blazor
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A Blazor component class LoaderComponent that extends ComponentBase with:
+    bool IsLoading { get; private set; } = false
+    List<string> Items { get; private set; } = new()
+    async Task LoadAsync() — sets IsLoading = true, awaits Task.Delay(1), then sets Items to ["Item 1", "Item 2", "Item 3"] and IsLoading = false
+  Return only valid C# code in a single file.
+test_code: |
+  public class LoaderComponentTests
+  {
+      [Fact]
+      public async Task LoadAsync_SetsItemsAndClearsLoading()
+      {
+          var component = new LoaderComponent();
+          await component.LoadAsync();
+          component.IsLoading.Should().BeFalse();
+          component.Items.Should().HaveCount(3);
+          component.Items[0].Should().Be("Item 1");
+      }
+      [Fact]
+      public void InitialState_IsNotLoading()
+      {
+          var component = new LoaderComponent();
+          component.IsLoading.Should().BeFalse();
+          component.Items.Should().BeEmpty();
+      }
+  }

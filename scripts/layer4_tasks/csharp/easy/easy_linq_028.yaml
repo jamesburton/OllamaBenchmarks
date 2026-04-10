@@ -1,0 +1,31 @@
+name: easy_linq_028
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Finder with a static method:
+    int? FindFirst(IEnumerable<int> numbers, int threshold)
+  that returns the first number greater than the threshold as a nullable int, or null if not found.
+  Use LINQ Where + Cast + FirstOrDefault.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FinderTests
+  {
+      [Fact]
+      public void FindFirst_Found()
+      {
+          Finder.FindFirst(new[]{1,5,3,8}, 4).Should().Be(5);
+      }
+      [Fact]
+      public void FindFirst_NotFound_ReturnsNull()
+      {
+          Finder.FindFirst(new[]{1,2,3}, 10).Should().BeNull();
+      }
+  }

@@ -1,0 +1,17 @@
+name: riddles_hard_002
+category: logic
+subcategory: riddles
+difficulty: hard
+weight: 3
+validator_type: logic
+max_tokens: 64
+prompt: |
+  I am the beginning of eternity, the end of time and space, the beginning of every end, and the end of every place. What am I?
+  Reply with only the answer.
+expected_answer: "The letter E"
+validator_config:
+  accepted_answers:
+  - "The letter E"
+  - "E"
+  - "the letter e"
+  - "letter e"

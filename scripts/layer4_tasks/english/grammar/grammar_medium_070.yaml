@@ -1,0 +1,15 @@
+name: grammar_medium_070
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which sentence does NOT contain a comma splice?
+  A) The data was incomplete, the analyst requested more information.
+  B) The data was incomplete, but the analyst proceeded.
+  C) The data was incomplete the analyst was frustrated.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

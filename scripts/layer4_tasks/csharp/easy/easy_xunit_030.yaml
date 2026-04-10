@@ -1,0 +1,38 @@
+name: easy_xunit_030
+category: csharp_easy
+subcategory: xunit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class ScoreBoard with:
+    Dictionary<string, int> Scores { get; } = new()
+    void AddScore(string player, int points) adds points to player's score (creates entry if not exists)
+    int GetScore(string player) returns player score or 0 if not found
+    string? Leader() returns name of player with highest score, or null if empty
+  Return only valid C# code in a single file.
+test_code: |
+  public class ScoreBoardTests
+  {
+      [Fact]
+      public void AddScore_AccumulatesPoints()
+      {
+          var board = new ScoreBoard();
+          board.AddScore("Alice", 10);
+          board.AddScore("Alice", 5);
+          board.GetScore("Alice").Should().Be(15);
+      }
+      [Fact]
+      public void Leader_ReturnsHighestScorer()
+      {
+          var board = new ScoreBoard();
+          board.AddScore("Bob", 20);
+          board.AddScore("Alice", 15);
+          board.Leader().Should().Be("Bob");
+      }
+  }

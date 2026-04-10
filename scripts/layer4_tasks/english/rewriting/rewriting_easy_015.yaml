@@ -1,0 +1,19 @@
+name: rewriting_easy_015
+category: english
+subcategory: rewriting
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in the passive voice:
+  'The students elected the class president.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "was elected"
+    - "president was"
+    - "class president"
+  min_words: 4
+  max_words: 15

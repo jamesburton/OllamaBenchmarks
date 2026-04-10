@@ -1,0 +1,97 @@
+name: hard_blazor_021
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor clipboard and keyboard shortcut service:
+  Records:
+    ClipboardItem(string Id, string Content, string ContentType, DateTime CopiedAt)
+    KeyboardShortcut(string Keys, string Action, string Description, bool IsGlobal)
+    ShortcutEvent(string Keys, DateTime TriggeredAt, bool Handled)
+
+  Class ClipboardService:
+    void Copy(string content, string contentType = "text/plain"): adds to history, max 20 items.
+    ClipboardItem? GetLatest(): returns most recent.
+    IReadOnlyList<ClipboardItem> GetHistory(): returns all, newest first.
+    void Clear()
+    bool Remove(string id)
+
+  Class KeyboardShortcutRegistry:
+    void Register(KeyboardShortcut shortcut): throws if Keys already registered globally.
+    void Unregister(string keys)
+    KeyboardShortcut? FindShortcut(string keys)
+    IReadOnlyList<KeyboardShortcut> GetGlobalShortcuts()
+    ShortcutEvent TriggerShortcut(string keys): records event, marks Handled if shortcut found.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ClipboardAndShortcutTests
+  {
+      [Fact]
+      public void Copy_AddsToHistory()
+      {
+          var svc = new ClipboardService();
+          svc.Copy("Hello", "text/plain");
+          svc.GetLatest().Should().NotBeNull();
+          svc.GetLatest()!.Content.Should().Be("Hello");
+      }
+
+      [Fact]
+      public void Copy_MaxHistory_EvictsOldest()
+      {
+          var svc = new ClipboardService();
+          for (int i = 0; i < 22; i++) svc.Copy($"item-{i}");
+          svc.GetHistory().Should().HaveCount(20);
+      }
+
+      [Fact]
+      public void GetHistory_NewestFirst()
+      {
+          var svc = new ClipboardService();
+          svc.Copy("first");
+          svc.Copy("second");
+          svc.GetHistory().First().Content.Should().Be("second");
+      }
+
+      [Fact]
+      public void Remove_RemovesItem()
+      {
+          var svc = new ClipboardService();
+          svc.Copy("temp");
+          var id = svc.GetLatest()!.Id;
+          svc.Remove(id).Should().BeTrue();
+          svc.GetHistory().Should().BeEmpty();
+      }
+
+      [Fact]
+      public void RegisterShortcut_DuplicateGlobal_Throws()
+      {
+          var reg = new KeyboardShortcutRegistry();
+          reg.Register(new KeyboardShortcut("Ctrl+S", "save", "Save", true));
+          var act = () => reg.Register(new KeyboardShortcut("Ctrl+S", "save2", "Save Again", true));
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void TriggerShortcut_Found_MarksHandled()
+      {
+          var reg = new KeyboardShortcutRegistry();
+          reg.Register(new KeyboardShortcut("Ctrl+K", "search", "Open Search", true));
+          var evt = reg.TriggerShortcut("Ctrl+K");
+          evt.Handled.Should().BeTrue();
+      }
+
+      [Fact]
+      public void TriggerShortcut_NotFound_NotHandled()
+      {
+          var reg = new KeyboardShortcutRegistry();
+          var evt = reg.TriggerShortcut("Ctrl+Z");
+          evt.Handled.Should().BeFalse();
+      }
+  }

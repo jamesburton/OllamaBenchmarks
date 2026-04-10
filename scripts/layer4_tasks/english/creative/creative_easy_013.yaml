@@ -1,0 +1,22 @@
+name: creative_easy_013
+category: english
+subcategory: creative
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Write a 2-sentence description of an old library filled with books.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "library"
+    - "books"
+    - "quiet"
+    - "shelves"
+    - "old"
+    - "dusty"
+    - "reading"
+    - "smell"
+  min_words: 15
+  max_words: 60

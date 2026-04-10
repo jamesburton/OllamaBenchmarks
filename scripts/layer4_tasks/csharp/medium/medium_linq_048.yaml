@@ -1,0 +1,56 @@
+name: medium_linq_048
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record TaskItem with: int Id, string Title, int? ParentId, int Priority.
+  A class TaskHierarchy with a constructor accepting IEnumerable<TaskItem> tasks.
+  Expose:
+    IEnumerable<TaskItem> RootTasks() — tasks with no parent (ParentId is null), ordered by Priority desc
+    IEnumerable<TaskItem> Children(int parentId) — direct children ordered by Priority desc
+    int SubtreeSize(int taskId) — total number of tasks in the subtree rooted at taskId (including itself)
+  Return only valid C# code in a single file.
+test_code: |
+  public class TaskHierarchyTests
+  {
+      private readonly TaskItem[] _tasks = {
+          new(1,"Alpha",  null, 3),
+          new(2,"Beta",   null, 1),
+          new(3,"A-Sub1", 1,   2),
+          new(4,"A-Sub2", 1,   5),
+          new(5,"A-Sub1a",3,   1),
+      };
+
+      [Fact]
+      public void RootTasks_TwoRoots_OrderedByPriorityDesc()
+      {
+          var result = new TaskHierarchy(_tasks).RootTasks().ToList();
+          result.Should().HaveCount(2);
+          result[0].Id.Should().Be(1);
+      }
+
+      [Fact]
+      public void Children_Task1_TwoChildren()
+      {
+          new TaskHierarchy(_tasks).Children(1).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void SubtreeSize_Task1_Is4()
+      {
+          new TaskHierarchy(_tasks).SubtreeSize(1).Should().Be(4);
+      }
+
+      [Fact]
+      public void SubtreeSize_Leaf_Is1()
+      {
+          new TaskHierarchy(_tasks).SubtreeSize(5).Should().Be(1);
+      }
+  }

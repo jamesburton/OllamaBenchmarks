@@ -1,0 +1,18 @@
+name: summarisation_easy_022
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  Scientists have discovered a new species of deep-sea fish in the Pacific Ocean. The creature, found at a depth of 3,000 metres, has bioluminescent organs used to attract prey. Researchers believe hundreds of undiscovered species may still exist in the deep ocean.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "species"
+    - "deep-sea"
+    - "bioluminescent"
+    - "ocean"
+  max_words: 25

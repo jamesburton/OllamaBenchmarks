@@ -1,0 +1,56 @@
+name: medium_masstransit_025
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record MembershipUpgraded(Guid MemberId, string OldTier, string NewTier, DateTime UpgradedAt).
+  A consumer MembershipUpgradedConsumer implementing IConsumer<MembershipUpgraded>.
+  Constructor accepts IBenefitService service.
+  Interface IBenefitService with: Task GrantBenefitsAsync(Guid memberId, string newTier).
+  In Consume: calls service.GrantBenefitsAsync with the appropriate properties.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record MembershipUpgraded(Guid MemberId, string OldTier, string NewTier, DateTime UpgradedAt); }
+  global using Contracts;
+
+  public class MembershipUpgradedConsumerTests
+  {
+      [Fact]
+      public async Task Consume_CallsService()
+      {
+          var svc = Substitute.For<IBenefitService>();
+          var consumer = new MembershipUpgradedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<MembershipUpgraded>>();
+          ctx.Message.Returns(new MembershipUpgraded(Guid.NewGuid(), "Old", "New", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).GrantBenefitsAsync(Arg.Any<Guid memberId>(), Arg.Any<object>());
+      }
+
+      [Fact]
+      public async Task Consume_DoesNotThrow()
+      {
+          var svc = Substitute.For<IBenefitService>();
+          var consumer = new MembershipUpgradedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<MembershipUpgraded>>();
+          ctx.Message.Returns(new MembershipUpgraded(Guid.NewGuid(), "Old", "New", DateTime.UtcNow));
+          await consumer.Invoking(c => c.Consume(ctx)).Should().NotThrowAsync();
+      }
+
+      [Fact]
+      public async Task Consume_CallsServiceOnce()
+      {
+          var svc = Substitute.For<IBenefitService>();
+          var consumer = new MembershipUpgradedConsumer(svc);
+          var ctx = Substitute.For<ConsumeContext<MembershipUpgraded>>();
+          ctx.Message.Returns(new MembershipUpgraded(Guid.NewGuid(), "OldT", "NewT", DateTime.UtcNow));
+          await consumer.Consume(ctx);
+          await svc.Received(1).GrantBenefitsAsync(Arg.Any<Guid memberId>(), Arg.Any<object>());
+      }
+  }

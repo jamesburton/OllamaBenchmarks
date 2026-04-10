@@ -1,0 +1,92 @@
+name: hard_xunit_006
+category: csharp_hard
+subcategory: xunit
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  xUnit custom data attributes and typed mock patterns:
+  Records:
+    EmailMessage(string To, string Subject, string Body, bool IsHtml)
+    SendResult(bool Success, string? MessageId, string? Error)
+
+  Interface IEmailProvider:
+    Task<SendResult> SendAsync(EmailMessage message, CancellationToken ct)
+
+  Class EmailService(IEmailProvider provider):
+    Task<SendResult> SendAsync(EmailMessage message, CancellationToken ct):
+      Validates To is not empty (returns fail with "Recipient required").
+      Validates Subject is not empty (returns fail with "Subject required").
+      Calls provider.
+    Task<IReadOnlyList<SendResult>> SendBulkAsync(IEnumerable<EmailMessage> messages, CancellationToken ct):
+      Sends all messages concurrently. Returns all results.
+
+  Custom attribute class ValidEmailDataAttribute : DataAttribute:
+    Provides 3 valid EmailMessage test cases.
+
+  Tests use NSubstitute to mock IEmailProvider.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EmailServiceTests
+  {
+      private IEmailProvider CreateProvider(bool success = true)
+      {
+          var p = Substitute.For<IEmailProvider>();
+          p.SendAsync(Arg.Any<EmailMessage>(), Arg.Any<CancellationToken>())
+              .Returns(success
+                  ? new SendResult(true, Guid.NewGuid().ToString(), null)
+                  : new SendResult(false, null, "Provider error"));
+          return p;
+      }
+
+      [Theory]
+      [ValidEmailData]
+      public async Task ValidEmail_Sends(EmailMessage message)
+      {
+          var svc = new EmailService(CreateProvider());
+          var result = await svc.SendAsync(message, CancellationToken.None);
+          result.Success.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task EmptyRecipient_ReturnsFail()
+      {
+          var svc = new EmailService(CreateProvider());
+          var result = await svc.SendAsync(new EmailMessage("", "Sub", "Body", false), CancellationToken.None);
+          result.Success.Should().BeFalse();
+          result.Error.Should().Contain("Recipient");
+      }
+
+      [Fact]
+      public async Task EmptySubject_ReturnsFail()
+      {
+          var svc = new EmailService(CreateProvider());
+          var result = await svc.SendAsync(new EmailMessage("a@b.com", "", "Body", false), CancellationToken.None);
+          result.Success.Should().BeFalse();
+          result.Error.Should().Contain("Subject");
+      }
+
+      [Fact]
+      public async Task BulkSend_AllSucceed()
+      {
+          var svc = new EmailService(CreateProvider());
+          var messages = Enumerable.Range(1, 5)
+              .Select(i => new EmailMessage($"u{i}@t.com", $"Subject {i}", "Body", false));
+          var results = await svc.SendBulkAsync(messages, CancellationToken.None);
+          results.Should().HaveCount(5);
+          results.Should().AllSatisfy(r => r.Success.Should().BeTrue());
+      }
+
+      [Fact]
+      public async Task ProviderError_IsPassedThrough()
+      {
+          var svc = new EmailService(CreateProvider(false));
+          var result = await svc.SendAsync(new EmailMessage("a@b.com", "Sub", "Body", false), CancellationToken.None);
+          result.Success.Should().BeFalse();
+      }
+  }

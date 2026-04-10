@@ -1,0 +1,61 @@
+name: medium_masstransit_003
+category: csharp_medium
+subcategory: masstransit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts: record PaymentProcessed(Guid PaymentId, Guid OrderId, decimal Amount, bool Success, string? FailureReason).
+  A consumer OrderPaymentConsumer implementing IConsumer<PaymentProcessed>.
+  Constructor accepts IOrderService orderService.
+  Interface IOrderService with: Task ConfirmAsync(Guid orderId) and Task CancelAsync(Guid orderId, string reason).
+  In Consume: if Success calls ConfirmAsync; else calls CancelAsync.
+  Return only valid C# code in a single file.
+test_code: |
+  namespace Contracts { public record PaymentProcessed(Guid PaymentId, Guid OrderId, decimal Amount, bool Success, string? FailureReason); }
+  global using Contracts;
+
+  public class OrderPaymentConsumerTests
+  {
+      [Fact]
+      public async Task Consume_Success_ConfirmsOrder()
+      {
+          var orderSvc = Substitute.For<IOrderService>();
+          var consumer = new OrderPaymentConsumer(orderSvc);
+          var ctx = Substitute.For<ConsumeContext<PaymentProcessed>>();
+          var orderId = Guid.NewGuid();
+          ctx.Message.Returns(new PaymentProcessed(Guid.NewGuid(), orderId, 100m, true, null));
+          await consumer.Consume(ctx);
+          await orderSvc.Received(1).ConfirmAsync(orderId);
+          await orderSvc.DidNotReceive().CancelAsync(Arg.Any<Guid>(), Arg.Any<string>());
+      }
+
+      [Fact]
+      public async Task Consume_Failure_CancelsOrder()
+      {
+          var orderSvc = Substitute.For<IOrderService>();
+          var consumer = new OrderPaymentConsumer(orderSvc);
+          var ctx = Substitute.For<ConsumeContext<PaymentProcessed>>();
+          var orderId = Guid.NewGuid();
+          ctx.Message.Returns(new PaymentProcessed(Guid.NewGuid(), orderId, 100m, false, "Insufficient funds"));
+          await consumer.Consume(ctx);
+          await orderSvc.Received(1).CancelAsync(orderId, "Insufficient funds");
+          await orderSvc.DidNotReceive().ConfirmAsync(Arg.Any<Guid>());
+      }
+
+      [Fact]
+      public async Task Consume_Failure_PassesReason()
+      {
+          var orderSvc = Substitute.For<IOrderService>();
+          var consumer = new OrderPaymentConsumer(orderSvc);
+          var ctx = Substitute.For<ConsumeContext<PaymentProcessed>>();
+          ctx.Message.Returns(new PaymentProcessed(Guid.NewGuid(), Guid.NewGuid(), 50m, false, "Card expired"));
+          await consumer.Consume(ctx);
+          await orderSvc.Received(1).CancelAsync(Arg.Any<Guid>(), "Card expired");
+      }
+  }

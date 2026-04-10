@@ -1,0 +1,54 @@
+name: medium_aspnet_034
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record ImportRequest(string Format, string Data).
+  A record ImportResult(int Imported, int Skipped, IEnumerable<string> Warnings).
+  An interface IDataImporter with:
+    Task<ImportResult> ImportAsync(string format, string data)
+  A class ImportController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IDataImporter.
+  Action: POST api/import — validates format is "csv" or "json", calls importer, returns result or 400.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ImportControllerTests
+  {
+      [Fact]
+      public async Task ValidCsv_CallsImporter()
+      {
+          var importer = Substitute.For<IDataImporter>();
+          importer.ImportAsync("csv", Arg.Any<string>()).Returns(new ImportResult(10, 0, Enumerable.Empty<string>()));
+          var ctrl = new ImportController(importer);
+          var result = await ctrl.Import(new ImportRequest("csv", "a,b,c")) as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+          (result.Value as ImportResult)!.Imported.Should().Be(10);
+      }
+
+      [Fact]
+      public async Task InvalidFormat_Returns400()
+      {
+          var importer = Substitute.For<IDataImporter>();
+          var ctrl = new ImportController(importer);
+          var result = await ctrl.Import(new ImportRequest("xml", "<data/>"));
+          result.Should().BeOfType<BadRequestObjectResult>();
+      }
+
+      [Fact]
+      public async Task ValidJson_CallsImporter()
+      {
+          var importer = Substitute.For<IDataImporter>();
+          importer.ImportAsync("json", Arg.Any<string>()).Returns(new ImportResult(5, 1, new[] { "skipped row 3" }));
+          var ctrl = new ImportController(importer);
+          var result = await ctrl.Import(new ImportRequest("json", "[]")) as OkObjectResult;
+          (result!.Value as ImportResult)!.Skipped.Should().Be(1);
+          await importer.Received(1).ImportAsync("json", "[]");
+      }
+  }

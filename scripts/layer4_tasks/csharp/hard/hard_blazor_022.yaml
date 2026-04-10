@@ -1,0 +1,90 @@
+name: hard_blazor_022
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor real-time collaboration state (CRDT-inspired):
+  Records:
+    DocumentVersion(Guid DocumentId, long Version, string Content, string AuthorId, DateTime ModifiedAt)
+    EditOperation(Guid OperationId, Guid DocumentId, long BaseVersion, int Position, string? InsertText, int DeleteCount, string AuthorId)
+    ConflictResolution(Guid OperationId, string Strategy, string Result)
+
+  Class CollaborativeDocumentService:
+    Constructor seeds one document with version 1.
+    DocumentVersion GetDocument(Guid documentId): throws KeyNotFoundException if not found.
+    DocumentVersion ApplyEdit(EditOperation op):
+      If BaseVersion matches current version, apply the edit and increment version.
+      If BaseVersion < current version, attempt merge (last-write-wins: apply edit to current content).
+      Returns updated version.
+    IReadOnlyList<DocumentVersion> GetHistory(Guid documentId)
+    int GetVersionCount(Guid documentId)
+  Return only valid C# code in a single file.
+test_code: |
+  public class CollaborativeDocumentServiceTests
+  {
+      private readonly CollaborativeDocumentService _svc = new();
+
+      [Fact]
+      public void GetDocument_SeedDocument_ReturnsVersion1()
+      {
+          var docId = CollaborativeDocumentService.SeedDocumentId;
+          var doc = _svc.GetDocument(docId);
+          doc.Version.Should().Be(1);
+      }
+
+      [Fact]
+      public void GetDocument_UnknownId_ThrowsKeyNotFoundException()
+      {
+          var act = () => _svc.GetDocument(Guid.NewGuid());
+          act.Should().Throw<KeyNotFoundException>();
+      }
+
+      [Fact]
+      public void ApplyEdit_ExactVersion_IncrementsVersion()
+      {
+          var docId = CollaborativeDocumentService.SeedDocumentId;
+          var doc = _svc.GetDocument(docId);
+          var op = new EditOperation(Guid.NewGuid(), docId, doc.Version, 0, "Hello ", null, 0, "user1");
+          var updated = _svc.ApplyEdit(op);
+          updated.Version.Should().Be(doc.Version + 1);
+      }
+
+      [Fact]
+      public void ApplyEdit_StaleVersion_AppliesLastWriteWins()
+      {
+          var docId = CollaborativeDocumentService.SeedDocumentId;
+          var doc = _svc.GetDocument(docId);
+          var op1 = new EditOperation(Guid.NewGuid(), docId, doc.Version, 0, "First ", null, 0, "u1");
+          _svc.ApplyEdit(op1);
+          var op2 = new EditOperation(Guid.NewGuid(), docId, doc.Version, 0, "Second ", null, 0, "u2");
+          var result = _svc.ApplyEdit(op2);
+          result.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void GetHistory_TracksVersions()
+      {
+          var docId = CollaborativeDocumentService.SeedDocumentId;
+          var doc = _svc.GetDocument(docId);
+          _svc.ApplyEdit(new EditOperation(Guid.NewGuid(), docId, doc.Version, 0, "A", null, 0, "u1"));
+          var history = _svc.GetHistory(docId);
+          history.Should().HaveCountGreaterThanOrEqualTo(2);
+      }
+
+      [Fact]
+      public void GetVersionCount_IncrementsOnEdit()
+      {
+          var docId = CollaborativeDocumentService.SeedDocumentId;
+          var before = _svc.GetVersionCount(docId);
+          var doc = _svc.GetDocument(docId);
+          _svc.ApplyEdit(new EditOperation(Guid.NewGuid(), docId, doc.Version, 0, "X", null, 0, "u1"));
+          _svc.GetVersionCount(docId).Should().Be(before + 1);
+      }
+  }

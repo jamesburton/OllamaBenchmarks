@@ -1,0 +1,21 @@
+name: rewriting_hard_055
+category: english
+subcategory: rewriting
+difficulty: hard
+weight: 1
+validator_type: regex
+max_tokens: 128
+prompt: |
+  Rewrite in informal English:
+  'The organisation is currently undergoing a period of strategic realignment to better position itself for future growth opportunities.'
+  Write only the rewritten sentence.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "restructuring"
+    - "changing"
+    - "new direction"
+    - "growth"
+    - "working on"
+  min_words: 5
+  max_words: 25

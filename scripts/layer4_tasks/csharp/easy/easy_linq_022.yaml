@@ -1,0 +1,35 @@
+name: easy_linq_022
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Sorter with a static method:
+    List<string> OrderByLength(IEnumerable<string> items)
+  that returns strings sorted by length ascending using LINQ OrderBy + ToList.
+  Items of equal length may appear in any order.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SorterTests
+  {
+      [Fact]
+      public void OrderByLength_BasicCase()
+      {
+          var result = Sorter.OrderByLength(new[]{"banana","hi","hello","yo"});
+          result[0].Length.Should().Be(2);
+          result[1].Length.Should().Be(2);
+          result[2].Length.Should().Be(5);
+          result[3].Length.Should().Be(6);
+      }
+      [Fact]
+      public void OrderByLength_EmptySource_ReturnsEmpty()
+      {
+          Sorter.OrderByLength(Array.Empty<string>()).Should().BeEmpty();
+      }
+  }

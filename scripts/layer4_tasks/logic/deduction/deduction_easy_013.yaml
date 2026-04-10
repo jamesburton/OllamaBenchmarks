@@ -1,0 +1,14 @@
+name: deduction_easy_013
+category: logic
+subcategory: deduction
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. If the light is on, someone is home.
+  2. No one is home.
+  What can you conclude? Reply with only the conclusion.
+expected_answer: "The light is not on."
+validator_config: {}

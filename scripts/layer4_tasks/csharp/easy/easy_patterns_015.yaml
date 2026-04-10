@@ -1,0 +1,40 @@
+name: easy_patterns_015
+category: csharp_easy
+subcategory: patterns
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class PatternMatcher with a static method:
+    bool IsInRange(int value, int min, int max)
+  that returns true if min <= value <= max using a relational pattern in a switch expression.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PatternMatcherTests
+  {
+      [Fact]
+      public void IsInRange_InRange_ReturnsTrue()
+      {
+          PatternMatcher.IsInRange(5, 1, 10).Should().BeTrue();
+      }
+      [Fact]
+      public void IsInRange_BoundaryMin_ReturnsTrue()
+      {
+          PatternMatcher.IsInRange(1, 1, 10).Should().BeTrue();
+      }
+      [Fact]
+      public void IsInRange_BoundaryMax_ReturnsTrue()
+      {
+          PatternMatcher.IsInRange(10, 1, 10).Should().BeTrue();
+      }
+      [Fact]
+      public void IsInRange_OutOfRange_ReturnsFalse()
+      {
+          PatternMatcher.IsInRange(11, 1, 10).Should().BeFalse();
+      }
+  }

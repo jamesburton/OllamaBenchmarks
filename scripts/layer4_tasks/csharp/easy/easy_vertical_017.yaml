@@ -1,0 +1,40 @@
+name: easy_vertical_017
+category: csharp_easy
+subcategory: vertical
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Appointment(int Id, string PatientName, string DoctorId, DateTime ScheduledAt, bool IsCancelled)
+  A class AppointmentScheduler with:
+    void Schedule(Appointment appointment)
+    void Cancel(int appointmentId) marks appointment as cancelled using 'with' expression
+    List<Appointment> GetForDoctor(string doctorId) returns non-cancelled appointments
+    int UpcomingCount(DateTime now) returns non-cancelled appointments after now
+  Return only valid C# code in a single file.
+test_code: |
+  public class AppointmentSchedulerTests
+  {
+      [Fact]
+      public void Cancel_MarksAsCancelled()
+      {
+          var scheduler = new AppointmentScheduler();
+          scheduler.Schedule(new Appointment(1, "John", "doc1", DateTime.UtcNow.AddHours(1), false));
+          scheduler.Cancel(1);
+          scheduler.GetForDoctor("doc1").Should().BeEmpty();
+      }
+      [Fact]
+      public void UpcomingCount_OnlyCountsFutureNonCancelled()
+      {
+          var scheduler = new AppointmentScheduler();
+          var now = DateTime.UtcNow;
+          scheduler.Schedule(new Appointment(1, "Alice", "doc1", now.AddHours(1), false));
+          scheduler.Schedule(new Appointment(2, "Bob", "doc1", now.AddHours(-1), false));
+          scheduler.UpcomingCount(now).Should().Be(1);
+      }
+  }

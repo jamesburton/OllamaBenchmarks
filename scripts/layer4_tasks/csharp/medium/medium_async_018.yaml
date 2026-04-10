@@ -1,0 +1,63 @@
+name: medium_async_018
+category: csharp_medium
+subcategory: async
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AsyncProducerConsumer<T> that wires a producer and consumer via Channel<T>.
+  Constructor accepts:
+    Func<ChannelWriter<T>, CancellationToken, Task> producer
+    Func<T, CancellationToken, Task> consumer
+    int capacity
+  Expose:
+    Task RunAsync(CancellationToken ct = default)
+  Starts producer and consumer concurrently; waits for both to complete.
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncProducerConsumerTests
+  {
+      [Fact]
+      public async Task RunAsync_ProducerWritesFive_ConsumerReceivesAll()
+      {
+          var received = new List<int>();
+          var pc = new AsyncProducerConsumer<int>(
+              async (writer, ct) => {
+                  for (int i = 1; i <= 5; i++) { await writer.WriteAsync(i, ct); }
+                  writer.Complete();
+              },
+              async (item, ct) => { await Task.Yield(); lock(received) received.Add(item); },
+              10);
+          await pc.RunAsync();
+          received.Should().BeEquivalentTo(new[]{1,2,3,4,5});
+      }
+
+      [Fact]
+      public async Task RunAsync_EmptyProducer_ConsumerNeverCalled()
+      {
+          int consumed = 0;
+          var pc = new AsyncProducerConsumer<string>(
+              (writer, ct) => { writer.Complete(); return Task.CompletedTask; },
+              async (item, ct) => { await Task.Yield(); consumed++; },
+              10);
+          await pc.RunAsync();
+          consumed.Should().Be(0);
+      }
+
+      [Fact]
+      public async Task RunAsync_CancelledToken_Stops()
+      {
+          var cts = new CancellationTokenSource();
+          var pc = new AsyncProducerConsumer<int>(
+              async (writer, ct) => { while (true) { ct.ThrowIfCancellationRequested(); await writer.WriteAsync(1, ct); } },
+              async (item, ct) => { await Task.Delay(1, ct); },
+              5);
+          cts.CancelAfter(100);
+          await Assert.ThrowsAnyAsync<OperationCanceledException>(() => pc.RunAsync(cts.Token));
+      }
+  }

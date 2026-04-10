@@ -1,0 +1,22 @@
+name: technical_easy_001
+category: english
+subcategory: technical
+difficulty: easy
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Installation' section for a simple command-line tool written in Python.
+  Include at least one code block using markdown.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "pip install"
+    - "python"
+    - "install"
+    - "```"
+    - "bash"
+    - "run"
+  min_words: 10
+  max_words: 80

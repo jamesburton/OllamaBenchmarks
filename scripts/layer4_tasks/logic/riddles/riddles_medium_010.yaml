@@ -1,0 +1,16 @@
+name: riddles_medium_010
+category: logic
+subcategory: riddles
+difficulty: medium
+weight: 2
+validator_type: logic
+max_tokens: 64
+prompt: |
+  What begins with T, ends with T, and has T in it?
+  Reply with only the answer.
+expected_answer: "A teapot"
+validator_config:
+  accepted_answers:
+  - "A teapot"
+  - "teapot"
+  - "a teapot"

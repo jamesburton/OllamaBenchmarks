@@ -1,0 +1,23 @@
+name: technical_medium_014
+category: english
+subcategory: technical
+difficulty: medium
+weight: 1
+validator_type: regex
+max_tokens: 160
+prompt: |
+  Write a README 'Changelog' section that documents three recent changes to a software library.
+  Use a structured format.
+  Keep it under 80 words.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "version"
+    - "changed"
+    - "added"
+    - "fixed"
+    - "changelog"
+    - "v1"
+    - "update"
+  min_words: 10
+  max_words: 80

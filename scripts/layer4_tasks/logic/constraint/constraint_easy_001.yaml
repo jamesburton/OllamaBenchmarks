@@ -1,0 +1,16 @@
+name: constraint_easy_001
+category: logic
+subcategory: constraint
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 256
+prompt: |
+  Three friends - Alice, Bob, and Carol - each own one of these pets: a cat, a dog, and a fish.
+  Clues:
+  1. Alice does not own the dog.
+  2. Bob owns the fish.
+  3. Carol does not own the cat.
+  Who owns the dog? Reply with only the name.
+expected_answer: "Carol"
+validator_config: {}

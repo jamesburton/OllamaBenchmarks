@@ -1,0 +1,34 @@
+name: easy_async_028
+category: csharp_easy
+subcategory: async
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class SafeTask with a static method:
+    async Task<Exception?> CaptureExceptionAsync(Task task)
+  that awaits the task and returns the exception if it faulted, or null if it succeeded.
+  Return only valid C# code in a single file.
+test_code: |
+  public class SafeTaskTests
+  {
+      [Fact]
+      public async Task CaptureExceptionAsync_Success_ReturnsNull()
+      {
+          var result = await SafeTask.CaptureExceptionAsync(Task.CompletedTask);
+          result.Should().BeNull();
+      }
+      [Fact]
+      public async Task CaptureExceptionAsync_Faulted_ReturnsException()
+      {
+          var ex = new InvalidOperationException("oops");
+          var result = await SafeTask.CaptureExceptionAsync(Task.FromException(ex));
+          result.Should().BeOfType<InvalidOperationException>();
+          result!.Message.Should().Be("oops");
+      }
+  }

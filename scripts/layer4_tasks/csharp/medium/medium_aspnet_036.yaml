@@ -1,0 +1,67 @@
+name: medium_aspnet_036
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record FeatureFlag(string Name, bool Enabled, IEnumerable<string> AllowedUsers).
+  A class FeatureFlagsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts List<FeatureFlag> (for testability).
+  Actions:
+    GET api/feature-flags — all flags
+    GET api/feature-flags/{name}/check?userId=x — true if flag enabled globally, or userId in AllowedUsers
+    PUT api/feature-flags/{name}/toggle — toggles Enabled, 404 if not found
+  Return only valid C# code in a single file.
+test_code: |
+  public class FeatureFlagsControllerTests
+  {
+      private FeatureFlagsController MakeController() => new(new List<FeatureFlag>
+      {
+          new("dark-mode", true, new[] { "user1", "user2" }),
+          new("beta-feature", false, new[] { "admin" })
+      });
+
+      [Fact]
+      public void GetAll_ReturnsAllFlags()
+      {
+          (MakeController().GetAll() as OkObjectResult)!
+              .Value.Should().BeAssignableTo<IEnumerable<FeatureFlag>>()
+              .Which.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Check_EnabledGlobally_ReturnsTrue()
+      {
+          var result = MakeController().Check("dark-mode", "anyone") as OkObjectResult;
+          result!.Value.Should().Be(true);
+      }
+
+      [Fact]
+      public void Check_DisabledButUserAllowed_ReturnsTrue()
+      {
+          var result = MakeController().Check("beta-feature", "admin") as OkObjectResult;
+          result!.Value.Should().Be(true);
+      }
+
+      [Fact]
+      public void Check_DisabledAndUserNotAllowed_ReturnsFalse()
+      {
+          var result = MakeController().Check("beta-feature", "randomuser") as OkObjectResult;
+          result!.Value.Should().Be(false);
+      }
+
+      [Fact]
+      public void Toggle_ChangesEnabledState()
+      {
+          var ctrl = MakeController();
+          ctrl.Toggle("dark-mode");
+          var flags = (ctrl.GetAll() as OkObjectResult)!.Value as IEnumerable<FeatureFlag>;
+          flags!.First(f => f.Name == "dark-mode").Enabled.Should().BeFalse();
+      }
+  }

@@ -1,0 +1,15 @@
+name: deduction_medium_001
+category: logic
+subcategory: deduction
+difficulty: medium
+weight: 2
+validator_type: exact
+max_tokens: 128
+prompt: |
+  Given:
+  1. All mammals are vertebrates.
+  2. All vertebrates have a spine.
+  3. A whale is a mammal.
+  What can you conclude about whales? Reply with only the conclusion.
+expected_answer: "A whale has a spine."
+validator_config: {}

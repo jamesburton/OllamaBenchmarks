@@ -1,0 +1,16 @@
+name: vocabulary_medium_024
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'The manager was known for her pragmatic approach', which word best replaces 'pragmatic'?
+  A) Idealistic
+  B) Emotional
+  C) Practical
+  D) Theoretical
+  Reply with only the letter.
+expected_answer: "C"
+validator_config: {}

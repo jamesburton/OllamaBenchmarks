@@ -1,0 +1,102 @@
+name: hard_efcore_009
+category: csharp_hard
+subcategory: efcore
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  EF Core enum value conversion and query by enum:
+  Enum: TicketStatus { Open=1, InProgress=2, Resolved=3, Closed=4, Cancelled=5 }.
+  Enum: TicketPriority { Low=1, Medium=2, High=3, Critical=4 }.
+  Entity: SupportTicket(int Id, string Title, string Description, TicketStatus Status,
+    TicketPriority Priority, string AssignedTo, DateTime CreatedAt, DateTime? ResolvedAt).
+  DbContext: SupportDbContext — store enums as strings using HasConversion<string>().
+  Class TicketRepository(SupportDbContext db):
+    Task<SupportTicket> CreateAsync(SupportTicket ticket, CancellationToken ct)
+    Task<SupportTicket?> GetAsync(int id, CancellationToken ct)
+    Task<IReadOnlyList<SupportTicket>> GetByStatusAsync(TicketStatus status, CancellationToken ct)
+    Task<IReadOnlyList<SupportTicket>> GetOpenHighPriorityAsync(CancellationToken ct) —
+      returns Open/InProgress tickets with Priority >= High, ordered by Priority desc.
+    Task<bool> TransitionAsync(int id, TicketStatus newStatus, CancellationToken ct) —
+      validates allowed transitions. Allowed: Open->InProgress, InProgress->Resolved,
+      Resolved->Closed, any->Cancelled. Returns false for invalid.
+  Use SQLite in-memory.
+  Return only valid C# code in a single file.
+test_code: |
+  public class TicketRepositoryTests : IDisposable
+  {
+      private readonly SupportDbContext _db;
+      private readonly TicketRepository _repo;
+
+      public TicketRepositoryTests()
+      {
+          var opts = new DbContextOptionsBuilder<SupportDbContext>()
+              .UseSqlite("Data Source=:memory:").Options;
+          _db = new SupportDbContext(opts);
+          _db.Database.EnsureCreated();
+          _repo = new TicketRepository(_db);
+      }
+      public void Dispose() => _db.Dispose();
+
+      private Task<SupportTicket> MakeTicket(TicketStatus status = TicketStatus.Open, TicketPriority priority = TicketPriority.Medium) =>
+          _repo.CreateAsync(new SupportTicket { Title = "T", Description = "D", Status = status, Priority = priority, AssignedTo = "agent", CreatedAt = DateTime.UtcNow }, CancellationToken.None);
+
+      [Fact]
+      public async Task Create_And_Get_EnumRoundtrips()
+      {
+          var t = await MakeTicket(TicketStatus.Open, TicketPriority.High);
+          var found = await _repo.GetAsync(t.Id, CancellationToken.None);
+          found!.Status.Should().Be(TicketStatus.Open);
+          found.Priority.Should().Be(TicketPriority.High);
+      }
+
+      [Fact]
+      public async Task GetByStatus_FiltersCorrectly()
+      {
+          await MakeTicket(TicketStatus.Open);
+          await MakeTicket(TicketStatus.Resolved);
+          var result = await _repo.GetByStatusAsync(TicketStatus.Open, CancellationToken.None);
+          result.Should().AllSatisfy(t => t.Status.Should().Be(TicketStatus.Open));
+      }
+
+      [Fact]
+      public async Task GetOpenHighPriority_FiltersAndOrders()
+      {
+          await MakeTicket(TicketStatus.Open, TicketPriority.Critical);
+          await MakeTicket(TicketStatus.Open, TicketPriority.Low);
+          await MakeTicket(TicketStatus.Resolved, TicketPriority.Critical);
+          var result = await _repo.GetOpenHighPriorityAsync(CancellationToken.None);
+          result.Should().AllSatisfy(t => t.Priority.Should().BeGreaterThanOrEqualTo(TicketPriority.High));
+          result.Should().NotContain(t => t.Status == TicketStatus.Resolved);
+      }
+
+      [Fact]
+      public async Task Transition_ValidTransition_Succeeds()
+      {
+          var t = await MakeTicket(TicketStatus.Open);
+          var result = await _repo.TransitionAsync(t.Id, TicketStatus.InProgress, CancellationToken.None);
+          result.Should().BeTrue();
+          (await _repo.GetAsync(t.Id, CancellationToken.None))!.Status.Should().Be(TicketStatus.InProgress);
+      }
+
+      [Fact]
+      public async Task Transition_InvalidTransition_ReturnsFalse()
+      {
+          var t = await MakeTicket(TicketStatus.Open);
+          var result = await _repo.TransitionAsync(t.Id, TicketStatus.Resolved, CancellationToken.None);
+          result.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task Transition_ToCancelled_AlwaysAllowed()
+      {
+          var t = await MakeTicket(TicketStatus.Resolved);
+          var result = await _repo.TransitionAsync(t.Id, TicketStatus.Cancelled, CancellationToken.None);
+          result.Should().BeTrue();
+      }
+  }

@@ -1,0 +1,16 @@
+name: vocabulary_medium_026
+category: english
+subcategory: vocabulary
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  In the sentence 'He gave a verbose answer to a simple question', which word best replaces 'verbose'?
+  A) Concise
+  B) Wordy
+  C) Honest
+  D) Polite
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

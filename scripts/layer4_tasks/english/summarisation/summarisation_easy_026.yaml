@@ -1,0 +1,18 @@
+name: summarisation_easy_026
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A new solar panel technology has achieved a record efficiency of 40 percent, converting sunlight to electricity at twice the rate of conventional panels. The breakthrough, developed at a university laboratory, uses a multi-layer design to capture a broader spectrum of light. Commercial production is expected within five years.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "solar"
+    - "efficiency"
+    - "electricity"
+    - "technology"
+  max_words: 25

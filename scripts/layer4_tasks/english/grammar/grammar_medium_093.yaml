@@ -1,0 +1,15 @@
+name: grammar_medium_093
+category: english
+subcategory: grammar
+difficulty: medium
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Give the package to whoever answers the door.
+  B) Give the package to whomever answers the door.
+  C) Give the package to whoever that answers the door.
+  Reply with only the letter.
+expected_answer: "A"
+validator_config: {}

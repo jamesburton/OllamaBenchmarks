@@ -1,0 +1,15 @@
+name: grammar_easy_041
+category: english
+subcategory: grammar
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Choose the grammatically correct sentence:
+  A) Walking down the street, the rain began to fall.
+  B) Walking down the street, she felt the rain begin to fall.
+  C) As walking down the street, rain began to fall.
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

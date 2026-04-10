@@ -1,0 +1,57 @@
+name: medium_linq_046
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record NewsArticle with: int Id, string Title, string Author, DateTime Published, IReadOnlyList<string> Keywords.
+  A class NewsSearch with a constructor accepting IEnumerable<NewsArticle> articles.
+  Expose:
+    IEnumerable<NewsArticle> Search(string keyword) — articles containing keyword (case-insensitive), newest first
+    IEnumerable<NewsArticle> ByAuthor(string author) — articles by author, newest first
+    IEnumerable<TrendingKeyword> TrendingKeywords(int topN, TimeSpan window, DateTime now)
+      — top N keywords by frequency in articles published within 'window' before 'now'
+  TrendingKeyword is a record with: string Keyword, int Count.
+  Return only valid C# code in a single file.
+test_code: |
+  public class NewsSearchTests
+  {
+      private static readonly DateTime Now = new DateTime(2024,6,1,0,0,0,DateTimeKind.Utc);
+      private readonly NewsArticle[] _articles = {
+          new(1,"AI Trends",   "Alice", Now.AddDays(-1), new[]{"ai","tech","ml"}),
+          new(2,"Cloud Ops",   "Bob",   Now.AddDays(-2), new[]{"cloud","tech","devops"}),
+          new(3,"AI in Health","Alice", Now.AddDays(-10),new[]{"ai","health"}),
+      };
+
+      [Fact]
+      public void Search_AI_ReturnsTwoArticles()
+      {
+          new NewsSearch(_articles).Search("ai").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Search_NewestFirst()
+      {
+          var result = new NewsSearch(_articles).Search("ai").ToList();
+          result[0].Published.Should().BeAfter(result[1].Published);
+      }
+
+      [Fact]
+      public void ByAuthor_AliceTwoArticles()
+      {
+          new NewsSearch(_articles).ByAuthor("Alice").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void TrendingKeywords_Window3Days_TechTop()
+      {
+          var result = new NewsSearch(_articles).TrendingKeywords(3, TimeSpan.FromDays(3), Now).ToList();
+          result.Should().Contain(k => k.Keyword == "tech");
+      }
+  }

@@ -1,0 +1,98 @@
+name: hard_blazor_014
+category: csharp_hard
+subcategory: blazor
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  Blazor modal dialog service:
+  Enum DialogResult { Confirmed, Cancelled, Dismissed }
+  Records:
+    DialogOptions(string Title, string Message, string ConfirmText, string CancelText, bool IsDestructive)
+    DialogRequest(Guid Id, DialogOptions Options, TaskCompletionSource<DialogResult> Completion)
+
+  Interface IDialogService:
+    Task<DialogResult> ShowConfirmAsync(string title, string message, CancellationToken ct)
+    Task<DialogResult> ShowDestructiveAsync(string title, string message, CancellationToken ct)
+    event Action<DialogRequest>? OnDialogRequested
+    DialogRequest? CurrentDialog { get; }
+
+  Class DialogService : IDialogService:
+    Queues dialogs; exposes current one.
+    void Confirm(Guid dialogId): completes with Confirmed.
+    void Cancel(Guid dialogId): completes with Cancelled.
+    void Dismiss(Guid dialogId): completes with Dismissed.
+    Each method does nothing if dialogId not current.
+  Return only valid C# code in a single file.
+test_code: |
+  public class DialogServiceTests
+  {
+      private readonly DialogService _svc = new();
+
+      [Fact]
+      public async Task ShowConfirm_Confirmed_ReturnsConfirmed()
+      {
+          var task = _svc.ShowConfirmAsync("Delete?", "Sure?", CancellationToken.None);
+          var dialog = _svc.CurrentDialog;
+          dialog.Should().NotBeNull();
+          _svc.Confirm(dialog!.Id);
+          var result = await task;
+          result.Should().Be(DialogResult.Confirmed);
+      }
+
+      [Fact]
+      public async Task ShowConfirm_Cancelled_ReturnsCancelled()
+      {
+          var task = _svc.ShowConfirmAsync("Proceed?", "Are you sure?", CancellationToken.None);
+          var dialog = _svc.CurrentDialog;
+          _svc.Cancel(dialog!.Id);
+          var result = await task;
+          result.Should().Be(DialogResult.Cancelled);
+      }
+
+      [Fact]
+      public async Task ShowDestructive_HasDestructiveFlag()
+      {
+          DialogRequest? captured = null;
+          _svc.OnDialogRequested += r => captured = r;
+          _ = _svc.ShowDestructiveAsync("Delete All", "This cannot be undone", CancellationToken.None);
+          captured.Should().NotBeNull();
+          captured!.Options.IsDestructive.Should().BeTrue();
+          _svc.Cancel(captured.Id);
+      }
+
+      [Fact]
+      public async Task Dismiss_ReturnsDismissed()
+      {
+          var task = _svc.ShowConfirmAsync("T", "M", CancellationToken.None);
+          var dialog = _svc.CurrentDialog;
+          _svc.Dismiss(dialog!.Id);
+          var result = await task;
+          result.Should().Be(DialogResult.Dismissed);
+      }
+
+      [Fact]
+      public void Cancel_WrongId_DoesNothing()
+      {
+          _ = _svc.ShowConfirmAsync("T", "M", CancellationToken.None);
+          var act = () => _svc.Cancel(Guid.NewGuid());
+          act.Should().NotThrow();
+          _svc.CurrentDialog.Should().NotBeNull();
+      }
+
+      [Fact]
+      public async Task ShowConfirm_FiresOnDialogRequested()
+      {
+          DialogRequest? captured = null;
+          _svc.OnDialogRequested += r => captured = r;
+          _ = _svc.ShowConfirmAsync("Title", "Msg", CancellationToken.None);
+          captured.Should().NotBeNull();
+          captured!.Options.Title.Should().Be("Title");
+          _svc.Cancel(captured.Id);
+      }
+  }

@@ -1,0 +1,18 @@
+name: summarisation_medium_070
+category: english
+subcategory: summarisation
+difficulty: medium
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  The sanctions regime imposed on a major oil-exporting state following its military aggression has produced mixed results, with energy revenues remaining robust due to alternative buyers in Asia. Western allies are debating whether to impose secondary sanctions on countries trading with the sanctioned state. Economists warn that over-use of financial sanctions risks undermining the dollar's reserve currency status.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "sanctions"
+    - "oil"
+    - "energy"
+    - "dollar"
+  max_words: 25

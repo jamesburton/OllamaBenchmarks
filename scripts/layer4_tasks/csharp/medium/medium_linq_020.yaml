@@ -1,0 +1,59 @@
+name: medium_linq_020
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class PagedResult<T> with properties: IReadOnlyList<T> Items, int TotalCount, int Page, int PageSize.
+  A class PaginationHelper with a static method:
+    PagedResult<T> Paginate<T>(IEnumerable<T> source, int page, int pageSize)
+  where page is 1-based. Throws ArgumentOutOfRangeException if page < 1 or pageSize < 1.
+  Return only valid C# code in a single file.
+test_code: |
+  public class PaginationHelperTests
+  {
+      private static int[] Source => Enumerable.Range(1, 25).ToArray();
+
+      [Fact]
+      public void Paginate_FirstPage()
+      {
+          var result = PaginationHelper.Paginate(Source, 1, 10);
+          result.Items.Should().BeEquivalentTo(Enumerable.Range(1,10), cfg => cfg.WithStrictOrdering());
+          result.TotalCount.Should().Be(25);
+      }
+
+      [Fact]
+      public void Paginate_LastPagePartial()
+      {
+          var result = PaginationHelper.Paginate(Source, 3, 10);
+          result.Items.Should().HaveCount(5);
+          result.Page.Should().Be(3);
+      }
+
+      [Fact]
+      public void Paginate_BeyondLastPage_ReturnsEmpty()
+      {
+          var result = PaginationHelper.Paginate(Source, 10, 10);
+          result.Items.Should().BeEmpty();
+      }
+
+      [Fact]
+      public void Paginate_InvalidPage_Throws()
+      {
+          Action act = () => PaginationHelper.Paginate(Source, 0, 10);
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+
+      [Fact]
+      public void Paginate_InvalidPageSize_Throws()
+      {
+          Action act = () => PaginationHelper.Paginate(Source, 1, 0);
+          act.Should().Throw<ArgumentOutOfRangeException>();
+      }
+  }

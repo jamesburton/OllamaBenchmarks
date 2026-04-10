@@ -1,0 +1,41 @@
+name: easy_efcore_029
+category: csharp_easy
+subcategory: efcore
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity class:
+    class Bookmark with properties: int Id, string UserId, string Url, string? Title
+  A DbContext class BookmarkContext with:
+    DbSet<Bookmark> Bookmarks { get; set; }
+  Use InMemory database in OnConfiguring.
+  A static class BookmarkRepository with:
+    bool Exists(BookmarkContext context, string userId, string url)
+  that returns true if a bookmark exists for the given userId and url (case-insensitive).
+  Return only valid C# code in a single file.
+test_code: |
+  public class BookmarkRepositoryTests
+  {
+      [Fact]
+      public void Exists_Found_ReturnsTrue()
+      {
+          using var context = new BookmarkContext();
+          context.Database.EnsureCreated();
+          context.Bookmarks.Add(new Bookmark { UserId = "u1", Url = "https://example.com" });
+          context.SaveChanges();
+          BookmarkRepository.Exists(context, "u1", "https://example.com").Should().BeTrue();
+      }
+      [Fact]
+      public void Exists_NotFound_ReturnsFalse()
+      {
+          using var context = new BookmarkContext();
+          context.Database.EnsureCreated();
+          BookmarkRepository.Exists(context, "u1", "https://other.com").Should().BeFalse();
+      }
+  }

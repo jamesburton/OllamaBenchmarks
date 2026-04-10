@@ -1,0 +1,49 @@
+name: medium_patterns_032
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class TreeNode<T> with T Value and IReadOnlyList<TreeNode<T>> Children.
+  A static class TreeTraversal<T> with:
+    IEnumerable<T> DepthFirst(TreeNode<T> root)
+    IEnumerable<T> BreadthFirst(TreeNode<T> root)
+    int Depth(TreeNode<T> root) — root = 1
+  Return only valid C# code in a single file.
+test_code: |
+  public class TreeTraversalTests
+  {
+      private static TreeNode<int> Tree() =>
+          new(1, new[]{
+              new TreeNode<int>(2, new[]{ new TreeNode<int>(4, Array.Empty<TreeNode<int>>()), new TreeNode<int>(5, Array.Empty<TreeNode<int>>()) }),
+              new TreeNode<int>(3, Array.Empty<TreeNode<int>>())
+          });
+
+      [Fact]
+      public void DepthFirst_Order()
+      {
+          TreeTraversal<int>.DepthFirst(Tree()).Should().BeEquivalentTo(new[]{1,2,4,5,3}, o => o.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void BreadthFirst_Order()
+      {
+          TreeTraversal<int>.BreadthFirst(Tree()).Should().BeEquivalentTo(new[]{1,2,3,4,5}, o => o.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void Depth_Returns3() { TreeTraversal<int>.Depth(Tree()).Should().Be(3); }
+
+      [Fact]
+      public void DepthFirst_SingleNode()
+      {
+          TreeTraversal<int>.DepthFirst(new TreeNode<int>(99, Array.Empty<TreeNode<int>>()))
+              .Should().ContainSingle(v => v == 99);
+      }
+  }

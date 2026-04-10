@@ -1,0 +1,69 @@
+name: medium_efcore_003
+category: csharp_medium
+subcategory: efcore
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  An entity Order with: int Id, string CustomerId, decimal Total, string Status, DateTime OrderDate.
+  A class OrderDbContext : DbContext with DbSet<Order> Orders.
+  A class OrderRepository with constructor accepting OrderDbContext.
+  Methods:
+    Task<IEnumerable<Order>> GetByStatusAsync(string status)
+    Task<decimal> GetTotalRevenueAsync()
+    Task UpdateStatusAsync(int orderId, string newStatus)
+    Task<IEnumerable<Order>> GetOrdersAfterAsync(DateTime date)
+  Return only valid C# code in a single file.
+test_code: |
+  public class OrderRepositoryTests : IAsyncLifetime
+  {
+      private OrderDbContext _db = null!;
+      private OrderRepository _repo = null!;
+
+      public async ValueTask InitializeAsync()
+      {
+          var opts = new DbContextOptionsBuilder<OrderDbContext>()
+              .UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
+          _db = new OrderDbContext(opts);
+          _repo = new OrderRepository(_db);
+          _db.Orders.AddRange(
+              new Order { CustomerId = "c1", Total = 100m, Status = "Pending", OrderDate = DateTime.UtcNow.AddDays(-5) },
+              new Order { CustomerId = "c2", Total = 200m, Status = "Completed", OrderDate = DateTime.UtcNow.AddDays(-2) },
+              new Order { CustomerId = "c1", Total = 50m, Status = "Pending", OrderDate = DateTime.UtcNow });
+          await _db.SaveChangesAsync();
+      }
+
+      public async ValueTask DisposeAsync() => await _db.DisposeAsync();
+
+      [Fact]
+      public async Task GetByStatus_FiltersPending()
+      {
+          (await _repo.GetByStatusAsync("Pending")).Should().HaveCount(2);
+      }
+
+      [Fact]
+      public async Task GetTotalRevenue_SumsAll()
+      {
+          (await _repo.GetTotalRevenueAsync()).Should().Be(350m);
+      }
+
+      [Fact]
+      public async Task UpdateStatus_ChangesStatus()
+      {
+          var order = _db.Orders.First();
+          await _repo.UpdateStatusAsync(order.Id, "Shipped");
+          _db.ChangeTracker.Clear();
+          (await _db.Orders.FindAsync(order.Id))!.Status.Should().Be("Shipped");
+      }
+
+      [Fact]
+      public async Task GetOrdersAfter_FiltersCorrectly()
+      {
+          (await _repo.GetOrdersAfterAsync(DateTime.UtcNow.AddDays(-3))).Should().HaveCount(2);
+      }
+  }

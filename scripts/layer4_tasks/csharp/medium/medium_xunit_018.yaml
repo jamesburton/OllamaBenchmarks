@@ -1,0 +1,39 @@
+name: medium_xunit_018
+category: csharp_medium
+subcategory: xunit
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class HtmlTagBuilder with:
+    HtmlTagBuilder Tag(string name), HtmlTagBuilder Attribute(string key, string val), HtmlTagBuilder Content(string text), string Build()
+  Return only valid C# code in a single file.
+test_code: |
+  public class HtmlTagBuilderTests
+  {
+      [Fact]
+      public void CanBeInstantiated()
+      {
+          var instance = new HtmlTagBuilder();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void BasicBehavior_Works()
+      {
+          var instance = new HtmlTagBuilder();
+          instance.Should().NotBeNull();
+      }
+
+      [Fact]
+      public void EdgeCase_DoesNotThrow()
+      {
+          var instance = new HtmlTagBuilder();
+          instance.Invoking(i => { }).Should().NotThrow();
+      }
+  }

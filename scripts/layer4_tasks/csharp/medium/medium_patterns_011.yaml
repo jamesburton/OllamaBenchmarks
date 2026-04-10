@@ -1,0 +1,50 @@
+name: medium_patterns_011
+category: csharp_medium
+subcategory: patterns
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A generic record Validated<T> with:
+    static Validated<T> Valid(T value)
+    static Validated<T> Invalid(IEnumerable<string> errors)
+    bool IsValid, T Value (throws if invalid), IReadOnlyList<string> Errors
+    Validated<TOut> Map<TOut>(Func<T, TOut> f)
+  Return only valid C# code in a single file.
+test_code: |
+  public class ValidatedTests
+  {
+      [Fact]
+      public void Valid_IsValid() { var v = Validated<int>.Valid(10); v.IsValid.Should().BeTrue(); v.Value.Should().Be(10); }
+
+      [Fact]
+      public void Invalid_HasErrors()
+      {
+          var v = Validated<int>.Invalid(new[]{"too small","negative"});
+          v.IsValid.Should().BeFalse();
+          v.Errors.Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void Value_Invalid_Throws()
+      {
+          Action act = () => { var _ = Validated<int>.Invalid(new[]{"err"}).Value; };
+          act.Should().Throw<InvalidOperationException>();
+      }
+
+      [Fact]
+      public void Map_Valid_Transforms() { Validated<int>.Valid(5).Map(x => x.ToString()).Value.Should().Be("5"); }
+
+      [Fact]
+      public void Map_Invalid_PropagatesErrors()
+      {
+          var v = Validated<int>.Invalid(new[]{"bad"}).Map(x => x * 2);
+          v.IsValid.Should().BeFalse();
+          v.Errors.Should().Contain("bad");
+      }
+  }

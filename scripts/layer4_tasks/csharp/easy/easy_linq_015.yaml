@@ -1,0 +1,32 @@
+name: easy_linq_015
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Zipper with a static method:
+    List<string> ZipCombine(IEnumerable<string> first, IEnumerable<string> second)
+  that combines pairs from two sequences into "first-second" strings using LINQ Zip + ToList.
+  Return only valid C# code in a single file.
+test_code: |
+  public class ZipperTests
+  {
+      [Fact]
+      public void ZipCombine_BasicCase()
+      {
+          var result = Zipper.ZipCombine(new[]{"a","b","c"}, new[]{"1","2","3"});
+          result.Should().BeEquivalentTo(new[]{"a-1","b-2","c-3"}, cfg => cfg.WithStrictOrdering());
+      }
+      [Fact]
+      public void ZipCombine_UnequalLengths_UsesShortestSequence()
+      {
+          var result = Zipper.ZipCombine(new[]{"x","y"}, new[]{"1","2","3"});
+          result.Should().BeEquivalentTo(new[]{"x-1","y-2"}, cfg => cfg.WithStrictOrdering());
+      }
+  }

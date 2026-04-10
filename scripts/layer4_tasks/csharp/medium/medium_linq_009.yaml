@@ -1,0 +1,55 @@
+name: medium_linq_009
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Event with: int Id, string Name, IReadOnlyList<string> Tags.
+  A class EventIndex with a constructor accepting IEnumerable<Event> events.
+  Expose:
+    IEnumerable<string> AllTags() — distinct tags across all events, ordered alphabetically
+    IEnumerable<Event> WithTag(string tag) — events that contain the given tag
+    IEnumerable<TagCount> TagFrequencies() — each tag with how many events use it, ordered by count desc
+  TagCount is a record with string Tag, int Count.
+  Return only valid C# code in a single file.
+test_code: |
+  public class EventIndexTests
+  {
+      private readonly Event[] _events = {
+          new(1, "Conf",    new[]{"tech","cloud"}),
+          new(2, "Hackday", new[]{"tech","ai"}),
+          new(3, "Meetup",  new[]{"cloud","networking"}),
+      };
+
+      [Fact]
+      public void AllTags_ReturnsDistinctSorted()
+      {
+          var result = new EventIndex(_events).AllTags().ToList();
+          result.Should().BeEquivalentTo(new[]{"ai","cloud","networking","tech"}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void WithTag_ReturnsTwoTechEvents()
+      {
+          new EventIndex(_events).WithTag("tech").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void WithTag_UnknownTag_ReturnsEmpty()
+      {
+          new EventIndex(_events).WithTag("music").Should().BeEmpty();
+      }
+
+      [Fact]
+      public void TagFrequencies_TechAndCloudTop()
+      {
+          var result = new EventIndex(_events).TagFrequencies().Take(2).Select(t => t.Tag).ToList();
+          result.Should().BeEquivalentTo(new[]{"cloud","tech"});
+      }
+  }

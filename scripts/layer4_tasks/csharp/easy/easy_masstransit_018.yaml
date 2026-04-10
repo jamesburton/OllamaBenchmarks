@@ -1,0 +1,41 @@
+name: easy_masstransit_018
+category: csharp_easy
+subcategory: masstransit
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  In namespace Contracts:
+    record SurveyResponse(Guid SurveyId, string RespondentId, int Score, string Comment)
+  A consumer class SurveyResponseConsumer that implements IConsumer<SurveyResponse>:
+    Has a public List<int> Scores = new()
+    Has a double AverageScore => Scores.Count == 0 ? 0.0 : Scores.Average()
+    Consume method adds Score to Scores
+  Return only valid C# code in a single file.
+test_code: |
+  global using Contracts;
+  public class SurveyResponseConsumerTests
+  {
+      [Fact]
+      public async Task Consume_AccumulatesScores()
+      {
+          var consumer = new SurveyResponseConsumer();
+          foreach (var score in new[]{4,5,3})
+          {
+              var context = Substitute.For<ConsumeContext<SurveyResponse>>();
+              context.Message.Returns(new SurveyResponse(Guid.NewGuid(), "u1", score, ""));
+              await consumer.Consume(context);
+          }
+          consumer.AverageScore.Should().BeApproximately(4.0, 0.001);
+      }
+      [Fact]
+      public void AverageScore_NoScores_ReturnsZero()
+      {
+          new SurveyResponseConsumer().AverageScore.Should().Be(0.0);
+      }
+  }

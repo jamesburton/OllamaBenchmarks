@@ -1,0 +1,13 @@
+name: calculus_hard_003
+category: maths
+subcategory: calculus
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Find the critical point(s) of f(x) = x^2 - 6x + 5. What is the x-coordinate of the minimum? Reply with only the number.
+expected_answer: "3"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

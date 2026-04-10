@@ -1,0 +1,32 @@
+name: easy_linq_005
+category: csharp_easy
+subcategory: linq
+difficulty: easy
+weight: 1
+template: test_project
+max_tokens: 2048
+num_ctx: 8192
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A static class Finder with a static method:
+    string? First(IEnumerable<string> items, string prefix)
+  that returns the first item starting with the given prefix, or null if none found.
+  Use LINQ FirstOrDefault.
+  Return only valid C# code in a single file.
+test_code: |
+  public class FinderTests
+  {
+      [Fact]
+      public void First_ReturnsFirstMatch()
+      {
+          var result = Finder.First(new[]{"apple","banana","avocado"}, "a");
+          result.Should().Be("apple");
+      }
+      [Fact]
+      public void First_NoMatch_ReturnsNull()
+      {
+          Finder.First(new[]{"cat","dog"}, "x").Should().BeNull();
+      }
+  }

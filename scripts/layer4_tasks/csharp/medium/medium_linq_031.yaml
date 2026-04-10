@@ -1,0 +1,60 @@
+name: medium_linq_031
+category: csharp_medium
+subcategory: linq
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A record Permission with: string Role, string Resource, string Action.
+  A class AccessMatrix with a constructor accepting IEnumerable<Permission> permissions.
+  Expose:
+    bool IsAllowed(string role, string resource, string action)
+    IEnumerable<string> AllowedActions(string role, string resource) — distinct actions ordered asc
+    Dictionary<string, List<string>> RoleResources(string role) — resource to list of actions for that role
+  Return only valid C# code in a single file.
+test_code: |
+  public class AccessMatrixTests
+  {
+      private readonly Permission[] _perms = {
+          new("Admin","Orders","Read"),
+          new("Admin","Orders","Write"),
+          new("Admin","Users","Read"),
+          new("User","Orders","Read"),
+      };
+
+      [Fact]
+      public void IsAllowed_AdminWrite_True()
+      {
+          new AccessMatrix(_perms).IsAllowed("Admin","Orders","Write").Should().BeTrue();
+      }
+
+      [Fact]
+      public void IsAllowed_UserWrite_False()
+      {
+          new AccessMatrix(_perms).IsAllowed("User","Orders","Write").Should().BeFalse();
+      }
+
+      [Fact]
+      public void AllowedActions_AdminOrders_TwoActions()
+      {
+          var result = new AccessMatrix(_perms).AllowedActions("Admin","Orders").ToList();
+          result.Should().BeEquivalentTo(new[]{"Read","Write"}, cfg => cfg.WithStrictOrdering());
+      }
+
+      [Fact]
+      public void RoleResources_AdminHasTwoResources()
+      {
+          new AccessMatrix(_perms).RoleResources("Admin").Should().HaveCount(2);
+      }
+
+      [Fact]
+      public void IsAllowed_UnknownRole_False()
+      {
+          new AccessMatrix(_perms).IsAllowed("Guest","Orders","Read").Should().BeFalse();
+      }
+  }

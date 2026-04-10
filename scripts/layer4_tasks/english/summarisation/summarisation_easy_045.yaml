@@ -1,0 +1,18 @@
+name: summarisation_easy_045
+category: english
+subcategory: summarisation
+difficulty: easy
+weight: 1
+validator_type: rubric_keywords
+max_tokens: 64
+prompt: |
+  A cyclist completed a solo crossing of the continent in 18 days, beating the previous record by two days. She covered over 4,000 kilometres through mountains, deserts, and plains. Her achievement has been praised as one of the most remarkable feats in endurance sports.
+  Summarise the above passage in 25 words or fewer.
+expected_answer: null
+validator_config:
+  must_contain_any:
+    - "cyclist"
+    - "record"
+    - "endurance"
+    - "crossing"
+  max_words: 25

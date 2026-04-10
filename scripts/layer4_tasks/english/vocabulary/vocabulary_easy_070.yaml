@@ -1,0 +1,16 @@
+name: vocabulary_easy_070
+category: english
+subcategory: vocabulary
+difficulty: easy
+weight: 1
+validator_type: exact
+max_tokens: 64
+prompt: |
+  Which word is MORE INFORMAL?
+  A) Utilise
+  B) Use
+  C) Employ
+  D) Apply
+  Reply with only the letter.
+expected_answer: "B"
+validator_config: {}

@@ -1,0 +1,14 @@
+name: arithmetic_hard_004
+category: maths
+subcategory: arithmetic
+difficulty: hard
+weight: 3
+validator_type: numeric
+max_tokens: 128
+prompt: |
+  Calculate: 7! / (5! * 2!)
+  Reply with only the number.
+expected_answer: "21"
+validator_config:
+  tolerance: 0
+  extract_pattern: '(-?\d+(?:\.\d+)?)'

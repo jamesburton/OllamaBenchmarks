@@ -1,0 +1,54 @@
+name: medium_aspnet_011
+category: csharp_medium
+subcategory: aspnet
+difficulty: medium
+weight: 2
+template: test_project
+max_tokens: 4096
+num_ctx: 12288
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing:
+  A class AppSettings with properties:
+    string ConnectionString
+    int MaxRetries
+    bool EnableCaching
+  A class SettingsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
+  Constructor accepts IOptions<AppSettings>.
+  Action: GET api/settings — returns the settings as JSON (Ok result).
+  Return only valid C# code in a single file.
+test_code: |
+  public class SettingsControllerTests
+  {
+      private SettingsController MakeController(AppSettings settings)
+      {
+          var opts = Microsoft.Extensions.Options.Options.Create(settings);
+          return new SettingsController(opts);
+      }
+
+      [Fact]
+      public void Get_ReturnsSettings()
+      {
+          var settings = new AppSettings { ConnectionString = "Server=.", MaxRetries = 3, EnableCaching = true };
+          var result = MakeController(settings).Get() as OkObjectResult;
+          result!.StatusCode.Should().Be(200);
+          result.Value.Should().Be(settings);
+      }
+
+      [Fact]
+      public void Get_ReturnsCorrectConnectionString()
+      {
+          var settings = new AppSettings { ConnectionString = "mydb", MaxRetries = 1, EnableCaching = false };
+          var result = MakeController(settings).Get() as OkObjectResult;
+          (result!.Value as AppSettings)!.ConnectionString.Should().Be("mydb");
+      }
+
+      [Fact]
+      public void Get_ReturnsCorrectMaxRetries()
+      {
+          var settings = new AppSettings { ConnectionString = "", MaxRetries = 5, EnableCaching = false };
+          var result = MakeController(settings).Get() as OkObjectResult;
+          (result!.Value as AppSettings)!.MaxRetries.Should().Be(5);
+      }
+  }

@@ -1,0 +1,84 @@
+name: hard_async_013
+category: csharp_hard
+subcategory: async
+difficulty: hard
+weight: 3
+template: test_project
+max_tokens: 8192
+num_ctx: 16384
+validator_type: dotnet
+references: []
+prompt: |
+  Create a single C# file containing a complete vertical slice:
+  A class AsyncTaskScheduler that schedules tasks for future execution:
+    Task ScheduleAsync(Func<CancellationToken, Task> work, TimeSpan delay, CancellationToken ct) —
+      schedules work to run after delay. Returns a task that completes when the work completes.
+    Task<T> ScheduleAsync<T>(Func<CancellationToken, Task<T>> work, TimeSpan delay, CancellationToken ct)
+    Task ScheduleRecurringAsync(Func<CancellationToken, Task> work, TimeSpan interval,
+      int maxExecutions, CancellationToken ct) — runs work repeatedly at interval for up to
+      maxExecutions times, or until ct is cancelled.
+    int ScheduledCount — number of tasks waiting to execute.
+  If ct is cancelled before execution starts, the scheduled task is abandoned (no exception from ScheduleAsync itself).
+  Return only valid C# code in a single file.
+test_code: |
+  public class AsyncTaskSchedulerTests
+  {
+      private readonly AsyncTaskScheduler _scheduler = new();
+
+      [Fact]
+      public async Task ScheduleAsync_RunsAfterDelay()
+      {
+          var ran = false;
+          var t = _scheduler.ScheduleAsync(_ => { ran = true; return Task.CompletedTask; },
+              TimeSpan.FromMilliseconds(50), CancellationToken.None);
+          ran.Should().BeFalse();
+          await t;
+          ran.Should().BeTrue();
+      }
+
+      [Fact]
+      public async Task ScheduleAsync_ReturnsResult()
+      {
+          var result = await _scheduler.ScheduleAsync(_ => Task.FromResult(99),
+              TimeSpan.FromMilliseconds(10), CancellationToken.None);
+          result.Should().Be(99);
+      }
+
+      [Fact]
+      public async Task ScheduleAsync_Cancelled_DoesNotExecuteWork()
+      {
+          var cts = new CancellationTokenSource();
+          var ran = false;
+          var t = _scheduler.ScheduleAsync(_ => { ran = true; return Task.CompletedTask; },
+              TimeSpan.FromMilliseconds(200), cts.Token);
+          cts.Cancel();
+          await Task.Delay(300);
+          ran.Should().BeFalse();
+      }
+
+      [Fact]
+      public async Task ScheduleRecurringAsync_RunsCorrectTimes()
+      {
+          int count = 0;
+          await _scheduler.ScheduleRecurringAsync(
+              _ => { count++; return Task.CompletedTask; },
+              TimeSpan.FromMilliseconds(30), 3, CancellationToken.None);
+          count.Should().Be(3);
+      }
+
+      [Fact]
+      public async Task ScheduleRecurringAsync_StopsOnCancellation()
+      {
+          var cts = new CancellationTokenSource();
+          int count = 0;
+          var t = _scheduler.ScheduleRecurringAsync(async ct =>
+          {
+              count++;
+              await Task.Delay(50, ct);
+          }, TimeSpan.FromMilliseconds(60), 100, cts.Token);
+          await Task.Delay(90);
+          cts.Cancel();
+          await Task.Delay(100);
+          count.Should().BeLessThan(5);
+      }
+  }
