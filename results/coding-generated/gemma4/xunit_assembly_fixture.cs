@@ -7,13 +7,12 @@ public class SharedCounter : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         counter = 0;
-        await ValueTask.CompletedTask;
+        await default;
     }
 
     public async ValueTask DisposeAsync()
     {
-        // Cleanup logic if needed
-        await ValueTask.CompletedTask;
+        await default;
     }
 
     public int IncrementAndGet()
@@ -32,10 +31,10 @@ public class FirstCounterTests
     }
 
     [Fact]
-    public void Counter_ShouldIncrement_ViaConstructorInjection()
+    public void Test_ConstructorInjection_IncrementsCounter()
     {
         var result = _counter.IncrementAndGet();
-        // Asserting the result is > 0 (since it's the first increment)
+        // Assert that the counter was successfully incremented (i.e., result > 0)
         Assert.True(result > 0);
     }
 }
@@ -43,13 +42,13 @@ public class FirstCounterTests
 public class SecondCounterTests
 {
     [Fact]
-    public void Counter_ShouldIncrement_ViaTestContext()
+    public void Test_GetFixture_IncrementsCounter()
     {
-        // Retrieve the fixture manually
+        // Manually retrieve the fixture instead of using constructor injection
         var counter = TestContext.Current.GetFixture<SharedCounter>();
 
         var result = counter.IncrementAndGet();
-        // Asserting the result is > 0
+        // Assert that the counter was successfully incremented (i.e., result > 0)
         Assert.True(result > 0);
     }
 }

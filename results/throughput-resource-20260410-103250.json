@@ -1,0 +1,32 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-04-10T10:32:50.1836741+01:00",
+    "run_finished_at":  "2026-04-10T10:32:51.0054760+01:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260410-103250.json",
+    "host":  "FRAMEWORK",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "FRAMEWORK"
+                     },
+    "models":  [
+                   "gemma4,gemma4:e2b,gemma4:26b"
+               ],
+    "completed_models":  [
+
+                         ],
+    "failed_models":  [
+                          {
+                              "model":  "gemma4,gemma4:e2b,gemma4:26b",
+                              "error":  "The remote server returned an error: (400) Bad Request."
+                          }
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+
+                ]
+}

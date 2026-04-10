@@ -76,9 +76,10 @@ public class TodoService : ITodoService
 }
 
 // 4. TodoListBase Component
-public class TodoListBase : ComponentBase
+public partial class TodoListBase : ComponentBase
 {
-    [Inject] public ITodoService TodoService { get; set; } = default!;
+    [Inject]
+    public ITodoService TodoService { get; set; } = default!;
 
     public List<TodoItem> Todos { get; set; } = new();
     public string NewTitle { get; set; } = "";
@@ -116,71 +117,6 @@ public class TodoListBase : ComponentBase
     }
 }
 
-// --- Component Markup (Required for bUnit testing context) ---
-// Note: In a real scenario, this would be in a .razor file.
-public partial class TodoListBase : ComponentBase
-{
-    private string RenderTree(RenderTreeBuilder builder)
-    {
-        builder.OpenElement(0, "div");
-        builder.AddAttribute(1, "class", "todo-list-container");
-
-        // Input form
-        builder.OpenElement(2, "div");
-        builder.AddAttribute(3, "class", "input-group");
-        builder.OpenElement(4, "input");
-        builder.AddAttribute(5, "type", "text");
-        builder.AddAttribute(6, "value", newobject[] { NewTitle });
-        builder.CloseElement(); // input
-
-        builder.OpenElement(7, "button");
-        builder.AddAttribute(8, "class", "add-button");
-        builder.AddAttribute(9, "onclick", EventCallback.Factory.Create(this, async () => await AddTodo()));
-        builder.AddContent(10, "Add Todo");
-        builder.CloseElement(); // button
-        builder.CloseElement(); // input-group
-
-        // Todo list
-        builder.OpenElement(11, "ul");
-        builder.AddAttribute(12, "class", "todo-list");
-
-        foreach (var todo in Todos)
-        {
-            builder.OpenElement(13, "li");
-            builder.AddAttribute(14, "class", todo.IsCompleted ? "completed" : "");
-
-            // Checkbox/Toggle
-            builder.OpenElement(15, "input");
-            builder.AddAttribute(16, "type", "checkbox");
-            builder.AddAttribute(17, "checked", todo.IsCompleted);
-            builder.AddAttribute(18, "onclick", EventCallback.Factory.Create(this, async () => await ToggleTodo(todo.Id)));
-            builder.CloseElement(); // input
-
-            // Title
-            builder.OpenElement(19, "span");
-            builder.AddAttribute(20, "style", todo.IsCompleted ? "text-decoration: line-through;" : "");
-            builder.AddContent(21, todo.Title);
-            builder.CloseElement(); // span
-
-            // Delete Button
-            builder.OpenElement(22, "button");
-            builder.AddAttribute(23, "class", "delete-button");
-            builder.AddAttribute(24, "onclick", EventCallback.Factory.Create(this, async () => await DeleteTodo(todo.Id)));
-            builder.AddContent(25, "X");
-            builder.CloseElement(); // button
-
-            builder.CloseElement(); // li
-        }
-
-        builder.CloseElement(); // ul
-        builder.CloseElement(); // div
-        builder.CloseElement(); // div
-
-        return builder.Render();
-    }
-}
-
-
 // 5. xUnit v3 tests for TodoService
 public class TodoServiceTests
 {
@@ -189,14 +125,16 @@ public class TodoServiceTests
     {
         // Arrange
         var service = new TodoService();
-        var title = "New test item";
+        var title = "New Test Item";
 
         // Act
         var result = await service.AddAsync(title);
 
         // Assert
-        result.Should().BeAssignableTo<TodoItem>();
-        result.Should().BeEquivalentTo(new TodoItem(3, title, false)); // ID should be 3 because 1 and 2 were seeded
+        result.Should().BeOfType<TodoItem>().Subject.Should().HaveProperty(t => t.Title).WithValue(title);
+        // Check if the ID was correctly assigned (it should be the next available ID)
+        // Since the service starts with 2 items, the first added item should have ID 3.
+        result.Should().HaveProperty(t => t.Id).WithValue(3); 
     }
 
     [Fact]
@@ -204,16 +142,16 @@ public class TodoServiceTests
     {
         // Arrange
         var service = new TodoService();
-        var initialTodos = await service.GetAllAsync();
-        var idToDelete = 1;
+        // The initial list has IDs 1 and 2. We will delete ID 1.
+        int idToDelete = 1;
 
         // Act
         await service.DeleteAsync(idToDelete);
-        var updatedTodos = await service.GetAllAsync();
 
         // Assert
-        updatedTodos.Should().NotContain(t => t.Id == idToDelete);
-        updatedTodos.Should().HaveCount(1);
+        var todos = await service.GetAllAsync();
+        todos.Should().NotContain(t => t.Id == idToDelete);
+        todos.Should().HaveCount(1); // Only ID 2 should remain
     }
 
     [Fact]
@@ -221,23 +159,24 @@ public class TodoServiceTests
     {
         // Arrange
         var service = new TodoService();
-        var idToToggle = 2; // Seeded as completed (true)
+        // Item 1: "Buy groceries", IsCompleted = false
+        int idToToggle = 1;
 
-        // Act 1: Toggle it (true -> false)
+        // Act 1: Toggle it (false -> true)
         await service.ToggleAsync(idToToggle);
-        var todosAfterFirstToggle = await service.GetAllAsync();
-        var itemAfterFirstToggle = todosAfterFirstToggle.First(t => t.Id == idToToggle);
 
         // Assert 1
-        itemAfterFirstToggle.IsCompleted.Should().BeFalse();
+        var todosAfterFirstToggle = await service.GetAllAsync();
+        var itemAfterFirstToggle = todosAfterFirstToggle.First(t => t.Id == idToToggle);
+        itemAfterFirstToggle.IsCompleted.Should().BeTrue();
 
-        // Act 2: Toggle it again (false -> true)
+        // Act 2: Toggle it again (true -> false)
         await service.ToggleAsync(idToToggle);
-        var todosAfterSecondToggle = await service.GetAllAsync();
-        var itemAfterSecondToggle = todosAfterSecondToggle.First(t => t.Id == idToToggle);
 
         // Assert 2
-        itemAfterSecondToggle.IsCompleted.Should().BeTrue();
+        var todosAfterSecondToggle = await service.GetAllAsync();
+        var itemAfterSecondToggle = todosAfterSecondToggle.First(t => t.Id == idToToggle);
+        itemAfterSecondToggle.IsCompleted.Should().BeFalse();
     }
 }
 
@@ -245,44 +184,37 @@ public class TodoServiceTests
 public class TodoListBaseTests : TestContext
 {
     [Fact]
-    public async Task TodoListBase_InitializesAndCallsGetAllAsync()
+    public async Task TodoListBase_LoadsTodosOnInitialization()
     {
         // Arrange
-        // 1. Mock the service
+        // Mock the service using NSubstitute
         var mockService = Substitute.For<ITodoService>();
 
-        // 2. Define the expected initial state
+        // Define the initial state returned by the service
         var initialTodos = new List<TodoItem>
         {
-            new TodoItem(10, "Initial Task", false),
-            new TodoItem(11, "Completed Task", true)
+            new TodoItem(10, "Mock Task A", false),
+            new TodoItem(20, "Mock Task B", true)
         };
 
-        // 3. Configure the mock to return the initial state when GetAllAsync is called
+        // Configure the mock to return the initial list when GetAllAsync is called
         mockService.GetAllAsync().Returns(Task.FromResult(initialTodos));
 
-        // 4. Create the component instance, injecting the mock service
-        var cut = RenderComponent<TodoListBase>(() =>
+        // Setup the component context
+        var cut = RenderComponent<TodoListBase>(parameters =>
         {
-            // Manually inject the mock service into the component instance
-            // This simulates the framework's dependency injection process
-            var component = new TodoListBase();
-            typeof(TodoListBase).GetProperty("TodoService", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                ?.SetValue(component, mockService);
-            return component;
+            // Inject the mock service into the component instance
+            parameters.Add(p => p.TodoService, mockService);
         });
 
-        // Act: Wait for OnInitializedAsync to complete (which calls GetAllAsync)
-        await Task.Delay(10); 
+        // Act: The component initializes and calls OnInitializedAsync, triggering GetAllAsync
+        await Task.Delay(10); // Wait for async initialization to complete
 
-        // Assert 1: Verify the service method was called exactly once
-        mockService.Received(1).GetAllAsync();
+        // Assert 1: Verify the service method was called
+        await mockService.Received(1).GetAllAsync();
 
-        // Assert 2: Verify the rendered markup contains the initial data
-        cut.Markup.Should().Contain("Initial Task");
-        cut.Markup.Should().Contain("Completed Task");
-
-        // Assert 3: Verify the structure for the completed task (line-through style)
-        cut.Markup.Should().Contain("style=\"text-decoration: line-through;\"");
+        // Assert 2: Verify the component rendered the correct initial data
+        cut.Markup.Should().Contain("Mock Task A");
+        cut.Markup.Should().Contain("Mock Task B");
     }
 }

@@ -3,7 +3,7 @@ using OneOf;
 using System;
 using System.Threading.Tasks;
 
-// --- Domain Models ---
+// --- Model Definitions ---
 
 // User must be a class with public get/set properties
 public class User
@@ -13,12 +13,11 @@ public class User
     public string Email { get; set; } = string.Empty;
 }
 
-// NotFound must be a record with a parameterless constructor
+// NotFound record type (parameterless constructor)
 public record NotFound;
 
-// ValidationError must be a record accepting a single string Message parameter
+// ValidationError record type (accepts Message)
 public record ValidationError(string Message);
-
 
 // --- Service Interface ---
 
@@ -27,8 +26,7 @@ public interface IUserService
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
-
-// --- Controller ---
+// --- Controller Implementation ---
 
 [ApiController]
 [Route("api/users")]
@@ -42,30 +40,29 @@ public class UsersController : ControllerBase
     }
 
     // GET /api/users/{id}
-    [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        // 1. Call the service which returns the OneOf union
+        // 1. Call the service layer
         var result = await _userService.GetByIdAsync(id);
 
-        // 2. Use Match to handle the discriminated union and map to appropriate HTTP results
+        // 2. Use Match to handle the discriminated union and map to IActionResult
         return result.Match<IActionResult>(
-            // Case 1: User found (200 OK)
+            // Case 1: Success (User) -> 200 OK
             user => Ok(user),
 
-            // Case 2: Not found (404 Not Found)
-            // Note: We use the default record instance here
+            // Case 2: Not Found (NotFound) -> 404 Not Found
+            // Note: We use the default record instance here.
             _ => NotFound(), 
 
-            // Case 3: Validation error (400 Bad Request)
-            // The 'err' parameter captures the ValidationError instance
-            err => BadRequest(new { Error = err.Message })
+            // Case 3: Validation Error (ValidationError) -> 400 Bad Request
+            // We must cast the remainder to ValidationError to access the message.
+            err => BadRequest(err.Message)
         );
     }
 }
 
-// --- Mock Implementation for Demonstration ---
-// In a real application, this would be registered via services.AddScoped
+// --- Mock Service Implementation (for completeness/testing) ---
+
 public class MockUserService : IUserService
 {
     public Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id)
@@ -78,30 +75,38 @@ public class MockUserService : IUserService
         }
         else if (id == 99)
         {
-            // Validation error case
-            return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new ValidationError("The provided ID format is invalid.")));
+            // Validation Error case
+            return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new ValidationError("User ID must be positive.")));
         }
         else if (id == 0)
         {
-            // Not found case
+            // Not Found case
             return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
         }
         else
         {
-            // Defaulting to Not Found for other IDs
+            // Default fallback (e.g., if the service logic changes)
             return Task.FromResult(new OneOf<User, NotFound, ValidationError>(new NotFound()));
         }
     }
 }
 
-// Example of how DI would register the mock service (optional, but good practice)
+// --- Program Setup (Simulating Dependency Injection) ---
+// This section is not required for the final output but shows how the components fit together.
 /*
-public static class ServiceCollectionExtensions
+public class Program
 {
-    public static IServiceCollection AddMockServices(this IServiceCollection services)
+    public static void Main(string[] args)
     {
-        services.AddScoped<IUserService, MockUserService>();
-        return services;
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Register services
+        builder.Services.AddSingleton<IUserService, MockUserService>();
+        builder.Services.AddControllers();
+
+        var app = builder.Build();
+        app.MapControllers();
+        app.Run();
     }
 }
 */

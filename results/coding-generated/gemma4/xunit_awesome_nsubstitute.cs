@@ -44,9 +44,9 @@ public class NotificationServiceTests
         // Act
         await service.NotifyUserAsync(1);
 
-        // Assert (Verify side effects on mocks)
-        await mockRepo.Received().GetByIdAsync(1);
-        await mockEmail.Received().SendWelcomeAsync("alice@example.com");
+        // Assert (Using AwesomeAssertions for verification)
+        // We verify the email service was called with the correct email
+        await mockEmail.Received(1).SendWelcomeAsync("alice@example.com");
     }
 
     [Fact]
@@ -56,13 +56,13 @@ public class NotificationServiceTests
         var mockRepo = Substitute.For<IUserRepository>();
         var mockEmail = Substitute.For<IEmailService>();
 
-        // Setup failure: User not found
+        // Setup retrieval failure (returns null)
         mockRepo.GetByIdAsync(99).Returns(Task.FromResult<User?>(null));
 
         var service = new NotificationService(mockRepo, mockEmail);
 
-        // Act & Assert
-        var act = () => service.NotifyUserAsync(99);
+        // Act & Assert (Using AwesomeAssertions for exception handling)
+        var act = async () => await service.NotifyUserAsync(99);
 
         await act.Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("User not found");

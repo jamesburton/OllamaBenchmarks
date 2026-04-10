@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,15 +25,16 @@ public class CompanyDbContext : DbContext
 {
     public DbSet<Company> Companies { get; set; }
 
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
+        : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Configure HeadquartersAddress as an owned JSON column
         modelBuilder.Entity<Company>()
-            .OwnsOne(c => c.HeadquartersAddress, b => { 
-                b.ToJson(); 
-            });
+            .OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
     }
 }
 
@@ -41,7 +43,7 @@ public static class CompanyQueries
 {
     public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        // Querying the JSON owned property
+        // Querying the JSON owned property (HeadquartersAddress.City)
         var companies = db.Companies
             .Where(c => c.HeadquartersAddress != null && c.HeadquartersAddress.City == city)
             .ToList();

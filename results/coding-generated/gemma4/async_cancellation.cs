@@ -30,7 +30,7 @@ public class DataProcessor
             }
             catch (OperationCanceledException)
             {
-                // If cancellation happens during the await, we treat it as a stop signal
+                // If cancellation happens during the await, we stop gracefully.
                 yield break;
             }
             catch

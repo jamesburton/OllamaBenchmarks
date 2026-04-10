@@ -1,16 +1,16 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-04-10T09:27:45.863034+00:00",
-  "run_finished_at": "2026-04-10T09:27:46.686828+00:00",
+  "run_started_at": "2026-04-10T09:29:35.598960+00:00",
+  "run_finished_at": "2026-04-10T13:42:26.581943+00:00",
   "models": [
-    "glm-4.7-flash"
+    "gemma4:26b"
   ],
   "results": [
     {
-      "model": "glm-4.7-flash",
+      "model": "gemma4:26b",
       "benchmark": "coding",
-      "run_started_at": "2026-04-10T09:27:45.866556+00:00",
-      "run_finished_at": "2026-04-10T09:27:46.661186+00:00",
+      "run_started_at": "2026-04-10T09:29:35.599972+00:00",
+      "run_finished_at": "2026-04-10T13:42:26.251814+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
@@ -21,7 +21,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.09,
+          "generation_time_s": 600.09,
           "generated_code_path": null
         },
         {
@@ -33,7 +33,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         },
         {
@@ -45,20 +45,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 600.47,
           "generated_code_path": null
         },
         {
           "task": "efcore_leftjoin",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 0.02,
-          "generated_code_path": null
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 464.75,
+          "generated_code_path": "results\\coding-generated\\gemma4_26b\\efcore_leftjoin.cs"
         },
         {
           "task": "efcore_json_columns",
@@ -69,7 +69,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         },
         {
@@ -81,7 +81,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         },
         {
@@ -93,7 +93,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.45,
           "generated_code_path": null
         },
         {
@@ -105,7 +105,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         },
         {
@@ -117,56 +117,56 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.38,
           "generated_code_path": null
         },
         {
           "task": "blazor_interactive_component",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 0.02,
-          "generated_code_path": null
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 443.08,
+          "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_interactive_component.cs"
         },
         {
           "task": "blazor_streaming_render",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 0.0,
-          "generated_code_path": null
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 403.16,
+          "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_streaming_render.cs"
         },
         {
           "task": "blazor_cascading_auth",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 0.0,
-          "generated_code_path": null
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 385.75,
+          "generated_code_path": "results\\coding-generated\\gemma4_26b\\blazor_cascading_auth.cs"
         },
         {
           "task": "xunit_v3_theory_tests",
           "category": "xunit",
           "weight": 1,
-          "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 0.0,
-          "generated_code_path": null
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 24,
+          "tests_total": 24,
+          "generation_time_s": 532.49,
+          "generated_code_path": "results\\coding-generated\\gemma4_26b\\xunit_v3_theory_tests.cs"
         },
         {
           "task": "xunit_awesome_nsubstitute",
@@ -177,7 +177,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 600.01,
           "generated_code_path": null
         },
         {
@@ -185,24 +185,24 @@
           "category": "xunit",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
-          "generated_code_path": null
+          "generation_time_s": 252.47,
+          "generated_code_path": "results\\coding-generated\\gemma4_26b\\xunit_assembly_fixture.cs"
         },
         {
           "task": "linq_complex_query",
           "category": "linq",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
-          "generated_code_path": null
+          "generation_time_s": 451.89,
+          "generated_code_path": "results\\coding-generated\\gemma4_26b\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
@@ -213,7 +213,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 0.14,
           "generated_code_path": null
         },
         {
@@ -225,7 +225,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 602.05,
           "generated_code_path": null
         },
         {
@@ -237,7 +237,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.01,
           "generated_code_path": null
         },
         {
@@ -249,7 +249,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 600.08,
           "generated_code_path": null
         },
         {
@@ -261,7 +261,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.47,
           "generated_code_path": null
         },
         {
@@ -273,7 +273,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 600.01,
           "generated_code_path": null
         },
         {
@@ -285,7 +285,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 600.2,
           "generated_code_path": null
         },
         {
@@ -297,7 +297,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
+          "generation_time_s": 600.05,
           "generated_code_path": null
         },
         {
@@ -309,7 +309,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
+          "generation_time_s": 600.26,
           "generated_code_path": null
         },
         {
@@ -321,7 +321,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 600.02,
           "generated_code_path": null
         },
         {
@@ -333,7 +333,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 198.59,
           "generated_code_path": null
         },
         {
@@ -345,7 +345,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 47.17,
           "generated_code_path": null
         },
         {
@@ -357,7 +357,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 64.99,
           "generated_code_path": null
         },
         {
@@ -369,7 +369,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 602.05,
           "generated_code_path": null
         },
         {
@@ -381,7 +381,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 24.69,
           "generated_code_path": null
         },
         {
@@ -393,7 +393,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.08,
           "generated_code_path": null
         },
         {
@@ -405,7 +405,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.08,
           "generated_code_path": null
         },
         {
@@ -417,7 +417,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 2.06,
           "generated_code_path": null
         },
         {
@@ -429,7 +429,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.14,
           "generated_code_path": null
         },
         {
@@ -441,7 +441,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.06,
           "generated_code_path": null
         },
         {
@@ -453,7 +453,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 2.14,
           "generated_code_path": null
         },
         {
@@ -465,7 +465,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.06,
           "generated_code_path": null
         },
         {
@@ -477,7 +477,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
+          "generation_time_s": 2.06,
           "generated_code_path": null
         },
         {
@@ -489,7 +489,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
+          "generation_time_s": 317.42,
           "generated_code_path": null
         },
         {
@@ -501,7 +501,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.2,
           "generated_code_path": null
         },
         {
@@ -513,7 +513,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.3,
           "generated_code_path": null
         },
         {
@@ -525,7 +525,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 2.09,
           "generated_code_path": null
         },
         {
@@ -537,7 +537,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.05,
           "generated_code_path": null
         },
         {
@@ -549,7 +549,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.12,
           "generated_code_path": null
         },
         {
@@ -561,7 +561,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 2.05,
           "generated_code_path": null
         },
         {
@@ -573,7 +573,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.09,
           "generated_code_path": null
         },
         {
@@ -585,7 +585,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.01,
+          "generation_time_s": 2.09,
           "generated_code_path": null
         },
         {
@@ -597,7 +597,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.0,
+          "generation_time_s": 2.05,
           "generated_code_path": null
         },
         {
@@ -609,11 +609,11 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 0.02,
+          "generation_time_s": 2.19,
           "generated_code_path": null
         }
       ],
-      "layer3_weighted_score": 0.0
+      "layer3_weighted_score": 0.09090909090909091
     }
   ]
 }

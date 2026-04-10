@@ -19,13 +19,12 @@ public class Order
     public int CustomerId { get; set; }
     public decimal Total { get; set; }
     public DateTime OrderDate { get; set; }
-    public Customer Customer { get; set; } // Navigation property
 }
 
-// 4. DTO record
+// 4. OrderDto record
 public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
-// 3. DbContext class
+// 3. AppDbContext class
 public class AppDbContext : DbContext
 {
     public DbSet<Order> Orders { get; set; }
@@ -42,24 +41,30 @@ public static class OrderQueries
     /// </summary>
     /// <param name="db">The application database context.</param>
     /// <returns>A list of OrderDto containing order details and customer name.</returns>
-    public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
+    public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
     {
-        // Use LeftJoin as per EF Core 10 reference
+        // Implementation using the LeftJoin pattern
         var query = db.Orders
             .LeftJoin(
                 db.Customers,
                 order => order.CustomerId,
                 customer => customer.Id,
-                (order, customer) => new OrderDto(
-                    order.Id,
-                    order.Total,
-                    // Handle the null case for the customer name
-                    customer == null ? "Unknown" : customer.Name
-                )
+                (order, customer) => new 
+                { 
+                    order.Id, 
+                    Total = order.Total, 
+                    OrderDate = order.OrderDate,
+                    // Handle null customer name case
+                    CustomerName = customer == null ? "Unknown" : customer.Name 
+                }
             );
 
-        // Execute the query and return the list
-        return await query.ToListAsync();
+        // Project the anonymous type result into the desired DTO
+        return query.Select(x => new OrderDto(
+            x.Id, 
+            x.Total, 
+            x.CustomerName
+        )).ToList();
     }
 }
 

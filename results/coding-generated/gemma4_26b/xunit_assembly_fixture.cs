@@ -21,12 +21,19 @@ public class SharedCounter : IAsyncLifetime
     }
 }
 
-public class FirstCounterTests(SharedCounter counter)
+public class FirstCounterTests
 {
+    private readonly SharedCounter _counter;
+
+    public FirstCounterTests(SharedCounter counter)
+    {
+        _counter = counter;
+    }
+
     [Fact]
     public void Test()
     {
-        Assert.True(counter.IncrementAndGet() > 0);
+        Assert.True(_counter.IncrementAndGet() > 0);
     }
 }
 

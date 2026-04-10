@@ -1,0 +1,32 @@
+{
+    "benchmark":  "throughput_resource",
+    "run_started_at":  "2026-04-10T11:48:25.7071414+01:00",
+    "run_finished_at":  "2026-04-10T11:58:59.3267865+01:00",
+    "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-20260410-114825.json",
+    "host":  "FRAMEWORK",
+    "ollama_host":  "http://127.0.0.1:11434",
+    "host_details":  {
+                         "hostname":  "FRAMEWORK"
+                     },
+    "models":  [
+                   "gemma4:31b"
+               ],
+    "completed_models":  [
+
+                         ],
+    "failed_models":  [
+                          {
+                              "model":  "gemma4:31b",
+                              "error":  "The remote server returned an error: (500) Internal Server Error."
+                          }
+                      ],
+    "incomplete_models":  [
+
+                          ],
+    "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
+    "num_predict":  192,
+    "seed":  42,
+    "results":  [
+
+                ]
+}
