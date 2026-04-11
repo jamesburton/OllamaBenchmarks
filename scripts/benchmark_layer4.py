@@ -69,15 +69,22 @@ def save_checkpoint(checkpoint_path: Path, data: dict):
 
 
 def compute_summary(completed: dict) -> dict:
-    """Compute score summary from completed tasks."""
+    """Compute score summary from completed tasks.
+
+    Only counts tasks where phase != 'generated' (i.e., fully verified).
+    """
     if not completed:
         return {}
 
-    total = len(completed)
-    passed = sum(1 for r in completed.values() if r.get("passed"))
+    # Only count fully verified tasks (not still in 'generated' phase)
+    verified = {k: v for k, v in completed.items() if v.get("phase") != "generated"}
+    pending_verify = len(completed) - len(verified)
+
+    total = len(verified)
+    passed = sum(1 for r in verified.values() if r.get("passed"))
 
     by_cat = {}
-    for r in completed.values():
+    for r in verified.values():
         cat = r.get("category", "unknown")
         if cat not in by_cat:
             by_cat[cat] = {"total": 0, "passed": 0}
@@ -91,6 +98,7 @@ def compute_summary(completed: dict) -> dict:
     return {
         "total": total,
         "passed": passed,
+        "pending_verify": pending_verify,
         "score": round(passed / total, 4) if total > 0 else 0,
         "by_category": by_cat,
     }
@@ -104,7 +112,13 @@ def run_category(
     context_prompt: str | None = None,
     baseline_checkpoint: dict | None = None,
 ):
-    """Run all tasks for one model + category. Supports per-task checkpoint."""
+    """Run all tasks for one model + category. Supports per-task checkpoint.
+
+    For C# (dotnet) tasks, uses two-phase approach:
+      Phase 1: Generate all responses from model (keeps model loaded/hot)
+      Phase 2: Compile and test all generated code (no model needed)
+    This avoids model loading/unloading between dotnet builds.
+    """
     slug = model_slug(model)
     suffix = "_ctx" if context_prompt else ""
     checkpoint_path = output_dir / f"{category}-{slug}{suffix}.json"
@@ -126,92 +140,201 @@ def run_category(
         task_paths = [p for p in task_paths if p.stem in failed_names or load_question(p).get("name", p.stem) in failed_names]
         print(f"  Context re-run: {len(task_paths)} failed tasks (of {len(baseline_completed)} total)")
 
-    # Setup dotnet template cache if C# tasks
-    if category == "csharp":
-        cache_dir = str(TEMPLATE_BASE / ".cache")
-        for template in ("test_project", "blazor_project"):
-            template_dir = str(TEMPLATE_BASE / template)
-            if os.path.isdir(template_dir):
-                setup_template_cache(template_dir, os.path.join(cache_dir, template))
-
     total = len(task_paths)
-    done = len(completed)
-    passed_count = sum(1 for r in completed.values() if r.get("passed"))
 
-    for i, yaml_path in enumerate(task_paths, 1):
+    if category == "csharp":
+        _run_csharp_two_phase(model, slug, task_paths, output_dir, checkpoint, checkpoint_path, total, context_prompt)
+    else:
+        _run_non_dotnet(model, slug, task_paths, output_dir, checkpoint, checkpoint_path, total, context_prompt)
+
+    # Final summary
+    completed = checkpoint.get("completed_tasks", {})
+    summary = compute_summary(completed)
+    print(f"  Score: {summary.get('passed', 0)}/{summary.get('total', 0)} ({summary.get('score', 0):.1%})")
+    return checkpoint
+
+
+def _run_non_dotnet(model, slug, task_paths, output_dir, checkpoint, checkpoint_path, total, context_prompt):
+    """Run non-C# tasks (English, Maths, Logic) — single-phase."""
+    completed = checkpoint.get("completed_tasks", {})
+    done = len(completed)
+
+    for yaml_path in task_paths:
         question = load_question(yaml_path)
         task_name = question.get("name", yaml_path.stem)
-
-        # Skip if already completed
         if task_name in completed:
             continue
 
         print(f"  [{done+1}/{total}] {task_name}...", end="", flush=True)
-
-        if question.get("validator_type") == "dotnet":
-            # C# task — use existing L3 harness
-            references_dir = str(REPO_ROOT / "scripts" / "coding_tasks" / "references")
-            task_def = load_task(str(yaml_path), references_dir)
-            template = task_def.get("template", "test_project")
-            cached_template = os.path.join(cache_dir, template)
-
-            t0 = time.monotonic()
-            llama_url = os.environ.get("LLAMA_SERVER_URL")
-            if llama_url:
-                from coding_tasks.task_runner import call_llama_server as _call_ls
-                raw = _call_ls(model, task_def["prompt"], max_tokens=task_def.get("max_tokens", 4096), timeout=600, base_url=llama_url)
-            else:
-                raw = call_ollama(model, task_def["prompt"], max_tokens=task_def.get("max_tokens", 4096), timeout=600)
-            gen_time = time.monotonic() - t0
-
-            code = extract_csharp(raw)
-            if not code:
-                result = {"task": task_name, "category": question.get("category", "csharp"),
-                          "subcategory": question.get("subcategory", ""), "difficulty": question.get("difficulty", "medium"),
-                          "weight": question.get("weight", 1), "passed": False, "validator_type": "dotnet",
-                          "harness_error": "Empty code after extraction", "model_response": "",
-                          "generation_time_s": round(gen_time, 2)}
-            else:
-                from coding_tasks.task_runner import run_dotnet_task
-                build_ok, all_passed, t_passed, t_total, output = run_dotnet_task(
-                    generated_code=code, test_code=task_def.get("test_code", ""),
-                    cached_template_dir=cached_template,
-                )
-                # Save generated code
-                code_dir = output_dir.parent / "generated_code" / slug
-                code_dir.mkdir(parents=True, exist_ok=True)
-                (code_dir / f"{task_name}.cs").write_text(code, encoding="utf-8")
-
-                result = {"task": task_name, "category": question.get("category", "csharp"),
-                          "subcategory": question.get("subcategory", ""), "difficulty": question.get("difficulty", "medium"),
-                          "weight": question.get("weight", 1), "passed": all_passed, "validator_type": "dotnet",
-                          "harness_error": None if build_ok else output[:200],
-                          "build_success": build_ok, "tests_passed": t_passed, "tests_total": t_total,
-                          "generation_time_s": round(gen_time, 2)}
-        else:
-            # Non-dotnet task
-            r = run_non_dotnet_task(question, model, context_prompt=context_prompt)
-            result = dataclasses.asdict(r)
+        r = run_non_dotnet_task(question, model, context_prompt=context_prompt)
+        result = dataclasses.asdict(r)
 
         completed[task_name] = result
         done += 1
-        if result.get("passed"):
-            passed_count += 1
-        status = "PASS" if result.get("passed") else "FAIL"
-        print(f" {status}")
+        print(f" {'PASS' if result.get('passed') else 'FAIL'}")
 
-        # Save checkpoint after each task
         checkpoint["completed_tasks"] = completed
         checkpoint["model"] = model
-        checkpoint["category"] = category
+        checkpoint["category"] = "non_dotnet"
         checkpoint["benchmark"] = "layer4"
         checkpoint["summary"] = compute_summary(completed)
         save_checkpoint(checkpoint_path, checkpoint)
 
-    # Final summary
-    summary = compute_summary(completed)
-    print(f"  Score: {summary.get('passed', 0)}/{summary.get('total', 0)} ({summary.get('score', 0):.1%})")
-    return checkpoint
+
+def _run_csharp_two_phase(model, slug, task_paths, output_dir, checkpoint, checkpoint_path, total, context_prompt):
+    """Two-phase C# execution: generate all responses, then compile/test all.
+
+    Phase 1 (GENERATE): Call model for every task, save raw code to disk.
+                        Model stays loaded — no dotnet builds interrupt it.
+    Phase 2 (VERIFY):   Compile and test each saved code file against test_code.
+                        No model calls — just dotnet build+test.
+
+    Checkpoint tracks state: 'generated' (phase 1 done) or full result (phase 2 done).
+    """
+    completed = checkpoint.get("completed_tasks", {})
+    code_dir = output_dir.parent / "generated_code" / slug
+    code_dir.mkdir(parents=True, exist_ok=True)
+    references_dir = str(REPO_ROOT / "scripts" / "coding_tasks" / "references")
+
+    # Setup dotnet template cache
+    cache_dir = str(TEMPLATE_BASE / ".cache")
+    for template in ("test_project", "blazor_project"):
+        template_dir = str(TEMPLATE_BASE / template)
+        if os.path.isdir(template_dir):
+            setup_template_cache(template_dir, os.path.join(cache_dir, template))
+
+    # ── Phase 1: GENERATE all responses ──────────────────────────────────
+    pending_generation = []
+    for yaml_path in task_paths:
+        question = load_question(yaml_path)
+        task_name = question.get("name", yaml_path.stem)
+        # Skip if already fully completed (phase 2 done)
+        if task_name in completed and completed[task_name].get("phase") != "generated":
+            continue
+        # Skip if already generated (phase 1 done, awaiting phase 2)
+        if task_name in completed and completed[task_name].get("phase") == "generated":
+            continue
+        pending_generation.append((yaml_path, question, task_name))
+
+    if pending_generation:
+        gen_done = sum(1 for r in completed.values() if r.get("phase") == "generated")
+        full_done = sum(1 for r in completed.values() if r.get("phase") != "generated")
+        print(f"  Phase 1 (GENERATE): {len(pending_generation)} to generate "
+              f"({gen_done} awaiting verify, {full_done} fully done)")
+
+        for yaml_path, question, task_name in pending_generation:
+            idx = gen_done + full_done + 1
+            print(f"  [gen {idx}/{total}] {task_name}...", end="", flush=True)
+
+            task_def = load_task(str(yaml_path), references_dir)
+            t0 = time.monotonic()
+            llama_url = os.environ.get("LLAMA_SERVER_URL")
+            if llama_url:
+                raw = call_llama_server(model, task_def["prompt"],
+                                        max_tokens=task_def.get("max_tokens", 4096), timeout=600,
+                                        base_url=llama_url)
+            else:
+                raw = call_ollama(model, task_def["prompt"],
+                                  max_tokens=task_def.get("max_tokens", 4096), timeout=600)
+            gen_time = time.monotonic() - t0
+
+            code = extract_csharp(raw)
+            code_path = code_dir / f"{task_name}.cs"
+            if code:
+                code_path.write_text(code, encoding="utf-8")
+
+            # Save generation result (phase 1 only — not yet verified)
+            completed[task_name] = {
+                "task": task_name,
+                "category": question.get("category", "csharp"),
+                "subcategory": question.get("subcategory", ""),
+                "difficulty": question.get("difficulty", "medium"),
+                "weight": question.get("weight", 1),
+                "validator_type": "dotnet",
+                "phase": "generated",
+                "has_code": bool(code),
+                "code_path": str(code_path),
+                "generation_time_s": round(gen_time, 2),
+            }
+            gen_done += 1
+            print(f" {'code' if code else 'EMPTY'} ({gen_time:.1f}s)")
+
+            checkpoint["completed_tasks"] = completed
+            checkpoint["model"] = model
+            checkpoint["category"] = "csharp"
+            checkpoint["benchmark"] = "layer4"
+            save_checkpoint(checkpoint_path, checkpoint)
+
+        print(f"  Phase 1 complete: {gen_done} generated")
+
+    # ── Phase 2: VERIFY all generated code ───────────────────────────────
+    pending_verify = [
+        (k, v) for k, v in completed.items()
+        if v.get("phase") == "generated"
+    ]
+
+    if pending_verify:
+        print(f"  Phase 2 (VERIFY): {len(pending_verify)} to compile+test")
+        from coding_tasks.task_runner import run_dotnet_task
+
+        verified = 0
+        passed_count = 0
+        for task_name, gen_result in pending_verify:
+            verified += 1
+            print(f"  [verify {verified}/{len(pending_verify)}] {task_name}...", end="", flush=True)
+
+            if not gen_result.get("has_code"):
+                gen_result.update({
+                    "phase": "complete",
+                    "passed": False,
+                    "harness_error": "Empty code after extraction",
+                    "build_success": False,
+                    "tests_passed": 0,
+                    "tests_total": 0,
+                })
+                print(" FAIL (no code)")
+            else:
+                # Find the YAML to get test_code
+                yaml_match = None
+                for yaml_path in task_paths:
+                    q = load_question(yaml_path)
+                    if q.get("name", yaml_path.stem) == task_name:
+                        yaml_match = yaml_path
+                        break
+
+                if not yaml_match:
+                    gen_result.update({"phase": "complete", "passed": False,
+                                       "harness_error": "YAML not found for verify"})
+                    print(" FAIL (yaml missing)")
+                else:
+                    task_def = load_task(str(yaml_match), references_dir)
+                    template = task_def.get("template", "test_project")
+                    cached_template = os.path.join(cache_dir, template)
+
+                    code = Path(gen_result["code_path"]).read_text(encoding="utf-8")
+                    build_ok, all_passed, t_passed, t_total, output = run_dotnet_task(
+                        generated_code=code,
+                        test_code=task_def.get("test_code", ""),
+                        cached_template_dir=cached_template,
+                    )
+                    gen_result.update({
+                        "phase": "complete",
+                        "passed": all_passed,
+                        "harness_error": None if build_ok else output[:200],
+                        "build_success": build_ok,
+                        "tests_passed": t_passed,
+                        "tests_total": t_total,
+                    })
+                    if all_passed:
+                        passed_count += 1
+                    print(f" {'PASS' if all_passed else 'FAIL'} ({t_passed}/{t_total})")
+
+            completed[task_name] = gen_result
+            checkpoint["completed_tasks"] = completed
+            checkpoint["summary"] = compute_summary(completed)
+            save_checkpoint(checkpoint_path, checkpoint)
+
+        print(f"  Phase 2 complete: {passed_count}/{verified} passed")
 
 
 def main():
