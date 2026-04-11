@@ -13,8 +13,8 @@ prompt: |
   A class BankAccount with:
     decimal Balance { get; private set; }
     IReadOnlyList<(string Type, decimal Amount, DateTime At)> Transactions { get; }
-    void Deposit(decimal amount) — throws ArgumentException if amount <= 0
-    void Withdraw(decimal amount) — throws ArgumentException if amount <= 0 or InsufficientFundsException if balance < amount
+    void Deposit(decimal amount) â€” throws ArgumentException if amount <= 0
+    void Withdraw(decimal amount) â€” throws ArgumentException if amount <= 0 or InsufficientFundsException if balance < amount
     class InsufficientFundsException : Exception
   Return only valid C# code in a single file.
 test_code: |

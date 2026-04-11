@@ -14,7 +14,7 @@ prompt: |
   An extension method on IQueryable<T>:
     PaginatedResult<T> ToPaginated<T>(int page, int pageSize)
   A class ItemsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
-  Action: GET api/items?page=1&pageSize=10 — returns PaginatedResult from a hardcoded list of 25 items.
+  Action: GET api/items?page=1&pageSize=10 â€” returns PaginatedResult from a hardcoded list of 25 items.
   Return only valid C# code in a single file.
 test_code: |
   public class ItemsControllerTests

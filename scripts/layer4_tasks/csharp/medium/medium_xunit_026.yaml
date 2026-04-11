@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class NumberBaseConverter with:
-    string ToBase(long number, int toBase), long FromBase(string number, int fromBase) — bases 2-36
+    string ToBase(long number, int toBase), long FromBase(string number, int fromBase) â€” bases 2-36
   Return only valid C# code in a single file.
 test_code: |
   public class NumberBaseConverterTests

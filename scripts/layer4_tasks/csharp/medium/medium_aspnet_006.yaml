@@ -16,7 +16,7 @@ prompt: |
     Task<LoginResponse?> AuthenticateAsync(string username, string password)
   A class AuthController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IAuthService.
-  Action: POST api/auth/login — calls AuthenticateAsync, returns 200 with token or 401.
+  Action: POST api/auth/login â€” calls AuthenticateAsync, returns 200 with token or 401.
   Return only valid C# code in a single file.
 test_code: |
   public class AuthControllerTests

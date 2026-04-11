@@ -14,10 +14,10 @@ prompt: |
   A class TodosController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<TodoItem> (for testability).
   Actions:
-    GET api/todos — all items
-    GET api/todos/completed — only completed items
-    GET api/todos/pending — only pending items
-    PUT api/todos/{id}/complete — mark as complete, 204 or 404
+    GET api/todos â€” all items
+    GET api/todos/completed â€” only completed items
+    GET api/todos/pending â€” only pending items
+    PUT api/todos/{id}/complete â€” mark as complete, 204 or 404
   Return only valid C# code in a single file.
 test_code: |
   public class TodosControllerTests

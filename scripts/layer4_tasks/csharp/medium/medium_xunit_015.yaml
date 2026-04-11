@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class JsonPathEvaluator with:
-    object? Query(string json, string path) — simple dot and array notation, e.g. "user.name", "items[0]"
+    object? Query(string json, string path) â€” simple dot and array notation, e.g. "user.name", "items[0]"
   Return only valid C# code in a single file.
 test_code: |
   public class JsonPathEvaluatorTests

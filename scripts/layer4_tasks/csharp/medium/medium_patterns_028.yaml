@@ -11,10 +11,10 @@ references: []
 prompt: |
   Create a single C# file containing:
   A sealed class Percentage with decimal Value (0-100).
-    static Percentage Of(decimal value) — throws ArgumentOutOfRangeException if invalid
-    static Percentage FromFraction(double fraction) — 0.0-1.0 converted to percentage
+    static Percentage Of(decimal value) â€” throws ArgumentOutOfRangeException if invalid
+    static Percentage FromFraction(double fraction) â€” 0.0-1.0 converted to percentage
     decimal Apply(decimal amount)
-    Percentage Add(Percentage other) — clamps at 100
+    Percentage Add(Percentage other) â€” clamps at 100
   Return only valid C# code in a single file.
 test_code: |
   public class PercentageTests

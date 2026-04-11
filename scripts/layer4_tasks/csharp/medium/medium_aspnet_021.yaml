@@ -13,8 +13,8 @@ prompt: |
   A record HealthStatus(bool IsHealthy, string Message, DateTime CheckedAt).
   A static class HealthEndpoints with:
     void MapHealthEndpoints(WebApplication app)
-  Register GET /health — returns HealthStatus with IsHealthy=true, Message="OK".
-  Register GET /health/ready — returns HealthStatus with IsHealthy=true if all services are reachable (simulate with always true).
+  Register GET /health â€” returns HealthStatus with IsHealthy=true, Message="OK".
+  Register GET /health/ready â€” returns HealthStatus with IsHealthy=true if all services are reachable (simulate with always true).
   Return only valid C# code in a single file.
 test_code: |
   public class HealthEndpointTests

@@ -14,9 +14,9 @@ prompt: |
   A class TagsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<TagDto> (for testability).
   Actions:
-    GET api/tags — all tags ordered by UsageCount descending
-    GET api/tags/popular?top=5 — top N tags by usage
-    GET api/tags/search?q=term — tags where Name contains term (case-insensitive)
+    GET api/tags â€” all tags ordered by UsageCount descending
+    GET api/tags/popular?top=5 â€” top N tags by usage
+    GET api/tags/search?q=term â€” tags where Name contains term (case-insensitive)
   Return only valid C# code in a single file.
 test_code: |
   public class TagsControllerTests

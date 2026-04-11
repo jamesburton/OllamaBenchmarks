@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class MarkdownParser with:
-    string Parse(string markdown) — handles **bold**, *italic*, `code`, # headings (h1-h6), plain text
+    string Parse(string markdown) â€” handles **bold**, *italic*, `code`, # headings (h1-h6), plain text
   Return only valid C# code in a single file.
 test_code: |
   public class MarkdownParserTests

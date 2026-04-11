@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class UnitConverter with:
-    double Convert(double value, string fromUnit, string toUnit) — supports: km/m/cm/mm, kg/g/mg, l/ml, celsius/fahrenheit/kelvin
+    double Convert(double value, string fromUnit, string toUnit) â€” supports: km/m/cm/mm, kg/g/mg, l/ml, celsius/fahrenheit/kelvin
   Return only valid C# code in a single file.
 test_code: |
   public class UnitConverterTests

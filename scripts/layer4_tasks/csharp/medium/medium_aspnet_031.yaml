@@ -14,8 +14,8 @@ prompt: |
   A class DiscountController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<DiscountRule> (for testability).
   Actions:
-    POST api/discount/validate — accepts {code: string}, returns {valid: bool, discount: decimal} or 400 if code empty
-    GET api/discount/active — returns only non-expired rules
+    POST api/discount/validate â€” accepts {code: string}, returns {valid: bool, discount: decimal} or 400 if code empty
+    GET api/discount/active â€” returns only non-expired rules
   Return only valid C# code in a single file.
 test_code: |
   public class DiscountControllerTests

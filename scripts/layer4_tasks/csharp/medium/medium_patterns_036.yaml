@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A record SemVer with int Major, int Minor, int Patch implementing IComparable<SemVer>.
-    static SemVer Parse(string s) — parses "major.minor.patch"
+    static SemVer Parse(string s) â€” parses "major.minor.patch"
     override string ToString()
     Comparison operators <, >, <=, >=, ==, !=
   Return only valid C# code in a single file.

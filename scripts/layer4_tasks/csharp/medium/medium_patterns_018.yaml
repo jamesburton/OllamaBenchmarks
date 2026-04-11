@@ -12,8 +12,8 @@ prompt: |
   Create a single C# file containing:
   A class Template with constructor accepting string template ({name} style placeholders).
   Expose:
-    string Render(Dictionary<string,string> variables) — replaces {key} with value
-    IEnumerable<string> GetPlaceholders() — distinct placeholder names
+    string Render(Dictionary<string,string> variables) â€” replaces {key} with value
+    IEnumerable<string> GetPlaceholders() â€” distinct placeholder names
   Unmatched placeholders left as-is.
   Return only valid C# code in a single file.
 test_code: |

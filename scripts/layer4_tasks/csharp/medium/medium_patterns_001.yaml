@@ -10,7 +10,7 @@ validator_type: dotnet
 references: []
 prompt: |
   Create a single C# file containing:
-  Records: Circle(double Radius), Rectangle(double Width, double Height), Triangle(double Base, double Height) — all inheriting from abstract record Shape.
+  Records: Circle(double Radius), Rectangle(double Width, double Height), Triangle(double Base, double Height) â€” all inheriting from abstract record Shape.
   A static class AreaCalculator with:
     double ComputeArea(Shape shape)
   using a switch expression.

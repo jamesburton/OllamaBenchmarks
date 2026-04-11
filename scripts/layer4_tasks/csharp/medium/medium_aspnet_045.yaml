@@ -14,9 +14,9 @@ prompt: |
   A class ChangelogController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<ChangelogEntry> (for testability).
   Actions:
-    GET api/changelog — all entries ordered by ReleasedAt descending
-    GET api/changelog/latest — most recent entry or 404 if empty
-    GET api/changelog/{version} — entry for that version or 404
+    GET api/changelog â€” all entries ordered by ReleasedAt descending
+    GET api/changelog/latest â€” most recent entry or 404 if empty
+    GET api/changelog/{version} â€” entry for that version or 404
   Return only valid C# code in a single file.
 test_code: |
   public class ChangelogControllerTests

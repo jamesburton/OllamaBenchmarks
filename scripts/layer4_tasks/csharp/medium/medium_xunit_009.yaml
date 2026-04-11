@@ -13,7 +13,7 @@ prompt: |
   A class Graph<T> with:
     void AddVertex(T vertex)
     void AddEdge(T from, T to)
-    bool HasPath(T from, T to) — uses BFS
+    bool HasPath(T from, T to) â€” uses BFS
     IEnumerable<T> GetNeighbors(T vertex)
     int VertexCount { get; }
   Return only valid C# code in a single file.

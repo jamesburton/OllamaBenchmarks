@@ -13,7 +13,7 @@ prompt: |
   A record VersionInfo(string Version, string Environment, DateTime BuildTime).
   A class VersionController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IConfiguration.
-  Action: GET api/version — reads "AppVersion" and "ASPNETCORE_ENVIRONMENT" from configuration and returns VersionInfo.
+  Action: GET api/version â€” reads "AppVersion" and "ASPNETCORE_ENVIRONMENT" from configuration and returns VersionInfo.
   Return only valid C# code in a single file.
 test_code: |
   public class VersionControllerTests

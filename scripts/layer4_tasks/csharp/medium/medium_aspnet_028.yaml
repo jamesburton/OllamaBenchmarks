@@ -14,8 +14,8 @@ prompt: |
   A class ContentController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<SluggedContent> (for testability).
   Actions:
-    GET api/content — returns all content ordered by PublishedAt descending
-    GET api/content/{slug} — returns content by slug (case-insensitive), 404 if not found
+    GET api/content â€” returns all content ordered by PublishedAt descending
+    GET api/content/{slug} â€” returns content by slug (case-insensitive), 404 if not found
   Return only valid C# code in a single file.
 test_code: |
   public class ContentControllerTests

@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A generic class ObservableValue<T> with:
-    T Value { get; set; } — raises Changed event when value differs
+    T Value { get; set; } â€” raises Changed event when value differs
     event EventHandler<ValueChangedArgs<T>> Changed
   ValueChangedArgs<T> has T OldValue, T NewValue.
   Return only valid C# code in a single file.

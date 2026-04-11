@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class ExpressionParser with:
-    double Evaluate(string expression) — supports +, -, *, /, parentheses, integers and decimals
+    double Evaluate(string expression) â€” supports +, -, *, /, parentheses, integers and decimals
   Return only valid C# code in a single file.
 test_code: |
   public class ExpressionParserTests

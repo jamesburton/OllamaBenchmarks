@@ -14,9 +14,9 @@ prompt: |
   A class UsersController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<UserDto> users (for testability).
   Actions:
-    GET api/users — returns all users
-    GET api/users/{id} — returns user by id or 404
-    POST api/users — adds user to list and returns 201 with the new user
+    GET api/users â€” returns all users
+    GET api/users/{id} â€” returns user by id or 404
+    POST api/users â€” adds user to list and returns 201 with the new user
   Return only valid C# code in a single file.
 test_code: |
   public class UsersControllerTests

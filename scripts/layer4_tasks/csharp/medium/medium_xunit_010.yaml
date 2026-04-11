@@ -13,7 +13,7 @@ prompt: |
   A class TextAnalyzer with:
     int CountWords(string text)
     int CountSentences(string text)
-    IDictionary<string, int> WordFrequency(string text) — case-insensitive
+    IDictionary<string, int> WordFrequency(string text) â€” case-insensitive
     string MostFrequentWord(string text)
     double AverageWordLength(string text)
   Return only valid C# code in a single file.

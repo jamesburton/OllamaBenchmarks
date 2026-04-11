@@ -13,8 +13,8 @@ prompt: |
   A class MultiMap<TKey, TValue> backed by Dictionary<TKey, List<TValue>>.
   Expose:
     void Add(TKey key, TValue value)
-    IReadOnlyList<TValue> Get(TKey key) — empty list if absent
-    bool Remove(TKey key, TValue value) — removes first matching
+    IReadOnlyList<TValue> Get(TKey key) â€” empty list if absent
+    bool Remove(TKey key, TValue value) â€” removes first matching
     IEnumerable<TKey> Keys
     int TotalCount
   Return only valid C# code in a single file.

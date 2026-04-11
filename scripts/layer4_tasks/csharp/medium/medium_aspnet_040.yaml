@@ -15,7 +15,7 @@ prompt: |
   A record SurveyResult(Guid SurveyId, IEnumerable<SurveyAnswer> Answers, DateTime SubmittedAt).
   A class SurveysController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<SurveyQuestion> and List<SurveyResult> (for testability).
-  Actions: GET api/surveys/questions — all questions; POST api/surveys/submit — validates all answers reference valid question ids and valid options, stores result, returns 201.
+  Actions: GET api/surveys/questions â€” all questions; POST api/surveys/submit â€” validates all answers reference valid question ids and valid options, stores result, returns 201.
   Return only valid C# code in a single file.
 test_code: |
   public class SurveysControllerTests

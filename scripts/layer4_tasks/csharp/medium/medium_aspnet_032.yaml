@@ -14,9 +14,9 @@ prompt: |
   A class SubscriptionsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<SubscriptionPlan> (for testability).
   Actions:
-    GET api/subscriptions/plans — all plans
-    GET api/subscriptions/plans/{id} — plan by id or 404
-    GET api/subscriptions/plans/compare?ids=id1,id2 — returns specified plans for comparison
+    GET api/subscriptions/plans â€” all plans
+    GET api/subscriptions/plans/{id} â€” plan by id or 404
+    GET api/subscriptions/plans/compare?ids=id1,id2 â€” returns specified plans for comparison
   Return only valid C# code in a single file.
 test_code: |
   public class SubscriptionsControllerTests

@@ -15,10 +15,10 @@ prompt: |
   A class PricingController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts Dictionary<string, List<PriceHistoryEntry>> history and List<PriceAlert> alerts (for testability).
   Actions:
-    GET api/pricing/{symbol}/history — price history for symbol (404 if not found)
-    GET api/pricing/{symbol}/current — most recent price (404 if not found)
-    POST api/pricing/alerts — adds alert, returns 201
-    GET api/pricing/alerts/triggered — alerts where current price crosses target
+    GET api/pricing/{symbol}/history â€” price history for symbol (404 if not found)
+    GET api/pricing/{symbol}/current â€” most recent price (404 if not found)
+    POST api/pricing/alerts â€” adds alert, returns 201
+    GET api/pricing/alerts/triggered â€” alerts where current price crosses target
   Return only valid C# code in a single file.
 test_code: |
   public class PricingControllerTests

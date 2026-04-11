@@ -14,9 +14,9 @@ prompt: |
   A class EventsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<EventDto> (for testability).
   Actions:
-    GET api/events — all events
-    GET api/events/available — events with CurrentAttendees < MaxAttendees
-    POST api/events/{id}/register — increments CurrentAttendees (400 if full, 404 if not found)
+    GET api/events â€” all events
+    GET api/events/available â€” events with CurrentAttendees < MaxAttendees
+    POST api/events/{id}/register â€” increments CurrentAttendees (400 if full, 404 if not found)
   Return only valid C# code in a single file.
 test_code: |
   public class EventsControllerTests

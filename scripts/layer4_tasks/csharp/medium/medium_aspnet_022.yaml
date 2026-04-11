@@ -16,7 +16,7 @@ prompt: |
     Task<BulkResult> CreateManyAsync(IEnumerable<T> items)
   A class BulkController<T> : ControllerBase with [ApiController] and [Route("api/bulk")] attributes.
   Constructor accepts IBulkService<T>.
-  Action: POST api/bulk — calls CreateManyAsync and returns 200 with BulkResult.
+  Action: POST api/bulk â€” calls CreateManyAsync and returns 200 with BulkResult.
   Return only valid C# code in a single file.
 test_code: |
   public record Widget(string Name, decimal Price);

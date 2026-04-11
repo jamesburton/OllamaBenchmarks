@@ -14,8 +14,8 @@ prompt: |
   A class CouponsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<Coupon> (for testability).
   Actions:
-    GET api/coupons — all coupons
-    POST api/coupons/apply — accepts {code, orderTotal}: validates code exists, not exceeded limit, computes final price, returns {originalPrice, discount, finalPrice}
+    GET api/coupons â€” all coupons
+    POST api/coupons/apply â€” accepts {code, orderTotal}: validates code exists, not exceeded limit, computes final price, returns {originalPrice, discount, finalPrice}
   Return only valid C# code in a single file.
 test_code: |
   public class CouponsControllerTests

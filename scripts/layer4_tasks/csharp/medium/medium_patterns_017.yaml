@@ -13,7 +13,7 @@ prompt: |
   Records: Coordinate(double Lat, double Lon), BoundingBox(Coordinate TopLeft, Coordinate BottomRight).
   A static class GeoUtils with:
     bool Contains(BoundingBox box, Coordinate point)
-    double Distance(Coordinate a, Coordinate b) — Euclidean distance
+    double Distance(Coordinate a, Coordinate b) â€” Euclidean distance
     Coordinate Midpoint(Coordinate a, Coordinate b)
   Return only valid C# code in a single file.
 test_code: |

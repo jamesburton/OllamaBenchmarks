@@ -14,10 +14,10 @@ prompt: |
   A class DocumentsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<DocumentDto> (for testability).
   Actions:
-    GET api/documents — all documents
-    GET api/documents/search?q=term — full-text search in Title and Content
-    GET api/documents/tag/{tag} — documents with specific tag
-    GET api/documents/{id} — by id or 404
+    GET api/documents â€” all documents
+    GET api/documents/search?q=term â€” full-text search in Title and Content
+    GET api/documents/tag/{tag} â€” documents with specific tag
+    GET api/documents/{id} â€” by id or 404
   Return only valid C# code in a single file.
 test_code: |
   public class DocumentsControllerTests

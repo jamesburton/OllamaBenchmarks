@@ -15,7 +15,7 @@ prompt: |
     Task<ReportDto> GenerateAsync(string reportType)
   A class ReportsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IReportService.
-  Action: GET api/reports/{reportType} — generates and returns report, or 400 if reportType is null/empty.
+  Action: GET api/reports/{reportType} â€” generates and returns report, or 400 if reportType is null/empty.
   Return only valid C# code in a single file.
 test_code: |
   public class ReportsControllerTests

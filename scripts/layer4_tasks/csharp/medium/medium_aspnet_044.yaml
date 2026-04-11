@@ -14,9 +14,9 @@ prompt: |
   A class BudgetController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<BudgetCategory> (for testability).
   Properties:
-    GET api/budget — all categories with Remaining (Allocated - Spent)
-    GET api/budget/summary — { totalAllocated, totalSpent, totalRemaining }
-    POST api/budget/{name}/spend — subtracts amount from category (400 if overspent, 404 if not found)
+    GET api/budget â€” all categories with Remaining (Allocated - Spent)
+    GET api/budget/summary â€” { totalAllocated, totalSpent, totalRemaining }
+    POST api/budget/{name}/spend â€” subtracts amount from category (400 if overspent, 404 if not found)
   Return only valid C# code in a single file.
 test_code: |
   public class BudgetControllerTests

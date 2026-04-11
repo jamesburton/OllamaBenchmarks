@@ -12,7 +12,7 @@ prompt: |
   Create a single C# file containing:
   A class TypeRegistry with:
     void Register<T>(string name)
-    object CreateInstance(string name) — uses reflection; throws KeyNotFoundException if not registered
+    object CreateInstance(string name) â€” uses reflection; throws KeyNotFoundException if not registered
     bool IsRegistered(string name)
     IEnumerable<string> RegisteredNames()
   Return only valid C# code in a single file.

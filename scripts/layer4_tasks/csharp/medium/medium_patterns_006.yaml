@@ -15,7 +15,7 @@ prompt: |
     PersonBuilder WithFirstName(string)
     PersonBuilder WithLastName(string)
     PersonBuilder WithAge(int)
-    Person Build() — throws InvalidOperationException if FirstName or LastName is empty/null
+    Person Build() â€” throws InvalidOperationException if FirstName or LastName is empty/null
   Return only valid C# code in a single file.
 test_code: |
   public class PersonBuilderTests

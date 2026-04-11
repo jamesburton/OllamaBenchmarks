@@ -11,10 +11,10 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class StringExtensions with static extension methods on string:
-    string ToPascalCase(this string s) — converts snake_case or kebab-case to PascalCase
-    string ToCamelCase(this string s) — converts to camelCase
-    string Truncate(this string s, int maxLength, string suffix = "...") — truncates with suffix
-    bool IsEmail(this string s) — simple email format check (contains @ and .)
+    string ToPascalCase(this string s) â€” converts snake_case or kebab-case to PascalCase
+    string ToCamelCase(this string s) â€” converts to camelCase
+    string Truncate(this string s, int maxLength, string suffix = "...") â€” truncates with suffix
+    bool IsEmail(this string s) â€” simple email format check (contains @ and .)
   Return only valid C# code in a single file.
 test_code: |
   public class StringExtensionsTests

@@ -16,7 +16,7 @@ prompt: |
     bool EnableCaching
   A class SettingsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IOptions<AppSettings>.
-  Action: GET api/settings — returns the settings as JSON (Ok result).
+  Action: GET api/settings â€” returns the settings as JSON (Ok result).
   Return only valid C# code in a single file.
 test_code: |
   public class SettingsControllerTests

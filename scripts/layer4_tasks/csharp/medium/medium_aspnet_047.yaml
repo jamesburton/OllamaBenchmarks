@@ -14,9 +14,9 @@ prompt: |
   A class UsageController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<ApiUsage> (for testability).
   Actions:
-    GET api/usage — all usage records
-    GET api/usage/{apiKey} — usage for specific key or 404
-    GET api/usage/top?limit=10 — top N by RequestCount descending
+    GET api/usage â€” all usage records
+    GET api/usage/{apiKey} â€” usage for specific key or 404
+    GET api/usage/top?limit=10 â€” top N by RequestCount descending
   Return only valid C# code in a single file.
 test_code: |
   public class UsageControllerTests

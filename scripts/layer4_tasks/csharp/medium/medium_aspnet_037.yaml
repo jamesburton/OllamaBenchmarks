@@ -14,9 +14,9 @@ prompt: |
   A class MetricsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<MetricPoint> (for testability).
   Actions:
-    POST api/metrics — adds a metric point, returns 201
-    GET api/metrics/{name} — returns all points for a metric name
-    GET api/metrics/{name}/summary — returns { min, max, avg, count } for the metric
+    POST api/metrics â€” adds a metric point, returns 201
+    GET api/metrics/{name} â€” returns all points for a metric name
+    GET api/metrics/{name}/summary â€” returns { min, max, avg, count } for the metric
   Return only valid C# code in a single file.
 test_code: |
   public class MetricsControllerTests

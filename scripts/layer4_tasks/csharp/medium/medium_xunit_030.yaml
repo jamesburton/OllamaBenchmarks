@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class NumberWordConverter with:
-    string ToWords(long number) — converts integers to English words, supports up to billions
+    string ToWords(long number) â€” converts integers to English words, supports up to billions
   Return only valid C# code in a single file.
 test_code: |
   public class NumberWordConverterTests

@@ -14,9 +14,9 @@ prompt: |
   A class ReviewsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<ReviewDto> (for testability).
   Actions:
-    GET api/reviews/{productId} — reviews for a product
-    GET api/reviews/{productId}/average — average rating (0 if no reviews)
-    POST api/reviews — adds review (validate Rating 1-5, returns 400 if invalid)
+    GET api/reviews/{productId} â€” reviews for a product
+    GET api/reviews/{productId}/average â€” average rating (0 if no reviews)
+    POST api/reviews â€” adds review (validate Rating 1-5, returns 400 if invalid)
   Return only valid C# code in a single file.
 test_code: |
   public class ReviewsControllerTests

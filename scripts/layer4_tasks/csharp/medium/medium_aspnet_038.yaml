@@ -14,9 +14,9 @@ prompt: |
   A class WaitlistController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<WaitlistEntry> (for testability).
   Actions:
-    POST api/waitlist/join — adds email to waitlist (400 if email invalid or already exists), returns 201 with position
-    GET api/waitlist/position?email=x — returns position or 404
-    DELETE api/waitlist/{id} — removes entry and renumbers positions, 404 if not found
+    POST api/waitlist/join â€” adds email to waitlist (400 if email invalid or already exists), returns 201 with position
+    GET api/waitlist/position?email=x â€” returns position or 404
+    DELETE api/waitlist/{id} â€” removes entry and renumbers positions, 404 if not found
   Return only valid C# code in a single file.
 test_code: |
   public class WaitlistControllerTests

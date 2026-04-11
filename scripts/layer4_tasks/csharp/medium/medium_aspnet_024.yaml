@@ -16,7 +16,7 @@ prompt: |
   Register two implementations: EmailNotificationSender and PushNotificationSender.
   A class NotificationsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IEnumerable<INotificationSender>.
-  Action: POST api/notifications — sends to all registered senders, returns 200.
+  Action: POST api/notifications â€” sends to all registered senders, returns 200.
   Return only valid C# code in a single file.
 test_code: |
   public class NotificationsControllerTests

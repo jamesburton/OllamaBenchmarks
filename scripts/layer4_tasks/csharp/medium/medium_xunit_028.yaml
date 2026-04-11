@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class TemplateLiteralParser with:
-    string Render(string template, IDictionary<string,string> variables) — substitutes {{variable}} placeholders
+    string Render(string template, IDictionary<string,string> variables) â€” substitutes {{variable}} placeholders
   Return only valid C# code in a single file.
 test_code: |
   public class TemplateLiteralParserTests

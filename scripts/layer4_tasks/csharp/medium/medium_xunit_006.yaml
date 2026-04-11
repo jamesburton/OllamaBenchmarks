@@ -15,8 +15,8 @@ prompt: |
     int Rows { get; }
     int Columns { get; }
     Constructor accepting int[,] data.
-    Matrix Add(Matrix other) — throws if dimensions don't match.
-    Matrix Multiply(Matrix other) — throws if incompatible dimensions.
+    Matrix Add(Matrix other) â€” throws if dimensions don't match.
+    Matrix Multiply(Matrix other) â€” throws if incompatible dimensions.
     Matrix Transpose()
   Return only valid C# code in a single file.
 test_code: |

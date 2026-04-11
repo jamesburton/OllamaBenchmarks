@@ -12,9 +12,9 @@ prompt: |
   Create a single C# file containing:
   A class OptionParser with constructor accepting string[] args.
   Expose:
-    string? GetOption(string name) — value after --name flag, null if absent
-    bool HasFlag(string name) — true if --name present without a following value
-    IReadOnlyList<string> PositionalArgs() — args not starting with --
+    string? GetOption(string name) â€” value after --name flag, null if absent
+    bool HasFlag(string name) â€” true if --name present without a following value
+    IReadOnlyList<string> PositionalArgs() â€” args not starting with --
   Return only valid C# code in a single file.
 test_code: |
   public class OptionParserTests

@@ -14,10 +14,10 @@ prompt: |
   A class JobQueueController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<QueuedJob> (for testability).
   Actions:
-    POST api/jobs — enqueue a new job (Status = "Queued"), returns 201
-    GET api/jobs — all jobs ordered by QueuedAt asc
-    PUT api/jobs/{id}/process — change Status to "Processing" (404 if not found)
-    PUT api/jobs/{id}/complete — change Status to "Completed" (404 if not found)
+    POST api/jobs â€” enqueue a new job (Status = "Queued"), returns 201
+    GET api/jobs â€” all jobs ordered by QueuedAt asc
+    PUT api/jobs/{id}/process â€” change Status to "Processing" (404 if not found)
+    PUT api/jobs/{id}/complete â€” change Status to "Completed" (404 if not found)
   Return only valid C# code in a single file.
 test_code: |
   public class JobQueueControllerTests

@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class Tokenizer with:
-    IEnumerable<(string Type, string Value)> Tokenize(string input) — identifies: NUMBER, STRING, IDENTIFIER, OPERATOR, WHITESPACE
+    IEnumerable<(string Type, string Value)> Tokenize(string input) â€” identifies: NUMBER, STRING, IDENTIFIER, OPERATOR, WHITESPACE
   Return only valid C# code in a single file.
 test_code: |
   public class TokenizerTests

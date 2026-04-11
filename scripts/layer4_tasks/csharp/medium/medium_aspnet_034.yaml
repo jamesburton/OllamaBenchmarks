@@ -16,7 +16,7 @@ prompt: |
     Task<ImportResult> ImportAsync(string format, string data)
   A class ImportController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IDataImporter.
-  Action: POST api/import — validates format is "csv" or "json", calls importer, returns result or 400.
+  Action: POST api/import â€” validates format is "csv" or "json", calls importer, returns result or 400.
   Return only valid C# code in a single file.
 test_code: |
   public class ImportControllerTests

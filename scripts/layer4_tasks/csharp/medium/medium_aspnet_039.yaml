@@ -16,7 +16,7 @@ prompt: |
     Task<GeocodingResult?> GeocodeAsync(AddressDto address)
   A class GeocodingController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IGeocodingService.
-  Action: POST api/geocoding — returns geocoding result or 404 if address not found.
+  Action: POST api/geocoding â€” returns geocoding result or 404 if address not found.
   Return only valid C# code in a single file.
 test_code: |
   public class GeocodingControllerTests

@@ -14,7 +14,7 @@ prompt: |
     static ComparisonChain Start()
     ComparisonChain ThenCompare<T>(T left, T right) where T : IComparable<T>
     ComparisonChain ThenCompareDescending<T>(T left, T right) where T : IComparable<T>
-    int Result() — -1, 0, or 1
+    int Result() â€” -1, 0, or 1
   Return only valid C# code in a single file.
 test_code: |
   public class ComparisonChainTests

@@ -15,7 +15,7 @@ prompt: |
   A record ContactRequest(string Name, string Email, string Message).
   A class ContactController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IEmailService.
-  Action: POST api/contact — validates request (Name/Email/Message required, Email must contain @), sends email, returns 200 or 400.
+  Action: POST api/contact â€” validates request (Name/Email/Message required, Email must contain @), sends email, returns 200 or 400.
   Return only valid C# code in a single file.
 test_code: |
   public class ContactControllerTests

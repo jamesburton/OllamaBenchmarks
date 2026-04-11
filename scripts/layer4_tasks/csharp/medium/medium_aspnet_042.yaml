@@ -14,8 +14,8 @@ prompt: |
   A class ShippingController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<ShippingRate> (for testability).
   Actions:
-    GET api/shipping/rates?country=US — all rates for that country
-    POST api/shipping/calculate — accepts {carrier, weightKg, country}: returns calculated cost or 404 if carrier/country combo not available
+    GET api/shipping/rates?country=US â€” all rates for that country
+    POST api/shipping/calculate â€” accepts {carrier, weightKg, country}: returns calculated cost or 404 if carrier/country combo not available
   Return only valid C# code in a single file.
 test_code: |
   public class ShippingControllerTests

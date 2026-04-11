@@ -16,7 +16,7 @@ prompt: |
     Task<PublishResult> PublishAsync(string topic, string message, IDictionary<string, string> metadata)
   A class MessagingController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts IMessageBus.
-  Action: POST api/messaging/publish — validates topic and message not empty, publishes, returns 200.
+  Action: POST api/messaging/publish â€” validates topic and message not empty, publishes, returns 200.
   Return only valid C# code in a single file.
 test_code: |
   public class MessagingControllerTests

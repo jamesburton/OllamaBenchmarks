@@ -14,7 +14,7 @@ prompt: |
   Expose:
     void AddTransition(TState from, TTrigger trigger, TState to)
     void AddTransition(TState from, TTrigger trigger, TState to, Action onTransition)
-    TState Fire(TTrigger trigger) — throws InvalidOperationException if no transition
+    TState Fire(TTrigger trigger) â€” throws InvalidOperationException if no transition
     TState CurrentState
   Return only valid C# code in a single file.
 test_code: |

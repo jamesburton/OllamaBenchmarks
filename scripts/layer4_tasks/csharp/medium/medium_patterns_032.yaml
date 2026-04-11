@@ -14,7 +14,7 @@ prompt: |
   A static class TreeTraversal<T> with:
     IEnumerable<T> DepthFirst(TreeNode<T> root)
     IEnumerable<T> BreadthFirst(TreeNode<T> root)
-    int Depth(TreeNode<T> root) — root = 1
+    int Depth(TreeNode<T> root) â€” root = 1
   Return only valid C# code in a single file.
 test_code: |
   public class TreeTraversalTests

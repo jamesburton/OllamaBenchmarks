@@ -14,9 +14,9 @@ prompt: |
   A class FeatureFlagsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<FeatureFlag> (for testability).
   Actions:
-    GET api/feature-flags — all flags
-    GET api/feature-flags/{name}/check?userId=x — true if flag enabled globally, or userId in AllowedUsers
-    PUT api/feature-flags/{name}/toggle — toggles Enabled, 404 if not found
+    GET api/feature-flags â€” all flags
+    GET api/feature-flags/{name}/check?userId=x â€” true if flag enabled globally, or userId in AllowedUsers
+    PUT api/feature-flags/{name}/toggle â€” toggles Enabled, 404 if not found
   Return only valid C# code in a single file.
 test_code: |
   public class FeatureFlagsControllerTests

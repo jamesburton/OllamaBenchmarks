@@ -14,9 +14,9 @@ prompt: |
   A class ExportsController : ControllerBase with [ApiController] and [Route("api/[controller]")] attributes.
   Constructor accepts List<DataExport> (for testability).
   Actions:
-    POST api/exports — creates export with Status="Pending", returns 202 Accepted
-    GET api/exports/{id}/status — returns export or 404
-    PUT api/exports/{id}/complete — sets Status="Completed" and CompletedAt=UtcNow, 404 if not found
+    POST api/exports â€” creates export with Status="Pending", returns 202 Accepted
+    GET api/exports/{id}/status â€” returns export or 404
+    PUT api/exports/{id}/complete â€” sets Status="Completed" and CompletedAt=UtcNow, 404 if not found
   Return only valid C# code in a single file.
 test_code: |
   public class ExportsControllerTests

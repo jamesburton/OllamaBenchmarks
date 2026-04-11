@@ -12,7 +12,7 @@ prompt: |
   Create a single C# file containing:
   A class TypedSettings with constructor accepting Dictionary<string,string> values.
   Expose:
-    T Get<T>(string key) — converts value via Convert.ChangeType; throws KeyNotFoundException if missing
+    T Get<T>(string key) â€” converts value via Convert.ChangeType; throws KeyNotFoundException if missing
     T GetOrDefault<T>(string key, T defaultValue)
     bool TryGet<T>(string key, out T value)
   Return only valid C# code in a single file.

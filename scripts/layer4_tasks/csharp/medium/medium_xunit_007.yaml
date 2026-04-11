@@ -14,7 +14,7 @@ prompt: |
     void Append(string streamId, object @event)
     IEnumerable<object> ReadStream(string streamId)
     IEnumerable<object> ReadAll()
-    int GetVersion(string streamId) — returns event count for that stream
+    int GetVersion(string streamId) â€” returns event count for that stream
   Events are stored in order. ReadAll returns all events across all streams.
   Return only valid C# code in a single file.
 test_code: |

@@ -11,7 +11,7 @@ references: []
 prompt: |
   Create a single C# file containing:
   A class CommandLineParser with:
-    IDictionary<string, string?> Parse(string[] args) — supports --key value and --flag syntax
+    IDictionary<string, string?> Parse(string[] args) â€” supports --key value and --flag syntax
   Return only valid C# code in a single file.
 test_code: |
   public class CommandLineParserTests
