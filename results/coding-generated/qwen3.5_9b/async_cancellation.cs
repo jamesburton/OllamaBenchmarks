@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 
 public interface IDataSource
 {
@@ -33,6 +29,11 @@ public class DataProcessor
 
             foreach (var item in batch)
             {
+                if (ct.IsCancellationRequested)
+                {
+                    yield break;
+                }
+
                 yield return item;
             }
 

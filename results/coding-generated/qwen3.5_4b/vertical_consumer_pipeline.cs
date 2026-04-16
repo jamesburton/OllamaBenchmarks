@@ -1,91 +1,58 @@
-global using Contracts; // This might be redundant if the whole file is inside Contracts, but the prompt asks for it specifically to make types accessible without explicit using statements from other files.
-                using MassTransit;
-                using MassTransit.Testing;
-                using Microsoft.Extensions.DependencyInjection;
-
-                namespace Contracts { ... }
-
-global using Contracts; // This is technically invalid if Contracts namespace isn't defined yet in the same file scope, but often used to simulate a project reference or just a directive. However, standard C# requires the namespace to be visible.
-                // Actually, looking at typical "single file" patterns for these prompts:
-                // It usually means:
-                global using Contracts; // This is likely intended to mean "Assume Contracts is available globally". But since I am defining it in this file...
+using MassTransit;
+using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
 
 global using Contracts;
-        using MassTransit;
-        using MassTransit.Testing;
-        using Microsoft.Extensions.DependencyInjection;
 
-        namespace Contracts { ... } // Messages & Consumers
+namespace Tests;
 
-        public class OrderPipelineTests { ... } // Tests
+public class OrderPipelineTests
+{
+    private readonly ITestHarness _harness;
 
-global using Contracts;
-        using MassTransit;
-        using MassTransit.Testing;
-        using Microsoft.Extensions.DependencyInjection;
+    public OrderPipelineTests(ITestHarness harness)
+    {
+        _harness = harness;
+    }
 
-        namespace Contracts { ... }
-        public class OrderPipelineTests { ... }
+    [Fact]
+    public async Task PublishesOrderPlacedAfterPlaceOrder()
+    {
+        await _harness.Start();
 
-global using Contracts;
-        using MassTransit;
-        using MassTransit.Testing;
-        using Microsoft.Extensions.DependencyInjection;
+        var orderId = Guid.NewGuid();
+        var customerName = "John Doe";
 
-        namespace Contracts { ... }
-        public class OrderPipelineTests { ... }
+        await _harness.Bus.Publish(new PlaceOrder(orderId, customerName));
 
-... 
-global using Contracts;
-        using MassTransit;
-        using MassTransit.Testing;
-        using Microsoft.Extensions.DependencyInjection;
+        // Verify PlaceOrder was consumed
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
 
-        namespace Contracts { ... }
-        public class OrderPipelineTests { ... }
+        // Verify OrderPlaced was published and consumed
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
+        Assert.True(await _harness.Consumed.Any<OrderPlaced>());
 
-global using Contracts;
-        using MassTransit;
-        using MassTransit.Testing;
-        using Microsoft.Extensions.DependencyInjection;
+        await _harness.Stop();
+    }
 
-namespace Contracts {
-            // Messages
-            public record PlaceOrder(Guid OrderId, string CustomerName);
-            public record OrderPlaced(Guid OrderId, string CustomerName);
-            public record CustomerNotified(Guid OrderId, string NotificationMessage);
+    [Fact]
+    public async Task FullPipelineCompletesEndToEnd()
+    {
+        await _harness.Start();
 
-            // Consumers
-            public class PlaceOrderConsumer : IConsumer<PlaceOrder> { ... }
-            public class NotifyCustomerConsumer : IConsumer<OrderPlaced> { ... }
-        }
+        var orderId = Guid.NewGuid();
+        var customerName = "Jane Smith";
 
-public class OrderPipelineTests {
-            private readonly IServiceProvider _provider;
-            private readonly ITestHarness _harness;
+        await _harness.Bus.Publish(new PlaceOrder(orderId, customerName));
 
-            [GlobalSetup]
-            public void Setup() { ... } // Configure DI and get harness
+        // Wait for async operations to complete
+        await Task.Delay(100);
 
-            [Fact]
-            public async Task TestStage1() { ... }
+        // Verify full chain: PlaceOrder -> OrderPlaced -> CustomerNotified
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Consumed.Any<OrderPlaced>());
+        Assert.True(await _harness.Consumed.Any<CustomerNotified>());
 
-            [Fact]
-            public async Task TestFullPipeline() { ... }
-        }
-
-[GlobalSetup]
-            public void Setup() {
-                var services = new ServiceCollection();
-                services.AddMassTransitTestHarness(cfg => cfg.AddConsumer<PlaceOrderConsumer>().AddConsumer<NotifyCustomerConsumer>());
-                _provider = services.BuildServiceProvider();
-                _harness = _provider.GetRequiredService<ITestHarness>();
-            }
-
-global using Contracts;
-        using MassTransit;
-        using MassTransit.Testing;
-        using Microsoft.Extensions.DependencyInjection;
-
-        namespace Contracts { ... }
-        public class OrderPipelineTests { ... }
+        await _harness.Stop();
+    }
+}

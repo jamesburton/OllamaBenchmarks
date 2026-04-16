@@ -46,28 +46,24 @@ public class OrderService
     {
         if (string.IsNullOrWhiteSpace(request.CustomerName))
         {
-            return new ValidationError { Message = "Customer name is required" };
+            return ValidationError.FromT1(new ValidationError { Message = "Customer name is required" });
         }
 
         if (request.Items == null || request.Items.Count == 0)
         {
-            return new ValidationError { Message = "At least one item is required" };
+            return ValidationError.FromT1(new ValidationError { Message = "At least one item is required" });
         }
 
         var order = new Order
         {
             CustomerName = request.CustomerName,
             Items = new List<OrderItem>(request.Items),
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Total = request.Items.Sum(item => item.Quantity * item.UnitPrice)
         };
-
-        foreach (var item in request.Items)
-        {
-            order.Total += item.Quantity * item.UnitPrice;
-        }
 
         _repository.Save(order);
 
-        return OneOf.FromT0(order);
+        return order;
     }
 }

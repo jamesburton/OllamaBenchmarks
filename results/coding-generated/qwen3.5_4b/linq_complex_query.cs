@@ -1,10 +1,22 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
-public record Sale(string Product, string Category, decimal Amount, DateOnly Date);
+public class Sale
+{
+    public string Product { get; set; }
+    public string Category { get; set; }
+    public decimal Amount { get; set; }
+    public DateOnly Date { get; set; }
+}
 
-public record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
+public class CategorySummary
+{
+    public string Category { get; set; }
+    public decimal TotalAmount { get; set; }
+    public decimal AverageAmount { get; set; }
+    public int Count { get; set; }
+}
 
 public static class SalesAnalyzer
 {
@@ -12,13 +24,14 @@ public static class SalesAnalyzer
     {
         return sales
             .GroupBy(s => s.Category)
-            .Select(g => new CategorySummary(
-                g.Key,
-                g.Sum(s => s.Amount),
-                g.Average(s => s.Amount),
-                g.Count()
-            ))
-            .OrderByDescending(x => x.TotalAmount)
+            .Select(g => new CategorySummary
+            {
+                Category = g.Key,
+                TotalAmount = g.Sum(s => s.Amount),
+                AverageAmount = g.Average(s => s.Amount),
+                Count = g.Count()
+            })
+            .OrderByDescending(s => s.TotalAmount)
             .ToList();
     }
 }

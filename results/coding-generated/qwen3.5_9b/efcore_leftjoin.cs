@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
-namespace MyApp
+namespace EFCore10Example
 {
     public class Customer
     {
@@ -20,25 +20,23 @@ namespace MyApp
         public DateTime OrderDate { get; set; }
     }
 
-    public record OrderDto(int OrderId, decimal Total, string CustomerName);
-
     public class AppDbContext : DbContext
     {
-        public DbSet<Order> Orders { get; set; } = null!;
-        public DbSet<Customer> Customers { get; set; } = null!;
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
         {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Customer)
-                .WithMany()
-                .HasForeignKey(o => o.CustomerId);
+            base.OnModelCreating(modelBuilder);
         }
     }
+
+    public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
     public static class OrderQueries
     {

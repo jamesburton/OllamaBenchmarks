@@ -1,8 +1,8 @@
 {
   "model": "qwen3.5:4b",
   "benchmark": "coding",
-  "run_started_at": "2026-04-09T20:22:52.385526+00:00",
-  "run_finished_at": "2026-04-09T22:46:46.863160+00:00",
+  "run_started_at": "2026-04-16T22:54:45.254076+00:00",
+  "run_finished_at": "2026-04-16T23:08:22.084803+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
@@ -13,7 +13,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 150.11,
+      "generation_time_s": 19.75,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\aspnet_oneof_controller.cs"
     },
     {
@@ -25,7 +25,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 92.38,
+      "generation_time_s": 25.0,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\aspnet_validation_endpoint.cs"
     },
     {
@@ -37,11 +37,35 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 78.52,
+      "generation_time_s": 27.33,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\aspnet_service_di.cs"
     },
     {
       "task": "efcore_leftjoin",
+      "category": "efcore",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 17.66,
+      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_leftjoin.cs"
+    },
+    {
+      "task": "efcore_json_columns",
+      "category": "efcore",
+      "weight": 1,
+      "passed": true,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 2,
+      "tests_total": 2,
+      "generation_time_s": 24.98,
+      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_json_columns.cs"
+    },
+    {
+      "task": "efcore_executeupdate",
       "category": "efcore",
       "weight": 1,
       "passed": true,
@@ -49,31 +73,7 @@
       "build_success": true,
       "tests_passed": 1,
       "tests_total": 1,
-      "generation_time_s": 90.3,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_leftjoin.cs"
-    },
-    {
-      "task": "efcore_json_columns",
-      "category": "efcore",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 171.64,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_json_columns.cs"
-    },
-    {
-      "task": "efcore_executeupdate",
-      "category": "efcore",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 160.67,
+      "generation_time_s": 18.66,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_executeupdate.cs"
     },
     {
@@ -85,7 +85,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 130.7,
+      "generation_time_s": 55.73,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\masstransit_consumer.cs"
     },
     {
@@ -97,7 +97,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 175.38,
+      "generation_time_s": 29.52,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\masstransit_statemachine.cs"
     },
     {
@@ -109,19 +109,19 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 136.81,
+      "generation_time_s": 28.72,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\masstransit_test_harness.cs"
     },
     {
       "task": "blazor_interactive_component",
       "category": "blazor",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 200.39,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generation_time_s": 22.23,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\blazor_interactive_component.cs"
     },
     {
@@ -133,43 +133,43 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 184.01,
+      "generation_time_s": 14.73,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\blazor_streaming_render.cs"
     },
     {
       "task": "blazor_cascading_auth",
       "category": "blazor",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 163.01,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generation_time_s": 80.56,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\blazor_cascading_auth.cs"
     },
     {
       "task": "xunit_v3_theory_tests",
       "category": "xunit",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 216.12,
+      "build_success": true,
+      "tests_passed": 24,
+      "tests_total": 24,
+      "generation_time_s": 25.09,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\xunit_v3_theory_tests.cs"
     },
     {
       "task": "xunit_awesome_nsubstitute",
       "category": "xunit",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 154.27,
+      "build_success": true,
+      "tests_passed": 6,
+      "tests_total": 6,
+      "generation_time_s": 23.97,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\xunit_awesome_nsubstitute.cs"
     },
     {
@@ -181,31 +181,31 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 186.38,
+      "generation_time_s": 15.0,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\xunit_assembly_fixture.cs"
     },
     {
       "task": "linq_complex_query",
       "category": "linq",
       "weight": 1,
-      "passed": true,
+      "passed": false,
       "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 220.97,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 30.31,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\linq_complex_query.cs"
     },
     {
       "task": "async_cancellation",
-      "category": "async",
+      "category": "linq",
       "weight": 1,
       "passed": false,
       "harness_error": null,
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 348.44,
+      "generation_time_s": 26.33,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\async_cancellation.cs"
     },
     {
@@ -217,7 +217,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 256.99,
+      "generation_time_s": 30.89,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\vertical_order_service.cs"
     },
     {
@@ -229,7 +229,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 242.11,
+      "generation_time_s": 124.05,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\vertical_consumer_pipeline.cs"
     },
     {
@@ -241,369 +241,806 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 230.84,
+      "generation_time_s": 50.66,
       "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\vertical_blazor_crud.cs"
-    },
-    {
-      "task": "linq_selectmany_flatten",
-      "category": "linq",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 159.94,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\linq_selectmany_flatten.cs"
-    },
-    {
-      "task": "linq_set_operations",
-      "category": "linq",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 150.45,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\linq_set_operations.cs"
-    },
-    {
-      "task": "linq_aggregate_stats",
-      "category": "linq",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 168.59,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\linq_aggregate_stats.cs"
-    },
-    {
-      "task": "linq_todictionary_tolookup",
-      "category": "linq",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 163.55,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\linq_todictionary_tolookup.cs"
-    },
-    {
-      "task": "async_whenall_parallel",
-      "category": "async",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 120.17,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\async_whenall_parallel.cs"
-    },
-    {
-      "task": "async_semaphore_throttle",
-      "category": "async",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 129.05,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\async_semaphore_throttle.cs"
-    },
-    {
-      "task": "async_channel_pipeline",
-      "category": "async",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 205.39,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\async_channel_pipeline.cs"
-    },
-    {
-      "task": "async_valuetask_cache",
-      "category": "async",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 136.26,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\async_valuetask_cache.cs"
-    },
-    {
-      "task": "aspnet_minimal_api_endpoint",
-      "category": "aspnet",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 147.11,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\aspnet_minimal_api_endpoint.cs"
-    },
-    {
-      "task": "aspnet_typed_httpclient",
-      "category": "aspnet",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 176.81,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\aspnet_typed_httpclient.cs"
-    },
-    {
-      "task": "aspnet_ioptions_config",
-      "category": "aspnet",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 153.02,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\aspnet_ioptions_config.cs"
-    },
-    {
-      "task": "aspnet_problemdetails_handler",
-      "category": "aspnet",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 120.31,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\aspnet_problemdetails_handler.cs"
-    },
-    {
-      "task": "efcore_include_navigation",
-      "category": "efcore",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 120.77,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_include_navigation.cs"
-    },
-    {
-      "task": "efcore_softdelete_filter",
-      "category": "efcore",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 138.03,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_softdelete_filter.cs"
-    },
-    {
-      "task": "efcore_owned_entity",
-      "category": "efcore",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 154.33,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_owned_entity.cs"
-    },
-    {
-      "task": "efcore_value_conversion",
-      "category": "efcore",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 206.69,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\efcore_value_conversion.cs"
-    },
-    {
-      "task": "masstransit_request_response",
-      "category": "masstransit",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 180.12,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\masstransit_request_response.cs"
-    },
-    {
-      "task": "masstransit_saga_events",
-      "category": "masstransit",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 153.08,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\masstransit_saga_events.cs"
-    },
-    {
-      "task": "masstransit_consumer_filter",
-      "category": "masstransit",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 177.56,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\masstransit_consumer_filter.cs"
-    },
-    {
-      "task": "xunit_memberdata",
-      "category": "xunit",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 203.7,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\xunit_memberdata.cs"
-    },
-    {
-      "task": "xunit_class_fixture",
-      "category": "xunit",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 223.34,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\xunit_class_fixture.cs"
-    },
-    {
-      "task": "xunit_async_collection",
-      "category": "xunit",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 227.56,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\xunit_async_collection.cs"
-    },
-    {
-      "task": "blazor_form_validation",
-      "category": "blazor",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 7,
-      "tests_total": 7,
-      "generation_time_s": 155.28,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\blazor_form_validation.cs"
-    },
-    {
-      "task": "blazor_navigation_redirect",
-      "category": "blazor",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 127.89,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\blazor_navigation_redirect.cs"
-    },
-    {
-      "task": "blazor_parameter_lifecycle",
-      "category": "blazor",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 122.95,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\blazor_parameter_lifecycle.cs"
-    },
-    {
-      "task": "vertical_cqrs_handler",
-      "category": "vertical",
-      "weight": 2,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 249.19,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\vertical_cqrs_handler.cs"
-    },
-    {
-      "task": "vertical_efcore_service",
-      "category": "vertical",
-      "weight": 2,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 216.06,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\vertical_efcore_service.cs"
-    },
-    {
-      "task": "patterns_record_with",
-      "category": "patterns",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 117.66,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\patterns_record_with.cs"
-    },
-    {
-      "task": "patterns_json_serialization",
-      "category": "patterns",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 117.27,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\patterns_json_serialization.cs"
-    },
-    {
-      "task": "patterns_timeprovider",
-      "category": "patterns",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 131.64,
-      "generated_code_path": "results\\coding-generated\\qwen3.5_4b\\patterns_timeprovider.cs"
     }
   ],
-  "layer3_weighted_score": 0.09090909090909091
+  "layer3_weighted_score": 0.30434782608695654,
+  "layer2_run_started_at": "2026-04-16T20:57:02.327824+00:00",
+  "layer2_run_finished_at": "2026-04-16T23:26:02.722807+00:00",
+  "layer2_pass_rate": 0.2088607594936709,
+  "layer2_passed": 33,
+  "layer2_total": 158,
+  "layer2_results": [
+    {
+      "name": "HumanEval_0_has_close_elements",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_1_separate_paren_groups",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSeparateParenGroups((\"(()()) ((())) () ((())()())\")).Equals((new List<string>(new string[]{(string)\"(()())\", (string)\"((()))\", (string)\"()\", (string)\"((())()())\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_ilqjzv_5\\Program.cs:line 36"
+    },
+    {
+      "name": "HumanEval_2_truncate_number",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_3_below_zero",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_4_mean_absolute_deviation",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_5_intersperse",
+      "passed": false,
+      "error": "Unhandled exception. System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')\n   at System.Collections.Generic.List`1.RemoveAt(Int32 index)\n   at Problem.Intersperse(List`1 numbers, Int64 delimeter) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_gmz6zq82\\Program.cs:line 20\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_gmz6zq82\\Program.cs:line 24"
+    },
+    {
+      "name": "HumanEval_6_parse_nested_parens",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nParseNestedParens((\"(()()) ((())) () ((())()())\")).Equals((new List<long>(new long[]{(long)2L, (long)3L, (long)1L, (long)3L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_vsx_ifwr\\Program.cs:line 32"
+    },
+    {
+      "name": "HumanEval_7_filter_by_substring",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFilterBySubstring((new List<string>()), (\"john\")).Equals((new List<string>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_3ofa08mt\\Program.cs:line 24"
+    },
+    {
+      "name": "HumanEval_8_sum_product",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_9_rolling_max",
+      "passed": false,
+      "error": "Unhandled exception. System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')\n   at System.Collections.Generic.List`1.get_Item(Int32 index)\n   at Problem.RollingMax(List`1 numbers) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_2cnuubtp\\Program.cs:line 15\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_2cnuubtp\\Program.cs:line 26"
+    },
+    {
+      "name": "HumanEval_10_make_palindrome",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nMakePalindrome((\"x\")).Equals((\"x\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_1ii58noh\\Program.cs:line 37"
+    },
+    {
+      "name": "HumanEval_11_string_xor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_12_longest",
+      "passed": false,
+      "error": "Unhandled exception. System.NullReferenceException: Object reference not set to an instance of an object.\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_3i0_naez\\Program.cs:line 30"
+    },
+    {
+      "name": "HumanEval_13_greatest_common_divisor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_14_all_prefixes",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_15_string_sequence",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_16_count_distinct_characters",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_17_parse_music",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nParseMusic((\"\")).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_gfu7p3ou\\Program.cs:line 38"
+    },
+    {
+      "name": "HumanEval_18_how_many_times",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_19_sort_numbers",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSortNumbers((\"three five nine\")).Equals((\"three five nine\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_luloefum\\Program.cs:line 22"
+    },
+    {
+      "name": "HumanEval_20_find_closest_elements",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_21_rescale_to_unit",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nRescaleToUnit((new List<float>(new float[]{(float)2.0f, (float)49.9f}))).Equals((new List<float>(new float[]{(float)0.0f, (float)1.0f})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_o2cac2yu\\Program.cs:line 36"
+    },
+    {
+      "name": "HumanEval_22_filter_integers",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_23_strlen",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_24_largest_divisor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_25_factorize",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFactorize((2L)).Equals((new List<long>(new long[]{(long)2L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_k584xnxp\\Program.cs:line 34"
+    },
+    {
+      "name": "HumanEval_26_remove_duplicates",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nRemoveDuplicates((new List<long>())).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_aexzqees\\Program.cs:line 25"
+    },
+    {
+      "name": "HumanEval_27_flip_case",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_28_concatenate",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_29_filter_by_prefix",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFilterByPrefix((new List<string>()), (\"john\")).Equals((new List<string>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_euzvgbl2\\Program.cs:line 24"
+    },
+    {
+      "name": "HumanEval_30_get_positive",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_31_is_prime",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_33_sort_third",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_34_unique",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nUnique((new List<long>(new long[]{(long)5L, (long)3L, (long)5L, (long)2L, (long)3L, (long)3L, (long)9L, (long)0L, (long)123L}))).Equals((new List<long>(new long[]{(long)0L, (long)2L, (long)3L, (long)5L, (long)9L, (long)123L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_hjrjccqt\\Program.cs:line 20"
+    },
+    {
+      "name": "HumanEval_35_max_element",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_36_fizz_buzz",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_37_sort_even",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_39_prime_fib",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nPrimeFib((1L)) == (2L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_f9kn5s0o\\Program.cs:line 52"
+    },
+    {
+      "name": "HumanEval_40_triples_sum_to_zero",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_41_car_race_collision",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_42_incr_list",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_43_pairs_sum_to_zero",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_44_change_base",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_45_triangle_area",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nTriangleArea((5L), (3L)) == (7.5f)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_pe8psclt\\Program.cs:line 16"
+    },
+    {
+      "name": "HumanEval_46_fib4",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_47_median",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_48_is_palindrome",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_49_modp",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_51_remove_vowels",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_52_below_threshold",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_53_add",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_54_same_chars",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_55_fib",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_56_correct_bracketing",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCorrectBracketing((\"><<>\")) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_qy5j9fz8\\Program.cs:line 37"
+    },
+    {
+      "name": "HumanEval_57_monotonic",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_58_common",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCommon((new List<long>(new long[]{(long)1L, (long)4L, (long)3L, (long)34L, (long)653L, (long)2L, (long)5L})), (new List<long>(new long[]{(long)5L, (long)7L, (long)1L, (long)5L, (long)9L, (long)653L, (long)121L}))).Equals((new List<long>(new long[]{(long)1L, (long)5L, (long)653L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_airpv22_\\Program.cs:line 27"
+    },
+    {
+      "name": "HumanEval_59_largest_prime_factor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_60_sum_to_n",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_61_correct_bracketing",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCorrectBracketing((\")(()\")) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_k7k_rv8t\\Program.cs:line 37"
+    },
+    {
+      "name": "HumanEval_62_derivative",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_63_fibfib",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_64_vowels_count",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_65_circular_shift",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_66_digitSum",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_67_fruit_distribution",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_68_pluck",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_69_search",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_70_strange_sort_list",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_71_triangle_area",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_72_will_it_fly",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nWillItFly((new List<long>(new long[]{(long)1L, (long)2L})), (5L)) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_yyn1pdv9\\Program.cs:line 30"
+    },
+    {
+      "name": "HumanEval_73_smallest_change",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_74_total_match",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nTotalMatch((new List<string>()), (new List<string>())).Equals((new List<string>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_paul1qn_\\Program.cs:line 39"
+    },
+    {
+      "name": "HumanEval_75_is_multiply_prime",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIsMultiplyPrime((30L)) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_0lj7678c\\Program.cs:line 23"
+    },
+    {
+      "name": "HumanEval_76_is_simple_power",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_77_iscube",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIscube((-1L)) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_di9kzber\\Program.cs:line 33"
+    },
+    {
+      "name": "HumanEval_78_hex_key",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_79_decimal_to_binary",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nDecimalToBinary((0L)).Equals((\"db0db\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_7f3nb8ls\\Program.cs:line 31"
+    },
+    {
+      "name": "HumanEval_80_is_happy",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_81_numerical_letter_grade",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nNumericalLetterGrade((new List<float>(new float[]{(float)4.0f, (float)3L, (float)1.7f, (float)2L, (float)3.5f}))).Equals((new List<string>(new string[]{(string)\"A+\", (string)\"B\", (string)\"C-\", (string)\"C\", (string)\"A-\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_gct9xm8e\\Program.cs:line 65"
+    },
+    {
+      "name": "HumanEval_82_prime_length",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_83_starts_one_ends",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_84_solve",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSolve((1000L)).Equals((\"1\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_alz4ddjl\\Program.cs:line 33"
+    },
+    {
+      "name": "HumanEval_85_add",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nAdd((new List<long>(new long[]{(long)4L, (long)5L, (long)6L, (long)7L, (long)2L, (long)122L}))) == (122L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_u7k4p993\\Program.cs:line 22"
+    },
+    {
+      "name": "HumanEval_86_anti_shuffle",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_87_get_row",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nGetRow((new List<List<long>>(new List<long>[]{(List<long>)new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L, (long)5L, (long)6L}), (List<long>)new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L, (long)1L, (long)6L}), (List<long>)new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L, (long)5L, (long)1L})})), (1L)).Equals((new List<Tuple<long, long>>(new Tuple<long, long>[]{(Tuple<long, long>)Tuple.Create(0L, 0L), (Tuple<long, long>)Tuple.Create(1L, 4L), (Tuple<long, long>)Tuple.Create(1L, 0L), (Tuple<long, long>)Tuple.Create(2L, 5L), (Tuple<long, long>)Tuple.Create(2L, 0L)})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_4p7s5_di\\Program.cs:line 36"
+    },
+    {
+      "name": "HumanEval_88_sort_array",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSortArray((new List<long>())).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_ognjp_61\\Program.cs:line 43"
+    },
+    {
+      "name": "HumanEval_89_encrypt",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nEncrypt((\"hi\")).Equals((\"lm\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_6ah4asih\\Program.cs:line 34"
+    },
+    {
+      "name": "HumanEval_90_next_smallest",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nNextSmallest((new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L, (long)5L}))).Equals(2L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_u6iwzjiu\\Program.cs:line 37"
+    },
+    {
+      "name": "HumanEval_91_is_bored",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIsBored((\"Is the sky blue?\")) == (0L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench__kb1aa8l\\Program.cs:line 29"
+    },
+    {
+      "name": "HumanEval_92_any_int",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nAnyInt((3.0f), (float)4L, (float)7L) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_yglo3eh8\\Program.cs:line 44"
+    },
+    {
+      "name": "HumanEval_93_encode",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nEncode((\"TEST\")).Equals((\"tgst\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_9bk0m7cz\\Program.cs:line 36"
+    },
+    {
+      "name": "HumanEval_94_skjkasdkd",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_95_check_dict_case",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCheckDictCase((new Dictionary<string,string>(){{\"p\", \"pineapple\"}, {\"5\", \"banana\"}, {\"a\", \"apple\"}})) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_fvggebez\\Program.cs:line 41"
+    },
+    {
+      "name": "HumanEval_96_count_up_to",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_97_multiply",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_98_count_upper",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCountUpper((\"dBBE\")) == (0L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_7k2dynj0\\Program.cs:line 29"
+    },
+    {
+      "name": "HumanEval_99_closest_integer",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nClosestInteger((\"-15.5\")) == (-16L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_38mzbjww\\Program.cs:line 44"
+    },
+    {
+      "name": "HumanEval_100_make_a_pile",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nMakeAPile((3L)).Equals((new List<long>(new long[]{(long)3L, (long)5L, (long)7L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_zo_rlzzs\\Program.cs:line 38"
+    },
+    {
+      "name": "HumanEval_101_words_string",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nWordsString((\"Hi, my name is John\")).Equals((new List<string>(new string[]{(string)\"Hi\", (string)\"my\", (string)\"name\", (string)\"is\", (string)\"John\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_6lt86326\\Program.cs:line 25"
+    },
+    {
+      "name": "HumanEval_102_choose_num",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nChooseNum((12L), (15L)) == (14L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_slguzy6x\\Program.cs:line 30"
+    },
+    {
+      "name": "HumanEval_104_unique_digits",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_105_by_length",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nByLength((new List<long>(new long[]{(long)2L, (long)1L, (long)1L, (long)4L, (long)5L, (long)8L, (long)2L, (long)3L}))).Equals((new List<string>(new string[]{(string)\"Eight\", (string)\"Five\", (string)\"Four\", (string)\"Three\", (string)\"Two\", (string)\"Two\", (string)\"One\", (string)\"One\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_1hk3wg3r\\Program.cs:line 31"
+    },
+    {
+      "name": "HumanEval_106_f",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nF((5L)).Equals((new List<long>(new long[]{(long)1L, (long)2L, (long)6L, (long)24L, (long)15L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_003ht3pn\\Program.cs:line 33"
+    },
+    {
+      "name": "HumanEval_107_even_odd_palindrome",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_108_count_nums",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCountNums((new List<long>(new long[]{(long)12L, (long)23L, (long)34L, (long)-45L, (long)-56L, (long)0L}))) == (5L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_or9tfge4\\Program.cs:line 43"
+    },
+    {
+      "name": "HumanEval_109_move_one_ball",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_110_exchange",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nExchange((new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L})), (new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L}))).Equals((\"YES\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_4t3enxv1\\Program.cs:line 28"
+    },
+    {
+      "name": "HumanEval_111_histogram",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nHistogram((\"a b b a\")).Equals((new Dictionary<string,long>(){{\"a\", 2L}, {\"b\", 2L}}))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_zxrkorou\\Program.cs:line 53"
+    },
+    {
+      "name": "HumanEval_112_reverse_delete",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_113_odd_count",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nOddCount((new List<string>(new string[]{(string)\"1234567\"}))).Equals((new List<string>(new string[]{(string)\"the number of odd elements 4n the str4ng 4 of the 4nput.\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_z9e5yx2s\\Program.cs:line 31"
+    },
+    {
+      "name": "HumanEval_114_minSubArraySum",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nMinsubarraysum((new List<long>(new long[]{(long)2L, (long)3L, (long)4L, (long)1L, (long)2L, (long)4L}))) == (1L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_jr_hprqx\\Program.cs:line 26"
+    },
+    {
+      "name": "HumanEval_115_max_fill",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nMaxFill((new List<List<long>>(new List<long>[]{(List<long>)new List<long>(new long[]{(long)0L, (long)0L, (long)1L, (long)1L}), (List<long>)new List<long>(new long[]{(long)0L, (long)0L, (long)0L, (long)0L}), (List<long>)new List<long>(new long[]{(long)1L, (long)1L, (long)1L, (long)1L}), (List<long>)new List<long>(new long[]{(long)0L, (long)1L, (long)1L, (long)1L})})), (2L)) == (5L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_6wseyhxm\\Program.cs:line 39"
+    },
+    {
+      "name": "HumanEval_116_sort_array",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSortArray((new List<long>(new long[]{(long)1L, (long)5L, (long)2L, (long)3L, (long)4L}))).Equals((new List<long>(new long[]{(long)1L, (long)2L, (long)4L, (long)3L, (long)5L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench__axj5_x0\\Program.cs:line 24"
+    },
+    {
+      "name": "HumanEval_117_select_words",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSelectWords((\"Mary had a little lamb\"), (4L)).Equals((new List<string>(new string[]{(string)\"little\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_i5_ge242\\Program.cs:line 36"
+    },
+    {
+      "name": "HumanEval_118_get_closest_vowel",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nGetClosestVowel((\"yogurt\")).Equals((\"u\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_juykh509\\Program.cs:line 39"
+    },
+    {
+      "name": "HumanEval_119_match_parens",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nMatchParens((new List<string>(new string[]{(string)\"()(\", (string)\")\"}))).Equals((\"Yes\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_hjydnpwh\\Program.cs:line 67"
+    },
+    {
+      "name": "HumanEval_120_maximum",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_121_solution",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_122_add_elements",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_123_get_odd_collatz",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nGetOddCollatz((14L)).Equals((new List<long>(new long[]{(long)1L, (long)5L, (long)7L, (long)11L, (long)13L, (long)17L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_iplaqbu6\\Program.cs:line 40"
+    },
+    {
+      "name": "HumanEval_124_valid_date",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_126_is_sorted",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIsSorted((new List<long>(new long[]{(long)1L, (long)2L, (long)2L, (long)2L, (long)3L, (long)4L}))) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_16pawet1\\Program.cs:line 53"
+    },
+    {
+      "name": "HumanEval_127_intersection",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIntersection((Tuple.Create(-3L, -1L)), (Tuple.Create(-5L, 5L))).Equals((\"YES\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_d8vmcpuy\\Program.cs:line 51"
+    },
+    {
+      "name": "HumanEval_128_prod_signs",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_129_minPath",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_130_tri",
+      "passed": false,
+      "error": "Unhandled exception. System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')\n   at System.Collections.Generic.List`1.get_Item(Int32 index)\n   at Problem.Tri(Int64 n) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_dqz_qq1k\\Program.cs:line 35\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_dqz_qq1k\\Program.cs:line 42"
+    },
+    {
+      "name": "HumanEval_131_digits",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nDigits((5L)) == (5L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_r4q17qly\\Program.cs:line 33"
+    },
+    {
+      "name": "HumanEval_132_is_nested",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIsNested((\"[[]]\")) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_7h0vnfqi\\Program.cs:line 29"
+    },
+    {
+      "name": "HumanEval_133_sum_squares",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_134_check_if_last_char_is_a_letter",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCheckIfLastCharIsALetter((\"apple\")) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_8_udyc03\\Program.cs:line 42"
+    },
+    {
+      "name": "HumanEval_135_can_arrange",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_136_largest_smallest_integers",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nLargestSmallestIntegers((new List<long>(new long[]{(long)2L, (long)4L, (long)1L, (long)3L, (long)5L, (long)7L}))).Equals(Tuple.Create((Nullable<long>)null, 1L))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_0wxcvdmg\\Program.cs:line 38"
+    },
+    {
+      "name": "HumanEval_138_is_equal_to_sum_even",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIsEqualToSumEven((10L)) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_qw_la0vx\\Program.cs:line 37"
+    },
+    {
+      "name": "HumanEval_139_special_factorial",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_140_fix_spaces",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFixSpaces((\"Mudasir Hanif \")).Equals((\"Mudasir_Hanif_\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench__epzw0_m\\Program.cs:line 40"
+    },
+    {
+      "name": "HumanEval_141_file_name_check",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_142_sum_squares",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_143_words_in_sentence",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_144_simplify",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_145_order_by_points",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nOrderByPoints((new List<long>(new long[]{(long)1L, (long)11L, (long)-1L, (long)-11L, (long)-12L}))).Equals((new List<long>(new long[]{(long)-1L, (long)-11L, (long)1L, (long)-12L, (long)11L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_u6qncu1k\\Program.cs:line 23"
+    },
+    {
+      "name": "HumanEval_146_specialFilter",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_147_get_max_triples",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_148_bf",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nBf((\"Jupiter\"), (\"Neptune\")).Equals((new List<string>(new string[]{(string)\"Saturn\", (string)\"Uranus\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_o5exvrwk\\Program.cs:line 51"
+    },
+    {
+      "name": "HumanEval_149_sorted_list_sum",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_150_x_or_y",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nXOrY((7L), (34L), (12L)) == (34L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_bfckct4a\\Program.cs:line 21"
+    },
+    {
+      "name": "HumanEval_151_double_the_difference",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_152_compare",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCompare((new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L, (long)5L, (long)1L})), (new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L, (long)2L, (long)-2L}))).Equals((new List<long>(new long[]{(long)0L, (long)0L, (long)0L, (long)0L, (long)3L, (long)3L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_qwf3_y6t\\Program.cs:line 29"
+    },
+    {
+      "name": "HumanEval_153_Strongest_Extension",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nStrongestExtension((\"Watashi\"), (new List<string>(new string[]{(string)\"tEN\", (string)\"niNE\", (string)\"eIGHt8OKe\"}))).Equals((\"Watashi.eIGHt8OKe\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_z5yyk0tt\\Program.cs:line 47"
+    },
+    {
+      "name": "HumanEval_154_cycpattern_check",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_155_even_odd_count",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nEvenOddCount((0L)).Equals((Tuple.Create(1L, 0L)))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_75ivndj8\\Program.cs:line 37"
+    },
+    {
+      "name": "HumanEval_156_int_to_mini_roman",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_157_right_angle_triangle",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_158_find_max",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_159_eat",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nEat((5L), (6L), (10L)).Equals((new List<long>(new long[]{(long)11L, (long)4L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_tlwu0zh4\\Program.cs:line 44"
+    },
+    {
+      "name": "HumanEval_160_do_algebra",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nDoAlgebra((new List<string>(new string[]{(string)\"**\", (string)\"*\", (string)\"+\"})), (new List<long>(new long[]{(long)2L, (long)3L, (long)4L, (long)5L}))) == (37L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_ks_80_8e\\Program.cs:line 52"
+    },
+    {
+      "name": "HumanEval_161_solve",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSolve((\"1234\")).Equals((\"4321\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_fj5n0ccb\\Program.cs:line 42"
+    },
+    {
+      "name": "HumanEval_162_string_to_md5",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_163_generate_integers",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nGenerateIntegers((2L), (10L)).Equals((new List<long>(new long[]{(long)2L, (long)4L, (long)6L, (long)8L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_bench_yyiiyd96\\Program.cs:line 43"
+    }
+  ]
 }

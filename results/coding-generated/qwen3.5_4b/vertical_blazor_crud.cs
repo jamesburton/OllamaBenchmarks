@@ -1,35 +1,51 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
+using NSubstitute;
+using Bunit;
+using Xunit;
+using AwesomeAssertions;
+
+// 1. TodoItem record
 public record TodoItem(int Id, string Title, bool IsCompleted);
 
+// 2. ITodoService interface
 public interface ITodoService
-    {
-        Task<List<TodoItem>> GetAllAsync();
-        Task<TodoItem> AddAsync(string title);
-        Task DeleteAsync(int id);
-        Task ToggleAsync(int id);
-    }
+{
+    Task<List<TodoItem>> GetAllAsync();
+    Task<TodoItem> AddAsync(string title);
+    Task DeleteAsync(int id);
+    Task ToggleAsync(int id);
+}
 
+// 3. TodoService implementation
 public class TodoService : ITodoService
+{
+    private readonly List<TodoItem> _todos;
+    private int _nextId;
+
+    public TodoService()
     {
-        private readonly List<TodoItem> _todos;
-        private int _nextId = 1;
-
-        public TodoService()
-        {
-            _todos = new List<TodoItem>();
-        }
-
-        public Task<List<TodoItem>> GetAllAsync() => Task.FromResult(_todos.ToList());
-        public Task<TodoItem> AddAsync(string title)
-        {
-            var item = new TodoItem(_nextId++, title, false);
-            _todos.Add(item);
-            return Task.FromResult(item);
-        }
-        public Task DeleteAsync(int id) => Task.CompletedTask; // Wait, need to remove.
-        // Actually, I should implement the logic properly.
+        _todos = new List<TodoItem>();
+        _nextId = 1;
     }
 
-public Task DeleteAsync(int id)
+    public Task<List<TodoItem>> GetAllAsync()
+    {
+        return Task.FromResult(_todos.ToList());
+    }
+
+    public Task<TodoItem> AddAsync(string title)
+    {
+        var newItem = new TodoItem(_nextId, title, false);
+        _nextId++;
+        _todos.Add(newItem);
+        return Task.FromResult(newItem);
+    }
+
+    public Task DeleteAsync(int id)
     {
         var item = _todos.FirstOrDefault(t => t.Id == id);
         if (item != null)
@@ -39,7 +55,7 @@ public Task DeleteAsync(int id)
         return Task.CompletedTask;
     }
 
-public Task ToggleAsync(int id)
+    public Task ToggleAsync(int id)
     {
         var item = _todos.FirstOrDefault(t => t.Id == id);
         if (item != null)
@@ -48,76 +64,118 @@ public Task ToggleAsync(int id)
         }
         return Task.CompletedTask;
     }
+}
 
+// 4. TodoListBase Component
 public class TodoListBase : ComponentBase
-    {
-        [Inject] public ITodoService TodoService { get; set; }
-        public List<TodoItem> Todos { get; set; } = new();
-        public string NewTitle { get; set; } = "";
+{
+    [Inject] public ITodoService TodoService { get; set; } = null!;
+    public List<TodoItem> Todos { get; set; } = new();
+    public string NewTitle { get; set; } = "";
 
-        protected override async Task OnInitializedAsync()
-        {
-            await TodoService.GetAllAsync();
-        }
-        // Wait, the prompt says "OnInitializedAsync that loads todos".
-        // But `TodoService` methods return `Task`. So I need to call them.
-        // The prompt says: "protected override async Task OnInitializedAsync() that loads todos"
-        // It doesn't specify *which* method. Usually `GetAllAsync`.
-        // Wait, the prompt says "OnInitializedAsync that loads todos".
-        // But `TodoService` has `GetAllAsync`.
-        // I will call `await TodoService.GetAllAsync();` inside `OnInitializedAsync`.
+    protected override async Task OnInitializedAsync()
+    {
+        Todos = await TodoService.GetAllAsync();
     }
 
+    public async Task AddTodo()
+    {
+        if (string.IsNullOrWhiteSpace(NewTitle)) return;
+        var newItem = await TodoService.AddAsync(NewTitle);
+        NewTitle = "";
+        Todos = await TodoService.GetAllAsync();
+    }
+
+    public async Task DeleteTodo(int id)
+    {
+        await TodoService.DeleteAsync(id);
+        Todos = await TodoService.GetAllAsync();
+    }
+
+    public async Task ToggleTodo(int id)
+    {
+        await TodoService.ToggleAsync(id);
+        Todos = await TodoService.GetAllAsync();
+    }
+}
+
+// 5. xUnit v3 tests for TodoService
 public class TodoServiceTests
-    {
-        [Fact]
-        public void AddAsyncCreatesItemWithCorrectTitle()
-        {
-            var service = new TodoService();
-            var result = service.AddAsync("Test Title").Result; // Wait, xUnit v3 doesn't use .Result usually for async tests unless blocking. Better to use `await`.
-            // But xUnit v3 tests are synchronous methods that run async code? No, they can be async.
-            // I should use `Task` and `Assert`.
-            // Actually, xUnit v3 supports async tests.
-        }
-    }
-
-[Fact]
-    public async Task AddAsyncCreatesItemWithCorrectTitle()
+{
+    [Fact]
+    public void AddAsyncCreatesItemWithCorrectTitle()
     {
         var service = new TodoService();
-        var item = await service.AddAsync("Test Title");
-        Assert.Equal("Test Title", item.Title);
-        Assert.Equal(1, item.Id);
+        var result = service.AddAsync("Test Task").Result;
+        result.Should().BeEquivalentTo(new TodoItem(1, "Test Task", false));
     }
 
-Assert.Equal("Test Title", item.Title).Should(); // No, Assert.Equal returns void.
-    // Correct usage:
-    var item = await service.AddAsync("Test Title");
-    item.Should().HaveProperty("Title").And.Be("Test Title"); // Wait, record doesn't have properties like that easily without GetField.
-    // Better:
-    item.Title.Should().Be("Test Title");
-
-public class TodoListBaseTests
+    [Fact]
+    public void DeleteAsyncRemovesItem()
     {
-        [Fact]
-        public async Task RenderComponentCallsGetAllAsyncOnInit()
-        {
-            var mockService = Substitute.For<ITodoService>();
-            mockService.GetAllAsync().Returns(Task.FromResult(new List<TodoItem>()));
+        var service = new TodoService();
+        service.AddAsync("Item 1").Result.Should().BeEquivalentTo(new TodoItem(1, "Item 1", false));
+        service.AddAsync("Item 2").Result.Should().BeEquivalentTo(new TodoItem(2, "Item 2", false));
 
-            var ctx = new Bunit.TestContext(); // Fully qualified as per instruction? "use `Bunit.TestContext` (fully qualified) to avoid ambiguity".
-            // Wait, the prompt says "In bUnit tests, use `Bunit.TestContext` (fully qualified)".
-            // So I should write `Bunit.TestContext`.
-            var cut = ctx.RenderComponent<TodoListBase>(p => p.Add(p => p.NewTitle, "Test"));
-            // Wait, I need to verify it calls GetAllAsync.
-            // bUnit doesn't easily allow verifying method calls on mocks unless using `Verify` or checking the mock state.
-            // NSubstitute has `Received`.
-            // But bUnit renders the component.
-            // To verify service call:
-            // I can check if `mockService.GetAllAsync()` was called.
-            // Wait, `TodoListBase` calls `OnInitializedAsync`.
-            // In bUnit, I need to render and then maybe wait or check state.
-            // Actually, the prompt says "verify it calls GetAllAsync on init".
-            // I can use `mockService.Received(1).GetAllAsync()`.
-        }
+        service.DeleteAsync(1).Wait();
+        service.GetAllAsync().Result.Should().ContainOnly(new TodoItem(2, "Item 2", false));
     }
+
+    [Fact]
+    public void ToggleAsyncFlipsIsCompleted()
+    {
+        var service = new TodoService();
+        service.AddAsync("Task").Result.Should().BeEquivalentTo(new TodoItem(1, "Task", false));
+
+        service.ToggleAsync(1).Wait();
+        service.GetAllAsync().Result.Should().Contain(t => t.IsCompleted == true);
+    }
+
+    [Theory, MemberData(nameof(ToggleTestData))]
+    public void ToggleAsyncFlipsSpecificId(int id, bool expectedState)
+    {
+        var service = new TodoService();
+        service.AddAsync("Task").Result.Should().BeEquivalentTo(new TodoItem(1, "Task", false));
+        service.AddAsync("Task").Result.Should().BeEquivalentTo(new TodoItem(2, "Task", false));
+
+        service.ToggleAsync(id).Wait();
+        var item = service.GetAllAsync().Result.FirstOrDefault(t => t.Id == id);
+        item.Should().NotBeNull();
+        item!.IsCompleted.Should().Be(expectedState);
+    }
+
+    public static MatrixTheoryData<int, bool> ToggleTestData =>
+        new([1, 2], [false, true]);
+
+    [Fact]
+    public void GetAllAsyncReturnsCopy()
+    {
+        var service = new TodoService();
+        service.AddAsync("A").Result.Should().BeEquivalentTo(new TodoItem(1, "A", false));
+        service.AddAsync("B").Result.Should().BeEquivalentTo(new TodoItem(2, "B", false));
+
+        var list1 = service.GetAllAsync().Result;
+        list1.Add(new TodoItem(999, "C", false));
+
+        var list2 = service.GetAllAsync().Result;
+        list2.Should().NotContain(new TodoItem(999, "C", false));
+    }
+}
+
+// 6. bUnit test for TodoListBase
+public class TodoListBaseTests
+{
+    [Fact]
+    public async Task OnInitializedAsyncCallsGetAllAsync()
+    {
+        var mockService = Substitute.For<ITodoService>();
+        mockService.GetAllAsync().Returns(Task.FromResult(new List<TodoItem> { new TodoItem(1, "Init", false) }));
+
+        var cut = Bunit.TestContext.RenderComponent<TodoListBase>(p =>
+            p.Add(p => p.TodoService, mockService));
+
+        await Task.Delay(10); // Allow async initialization to complete
+
+        mockService.Received(1).GetAllAsync();
+    }
+}

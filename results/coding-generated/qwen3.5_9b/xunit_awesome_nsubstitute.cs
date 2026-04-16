@@ -26,83 +26,54 @@ public class NotificationService(IUserRepository repo, IEmailService email)
     }
 }
 
-public class NotificationServiceTests
+[Fact]
+public async Task NotifyUserAsync_HappyPath()
 {
-    private readonly IUserRepository _repo;
-    private readonly IEmailService _email;
-    private readonly NotificationService _sut;
+    var mockRepo = Substitute.For<IUserRepository>();
+    var mockEmail = Substitute.For<IEmailService>();
 
-    public NotificationServiceTests()
+    var user = new User { Id = 1, Name = "Alice", Email = "alice@example.com" };
+    mockRepo.GetByIdAsync(1).Returns(Task.FromResult(user));
+    mockEmail.SendWelcomeAsync("alice@example.com").Returns(Task.CompletedTask);
+
+    var sut = new NotificationService(mockRepo, mockEmail);
+
+    await sut.NotifyUserAsync(1);
+
+    mockRepo.Received(1).GetByIdAsync(1);
+    mockEmail.Received(1).SendWelcomeAsync("alice@example.com");
+}
+
+[Fact]
+public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
+{
+    var mockRepo = Substitute.For<IUserRepository>();
+    var mockEmail = Substitute.For<IEmailService>();
+
+    mockRepo.GetByIdAsync(99).Returns(Task.FromResult<User?>(null));
+
+    var sut = new NotificationService(mockRepo, mockEmail);
+
+    await act.Should().ThrowAsync<InvalidOperationException>();
+}
+
+[Fact]
+public async Task NotifyUserAsync_VerifyCalls()
+{
+    var mockRepo = Substitute.For<IUserRepository>();
+    var mockEmail = Substitute.For<IEmailService>();
+
+    var user = new User { Id = 1, Name = "Bob", Email = "bob@example.com" };
+    mockRepo.GetByIdAsync(1).Returns(Task.FromResult(user));
+    mockEmail.SendWelcomeAsync("bob@example.com").Returns(Task.CompletedTask);
+
+    var sut = new NotificationService(mockRepo, mockEmail);
+
+    await sut.NotifyUserAsync(1);
+
+    Received.InOrder(() =>
     {
-        _repo = Substitute.For<IUserRepository>();
-        _email = Substitute.For<IEmailService>();
-        _sut = new NotificationService(_repo, _email);
-    }
-
-    [Fact]
-    public async Task NotifyUserAsync_HappyPath()
-    {
-        var user = new User { Id = 1, Name = "John", Email = "john@example.com" };
-        _repo.GetByIdAsync(1).Returns(Task.FromResult(user));
-        _email.SendWelcomeAsync("john@example.com").Returns(Task.CompletedTask);
-
-        await _sut.NotifyUserAsync(1);
-
-        _repo.Received().GetByIdAsync(1);
-        _email.Received().SendWelcomeAsync("john@example.com");
-    }
-
-    [Fact]
-    public async Task NotifyUserAsync_UserNotFound_Throws()
-    {
-        _repo.GetByIdAsync(999).Returns(Task.FromResult<User?>(null));
-
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.NotifyUserAsync(999));
-    }
-
-    [Fact]
-    public async Task NotifyUserAsync_VerifyEmailSentWithCorrectAddress()
-    {
-        var user = new User { Id = 1, Name = "Jane", Email = "jane@example.com" };
-        _repo.GetByIdAsync(1).Returns(Task.FromResult(user));
-
-        await _sut.NotifyUserAsync(1);
-
-        _email.Received().SendWelcomeAsync("jane@example.com");
-    }
-
-    [Fact]
-    public async Task NotifyUserAsync_VerifyRepositoryCalledOnce()
-    {
-        var user = new User { Id = 1, Name = "Bob", Email = "bob@example.com" };
-        _repo.GetByIdAsync(1).Returns(Task.FromResult(user));
-        _email.SendWelcomeAsync("bob@example.com").Returns(Task.CompletedTask);
-
-        await _sut.NotifyUserAsync(1);
-
-        _repo.Received(1).GetByIdAsync(1);
-    }
-
-    [Fact]
-    public async Task NotifyUserAsync_VerifyEmailCalledOnce()
-    {
-        var user = new User { Id = 2, Name = "Alice", Email = "alice@example.com" };
-        _repo.GetByIdAsync(2).Returns(Task.FromResult(user));
-        _email.SendWelcomeAsync("alice@example.com").Returns(Task.CompletedTask);
-
-        await _sut.NotifyUserAsync(2);
-
-        _email.Received(1).SendWelcomeAsync("alice@example.com");
-    }
-
-    [Fact]
-    public async Task NotifyUserAsync_RepositoryCalledWithCorrectUserId()
-    {
-        var user = new User { Id = 42, Name = "Charlie", Email = "charlie@example.com" };
-        _repo.GetByIdAsync(42).Returns(Task.FromResult(user));
-
-        await _sut.NotifyUserAsync(42);
-
-        _repo.Received().GetByIdAsync(42);
-    }
+        mockRepo.Received(1).GetByIdAsync(1);
+        mockEmail.Received(1).SendWelcomeAsync("bob@example.com");
+    });
 }

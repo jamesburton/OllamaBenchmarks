@@ -1,609 +1,1046 @@
 {
   "model": "qwen3:8b",
   "benchmark": "coding",
-  "run_started_at": "2026-04-09T20:28:40.348949+00:00",
-  "run_finished_at": "2026-04-09T22:48:37.880425+00:00",
+  "run_started_at": "2026-04-16T23:25:36.548658+00:00",
+  "run_finished_at": "2026-04-16T23:25:36.955508+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
       "category": "aspnet",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 161.34,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\aspnet_oneof_controller.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "aspnet_validation_endpoint",
       "category": "aspnet",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 163.89,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\aspnet_validation_endpoint.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "aspnet_service_di",
       "category": "aspnet",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 132.16,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\aspnet_service_di.cs"
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "efcore_leftjoin",
       "category": "efcore",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 1,
-      "tests_total": 1,
-      "generation_time_s": 173.44,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\efcore_leftjoin.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "efcore_json_columns",
       "category": "efcore",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 127.47,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\efcore_json_columns.cs"
+      "generation_time_s": 0.03,
+      "generated_code_path": null
     },
     {
       "task": "efcore_executeupdate",
       "category": "efcore",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 211.64,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\efcore_executeupdate.cs"
+      "generation_time_s": 0.03,
+      "generated_code_path": null
     },
     {
       "task": "masstransit_consumer",
       "category": "masstransit",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 1,
-      "tests_total": 1,
-      "generation_time_s": 148.19,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\masstransit_consumer.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.03,
+      "generated_code_path": null
     },
     {
       "task": "masstransit_statemachine",
       "category": "masstransit",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 154.23,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\masstransit_statemachine.cs"
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "masstransit_test_harness",
       "category": "masstransit",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 234.0,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\masstransit_test_harness.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "blazor_interactive_component",
       "category": "blazor",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 157.25,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\blazor_interactive_component.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "blazor_streaming_render",
       "category": "blazor",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 123.31,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\blazor_streaming_render.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "blazor_cascading_auth",
       "category": "blazor",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 239.42,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\blazor_cascading_auth.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.03,
+      "generated_code_path": null
     },
     {
       "task": "xunit_v3_theory_tests",
       "category": "xunit",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 327.34,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\xunit_v3_theory_tests.cs"
+      "generation_time_s": 0.03,
+      "generated_code_path": null
     },
     {
       "task": "xunit_awesome_nsubstitute",
       "category": "xunit",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 235.72,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\xunit_awesome_nsubstitute.cs"
+      "generation_time_s": 0.03,
+      "generated_code_path": null
     },
     {
       "task": "xunit_assembly_fixture",
       "category": "xunit",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 220.44,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\xunit_assembly_fixture.cs"
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "linq_complex_query",
       "category": "linq",
       "weight": 1,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 231.77,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\linq_complex_query.cs"
+      "generation_time_s": 0.02,
+      "generated_code_path": null
     },
     {
       "task": "async_cancellation",
-      "category": "async",
+      "category": "linq",
       "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 251.94,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\async_cancellation.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.03,
+      "generated_code_path": null
     },
     {
       "task": "vertical_order_service",
       "category": "vertical",
       "weight": 2,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 6,
-      "tests_total": 6,
-      "generation_time_s": 145.69,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\vertical_order_service.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.03,
+      "generated_code_path": null
     },
     {
       "task": "vertical_consumer_pipeline",
       "category": "vertical",
       "weight": 2,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 4,
-      "tests_total": 4,
-      "generation_time_s": 161.53,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\vertical_consumer_pipeline.cs"
+      "passed": false,
+      "harness_error": "Empty code after extraction",
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     },
     {
       "task": "vertical_blazor_crud",
       "category": "vertical",
       "weight": 2,
       "passed": false,
-      "harness_error": null,
+      "harness_error": "Empty code after extraction",
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 148.94,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\vertical_blazor_crud.cs"
-    },
-    {
-      "task": "linq_selectmany_flatten",
-      "category": "linq",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 126.94,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\linq_selectmany_flatten.cs"
-    },
-    {
-      "task": "linq_set_operations",
-      "category": "linq",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 117.12,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\linq_set_operations.cs"
-    },
-    {
-      "task": "linq_aggregate_stats",
-      "category": "linq",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 204.03,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\linq_aggregate_stats.cs"
-    },
-    {
-      "task": "linq_todictionary_tolookup",
-      "category": "linq",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 137.61,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\linq_todictionary_tolookup.cs"
-    },
-    {
-      "task": "async_whenall_parallel",
-      "category": "async",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 144.38,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\async_whenall_parallel.cs"
-    },
-    {
-      "task": "async_semaphore_throttle",
-      "category": "async",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 172.5,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\async_semaphore_throttle.cs"
-    },
-    {
-      "task": "async_channel_pipeline",
-      "category": "async",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 154.94,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\async_channel_pipeline.cs"
-    },
-    {
-      "task": "async_valuetask_cache",
-      "category": "async",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 149.08,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\async_valuetask_cache.cs"
-    },
-    {
-      "task": "aspnet_minimal_api_endpoint",
-      "category": "aspnet",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 1,
-      "tests_total": 3,
-      "generation_time_s": 95.11,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\aspnet_minimal_api_endpoint.cs"
-    },
-    {
-      "task": "aspnet_typed_httpclient",
-      "category": "aspnet",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 122.92,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\aspnet_typed_httpclient.cs"
-    },
-    {
-      "task": "aspnet_ioptions_config",
-      "category": "aspnet",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 158.89,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\aspnet_ioptions_config.cs"
-    },
-    {
-      "task": "aspnet_problemdetails_handler",
-      "category": "aspnet",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 5,
-      "generation_time_s": 178.09,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\aspnet_problemdetails_handler.cs"
-    },
-    {
-      "task": "efcore_include_navigation",
-      "category": "efcore",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 184.92,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\efcore_include_navigation.cs"
-    },
-    {
-      "task": "efcore_softdelete_filter",
-      "category": "efcore",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 159.38,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\efcore_softdelete_filter.cs"
-    },
-    {
-      "task": "efcore_owned_entity",
-      "category": "efcore",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 144.0,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\efcore_owned_entity.cs"
-    },
-    {
-      "task": "efcore_value_conversion",
-      "category": "efcore",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 159.38,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\efcore_value_conversion.cs"
-    },
-    {
-      "task": "masstransit_request_response",
-      "category": "masstransit",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 216.38,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\masstransit_request_response.cs"
-    },
-    {
-      "task": "masstransit_saga_events",
-      "category": "masstransit",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 2,
-      "tests_total": 2,
-      "generation_time_s": 219.05,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\masstransit_saga_events.cs"
-    },
-    {
-      "task": "masstransit_consumer_filter",
-      "category": "masstransit",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 200.58,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\masstransit_consumer_filter.cs"
-    },
-    {
-      "task": "xunit_memberdata",
-      "category": "xunit",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 25,
-      "tests_total": 25,
-      "generation_time_s": 118.61,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\xunit_memberdata.cs"
-    },
-    {
-      "task": "xunit_class_fixture",
-      "category": "xunit",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 5,
-      "tests_total": 9,
-      "generation_time_s": 118.2,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\xunit_class_fixture.cs"
-    },
-    {
-      "task": "xunit_async_collection",
-      "category": "xunit",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 8,
-      "tests_total": 8,
-      "generation_time_s": 153.24,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\xunit_async_collection.cs"
-    },
-    {
-      "task": "blazor_form_validation",
-      "category": "blazor",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 7,
-      "tests_total": 7,
-      "generation_time_s": 209.98,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\blazor_form_validation.cs"
-    },
-    {
-      "task": "blazor_navigation_redirect",
-      "category": "blazor",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 205.08,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\blazor_navigation_redirect.cs"
-    },
-    {
-      "task": "blazor_parameter_lifecycle",
-      "category": "blazor",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 3,
-      "generation_time_s": 109.98,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\blazor_parameter_lifecycle.cs"
-    },
-    {
-      "task": "vertical_cqrs_handler",
-      "category": "vertical",
-      "weight": 2,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 8,
-      "tests_total": 8,
-      "generation_time_s": 124.67,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\vertical_cqrs_handler.cs"
-    },
-    {
-      "task": "vertical_efcore_service",
-      "category": "vertical",
-      "weight": 2,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 8,
-      "tests_total": 8,
-      "generation_time_s": 125.08,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\vertical_efcore_service.cs"
-    },
-    {
-      "task": "patterns_record_with",
-      "category": "patterns",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 6,
-      "tests_total": 6,
-      "generation_time_s": 20.31,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\patterns_record_with.cs"
-    },
-    {
-      "task": "patterns_json_serialization",
-      "category": "patterns",
-      "weight": 1,
-      "passed": false,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 3,
-      "tests_total": 5,
-      "generation_time_s": 16.72,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\patterns_json_serialization.cs"
-    },
-    {
-      "task": "patterns_timeprovider",
-      "category": "patterns",
-      "weight": 1,
-      "passed": true,
-      "harness_error": null,
-      "build_success": true,
-      "tests_passed": 4,
-      "tests_total": 4,
-      "generation_time_s": 11.98,
-      "generated_code_path": "results\\coding-generated\\qwen3_8b\\patterns_timeprovider.cs"
+      "generation_time_s": 0.0,
+      "generated_code_path": null
     }
   ],
-  "layer3_weighted_score": 0.5818181818181818
+  "layer3_weighted_score": 0.0,
+  "layer2_run_started_at": "2026-04-16T23:26:02.744861+00:00",
+  "layer2_run_finished_at": "2026-04-16T23:26:05.085906+00:00",
+  "layer2_pass_rate": 0.0,
+  "layer2_passed": 0,
+  "layer2_total": 158,
+  "layer2_results": [
+    {
+      "name": "HumanEval_0_has_close_elements",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_1_separate_paren_groups",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_2_truncate_number",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_3_below_zero",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_4_mean_absolute_deviation",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_5_intersperse",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_6_parse_nested_parens",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_7_filter_by_substring",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_8_sum_product",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_9_rolling_max",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_10_make_palindrome",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_11_string_xor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_12_longest",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_13_greatest_common_divisor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_14_all_prefixes",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_15_string_sequence",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_16_count_distinct_characters",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_17_parse_music",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_18_how_many_times",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_19_sort_numbers",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_20_find_closest_elements",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_21_rescale_to_unit",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_22_filter_integers",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_23_strlen",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_24_largest_divisor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_25_factorize",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_26_remove_duplicates",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_27_flip_case",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_28_concatenate",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_29_filter_by_prefix",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_30_get_positive",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_31_is_prime",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_33_sort_third",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_34_unique",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_35_max_element",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_36_fizz_buzz",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_37_sort_even",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_39_prime_fib",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_40_triples_sum_to_zero",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_41_car_race_collision",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_42_incr_list",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_43_pairs_sum_to_zero",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_44_change_base",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_45_triangle_area",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_46_fib4",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_47_median",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_48_is_palindrome",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_49_modp",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_51_remove_vowels",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_52_below_threshold",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_53_add",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_54_same_chars",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_55_fib",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_56_correct_bracketing",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_57_monotonic",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_58_common",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_59_largest_prime_factor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_60_sum_to_n",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_61_correct_bracketing",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_62_derivative",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_63_fibfib",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_64_vowels_count",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_65_circular_shift",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_66_digitSum",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_67_fruit_distribution",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_68_pluck",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_69_search",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_70_strange_sort_list",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_71_triangle_area",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_72_will_it_fly",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_73_smallest_change",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_74_total_match",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_75_is_multiply_prime",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_76_is_simple_power",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_77_iscube",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_78_hex_key",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_79_decimal_to_binary",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_80_is_happy",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_81_numerical_letter_grade",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_82_prime_length",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_83_starts_one_ends",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_84_solve",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_85_add",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_86_anti_shuffle",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_87_get_row",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_88_sort_array",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_89_encrypt",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_90_next_smallest",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_91_is_bored",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_92_any_int",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_93_encode",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_94_skjkasdkd",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_95_check_dict_case",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_96_count_up_to",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_97_multiply",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_98_count_upper",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_99_closest_integer",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_100_make_a_pile",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_101_words_string",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_102_choose_num",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_104_unique_digits",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_105_by_length",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_106_f",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_107_even_odd_palindrome",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_108_count_nums",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_109_move_one_ball",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_110_exchange",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_111_histogram",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_112_reverse_delete",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_113_odd_count",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_114_minSubArraySum",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_115_max_fill",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_116_sort_array",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_117_select_words",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_118_get_closest_vowel",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_119_match_parens",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_120_maximum",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_121_solution",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_122_add_elements",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_123_get_odd_collatz",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_124_valid_date",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_126_is_sorted",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_127_intersection",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_128_prod_signs",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_129_minPath",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_130_tri",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_131_digits",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_132_is_nested",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_133_sum_squares",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_134_check_if_last_char_is_a_letter",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_135_can_arrange",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_136_largest_smallest_integers",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_138_is_equal_to_sum_even",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_139_special_factorial",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_140_fix_spaces",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_141_file_name_check",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_142_sum_squares",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_143_words_in_sentence",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_144_simplify",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_145_order_by_points",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_146_specialFilter",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_147_get_max_triples",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_148_bf",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_149_sorted_list_sum",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_150_x_or_y",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_151_double_the_difference",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_152_compare",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_153_Strongest_Extension",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_154_cycpattern_check",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_155_even_odd_count",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_156_int_to_mini_roman",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_157_right_angle_triangle",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_158_find_max",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_159_eat",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_160_do_algebra",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_161_solve",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_162_string_to_md5",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_163_generate_integers",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    }
+  ]
 }

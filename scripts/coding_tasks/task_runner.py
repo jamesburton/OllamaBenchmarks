@@ -71,34 +71,6 @@ def load_task(yaml_path: str, references_dir: str) -> dict:
     return task
 
 
-def _get_think_setting(model: str):
-    """Return think parameter for the model.
-
-    - False for models where thinking mode tanks throughput (gemma4)
-    - None (omit) for models that crash with think=false (qwen3-coder-next)
-    - Config override if set in prompt_configs
-    """
-    config = _load_prompt_config(model)
-    if config and "think" in config:
-        return config["think"]
-    # Gemma4 models: thinking mode makes them 10-100x slower
-    if model.startswith("gemma4"):
-        return False
-    # Default: omit (let Ollama decide) — safest for unknown models
-    return None
-
-
-def _load_prompt_config(model: str) -> dict | None:
-    """Load prompt optimizer config for a model, if it exists."""
-    config_dir = os.path.join(os.path.dirname(__file__), "..", "prompt_configs")
-    slug = re.sub(r"[^\w\.-]", "_", model.replace(":", "_").replace("/", "_"))
-    config_path = os.path.join(config_dir, f"{slug}.json")
-    if os.path.isfile(config_path):
-        with open(config_path, "r", encoding="utf-8") as fh:
-            return json.load(fh)
-    return None
-
-
 def call_ollama(
     model: str,
     prompt: str,
@@ -113,26 +85,11 @@ def call_ollama(
     Returns empty string on timeout or connection error (does not crash).
     """
     options = sampling_options(model)
-
-    # Check for prompt optimizer config override
-    config = _load_prompt_config(model)
-    messages = []
-    if config and config.get("system_prompt"):
-        messages.append({"role": "system", "content": config["system_prompt"]})
-    if config and config.get("sampling"):
-        options.update(config["sampling"])
-    messages.append({"role": "user", "content": prompt})
-
-    # Disable thinking for models where it tanks throughput without helping code quality.
-    # Some models (qwen3-coder-next on Ollama 0.20.2) crash with 500 when think=false,
-    # so only disable for known-safe models. Others fall back to message.thinking below.
-    think_setting = _get_think_setting(model)
-
     payload = {
         "model": model,
-        "messages": messages,
+        "messages": [{"role": "user", "content": prompt}],
         "stream": False,
-        "think": False,  # Disable thinking to avoid wasting tokens on CoT
+        "think": False,
         "options": {
             "num_predict": max_tokens,
             "num_ctx": num_ctx,
@@ -141,80 +98,9 @@ def call_ollama(
             "seed": seed,
         },
     }
-    if think_setting is not None:
-        payload["think"] = think_setting
-    data = json.dumps(payload).encode("utf-8")
-    max_retries = 5
-    for attempt in range(max_retries):
-        req = urllib.request.Request(
-            os.environ.get("OLLAMA_HOST_URL", "http://127.0.0.1:11434") + "/api/chat",
-            data=data,
-            headers={"Content-Type": "application/json"},
-            method="POST",
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
-                body = json.loads(resp.read().decode("utf-8"))
-            content = body.get("message", {}).get("content", "")
-            # Fall back to thinking field for models using Ollama's native thinking mode
-            # (e.g., IQuest-Coder puts all output in message.thinking, content is empty)
-            if not content:
-                content = body.get("message", {}).get("thinking", "")
-            # Strip thinking tags if present (some models use <think>...</think>)
-            if "<think>" in content:
-                content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
-            return content
-        except urllib.error.HTTPError as exc:
-            if exc.code == 429 and attempt < max_retries - 1:
-                import time
-                wait = min(30 * (2 ** attempt), 300)
-                print(f"    [429 rate-limited] waiting {wait}s (attempt {attempt+1}/{max_retries})")
-                time.sleep(wait)
-                continue
-            print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
-            return ""
-        except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
-            print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
-            return ""
-
-
-def call_llama_server(
-    model: str,
-    prompt: str,
-    max_tokens: int = 4096,
-    num_ctx: int = 12288,
-    seed: int = 42,
-    timeout: int = 600,
-    base_url: str = "http://127.0.0.1:8080",
-) -> str:
-    """POST to llama-server OpenAI-compatible /v1/chat/completions endpoint.
-
-    Used for models that Ollama can't load (e.g., Step-3.5-Flash).
-    Handles reasoning_content field from thinking models.
-    Returns empty string on timeout or connection error.
-    """
-    # Check for prompt optimizer config override
-    config = _load_prompt_config(model)
-    messages = []
-    if config and config.get("system_prompt"):
-        messages.append({"role": "system", "content": config["system_prompt"]})
-    temperature = 0
-    top_p = 1
-    if config and config.get("sampling"):
-        temperature = config["sampling"].get("temperature", temperature)
-        top_p = config["sampling"].get("top_p", top_p)
-    messages.append({"role": "user", "content": prompt})
-    payload = {
-        "model": model,
-        "messages": messages,
-        "max_tokens": max_tokens,
-        "temperature": temperature,
-        "top_p": top_p,
-        "seed": seed,
-    }
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
-        f"{base_url}/v1/chat/completions",
+        "http://127.0.0.1:11434/api/chat",
         data=data,
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -222,17 +108,13 @@ def call_llama_server(
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-        msg = body.get("choices", [{}])[0].get("message", {})
-        content = msg.get("content", "")
-        # Fall back to reasoning_content for thinking models (e.g., Step-3.5-Flash)
-        if not content:
-            content = msg.get("reasoning_content", "")
-        # Strip thinking tags if present
+        content = body.get("message", {}).get("content", "")
+        # Strip thinking tags if present (some models use <think>...</think>)
         if "<think>" in content:
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
         return content
     except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
-        print(f"    [call_llama_server] Error: {type(exc).__name__}: {exc}")
+        print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
         return ""
 
 
@@ -289,25 +171,14 @@ def run_dotnet_task(
     if build.returncode != 0:
         return (False, False, 0, 0, build.stderr or build.stdout)
 
-    # Test (use creationflags on Windows to enable process tree kill on timeout)
-    try:
-        test = subprocess.run(
-            ["dotnet", "test", "--no-restore", "--no-build"],
-            cwd=work_dir,
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-    except subprocess.TimeoutExpired:
-        # Kill any lingering dotnet/test processes for this work_dir
-        try:
-            subprocess.run(
-                ["taskkill", "/F", "/IM", "dotnet.exe", "/T"],
-                capture_output=True, timeout=5,
-            )
-        except Exception:
-            pass
-        return (True, False, 0, 0, "dotnet test timed out (60s) — possible infinite loop in generated code")
+    # Test
+    test = subprocess.run(
+        ["dotnet", "test", "--no-restore", "--no-build"],
+        cwd=work_dir,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
     output = test.stdout + "\n" + test.stderr
 
     # Parse test results from stdout
@@ -356,31 +227,15 @@ def run_task(
         # Determine generation timeout
         gen_timeout = 600 if weight >= 2 else 600
 
-        # Use llama-server if LLAMA_SERVER_URL is set, otherwise Ollama
-        llama_server_url = os.environ.get("LLAMA_SERVER_URL")
-
-        # Call LLM and measure time
+        # Call Ollama and measure time
         t0 = time.monotonic()
-        if llama_server_url:
-            # Thinking models (e.g., Step-3.5-Flash) need more tokens for
-            # reasoning + code output.  Double the budget, minimum 8192.
-            llama_max_tokens = max(max_tokens * 2, 8192)
-            raw_response = call_llama_server(
-                model,
-                task_def["prompt"],
-                max_tokens=llama_max_tokens,
-                num_ctx=num_ctx,
-                timeout=gen_timeout,
-                base_url=llama_server_url,
-            )
-        else:
-            raw_response = call_ollama(
-                model,
-                task_def["prompt"],
-                max_tokens=max_tokens,
-                num_ctx=num_ctx,
-                timeout=gen_timeout,
-            )
+        raw_response = call_ollama(
+            model,
+            task_def["prompt"],
+            max_tokens=max_tokens,
+            num_ctx=num_ctx,
+            timeout=gen_timeout,
+        )
         generation_time = time.monotonic() - t0
 
         # Extract C# code

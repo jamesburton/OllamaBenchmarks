@@ -19,21 +19,23 @@ public class SharedCounter : IAsyncLifetime
     }
 }
 
-public class FirstCounterTests(SharedCounter sharedCounter)
+public class FirstCounterTests(SharedCounter counter)
 {
     [Fact]
     public void TestIncrement()
     {
-        Assert.True(sharedCounter.IncrementAndGet() > 0);
+        var result = counter.IncrementAndGet();
+        Assert.True(result > 0);
     }
 }
 
 public class SecondCounterTests
 {
     [Fact]
-    public async Task TestIncrementWithTestContext()
+    public void TestIncrementViaContext()
     {
-        var fixture = TestContext.Current.GetFixture<SharedCounter>();
-        Assert.True(fixture.IncrementAndGet() > 0);
+        var counter = TestContext.Current.GetFixture<SharedCounter>();
+        var result = counter.IncrementAndGet();
+        Assert.True(result > 0);
     }
 }
