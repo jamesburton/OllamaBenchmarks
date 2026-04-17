@@ -185,6 +185,7 @@
     "hf.co/bartowski/stepfun-ai_Step-3.5-Flash-GGUF:IQ2_XXS": "BLOCKED: Ollama 0.20.2 does not support Step-3.5-Flash architecture (GitHub issue #14043, llama.cpp PRs merged but not in Ollama yet). 48GB IQ2_XXS downloaded, 500 error on load. 197B MoE (11B active), Apache 2.0. StepFun official Q4_K_S (111GB) explicitly targets 128GB unified memory (AMD Ryzen AI Max+ 395). REAP pruned variant (149B/11B) available at Q4_K_S 85GB. Needs llama-server or Ollama update.",
     "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_XXS": "Framework candidate. 31B dense, Unsloth Dynamic IQ2_XXS = 8.5GB. Fits fully in 12GB GPU. Testing if IQ2 quality holds for code generation.",
     "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_M": "Framework candidate. 31B dense, Unsloth Dynamic IQ2_M = 10.8GB. Tight fit in 12GB GPU. Better quality than IQ2_XXS.",
-    "hf.co/TeichAI/gemma-4-31B-it-Claude-Opus-Distill-GGUF:Q4_K_M": "Strix candidate. 31B dense fine-tuned with Claude Opus reasoning data. Q4_K_M = ~18GB. Too large for Framework GPU but fits Strix 128GB easily. May outperform base gemma4:31b on coding tasks."
+    "hf.co/TeichAI/gemma-4-31B-it-Claude-Opus-Distill-GGUF:Q4_K_M": "Strix candidate. 31B dense fine-tuned with Claude Opus reasoning data. Q4_K_M = ~18GB. Too large for Framework GPU but fits Strix 128GB easily. May outperform base gemma4:31b on coding tasks.",
+    "qwen3.6": "Qwen3.6-35B-A3B released April 2026 (Apache 2.0). MoE 35B total / 3B active. Q4_K_M = 24GB, Q8_0 = 39GB. T5500 should fit Q4_K_M in ~48GB budget. Not yet tested \u2014 pending pull (registry TLS issues 2026-04-17)."
   }
 }
