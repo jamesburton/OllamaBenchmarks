@@ -1,0 +1,62 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-04-17T12:28:20.455495+00:00",
+  "run_finished_at": "2026-04-17T12:28:43.299309+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\quality-qwen3.6_35b-a3b-q4_K_M.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-04-17T12:28:23.625053+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "10",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.11.3",
+    "ollama_version": "ollama version is 0.20.7",
+    "gpus": [
+      {
+        "Name": "USB Mobile Monitor Virtual Display",
+        "AdapterRAM": null,
+        "DriverVersion": "2.0.0.1",
+        "VideoProcessor": null,
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "qwen3.6:35b-a3b-q4_K_M"
+  ],
+  "completed_models": [
+    "qwen3.6:35b-a3b-q4_K_M"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "results": [
+    {
+      "model": "qwen3.6:35b-a3b-q4_K_M",
+      "coding_pass": 0,
+      "coding_total": 5,
+      "tool_pass": 0,
+      "tool_total": 4,
+      "agentic_pass": 0,
+      "agentic_total": 2,
+      "score": 0,
+      "score_max": 11
+    }
+  ]
+}
