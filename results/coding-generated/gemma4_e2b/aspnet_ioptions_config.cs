@@ -30,7 +30,8 @@ public class SmtpEmailSender : IEmailSender
         // Implementation detail: Storing 'to' in LastSentTo
         this.LastSentTo = to;
 
-        // In a real application, this is where SMTP sending logic would go.
+        // In a real application, SMTP sending logic would go here.
+        // For this exercise, we just complete the task.
         return Task.CompletedTask;
     }
 }

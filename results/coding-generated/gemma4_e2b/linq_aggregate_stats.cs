@@ -31,9 +31,9 @@ public static class SurveyAnalyzer
         else
         {
             // Even count: average of the two middle elements
-            int middleRightIndex = count / 2;
-            int middleLeftIndex = middleRightIndex - 1;
-            median = (sortedValues[middleLeftIndex] + sortedValues[middleRightIndex]) / 2.0;
+            int middle1 = count / 2 - 1;
+            int middle2 = count / 2;
+            median = (sortedValues[middle1] + sortedValues[middle2]) / 2.0;
         }
 
         return (mean, median, min, max);

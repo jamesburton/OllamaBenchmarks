@@ -18,9 +18,12 @@ public class DataPipeline
 
     public ChannelWriter<string> Writer => _writer;
 
-    public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
+    public async IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
     {
-        return _reader.ReadAllAsync(ct);
+        await foreach (var item in _reader.ReadAllAsync(ct))
+        {
+            yield return item;
+        }
     }
 
     public Task CompleteAsync()

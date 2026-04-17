@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 using System.Threading.Tasks;
 
 // 1. Address class
@@ -41,19 +40,45 @@ public class CompanyDbContext : DbContext
 // 4. Static class CompanyQueries
 public static class CompanyQueries
 {
-    /// <summary>
-    /// Queries companies where HeadquartersAddress.City matches the given city parameter.
-    /// </summary>
     public static async Task<List<Company>> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        // EF Core 10 Left Join equivalent for querying owned types requires specific navigation or projection.
-        // Since we are using Owned types with ToJson(), EF Core handles the JSON mapping.
-        // To query based on a property within an owned type, we typically need to access the navigation property.
-
-        var results = await db.Companies
-            .Where(c => c.HeadquartersAddress != null && c.HeadquartersAddress.City == city)
+        // Querying based on the owned property's property (City)
+        var companies = await db.Companies
+            .Where(c => c.HeadquartersAddress.City == city)
             .ToListAsync();
 
-        return results;
+        return companies;
     }
 }
+
+// Example usage (optional, for completeness, not strictly required by prompt)
+/*
+public class Program
+{
+    public static async Task Main(string[] args)
+    {
+        // Setup DbContext (Example using in-memory for demonstration)
+        var options = new DbContextOptionsBuilder<CompanyDbContext>()
+            .UseInMemoryDatabase("CompanyDb")
+            .Options;
+
+        using (var context = new CompanyDbContext(options))
+        {
+            context.Database.EnsureCreated();
+
+            // Seed Data
+            context.Companies.Add(new Company { Name = "Alpha Corp", HeadquartersAddress = new Address { City = "London", Street = "1 Main St" } });
+            context.Companies.Add(new Company { Name = "Beta Ltd", HeadquartersAddress = new Address { City = "Manchester", Street = "2 High Rd" } });
+            context.Companies.Add(new Company { Name = "Gamma Inc", HeadquartersAddress = new Address { City = "London", Street = "3 Park Ave" } });
+
+            // Test Query
+            Console.WriteLine("Finding companies in London:");
+            var londonCompanies = await CompanyQueries.FindCompaniesByCity(context, "London");
+            foreach (var company in londonCompanies)
+            {
+                Console.WriteLine($"ID: {company.Id}, Name: {company.Name}, City: {company.HeadquartersAddress.City}");
+            }
+        }
+    }
+}
+*/

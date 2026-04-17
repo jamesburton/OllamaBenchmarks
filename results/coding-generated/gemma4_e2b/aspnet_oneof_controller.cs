@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using OneOf;
 
-// --- Data Structures ---
+// --- Domain/Result Types ---
 
-// User class (must support object-initializer syntax)
+// User record (Class for object initializer support)
 public class User
 {
     public int Id { get; set; }
@@ -24,8 +24,8 @@ public interface IUserService
     OneOf<User, NotFound, ValidationError> GetByIdAsync(int id);
 }
 
-// --- Example Service Implementation (for context, not strictly required by prompt) ---
-// In a real application, this would be injected.
+// --- Example Service Implementation (Mocked for completeness) ---
+
 public class UserService : IUserService
 {
     public OneOf<User, NotFound, ValidationError> GetByIdAsync(int id)
@@ -34,16 +34,11 @@ public class UserService : IUserService
         {
             return new User { Id = 1, Name = "Alice", Email = "a@b.com" };
         }
-        if (id == 404)
+        if (id == 99)
         {
             return new NotFound();
         }
-        if (id == 400)
-        {
-            return new ValidationError("User not found for ID: " + id);
-        }
-        // Default case if needed
-        return new NotFound();
+        return new ValidationError("User not found");
     }
 }
 
@@ -61,25 +56,19 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a user by ID, handling success, not found, and validation errors.
+    /// Retrieves a user by ID, handling success, not found, and validation errors using OneOf.
     /// </summary>
-    /// <param name="id">The ID of the user to retrieve.</param>
-    /// <returns>The appropriate HTTP result (200, 404, or 400).</returns>
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        // Call the service which returns the OneOf union type
+        // Call the service which returns the discriminated union
         OneOf<User, NotFound, ValidationError> result = await _userService.GetByIdAsync(id);
 
-        // Use the Match method to map the union type to the appropriate IActionResult
+        // Use the Match method to map the result to the appropriate IActionResult
         return result.Match<IActionResult>(
-            user    => Ok(user),             // Maps User to 200 OK
-            notFound => NotFound(),           // Maps NotFound to 404 Not Found
-            err     => BadRequest(new
-                {
-                    Message = err.Message,
-                    Status = 400
-                }) // Maps ValidationError to 400 Bad Request
+            user    => Ok(user),
+            notFound => NotFound(),
+            err     => BadRequest(new { Message = err.Message }) // Map ValidationError to 400 Bad Request
         );
     }
 }

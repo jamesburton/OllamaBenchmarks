@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
+using System;
 
 // 1. CreateOrderRequest class
 public class CreateOrderRequest
@@ -28,8 +29,16 @@ public class OrderService
         if (!isValid)
         {
             // If validation fails, throw an ArgumentException with details of the first validation error
-            var firstError = validationResults.FirstOrDefault()?.ErrorMessage ?? "Validation failed for unknown reasons.";
-            throw new ArgumentException($"Validation failed: {firstError}");
+            var firstError = validationResults.FirstOrDefault();
+            if (firstError != null)
+            {
+                throw new ArgumentException($"Validation failed for CreateOrderRequest: {firstError.ErrorMessage}", nameof(request));
+            }
+            else
+            {
+                // Fallback if TryValidateObject returns false but no results are found (should not happen if validationResults is populated correctly)
+                throw new ArgumentException("Validation failed, but no specific error details were provided.", nameof(request));
+            }
         }
 
         // If validation passes, return the request as a confirmed order

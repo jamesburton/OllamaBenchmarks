@@ -99,7 +99,7 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Setup In-Memory Database
+        // Setup In-Memory Database for testing
         var options = new DbContextOptionsBuilder<TodoDbContext>()
             .UseInMemoryDatabase(databaseName: "TestTodoDb")
             .Options;
@@ -111,33 +111,29 @@ public class Program
             // Setup Service
             var todoService = new TodoService(context);
 
-            // Test Operations
-            Console.WriteLine("--- Creating Item ---");
-            var createdItem = await todoService.CreateAsync("Buy Groceries");
+            // Test Create
+            var createdItem = await todoService.CreateAsync("Buy groceries");
             Console.WriteLine($"Created: {createdItem.Title}, ID: {createdItem.Id}");
 
-            Console.WriteLine("\n--- Getting All Items ---");
+            // Test GetAll
             var allItems = await todoService.GetAllAsync();
-            foreach (var item in allItems)
-            {
-                Console.WriteLine($"ID: {item.Id}, Title: {item.Title}, Complete: {item.IsComplete}");
-            }
+            Console.WriteLine($"Total items: {allItems.Count}");
 
-            Console.WriteLine("\n--- Completing Item ---");
-            bool completed = await todoService.CompleteAsync(createdItem.Id);
-            Console.WriteLine($"Item {createdItem.Id} completed: {completed}");
+            // Test GetById
+            var item = await todoService.GetByIdAsync(createdItem.Id);
+            Console.WriteLine($"Retrieved item: {item?.Title}");
 
-            Console.WriteLine("\n--- Getting Updated Item ---");
+            // Test Complete
+            var completed = await todoService.CompleteAsync(createdItem.Id);
+            Console.WriteLine($"Completed: {completed}");
             var updatedItem = await todoService.GetByIdAsync(createdItem.Id);
-            Console.WriteLine($"Updated Status: {updatedItem?.IsComplete}");
+            Console.WriteLine($"IsComplete after completion: {updatedItem?.IsComplete}");
 
-            Console.WriteLine("\n--- Deleting Item ---");
-            bool deleted = await todoService.DeleteAsync(createdItem.Id);
-            Console.WriteLine($"Item {createdItem.Id} deleted: {deleted}");
-
-            Console.WriteLine("\n--- Getting All Items After Deletion ---");
-            var finalItems = await todoService.GetAllAsync();
-            Console.WriteLine($"Total items remaining: {finalItems.Count}");
+            // Test Delete
+            var deleted = await todoService.DeleteAsync(createdItem.Id);
+            Console.WriteLine($"Deleted: {deleted}");
+            var checkDeleted = await todoService.GetByIdAsync(createdItem.Id);
+            Console.WriteLine($"Item exists after deletion: {checkDeleted != null}");
         }
     }
 }

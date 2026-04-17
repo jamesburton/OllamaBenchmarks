@@ -20,8 +20,8 @@ public class CachingService
             return new System.Threading.Tasks.ValueTask<string>(cachedValue);
         }
 
-        string computedValue = await inner.ComputeAsync(key);
-        cache[key] = computedValue;
-        return System.Threading.Tasks.ValueTask.FromResult(computedValue);
+        string result = System.Threading.Tasks.Task.Run(() => inner.ComputeAsync(key)).Result;
+        cache[key] = result;
+        return new System.Threading.Tasks.ValueTask<string>(result);
     }
 }

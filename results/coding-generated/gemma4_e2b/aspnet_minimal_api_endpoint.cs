@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Results;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 
 // 1. CreateProductRequest record
 record CreateProductRequest(string Name, decimal Price);
@@ -29,9 +30,9 @@ public static class ProductEndpoints
             errors.Add("Price", new[] { "Price must be greater than 0." });
         }
 
-        if (errors.Count > 0)
+        if (errors.Any())
         {
-            // Return validation errors if validation fails
+            // Return validation errors if any exist
             return Results.ValidationProblem(errors);
         }
 

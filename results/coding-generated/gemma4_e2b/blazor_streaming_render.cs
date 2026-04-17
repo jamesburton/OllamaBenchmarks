@@ -10,18 +10,15 @@ public interface IWeatherService
 public class WeatherPageBase : ComponentBase
 {
     [Inject]
-    public IWeatherService Orders { get; set; }
+    public IWeatherService WeatherService { get; set; }
 
     public WeatherForecast[]? Forecasts { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadForecasts();
-    }
-
-    private async Task LoadForecasts()
-    {
-        var forecasts = await Orders.GetForecastsAsync();
-        Forecasts = forecasts;
+        if (WeatherService != null)
+        {
+            Forecasts = await WeatherService.GetForecastsAsync();
+        }
     }
 }

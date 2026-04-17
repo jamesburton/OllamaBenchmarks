@@ -51,7 +51,9 @@
     "hf.co/mradermacher/Qwen3-235B-A22B-abliterated-i1-GGUF:i1-Q2_K",
     "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_XXS",
     "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_M",
-    "hf.co/TeichAI/gemma-4-31B-it-Claude-Opus-Distill-GGUF:Q4_K_M"
+    "hf.co/TeichAI/gemma-4-31B-it-Claude-Opus-Distill-GGUF:Q4_K_M",
+    "llama3.2:3b",
+    "qwen3.6"
   ],
   "local_installed": [
     "cogito:8b",
@@ -186,6 +188,7 @@
     "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_XXS": "Framework candidate. 31B dense, Unsloth Dynamic IQ2_XXS = 8.5GB. Fits fully in 12GB GPU. Testing if IQ2 quality holds for code generation.",
     "hf.co/unsloth/gemma-4-31B-it-GGUF:UD-IQ2_M": "Framework candidate. 31B dense, Unsloth Dynamic IQ2_M = 10.8GB. Tight fit in 12GB GPU. Better quality than IQ2_XXS.",
     "hf.co/TeichAI/gemma-4-31B-it-Claude-Opus-Distill-GGUF:Q4_K_M": "Strix candidate. 31B dense fine-tuned with Claude Opus reasoning data. Q4_K_M = ~18GB. Too large for Framework GPU but fits Strix 128GB easily. May outperform base gemma4:31b on coding tasks.",
-    "qwen3.6": "T5500 Ollama 0.20.7: FAILS TO LOAD. Architecture qwen35moe panics with \"index out of range [0] with length 0\" at ggml.go:276 for 35B variant \u2014 same bug as qwen3.5:27b/35b. Small qwen35moe (4b, 9b) load fine; large 35B does not. Q4_K_M = 24GB downloaded and registered manually (registry TLS intermittent). Bug likely in Ollama ggml backend tensor handling for large MoE configs."
+    "qwen3.6": "35B MoE (a3b = ~3B active), 24GB Q4_K_M. Too large for 12GB RTX 3060 — Framework iGPU/CPU only. Intel Arc iGPU (54GB unified memory) candidate via SYCL llama-bench. MoE architecture may have SYCL compatibility issues (like gemma4:e2b). Agentic coding + thinking preservation. 256K context. Vision-capable. T5500 Ollama 0.20.7: FAILS TO LOAD — qwen35moe 35B panics with 'index out of range [0] with length 0' at ggml.go:276 (same bug as qwen3.5:27b/35b; small qwen35moe variants 4b/9b load fine). Bug likely in Ollama ggml backend tensor handling for large MoE configs.",
+    "llama3.2:3b": "XGrammar 2 tool-use partner model. 3.2B dense, 2.0GB Q4_K_M. Framework GPU: fits easily in 12GB RTX 3060. Added for structured output / function calling benchmarks — XGrammar 2 constrained decoding (built into Ollama) reportedly lets this 3B model beat 70B models on tool-calling accuracy. Primary role: tool-use benchmark partner, not general coding."
   }
 }

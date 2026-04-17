@@ -2,6 +2,11 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Threading.Tasks;
 
+public interface IUserService
+{
+    Task<string> GetDisplayNameAsync(string userId);
+}
+
 public class UserDashboard : ComponentBase
 {
     [CascadingParameter]
@@ -15,28 +20,26 @@ public class UserDashboard : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        if (AuthState != null)
+        if (AuthState == null)
         {
-            var authState = await AuthState.Result;
+            await Task.CompletedTask;
+            return;
+        }
 
-            if (authState.User?.Identity?.IsAuthenticated == true)
-            {
-                IsAuthenticated = true;
-                var userName = authState.User.Identity?.Name ?? "Unknown User";
-                DisplayName = await UserService.GetDisplayNameAsync(userName);
-            }
-            else
-            {
-                IsAuthenticated = false;
-                DisplayName = "Guest";
-            }
+        var authState = await AuthState.Result;
+
+        if (authState.User?.Identity?.IsAuthenticated == true)
+        {
+            IsAuthenticated = true;
+            var userName = authState.User.Identity?.Name ?? "Unknown User";
+
+            // Call the injected service
+            DisplayName = await UserService.GetDisplayNameAsync(userName);
+        }
+        else
+        {
+            IsAuthenticated = false;
+            DisplayName = "Guest";
         }
     }
-}
-
-// Placeholder for IUserService as it is required for compilation, 
-// although the actual implementation is not requested.
-public interface IUserService
-{
-    Task<string> GetDisplayNameAsync(string userId);
 }

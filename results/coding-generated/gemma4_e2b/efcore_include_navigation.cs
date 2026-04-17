@@ -9,7 +9,6 @@ public class Comment
     public string Text { get; set; }
     public int PostId { get; set; }
     public Post? Post { get; set; } // Navigation property to Post
-    public List<Comment> Comments { get; set; } = new();
 }
 
 // 2. Post class
@@ -19,7 +18,7 @@ public class Post
     public string Content { get; set; }
     public int BlogId { get; set; }
     public Blog? Blog { get; set; } // Navigation property to Blog
-    public List<Comment> Comments { get; set; } = new();
+    public List<Comment> Comments { get; set; } = new(); // Initialize collection
 }
 
 // 3. Blog class
@@ -27,7 +26,7 @@ public class Blog
 {
     public int Id { get; set; }
     public string Title { get; set; }
-    public List<Post> Posts { get; set; } = new();
+    public List<Post> Posts { get; set; } = new(); // Initialize collection
 }
 
 // 4. BlogDbContext class
@@ -43,13 +42,13 @@ public class BlogDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Blog has many Posts (with foreign key BlogId)
+        // Configure Blog has many Posts (with foreign key BlogId)
         modelBuilder.Entity<Blog>()
             .HasMany(b => b.Posts)
             .WithOne(p => p.Blog)
             .HasForeignKey(p => p.BlogId);
 
-        // Post has many Comments (with foreign key PostId)
+        // Configure Post has many Comments (with foreign key PostId)
         modelBuilder.Entity<Post>()
             .HasMany(p => p.Comments)
             .WithOne(c => c.Post)

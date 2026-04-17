@@ -55,17 +55,14 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
                 })
         );
 
-        // Finalization
+        // Transition to Completed state
         During(Accepted,
             When(OrderCompleted)
                 .TransitionTo(Completed)
                 .Finalize()
         );
+
+        // Finalization logic (optional, but good practice if needed)
+        SetCompletedWhenFinalized();
     }
 }
-
-// --- Event Records ---
-
-public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
-public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
-public record OrderCompleted(Guid OrderId);

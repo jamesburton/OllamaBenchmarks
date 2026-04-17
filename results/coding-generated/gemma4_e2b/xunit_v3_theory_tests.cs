@@ -20,14 +20,9 @@ public class StringProcessor
     }
 }
 
-using Xunit;
-using AwesomeAssertions;
-
 public class StringProcessorTests
 {
     private readonly StringProcessor _processor = new StringProcessor();
-
-    // --- Truncate Tests ---
 
     [Theory]
     [InlineData(null, 10, "")] // Null input
@@ -35,57 +30,61 @@ public class StringProcessorTests
     [InlineData("short", 10, "short")] // Shorter than max
     [InlineData("exact", 5, "exact")] // Equal to max
     [InlineData("longer string", 5, "longer...")] // Longer than max
-    [InlineData("test", 3, "tes...")] // Longer than max, testing truncation logic
-    public void Truncate_VariousInputs_ShouldHandleCases(string input, int maxLength, string expected)
+    [InlineData("palindrome", 10, "palindrome")] // Palindrome
+    [InlineData("hello", 10, "hello")] // Non-palindrome
+    [InlineData("racecar", 10, "racecar")] // Palindrome
+    [InlineData("A man a plan", 10, "a man a...")] // Palindrome with spaces (should be handled by cleaning)
+    [InlineData("  multiple   spaces ", 10, "multiple...")] // Multiple spaces
+    public void Truncate_VariousInputs_ShouldProduceCorrectOutput(string input, int maxLength, string expected)
     {
         string actual = _processor.Truncate(input, maxLength);
 
+        // Special handling for null input based on implementation: returns ""
         if (input == null)
         {
             actual.Should().Be("");
         }
-        else if (input.Length <= maxLength)
-        {
-            actual.Should().Be(input);
-        }
         else
         {
-            actual.Should().EndWith("...");
-            actual.Should().HaveLength(maxLength + 3); // Length of substring + "..."
+            actual.Should().Be(expected);
         }
     }
-
-    // --- CountWords Tests ---
 
     [Theory]
     [InlineData(null, 0)] // Null input
     [InlineData("", 0)]  // Empty string
-    [InlineData("single", 1)] // Single word
-    [InlineData("two words", 2)] // Multiple words
-    [InlineData("  extra spaces", 2)] // Extra spaces
-    [InlineData("one  two   three", 3)] // Multiple spaces
-    [InlineData("   ", 0)] // Only spaces
-    public void CountWords_VariousInputs_ShouldReturnCorrectCount(string input, int expected)
+    [InlineData("word", 0, 1)] // Single word
+    [InlineData("word1 word2", 0, 2)] // Multiple words
+    [InlineData("  leading and trailing  ", 0, 4)] // Extra spaces
+    [InlineData("single", 10, 1)] // Single word test
+    [InlineData("one two three", 10, 3)] // Multiple words test
+    public void CountWords_VariousInputs_ShouldReturnCorrectCount(string input, int expectedCount)
     {
         int actual = _processor.CountWords(input);
-        actual.Should().Be(expected);
+        actual.Should().Be(expectedCount);
     }
 
-    // --- IsPalindrome Tests ---
-
     [Theory]
-    [InlineData(null, false)] // Null input
-    [InlineData("", false)]  // Empty string
-    [InlineData("a", false)]  // Single character
-    [InlineData("racecar", true)] // Palindrome
-    [InlineData("level", true)] // Palindrome
-    [InlineData("hello", false)] // Non-palindrome
-    [InlineData("Madam", false)] // Non-palindrome (case sensitive check in implementation, but cleaned should handle it)
-    [InlineData("A man a plan a canal Panama", true)] // Palindrome with spaces and mixed case
-    [InlineData("No lemon no melon", true)] // Palindrome with spaces and mixed case
-    public void IsPalindrome_VariousInputs_ShouldReturnCorrectResult(string input, bool expected)
+    [InlineData(null)] // Null input
+    [InlineData("")]  // Empty string
+    [InlineData("a")]  // Single character
+    [InlineData("level")] // Palindrome
+    [InlineData("hello")] // Non-palindrome
+    [InlineData("madam")] // Palindrome
+    [InlineData("   ")] // Only spaces
+    [InlineData("  a b  c", 10, 3)] // Palindrome with spaces (should be 3 words)
+    public void IsPalindrome_VariousInputs_ShouldReturnCorrectBoolean(string input)
     {
         bool actual = _processor.IsPalindrome(input);
-        actual.Should().Be(expected);
+
+        // Based on implementation: null/empty returns false
+        if (string.IsNullOrEmpty(input))
+        {
+            actual.Should().Be(false);
+        }
+        else
+        {
+            actual.Should().Be(true, $"Input: {input}");
+        }
     }
 }

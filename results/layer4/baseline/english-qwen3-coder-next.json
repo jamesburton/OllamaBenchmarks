@@ -7078,4 +7078,54 @@
       "weight": 1,
       "passed": false,
       "validator_type": "rubric_keywords",
-      "harness_error": "Empty re
+      "harness_error": "Empty response",
+      "model_response": "",
+      "expected_answer": null,
+      "validation_reason": "Empty response from model",
+      "generation_time_s": 0.01600000000325963
+    },
+    "summarisation_hard_016": {
+      "task": "summarisation_hard_016",
+      "category": "english",
+      "subcategory": "summarisation",
+      "difficulty": "hard",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "rubric_keywords",
+      "harness_error": "Empty response",
+      "model_response": "",
+      "expected_answer": null,
+      "validation_reason": "Empty response from model",
+      "generation_time_s": 0.0159999999741558
+    },
+    "summarisation_hard_017": {
+      "task": "summarisation_hard_017",
+      "category": "english",
+      "subcategory": "summarisation",
+      "difficulty": "hard",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "rubric_keywords",
+      "harness_error": "Empty response",
+      "model_response": "",
+      "expected_answer": null,
+      "validation_reason": "Empty response from model",
+      "generation_time_s": 0.03200000000651926
+    }
+  },
+  "model": "qwen3-coder-next",
+  "category": "english",
+  "benchmark": "layer4",
+  "summary": {
+    "total": 508,
+    "passed": 0,
+    "score": 0.0,
+    "by_category": {
+      "english": {
+        "total": 508,
+        "passed": 0,
+        "score": 0.0
+      }
+    }
+  }
+}

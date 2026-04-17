@@ -8,13 +8,13 @@ public class ProcessPaymentConsumerTests
     public async Task ProcessPaymentConsumer_ShouldPublishPaymentProcessedEvent()
     {
         // Arrange
-        var services = new ServiceCollection();
-        services.AddMassTransitTestHarness(cfg =>
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddMassTransitTestHarness(cfg =>
         {
             cfg.AddConsumer<ProcessPaymentConsumer>();
         });
 
-        var provider = services.BuildServiceProvider(true);
+        var provider = serviceCollection.BuildServiceProvider(true);
         var harness = provider.GetRequiredService<ITestHarness>();
 
         var orderId = Guid.NewGuid();
@@ -26,33 +26,21 @@ public class ProcessPaymentConsumerTests
         await harness.Bus.Publish(paymentMessage);
 
         // Assert
-        var consumed = await harness.Consumed.Any<PaymentProcessed>();
+        var consumed = await harness.Consumed.Any<ProcessPayment>();
         var published = await harness.Published.Any<PaymentProcessed>();
 
-        // Check if the event was consumed
-        var consumedResult = await consumed;
-        Assert.True(consumedResult, "PaymentProcessed event should have been consumed.");
+        // 1. Verify the message was consumed
+        Assert.True(consumed, $"Expected to consume ProcessPayment message, but found none.");
 
-        // Check if the event was published
-        var publishedResult = await published;
-        Assert.True(publishedResult, "PaymentProcessed event should have been published.");
+        // 2. Verify the PaymentProcessed event was published
+        Assert.True(published, $"Expected to publish PaymentProcessed event, but found none.");
 
-        // Verify the content of the published event
-        var publishedEvent = await published.First();
-        Assert.Equal(orderId, publishedEvent.OrderId);
+        // 3. Verify the published event contains the correct OrderId
+        var paymentProcessedEvents = await harness.Consumed.OfType<PaymentProcessed>().ToList();
 
-        // Since the consumer generates a new Guid for TransactionId, we only check the OrderId match.
-        // We don't assert the exact TransactionId as it's generated inside the consumer.
+        Assert.Single(paymentProcessedEvents, $"Expected exactly one PaymentProcessed event, but found {paymentProcessedEvents.Count}.");
 
-        // Use Assert.Multiple to group the checks
-        Assert.Multiple(
-            () =>
-            {
-                // 1. Check consumption
-                Assert.True(consumedResult, "The PaymentProcessed event must be consumed.");
-
-                // 2. Check publication
-                Assert.True(publishedResult, "The PaymentProcessed event must be published.");
-            });
+        var processedEvent = paymentProcessedEvents.First();
+        Assert.Equal(orderId, processedEvent.OrderId);
     }
 }

@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 // 1. ISoftDeletable interface
@@ -47,7 +49,7 @@ public class ArticleRepository
     /// </summary>
     public async Task SoftDeleteAsync(int id)
     {
-        // Use IgnoreQueryFilters() to bypass the global query filter when finding the entity to update.
+        // Find the article, ignoring the default query filter to find soft-deleted items if necessary
         var article = await _context.Articles
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
@@ -55,17 +57,17 @@ public class ArticleRepository
         if (article != null)
         {
             article.IsDeleted = true;
-            // Since we are using EF Core tracking, saving the context will persist the change.
+            // SaveChanges will apply the change
             await _context.SaveChangesAsync();
         }
     }
 
     /// <summary>
-    /// Retrieves all articles where IsDeleted is false (handled by the query filter).
+    /// Retrieves all articles where IsDeleted is false (default behavior enforced by query filter).
     /// </summary>
     public async Task<List<Article>> GetAllAsync()
     {
-        // The query filter automatically restricts results to non-deleted items.
+        // The query filter in OnModelCreating ensures this only returns non-deleted items
         return await _context.Articles.ToListAsync();
     }
 
@@ -74,7 +76,7 @@ public class ArticleRepository
     /// </summary>
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        // Use IgnoreQueryFilters() to bypass the global query filter.
+        // Use IgnoreQueryFilters() to bypass the default filter
         return await _context.Articles
             .IgnoreQueryFilters()
             .ToListAsync();

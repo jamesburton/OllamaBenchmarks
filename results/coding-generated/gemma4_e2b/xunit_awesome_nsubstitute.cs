@@ -45,7 +45,7 @@ public class NotificationServiceTests
         mockRepo.GetByIdAsync(1).Returns(expectedUser);
 
         // Setup mock to verify the email is sent
-        mockEmail.SendWelcomeAsync("alice@example.com").Returns(Task.CompletedTask);
+        mockEmail.SendWelcomeAsync(expectedUser.Email).Returns(Task.CompletedTask);
 
         var service = new NotificationService(mockRepo, mockEmail);
 
@@ -53,11 +53,11 @@ public class NotificationServiceTests
         await service.NotifyUserAsync(1);
 
         // Assert
-        // Verify that the email service was called with the correct email
-        mockEmail.Received(1).SendWelcomeAsync("alice@example.com");
-
-        // Verify that the repository was called to fetch the user
+        // Verify repository interaction
         mockRepo.Received(1).GetByIdAsync(1);
+
+        // Verify email service interaction
+        mockEmail.Received(1).SendWelcomeAsync(expectedUser.Email);
     }
 
     [Fact]
@@ -81,9 +81,7 @@ public class NotificationServiceTests
             await service.NotifyUserAsync(999);
         });
 
-        // Verify that the email service was NOT called
+        // Verify that the email service was never called
         mockEmail.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
-        // Verify that the repository was called
-        mockRepo.Received(1).GetByIdAsync(999);
     }
 }

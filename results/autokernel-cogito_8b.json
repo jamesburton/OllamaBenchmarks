@@ -1,0 +1,1052 @@
+{
+  "benchmark": "autokernel",
+  "model": "cogito:8b",
+  "run_started_at": "2026-04-12T18:40:25.237860+00:00",
+  "run_finished_at": "2026-04-12T18:54:42.513364+00:00",
+  "duration_s": 857.3,
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\autokernel-cogito_8b.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-04-12T18:54:44.087135+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26220",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 22,
+    "total_memory_gb": 95.47,
+    "python_version": "3.12.2",
+    "ollama_version": "ollama version is 0.20.5",
+    "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7026",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "layer_count": 32,
+  "best_options": {
+    "num_ctx": 32768,
+    "num_gpu": 99,
+    "num_batch": 2048,
+    "num_thread": 4,
+    "flash_attention": true
+  },
+  "best_tps": 61.99,
+  "phases": {
+    "phase1_gpu_layers": {
+      "results": [
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 4.87,
+          "tps_min": 4.61,
+          "tps_max": 5.13,
+          "tps_stdev": 0.37,
+          "total_s_avg": 39.333,
+          "prompt_s_avg": 1.121,
+          "eval_count": 181,
+          "measurements": [
+            {
+              "tps": 5.13,
+              "eval_s": 35.279,
+              "prompt_s": 2.056,
+              "total_s": 38.055,
+              "eval_count": 181,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 4.61,
+              "eval_s": 39.293,
+              "prompt_s": 0.187,
+              "total_s": 40.611,
+              "eval_count": 181,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=0",
+          "opts": {
+            "num_gpu": 0
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 4.31,
+          "tps_min": 4.27,
+          "tps_max": 4.36,
+          "tps_stdev": 0.06,
+          "total_s_avg": 41.219,
+          "prompt_s_avg": 1.179,
+          "eval_count": 178,
+          "measurements": [
+            {
+              "tps": 4.36,
+              "eval_s": 40.818,
+              "prompt_s": 2.118,
+              "total_s": 43.737,
+              "eval_count": 178,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 4.27,
+              "eval_s": 37.73,
+              "prompt_s": 0.24,
+              "total_s": 38.701,
+              "eval_count": 161,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=4",
+          "opts": {
+            "num_gpu": 4
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 4.46,
+          "tps_min": 4.33,
+          "tps_max": 4.59,
+          "tps_stdev": 0.18,
+          "total_s_avg": 37.731,
+          "prompt_s_avg": 0.942,
+          "eval_count": 161,
+          "measurements": [
+            {
+              "tps": 4.59,
+              "eval_s": 35.092,
+              "prompt_s": 1.661,
+              "total_s": 37.416,
+              "eval_count": 161,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 4.33,
+              "eval_s": 37.178,
+              "prompt_s": 0.222,
+              "total_s": 38.047,
+              "eval_count": 161,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=8",
+          "opts": {
+            "num_gpu": 8
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 5.47,
+          "tps_min": 5.2,
+          "tps_max": 5.74,
+          "tps_stdev": 0.38,
+          "total_s_avg": 30.906,
+          "prompt_s_avg": 0.773,
+          "eval_count": 161,
+          "measurements": [
+            {
+              "tps": 5.74,
+              "eval_s": 28.045,
+              "prompt_s": 1.302,
+              "total_s": 30.012,
+              "eval_count": 161,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 5.2,
+              "eval_s": 30.935,
+              "prompt_s": 0.244,
+              "total_s": 31.8,
+              "eval_count": 161,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=12",
+          "opts": {
+            "num_gpu": 12
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 6.35,
+          "tps_min": 6.09,
+          "tps_max": 6.61,
+          "tps_stdev": 0.37,
+          "total_s_avg": 27.975,
+          "prompt_s_avg": 0.567,
+          "eval_count": 161,
+          "measurements": [
+            {
+              "tps": 6.61,
+              "eval_s": 24.342,
+              "prompt_s": 0.947,
+              "total_s": 25.922,
+              "eval_count": 161,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 6.09,
+              "eval_s": 29.226,
+              "prompt_s": 0.187,
+              "total_s": 30.028,
+              "eval_count": 178,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=16",
+          "opts": {
+            "num_gpu": 16
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 8.07,
+          "tps_min": 7.93,
+          "tps_max": 8.21,
+          "tps_stdev": 0.2,
+          "total_s_avg": 21.284,
+          "prompt_s_avg": 0.409,
+          "eval_count": 165,
+          "measurements": [
+            {
+              "tps": 8.21,
+              "eval_s": 20.104,
+              "prompt_s": 0.676,
+              "total_s": 21.422,
+              "eval_count": 165,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 7.93,
+              "eval_s": 20.312,
+              "prompt_s": 0.141,
+              "total_s": 21.145,
+              "eval_count": 161,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=20",
+          "opts": {
+            "num_gpu": 20
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 10.01,
+          "tps_min": 9.46,
+          "tps_max": 10.56,
+          "tps_stdev": 0.78,
+          "total_s_avg": 16.53,
+          "prompt_s_avg": 0.287,
+          "eval_count": 146,
+          "measurements": [
+            {
+              "tps": 10.56,
+              "eval_s": 13.831,
+              "prompt_s": 0.47,
+              "total_s": 14.897,
+              "eval_count": 146,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 9.46,
+              "eval_s": 17.445,
+              "prompt_s": 0.105,
+              "total_s": 18.164,
+              "eval_count": 165,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=24",
+          "opts": {
+            "num_gpu": 24
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 14.84,
+          "tps_min": 14.03,
+          "tps_max": 15.65,
+          "tps_stdev": 1.15,
+          "total_s_avg": 11.899,
+          "prompt_s_avg": 0.142,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 15.65,
+              "eval_s": 10.796,
+              "prompt_s": 0.22,
+              "total_s": 11.638,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 14.03,
+              "eval_s": 11.473,
+              "prompt_s": 0.064,
+              "total_s": 12.16,
+              "eval_count": 161,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=28",
+          "opts": {
+            "num_gpu": 28
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 31.05,
+          "tps_min": 30.58,
+          "tps_max": 31.51,
+          "tps_stdev": 0.66,
+          "total_s_avg": 6.062,
+          "prompt_s_avg": 0.041,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 30.58,
+              "eval_s": 5.526,
+              "prompt_s": 0.051,
+              "total_s": 6.155,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 31.51,
+              "eval_s": 5.364,
+              "prompt_s": 0.032,
+              "total_s": 5.968,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=32",
+          "opts": {
+            "num_gpu": 32
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 61.98,
+          "tps_min": 61.76,
+          "tps_max": 62.2,
+          "tps_stdev": 0.31,
+          "total_s_avg": 3.272,
+          "prompt_s_avg": 0.026,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.76,
+              "eval_s": 2.736,
+              "prompt_s": 0.035,
+              "total_s": 3.343,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.2,
+              "eval_s": 2.62,
+              "prompt_s": 0.016,
+              "total_s": 3.2,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_gpu=99",
+          "opts": {
+            "num_gpu": 99
+          }
+        }
+      ],
+      "best": "num_gpu=99",
+      "best_tps": 61.98
+    },
+    "phase2_batch_size": {
+      "results": [
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 61.89,
+          "tps_min": 61.87,
+          "tps_max": 61.91,
+          "tps_stdev": 0.03,
+          "total_s_avg": 3.294,
+          "prompt_s_avg": 0.026,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.87,
+              "eval_s": 2.731,
+              "prompt_s": 0.035,
+              "total_s": 3.344,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 61.91,
+              "eval_s": 2.633,
+              "prompt_s": 0.016,
+              "total_s": 3.244,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_batch=128",
+          "opts": {
+            "num_batch": 128
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 61.88,
+          "tps_min": 61.65,
+          "tps_max": 62.1,
+          "tps_stdev": 0.32,
+          "total_s_avg": 3.263,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.65,
+              "eval_s": 2.741,
+              "prompt_s": 0.033,
+              "total_s": 3.329,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.1,
+              "eval_s": 2.625,
+              "prompt_s": 0.016,
+              "total_s": 3.196,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_batch=256",
+          "opts": {
+            "num_batch": 256
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 61.73,
+          "tps_min": 61.67,
+          "tps_max": 61.78,
+          "tps_stdev": 0.08,
+          "total_s_avg": 3.263,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.78,
+              "eval_s": 2.736,
+              "prompt_s": 0.034,
+              "total_s": 3.34,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 61.67,
+              "eval_s": 2.643,
+              "prompt_s": 0.016,
+              "total_s": 3.186,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_batch=512",
+          "opts": {
+            "num_batch": 512
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 61.82,
+          "tps_min": 61.8,
+          "tps_max": 61.84,
+          "tps_stdev": 0.03,
+          "total_s_avg": 3.248,
+          "prompt_s_avg": 0.026,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.84,
+              "eval_s": 2.733,
+              "prompt_s": 0.034,
+              "total_s": 3.261,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 61.8,
+              "eval_s": 2.637,
+              "prompt_s": 0.017,
+              "total_s": 3.235,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_batch=1024",
+          "opts": {
+            "num_batch": 1024
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.23,
+          "tps_min": 62.0,
+          "tps_max": 62.46,
+          "tps_stdev": 0.33,
+          "total_s_avg": 3.26,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.0,
+              "eval_s": 2.726,
+              "prompt_s": 0.033,
+              "total_s": 3.296,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.46,
+              "eval_s": 2.61,
+              "prompt_s": 0.017,
+              "total_s": 3.224,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_batch=2048",
+          "opts": {
+            "num_batch": 2048
+          }
+        }
+      ],
+      "best": "num_batch=2048",
+      "best_tps": 62.23
+    },
+    "phase3_context_window": {
+      "results": [
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.16,
+          "tps_min": 62.02,
+          "tps_max": 62.29,
+          "tps_stdev": 0.19,
+          "total_s_avg": 3.257,
+          "prompt_s_avg": 0.026,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.02,
+              "eval_s": 2.725,
+              "prompt_s": 0.035,
+              "total_s": 3.33,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.29,
+              "eval_s": 2.617,
+              "prompt_s": 0.016,
+              "total_s": 3.184,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_ctx=2048",
+          "opts": {
+            "num_ctx": 2048
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 61.98,
+          "tps_min": 61.86,
+          "tps_max": 62.09,
+          "tps_stdev": 0.16,
+          "total_s_avg": 3.233,
+          "prompt_s_avg": 0.026,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.86,
+              "eval_s": 2.732,
+              "prompt_s": 0.034,
+              "total_s": 3.37,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.09,
+              "eval_s": 2.625,
+              "prompt_s": 0.017,
+              "total_s": 3.096,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_ctx=4096",
+          "opts": {
+            "num_ctx": 4096
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.09,
+          "tps_min": 62.0,
+          "tps_max": 62.17,
+          "tps_stdev": 0.12,
+          "total_s_avg": 3.248,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.0,
+              "eval_s": 2.726,
+              "prompt_s": 0.033,
+              "total_s": 3.339,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.17,
+              "eval_s": 2.622,
+              "prompt_s": 0.017,
+              "total_s": 3.157,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_ctx=8192",
+          "opts": {
+            "num_ctx": 8192
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.09,
+          "tps_min": 62.09,
+          "tps_max": 62.1,
+          "tps_stdev": 0.01,
+          "total_s_avg": 3.252,
+          "prompt_s_avg": 0.026,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.1,
+              "eval_s": 2.721,
+              "prompt_s": 0.036,
+              "total_s": 3.322,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.09,
+              "eval_s": 2.625,
+              "prompt_s": 0.016,
+              "total_s": 3.182,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_ctx=16384",
+          "opts": {
+            "num_ctx": 16384
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.38,
+          "tps_min": 62.27,
+          "tps_max": 62.48,
+          "tps_stdev": 0.15,
+          "total_s_avg": 3.241,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.48,
+              "eval_s": 2.705,
+              "prompt_s": 0.034,
+              "total_s": 3.276,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.27,
+              "eval_s": 2.618,
+              "prompt_s": 0.016,
+              "total_s": 3.207,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_ctx=32768",
+          "opts": {
+            "num_ctx": 32768
+          }
+        }
+      ],
+      "best": "num_ctx=32768",
+      "best_tps": 62.38
+    },
+    "phase4_threads": {
+      "results": [
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.0,
+          "tps_min": 61.78,
+          "tps_max": 62.23,
+          "tps_stdev": 0.32,
+          "total_s_avg": 3.228,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.78,
+              "eval_s": 2.736,
+              "prompt_s": 0.033,
+              "total_s": 3.264,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.23,
+              "eval_s": 2.619,
+              "prompt_s": 0.016,
+              "total_s": 3.191,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_thread=1",
+          "opts": {
+            "num_thread": 1
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.24,
+          "tps_min": 62.19,
+          "tps_max": 62.29,
+          "tps_stdev": 0.07,
+          "total_s_avg": 3.281,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.19,
+              "eval_s": 2.717,
+              "prompt_s": 0.034,
+              "total_s": 3.347,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.29,
+              "eval_s": 2.617,
+              "prompt_s": 0.015,
+              "total_s": 3.215,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_thread=2",
+          "opts": {
+            "num_thread": 2
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.32,
+          "tps_min": 62.13,
+          "tps_max": 62.51,
+          "tps_stdev": 0.27,
+          "total_s_avg": 3.248,
+          "prompt_s_avg": 0.026,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.13,
+              "eval_s": 2.72,
+              "prompt_s": 0.035,
+              "total_s": 3.31,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.51,
+              "eval_s": 2.608,
+              "prompt_s": 0.016,
+              "total_s": 3.186,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_thread=4",
+          "opts": {
+            "num_thread": 4
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.13,
+          "tps_min": 61.87,
+          "tps_max": 62.4,
+          "tps_stdev": 0.37,
+          "total_s_avg": 3.25,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.4,
+              "eval_s": 2.708,
+              "prompt_s": 0.034,
+              "total_s": 3.292,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 61.87,
+              "eval_s": 2.635,
+              "prompt_s": 0.016,
+              "total_s": 3.209,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_thread=8",
+          "opts": {
+            "num_thread": 8
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.0,
+          "tps_min": 61.95,
+          "tps_max": 62.04,
+          "tps_stdev": 0.06,
+          "total_s_avg": 3.255,
+          "prompt_s_avg": 0.026,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.04,
+              "eval_s": 2.724,
+              "prompt_s": 0.035,
+              "total_s": 3.34,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 61.95,
+              "eval_s": 2.631,
+              "prompt_s": 0.016,
+              "total_s": 3.171,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_thread=11",
+          "opts": {
+            "num_thread": 11
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.04,
+          "tps_min": 61.83,
+          "tps_max": 62.25,
+          "tps_stdev": 0.3,
+          "total_s_avg": 3.24,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.83,
+              "eval_s": 2.733,
+              "prompt_s": 0.035,
+              "total_s": 3.305,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.25,
+              "eval_s": 2.619,
+              "prompt_s": 0.015,
+              "total_s": 3.175,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "num_thread=22",
+          "opts": {
+            "num_thread": 22
+          }
+        }
+      ],
+      "best": "num_thread=4",
+      "best_tps": 62.32
+    },
+    "phase5_flash_attention": {
+      "results": [
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.04,
+          "tps_min": 61.89,
+          "tps_max": 62.19,
+          "tps_stdev": 0.21,
+          "total_s_avg": 3.27,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 61.89,
+              "eval_s": 2.731,
+              "prompt_s": 0.034,
+              "total_s": 3.343,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.19,
+              "eval_s": 2.621,
+              "prompt_s": 0.016,
+              "total_s": 3.197,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "flash_attention=off",
+          "opts": {
+            "flash_attention": false
+          }
+        },
+        {
+          "runs": 2,
+          "errors": [],
+          "tps_avg": 62.2,
+          "tps_min": 62.1,
+          "tps_max": 62.3,
+          "tps_stdev": 0.14,
+          "total_s_avg": 3.232,
+          "prompt_s_avg": 0.025,
+          "eval_count": 169,
+          "measurements": [
+            {
+              "tps": 62.3,
+              "eval_s": 2.713,
+              "prompt_s": 0.034,
+              "total_s": 3.299,
+              "eval_count": 169,
+              "prompt_eval_count": 23
+            },
+            {
+              "tps": 62.1,
+              "eval_s": 2.625,
+              "prompt_s": 0.015,
+              "total_s": 3.166,
+              "eval_count": 163,
+              "prompt_eval_count": 23
+            }
+          ],
+          "label": "flash_attention=on",
+          "opts": {
+            "flash_attention": true
+          }
+        }
+      ],
+      "best": "flash_attention=on",
+      "best_tps": 62.2
+    },
+    "phase6_final": {
+      "opts": {
+        "num_ctx": 32768,
+        "num_gpu": 99,
+        "num_batch": 2048,
+        "num_thread": 4,
+        "flash_attention": true
+      },
+      "runs": 3,
+      "errors": [],
+      "tps_avg": 61.99,
+      "tps_min": 61.8,
+      "tps_max": 62.21,
+      "tps_stdev": 0.21,
+      "total_s_avg": 3.22,
+      "prompt_s_avg": 0.022,
+      "eval_count": 169,
+      "measurements": [
+        {
+          "tps": 61.8,
+          "eval_s": 2.735,
+          "prompt_s": 0.034,
+          "total_s": 3.335,
+          "eval_count": 169,
+          "prompt_eval_count": 23
+        },
+        {
+          "tps": 61.97,
+          "eval_s": 2.63,
+          "prompt_s": 0.015,
+          "total_s": 3.147,
+          "eval_count": 163,
+          "prompt_eval_count": 23
+        },
+        {
+          "tps": 62.21,
+          "eval_s": 2.62,
+          "prompt_s": 0.016,
+          "total_s": 3.177,
+          "eval_count": 163,
+          "prompt_eval_count": 23
+        }
+      ]
+    }
+  }
+}

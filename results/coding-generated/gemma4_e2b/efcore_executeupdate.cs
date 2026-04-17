@@ -28,13 +28,13 @@ public class ProductDbContext : DbContext
 public static class ProductOperations
 {
     /// <summary>
-    /// Applies a discount to all products in a specific category by manually querying and updating,
-    /// necessary because the InMemory provider does not support ExecuteUpdateAsync.
+    /// Applies a discount to all products in a specific category using manual iteration,
+    /// necessary for compatibility with the InMemory provider's limitations on ExecuteUpdateAsync.
     /// </summary>
     /// <param name="db">The DbContext to operate on.</param>
     /// <param name="category">The category to target.</param>
     /// <param name="discountPct">The discount fraction (e.g., 0.10 for 10%).</param>
-    /// <returns>The number of rows affected (updated).</returns>
+    /// <returns>The number of products updated.</returns>
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
         var updatedCount = 0;
@@ -45,11 +45,19 @@ public static class ProductOperations
             .Where(p => p.Category == category)
             .ToListAsync();
 
-        // Manually update the properties
         foreach (var product in productsToUpdate)
         {
+            // Calculate new price
             product.Price = product.Price * (1m - discountPct);
+
+            // Update last modified time
             product.LastModified = now;
+
+            // Note: Since we are operating on entities loaded from the context, 
+            // EF Core will track these changes. We must explicitly mark them as modified 
+            // or rely on SaveChangesAsync to detect changes if the context is tracking them.
+            // For simplicity and correctness in this manual loop, we rely on the context tracking 
+            // the modifications made to the tracked entities.
         }
 
         // Save changes
@@ -60,45 +68,47 @@ public static class ProductOperations
     }
 }
 
-// Example usage context (optional, for completeness, not strictly required by prompt)
+// Example usage context (for completeness, not strictly required by prompt but useful for context)
 /*
 public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Setup In-Memory Database for testing
+        // Setup In-Memory Database
         var options = new DbContextOptionsBuilder<ProductDbContext>()
             .UseInMemoryDatabase(databaseName: "TestDb")
             .Options;
 
         using (var context = new ProductDbContext(options))
         {
-            // Seed data
+            // Seed Data
             context.Products.AddRange(
-                new Product { Name = "Laptop", Price = 1000.00m, Category = "Electronics" },
-                new Product { Name = "Mouse", Price = 25.00m, Category = "Electronics" },
-                new Product { Name = "Shirt", Price = 50.00m, Category = "Apparel" }
+                new Product { Name = "Laptop", Price = 1000m, Category = "Electronics" },
+                new Product { Name = "Mouse", Price = 25m, Category = "Electronics" },
+                new Product { Name = "Shirt", Price = 50m, Category = "Apparel" }
             );
             await context.SaveChangesAsync();
 
             Console.WriteLine("--- Before Discount ---");
-            var electronicsCountBefore = await context.Products.Where(p => p.Category == "Electronics").CountAsync();
-            Console.WriteLine($"Electronics count: {electronicsCountBefore}");
+            await DisplayProducts(context);
 
             // Apply Discount
             string targetCategory = "Electronics";
             decimal discount = 0.10m; // 10% discount
+            int updated = await ProductOperations.ApplyDiscount(context, targetCategory, discount);
+            Console.WriteLine($"\nSuccessfully applied {discount * 100}% discount to {updated} products in {targetCategory}.");
 
-            var affectedRows = await ProductOperations.ApplyDiscount(context, targetCategory, discount);
+            Console.WriteLine("\n--- After Discount ---");
+            await DisplayProducts(context);
+        }
+    }
 
-            Console.WriteLine($"\n--- After Discount ---");
-            Console.WriteLine($"Products in {targetCategory} updated: {affectedRows}");
-
-            var electronicsCountAfter = await context.Products.Where(p => p.Category == "Electronics").CountAsync();
-            Console.WriteLine($"Electronics count after update: {electronicsCountAfter}");
-
-            var apparelCount = await context.Products.Where(p => p.Category == "Apparel").CountAsync();
-            Console.WriteLine($"Apparel count (unchanged): {apparelCount}");
+    private static async Task DisplayProducts(ProductDbContext context)
+    {
+        var products = await context.Products.OrderBy(p => p.Id).ToListAsync();
+        foreach (var p in products)
+        {
+            Console.WriteLine($"ID: {p.Id}, Name: {p.Name}, Price: {p.Price:C}, Category: {p.Category}, Modified: {p.LastModified}");
         }
     }
 }

@@ -15,7 +15,7 @@ public class Customer
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public Address HomeAddress { get; set; } = new Address(); // Initialize to a new Address instance
+    public Address HomeAddress { get; set; } // Navigation property
 }
 
 // 3. CustomerDbContext class
@@ -64,7 +64,7 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Setup DbContext (Example using in-memory for demonstration)
+        // Setup DbContext (using in-memory for simplicity)
         var options = new DbContextOptionsBuilder<CustomerDbContext>()
             .UseInMemoryDatabase(databaseName: "TestDb")
             .Options;
@@ -74,23 +74,24 @@ public class Program
             // Ensure database is created (for in-memory)
             context.Database.EnsureCreated();
 
+            // Setup Repository
             var repository = new CustomerRepository(context);
 
             // Create a new customer
             var newCustomer = new Customer
             {
                 Name = "Alice Smith",
-                HomeAddress = new Address { Street = "123 Main St", City = "London", Zip = "SW1A 0AA" }
+                HomeAddress = new Address { Street = "123 Main St", City = "Springfield", Zip = "12345" }
             };
-            await repository.CreateAsync(newCustomer);
-            Console.WriteLine($"Created customer with ID: {newCustomer.Id}");
+
+            var savedCustomer = await repository.CreateAsync(newCustomer);
+            Console.WriteLine($"Created Customer: {savedCustomer.Name}, ID: {savedCustomer.Id}");
 
             // Get the customer
-            var retrievedCustomer = await repository.GetByIdAsync(newCustomer.Id);
+            var retrievedCustomer = await repository.GetByIdAsync(savedCustomer.Id);
             if (retrievedCustomer != null)
             {
-                Console.WriteLine($"Retrieved Customer: {retrievedCustomer.Name}");
-                Console.WriteLine($"Address: {retrievedCustomer.HomeAddress.Street}, {retrievedCustomer.HomeAddress.City}");
+                Console.WriteLine($"Retrieved Customer: {retrievedCustomer.Name}, City: {retrievedCustomer.HomeAddress.City}");
             }
         }
     }

@@ -12,9 +12,7 @@ public class GetProductConsumer : IConsumer<GetProduct>
 
     public async Task Consume(ConsumeContext<GetProduct> context)
     {
-        var request = context.Message;
-
-        if (request.ProductId == KnownId)
+        if (context.Message.ProductId == KnownId)
         {
             await context.RespondAsync(new ProductResult(KnownId, "Test Widget", 19.99m));
         }

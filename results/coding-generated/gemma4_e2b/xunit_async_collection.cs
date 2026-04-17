@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -31,7 +30,7 @@ public class CounterFixture : IAsyncLifetime
     }
 }
 
-// 3. Marker class implementing ICollectionFixture
+// 3. Marker class for collection fixture
 [CollectionDefinition("Counter")]
 public class CounterCollection : ICollectionFixture<CounterFixture>
 {
@@ -42,18 +41,18 @@ public class CounterCollection : ICollectionFixture<CounterFixture>
 [Collection("Counter")]
 public class CounterFirstTests
 {
-    public CounterFixture Fixture { get; }
+    private readonly CounterFixture _fixture;
 
     public CounterFirstTests(CounterFixture fixture)
     {
-        Fixture = fixture;
+        _fixture = fixture;
     }
 
     [Fact]
     public void Increment_FirstTest_IncrementsCount()
     {
-        Fixture.Counter.Increment();
-        Fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
+        _fixture.Counter.Increment();
+        _fixture.Counter.Count.Should().Be(1);
     }
 }
 
@@ -61,18 +60,18 @@ public class CounterFirstTests
 [Collection("Counter")]
 public class CounterSecondTests
 {
-    public CounterFixture Fixture { get; }
+    private readonly CounterFixture _fixture;
 
     public CounterSecondTests(CounterFixture fixture)
     {
-        Fixture = fixture;
+        _fixture = fixture;
     }
 
     [Fact]
     public void Increment_SecondTest_IncrementsCountCorrectly()
     {
-        Fixture.Counter.Increment();
-        Fixture.Counter.Increment();
-        Fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
+        _fixture.Counter.Increment();
+        _fixture.Counter.Increment();
+        _fixture.Counter.Count.Should().Be(2);
     }
 }

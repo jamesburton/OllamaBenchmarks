@@ -93,6 +93,7 @@ def call_ollama(
         "options": {
             "num_predict": max_tokens,
             "num_ctx": num_ctx,
+            "num_gpu": 99,
             "temperature": options["temperature"],
             "top_p": options["top_p"],
             "seed": seed,

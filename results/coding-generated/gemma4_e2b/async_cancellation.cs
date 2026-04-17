@@ -17,8 +17,7 @@ public class DataProcessor
             // 1. Check cancellation before fetching
             if (ct.IsCancellationRequested)
             {
-                // Yield break if cancelled (do NOT throw)
-                break;
+                yield break; // Stop enumeration gracefully
             }
 
             // 2. Fetch batch
@@ -29,14 +28,8 @@ public class DataProcessor
             }
             catch (OperationCanceledException)
             {
-                // If FetchBatchAsync throws OCE (which it might if it respects ct), we stop.
-                break;
-            }
-            catch (Exception)
-            {
-                // Handle other potential exceptions during fetching if necessary, 
-                // though the requirement focuses on cancellation.
-                break;
+                // If an operation was cancelled during the fetch, stop immediately.
+                yield break;
             }
 
             // 3. Break if empty
@@ -51,10 +44,9 @@ public class DataProcessor
                 // Check cancellation again before yielding the next item in the batch
                 if (ct.IsCancellationRequested)
                 {
-                    // Stop yielding immediately if cancelled
-                    break;
+                    yield break;
                 }
-                yield return item;
+                yield item;
             }
 
             batchNumber++;

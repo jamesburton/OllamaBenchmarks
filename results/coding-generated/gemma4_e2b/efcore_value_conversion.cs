@@ -22,7 +22,7 @@ public class ProductDbContext : DbContext
     {
     }
 
-    // Private static method to parse money string
+    // Helper method to parse the string format "amount:currency"
     private static Money ParseMoney(string s)
     {
         if (string.IsNullOrEmpty(s))
@@ -34,7 +34,7 @@ public class ProductDbContext : DbContext
         {
             return new Money(amount, parts[1]);
         }
-        // Fallback or error handling if format is unexpected
+        // Fallback if parsing fails
         return new Money(0, "USD");
     }
 

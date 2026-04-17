@@ -5,28 +5,19 @@ using Microsoft.Extensions.DependencyInjection;
 public interface IOrderRepository { }
 
 // 2. OrderRepository class
-public class OrderRepository : IOrderRepository
-{
-    // Must have a parameterless constructor
-}
+public class OrderRepository : IOrderRepository { }
 
 // 3. IOrderService interface
 public interface IOrderService { }
 
 // 4. OrderService class
-public class OrderService : IOrderService
-{
-    // Must have a parameterless constructor
-}
+public class OrderService : IOrderService { }
 
 // 5. IEmailNotifier interface
 public interface IEmailNotifier { }
 
 // 6. EmailNotifier class
-public class EmailNotifier : IEmailNotifier
-{
-    // Must have a parameterless constructor
-}
+public class EmailNotifier : IEmailNotifier { }
 
 // 7. OrderSettings class
 public class OrderSettings

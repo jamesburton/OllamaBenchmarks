@@ -8,14 +8,14 @@ public record Sale(string Product, string Category, decimal Amount, DateOnly Dat
 // 2. A CategorySummary record
 public record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
 
-// 3. A static class for analysis
+// 3. A static class SalesAnalyzer with the summarization method
 public static class SalesAnalyzer
 {
     /// <summary>
-    /// Summarizes sales data by category, calculating total, average, and count, and orders by total amount descending.
+    /// Summarizes sales data by category, calculating total, average, and count for each category.
     /// </summary>
     /// <param name="sales">The collection of Sale records.</param>
-    /// <returns>A list of CategorySummary records.</returns>
+    /// <returns>A list of CategorySummary records, ordered by TotalAmount descending.</returns>
     public static List<CategorySummary> SummarizeByCategory(IEnumerable<Sale> sales)
     {
         return sales
@@ -42,12 +42,12 @@ public class Program
         // Example Usage
         var salesData = new List<Sale>
         {
-            new Sale("Laptop", "Electronics", 1200.50m, new DateOnly(2023, 10, 1)),
-            new Sale("T-Shirt", "Apparel", 25.00m, new DateOnly(2023, 10, 2)),
-            new Sale("Mouse", "Electronics", 35.99m, new DateOnly(2023, 10, 3)),
-            new Sale("Jeans", "Apparel", 75.50m, new DateOnly(2023, 10, 4)),
-            new Sale("Keyboard", "Electronics", 75.00m, new DateOnly(2023, 10, 5)),
-            new Sale("Socks", "Apparel", 10.00m, new DateOnly(2023, 10, 6))
+            new Sale("Laptop", "Electronics", 1200.00m, new DateOnly(2023, 1, 15)),
+            new Sale("T-Shirt", "Apparel", 25.50m, new DateOnly(2023, 1, 16)),
+            new Sale("Mouse", "Electronics", 45.00m, new DateOnly(2023, 1, 17)),
+            new Sale("Jeans", "Apparel", 75.00m, new DateOnly(2023, 1, 18)),
+            new Sale("Keyboard", "Electronics", 75.00m, new DateOnly(2023, 1, 19)),
+            new Sale("Socks", "Apparel", 10.00m, new DateOnly(2023, 1, 20))
         };
 
         Console.WriteLine("--- Sales Data ---");

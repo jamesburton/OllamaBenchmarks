@@ -27,8 +27,17 @@ public class GitHubClient : IGitHubClient
 
     public async Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
     {
-        // The API reference implies using GetFromJsonAsync for deserialization
-        return await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
+        // The API reference implies the base address is set in the DI setup (e.g., to github.com)
+        // We use the HttpClient injected via DI.
+        var response = await _httpClient.GetAsync($"/users/{username}", ct);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Use GetFromJsonAsync for deserialization
+            return await response.Content.ReadFromJsonAsync<GitHubUser>(ct);
+        }
+
+        return null;
     }
 }
 

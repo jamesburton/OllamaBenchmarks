@@ -7,12 +7,12 @@ public class SharedCounter : IAsyncLifetime
     public ValueTask InitializeAsync()
     {
         counter = 0;
-        return default;
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask DisposeAsync()
     {
-        return default;
+        return ValueTask.CompletedTask;
     }
 
     public int IncrementAndGet()
@@ -23,29 +23,17 @@ public class SharedCounter : IAsyncLifetime
 
 public class FirstCounterTests
 {
-    public FirstCounterTests(SharedCounter counter)
+    private readonly SharedCounter _counter;
+
+    public FirstCounterTests()
     {
-        // Constructor injection is used here
+        _counter = new SharedCounter();
     }
 
     [Fact]
-    public void TestIncrementAndGet_ConstructorInjection()
+    public void IncrementAndGet_shouldReturnGreaterThanZero()
     {
-        var counter = new SharedCounter();
-        var instance = new FirstCounterTests(counter);
-
-        // Since we are not using IAsyncLifetime setup via fixture, 
-        // we must manually call InitializeAsync if we want to rely on the IAsyncLifetime contract 
-        // for setup, although for this specific test, we just need to ensure the counter is usable.
-        // In a real scenario using AssemblyFixture, the fixture handles this setup.
-        // For this isolated test, we rely on the fact that the counter object exists.
-
-        // To properly test the state change, we need to interact with the object instance.
-        // Since the requirement implies testing the interaction, we'll instantiate and test directly.
-
-        var counterInstance = new SharedCounter();
-        var result = counterInstance.IncrementAndGet();
-
+        int result = _counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }
@@ -53,20 +41,12 @@ public class FirstCounterTests
 public class SecondCounterTests
 {
     [Fact]
-    public void TestIncrementAndGet_TestContextFixture()
+    public void IncrementAndGet_viaFixture_shouldReturnGreaterThanZero()
     {
-        // Accessing the fixture via TestContext.Current.GetFixture<T>()
+        // Retrieve the fixture using TestContext
         var counter = TestContext.Current.GetFixture<SharedCounter>();
 
-        // Note: In xUnit v3, fixtures injected via AssemblyFixture are typically available 
-        // via the constructor if using the fixture pattern, or via TestContext if using 
-        // the assembly-scoped fixture pattern.
-
-        // We must ensure the fixture has been initialized if we rely on its state.
-        // Since the fixture implements IAsyncLifetime, the setup happens during test execution.
-
-        var result = counter.IncrementAndGet();
-
+        int result = counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }
