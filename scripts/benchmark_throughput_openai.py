@@ -92,6 +92,7 @@ def main() -> None:
         'messages': [{'role': 'user', 'content': 'Warmup: one short sentence.'}],
         'temperature': 0,
         'max_tokens': 16,
+        'chat_template_kwargs': {'enable_thinking': False},
     }, api_key=args.api_key)
 
     payload = {
@@ -99,6 +100,7 @@ def main() -> None:
         'messages': [{'role': 'user', 'content': args.prompt}],
         'temperature': 0,
         'max_tokens': args.num_predict,
+        'chat_template_kwargs': {'enable_thinking': False},
     }
 
     cpu_samples: list[float] = []
@@ -111,7 +113,7 @@ def main() -> None:
     start = time.perf_counter()
     proc = subprocess.Popen(['python', '-c', (
         'import json, urllib.request; '
-        f'payload = {json.dumps(payload)}; '
+        f'payload = json.loads({json.dumps(json.dumps(payload))}); '
         'req = urllib.request.Request(' + repr(args.base_url.rstrip('/') + '/v1/chat/completions') + ', data=json.dumps(payload).encode("utf-8"), headers={"Content-Type":"application/json"}, method="POST"); '
         'print(urllib.request.urlopen(req, timeout=1800).read().decode("utf-8"))'
     )], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)

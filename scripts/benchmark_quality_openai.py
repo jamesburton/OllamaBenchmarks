@@ -121,6 +121,7 @@ def chat_completion(base_url: str, model: str, messages: list[dict[str, Any]], a
         "messages": messages,
         "temperature": 0,
         "max_tokens": max_tokens,
+        "chat_template_kwargs": {"enable_thinking": False},
     }
     if tools:
         payload["tools"] = tools

@@ -7,3 +7,8 @@ __pycache__/
 *.bak
 
 scripts/coding_tasks/templates/.cache/
+
+models/
+*.gguf
+*.tar
+.claude/scheduled_tasks.lock
