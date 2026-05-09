@@ -1,0 +1,62 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-05-09T17:41:08.735322+00:00",
+  "run_finished_at": "2026-05-09T17:45:16.920306+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-hf.co_bartowski_kai-os_Carnice-V2-27b-GGUF_Q4_K_M.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-05-09T17:41:10.375366+00:00",
+    "hostname": "Strix",
+    "host_slug": "strix",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Bosgame",
+    "model": "BeyondMax Series",
+    "processor": "AMD64 Family 26 Model 112 Stepping 0, AuthenticAMD",
+    "logical_cpu_count": 32,
+    "total_memory_gb": 63.65,
+    "python_version": "3.14.3",
+    "ollama_version": "ollama version is 0.22.0",
+    "gpus": [
+      {
+        "Name": "AMD Radeon(TM) 8060S Graphics",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.12064.27",
+        "VideoProcessor": "AMD Radeon Graphics Processor (0x1586)",
+        "Status": "OK"
+      },
+      {
+        "Name": "USB Mobile Monitor Virtual Display",
+        "AdapterRAM": null,
+        "DriverVersion": "2.0.0.1",
+        "VideoProcessor": null,
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M"
+  ],
+  "completed_models": [
+    "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "results": [
+    {
+      "model": "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M",
+      "coding_pass": 3,
+      "coding_total": 5,
+      "tool_pass": 0,
+      "tool_total": 4,
+      "agentic_pass": 0,
+      "agentic_total": 2,
+      "score": 3,
+      "score_max": 11
+    }
+  ]
+}

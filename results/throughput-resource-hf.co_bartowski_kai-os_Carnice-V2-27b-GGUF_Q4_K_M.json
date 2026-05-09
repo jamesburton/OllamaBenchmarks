@@ -1,0 +1,39 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-05-09T18:46:20.2850531+01:00",
+  "run_finished_at": "2026-05-09T18:46:47.3017938+01:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-hf.co_bartowski_kai-os_Carnice-V2-27b-GGUF_Q4_K_M.json",
+  "host": "STRIX",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "hostname": "STRIX"
+  },
+  "models": [
+    "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M"
+  ],
+  "completed_models": [
+    "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M",
+      "eval_count": 192,
+      "eval_s": 22.196,
+      "toks_per_s": 8.65,
+      "total_s": 22.832,
+      "load_s": 0.244,
+      "cpu_avg_pct": 3.2,
+      "cpu_peak_pct": 3.5,
+      "ram_peak_gb": 1.22,
+      "gpu_util_avg": 97.3,
+      "gpu_util_peak": 98.1,
+      "gpu_mem_peak_gb": 38.39,
+      "ollama_ps": "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M size=36.85GB vram=36.85GB ctx=262144 quant=unknown"
+    }
+  ]
+}
