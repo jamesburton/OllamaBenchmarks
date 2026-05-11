@@ -131,7 +131,10 @@ def main() -> None:
             "layer3_weighted_score": layer3_score,
         }
 
-        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
+        think_env = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
+        suffix = "-think" if think_env in ("1", "true", "yes", "on", "low", "medium", "high") else ""
+        checkpoint_payload["think_setting"] = think_env or "false"
+        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
         write_json(checkpoint_path, checkpoint_payload)
         print(f"  [checkpoint] Written to {checkpoint_path}")
 

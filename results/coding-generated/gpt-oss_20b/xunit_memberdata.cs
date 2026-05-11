@@ -7,16 +7,19 @@ public static class MathValidator
         if (n < 2) return false;
         if (n == 2) return true;
         if (n % 2 == 0) return false;
-        int limit = (int)Math.Sqrt(n);
-        for (int i = 3; i <= limit; i += 2)
+        for (int i = 3; i * i <= n; i += 2)
         {
             if (n % i == 0) return false;
         }
         return true;
     }
 
-    public static string Classify(int n) =>
-        n < 0 ? "negative" : n == 0 ? "zero" : "positive";
+    public static string Classify(int n)
+    {
+        if (n < 0) return "negative";
+        if (n == 0) return "zero";
+        return "positive";
+    }
 }
 
 public class MathValidatorTests

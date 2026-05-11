@@ -5,21 +5,20 @@ public static class MathValidator
     public static bool IsPrime(int n)
     {
         if (n < 2) return false;
-        if (n == 2) return true;
-        if (n % 2 == 0) return false;
-        for (int i = 3; i * i <= n; i += 2)
-        {
+        for (int i = 2; i * i <= n; i++)
             if (n % i == 0) return false;
-        }
         return true;
     }
 
-    public static string Classify(int n) => n < 0 ? "negative" : n == 0 ? "zero" : "positive";
+    public static string Classify(int n)
+    {
+        return n < 0 ? "negative" : n == 0 ? "zero" : "positive";
+    }
 }
 
 public class MathValidatorTests
 {
-    public static IEnumerable<object[]> EvenTestData => new object[][]
+    public static IEnumerable<object[]> EvenTestData => new[]
     {
         new object[] { 2, true },
         new object[] { 3, false },

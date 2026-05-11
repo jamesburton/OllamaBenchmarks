@@ -17,14 +17,13 @@ public class OrderService
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
         var validationContext = new ValidationContext(request);
-        var validationResults = new List<ValidationResult>();
+        var validationResults = new System.Collections.Generic.List<ValidationResult>();
 
         bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
 
         if (!isValid)
         {
-            var firstError = validationResults.FirstOrDefault();
-            throw new ArgumentException(firstError?.ErrorMessage ?? "Validation failed");
+            throw new System.ArgumentException(validationResults[0].ErrorMessage);
         }
 
         return request;

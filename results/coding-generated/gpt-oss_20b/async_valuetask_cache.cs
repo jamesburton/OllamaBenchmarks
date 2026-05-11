@@ -6,7 +6,7 @@ public interface IExpensiveService
 public class CachingService
 {
     private readonly IExpensiveService _inner;
-    private readonly System.Collections.Generic.Dictionary<string, string> _cache = new System.Collections.Generic.Dictionary<string, string>();
+    private readonly System.Collections.Generic.Dictionary<string, string> _cache = new();
 
     public CachingService(IExpensiveService inner)
     {
@@ -20,7 +20,7 @@ public class CachingService
             return new System.Threading.Tasks.ValueTask<string>(cachedValue);
         }
 
-        var result = await _inner.ComputeAsync(key);
+        var result = await _inner.ComputeAsync(key).ConfigureAwait(false);
         _cache[key] = result;
         return result;
     }

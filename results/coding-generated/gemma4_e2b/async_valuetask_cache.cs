@@ -5,23 +5,32 @@ public interface IExpensiveService
 
 public class CachingService
 {
-    private readonly IExpensiveService inner;
-    private readonly System.Collections.Generic.Dictionary<string, string> cache = new System.Collections.Generic.Dictionary<string, string>();
+    private readonly IExpensiveService _inner;
+    private readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
 
     public CachingService(IExpensiveService inner)
     {
-        this.inner = inner;
+        _inner = inner;
     }
 
-    public System.Threading.Tasks.ValueTask<string> GetAsync(string key)
+    public ValueTask<string> GetAsync(string key)
     {
-        if (cache.TryGetValue(key, out string cachedValue))
+        if (_cache.TryGetValue(key, out string cachedValue))
         {
-            return new System.Threading.Tasks.ValueTask<string>(cachedValue);
+            // Cache Hit: Return synchronously
+            return new ValueTask<string>(cachedValue);
         }
 
-        string result = System.Threading.Tasks.Task.Run(() => inner.ComputeAsync(key)).Result;
-        cache[key] = result;
-        return new System.Threading.Tasks.ValueTask<string>(result);
+        // Cache Miss: Compute the value
+        Task<string> computationTask = _inner.ComputeAsync(key);
+
+        // Await the result
+        string computedValue = computationTask.GetAwaiter().GetResult();
+
+        // Store the result
+        _cache[key] = computedValue;
+
+        // Return the result wrapped in ValueTask
+        return new ValueTask<string>(computedValue);
     }
 }

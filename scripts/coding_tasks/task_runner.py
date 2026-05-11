@@ -85,11 +85,18 @@ def call_ollama(
     Returns empty string on timeout or connection error (does not crash).
     """
     options = sampling_options(model)
+    think_env = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
+    if think_env in ("1", "true", "yes", "on"):
+        think_value: bool | str = True
+    elif think_env in ("low", "medium", "high"):
+        think_value = think_env
+    else:
+        think_value = False
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": False,
-        "think": False,
+        "think": think_value,
         "options": {
             "num_predict": max_tokens,
             "num_ctx": num_ctx,

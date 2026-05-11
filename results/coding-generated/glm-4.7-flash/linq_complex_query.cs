@@ -20,7 +20,7 @@ namespace SalesApp
                     g.Average(s => s.Amount),
                     g.Count()
                 ))
-                .OrderByDescending(s => s.TotalAmount)
+                .OrderByDescending(g => g.TotalAmount)
                 .ToList();
         }
     }

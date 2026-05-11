@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 public class Address
@@ -26,10 +25,10 @@ public class CompanyDbContext : DbContext
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        builder.Entity<Company>()
-            .OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
+        modelBuilder.Entity<Company>()
+            .OwnsOne(c => c.HeadquartersAddress, a => a.ToJson());
     }
 }
 
@@ -38,8 +37,7 @@ public static class CompanyQueries
     public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
         return db.Companies
-            .Where(c => c.HeadquartersAddress != null && 
-                        c.HeadquartersAddress.City == city)
+            .Where(c => c.HeadquartersAddress != null && c.HeadquartersAddress.City == city)
             .ToList();
     }
 }

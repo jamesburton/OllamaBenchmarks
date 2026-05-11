@@ -13,14 +13,13 @@ public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
 
-    public ProductDbContext(DbContextOptions<ProductDbContext> options)
-        : base(options)
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
     {
     }
 
     private static Money ParseMoney(string s)
     {
-        var parts = s.Split(':');
+        var parts = s.Split(':', 2);
         if (parts.Length != 2)
         {
             throw new FormatException("Invalid money format");
@@ -36,10 +35,10 @@ public class ProductDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Product>().Property(p => p.Price)
-            .HasConversion(
-                m => $"{m.Amount}:{m.Currency}",
-                s => ParseMoney(s));
+        modelBuilder.Entity<Product>().Property(p => p.Price).HasConversion(
+            m => $"{m.Amount}:{m.Currency}",
+            s => ParseMoney(s)
+        );
     }
 }
 

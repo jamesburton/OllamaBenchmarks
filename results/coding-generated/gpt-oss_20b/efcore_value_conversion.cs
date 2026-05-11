@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 public record Money(decimal Amount, string Currency);
 
@@ -21,7 +21,7 @@ public class ProductDbContext : DbContext
 
     private static Money ParseMoney(string s)
     {
-        var parts = s.Split(':');
+        var parts = s.Split(':', 2);
         var amount = decimal.Parse(parts[0]);
         var currency = parts[1];
         return new Money(amount, currency);
@@ -29,8 +29,6 @@ public class ProductDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
             .HasConversion(

@@ -15,23 +15,24 @@ public class UserDashboard : ComponentBase
     public IUserService UserService { get; set; } = default!;
 
     public string? DisplayName { get; set; }
+
     public bool IsAuthenticated { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthState;
-        if (authState.User?.Identity?.IsAuthenticated == true)
+        if (authState?.User?.Identity?.IsAuthenticated == true)
         {
             IsAuthenticated = true;
-            var userName = authState.User.Identity.Name;
-            DisplayName = await UserService.GetDisplayNameAsync(userName);
+            var userName = authState.User.Identity?.Name;
+            DisplayName = string.IsNullOrEmpty(userName)
+                ? "Guest"
+                : await UserService.GetDisplayNameAsync(userName);
         }
         else
         {
             IsAuthenticated = false;
             DisplayName = "Guest";
         }
-
-        await base.OnInitializedAsync();
     }
 }

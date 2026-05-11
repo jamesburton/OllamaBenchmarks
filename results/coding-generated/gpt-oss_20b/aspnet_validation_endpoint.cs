@@ -21,8 +21,8 @@ public class OrderService
         bool isValid = Validator.TryValidateObject(request, context, results, true);
         if (!isValid)
         {
-            var firstError = results[0];
-            throw new ArgumentException(firstError.ErrorMessage);
+            var errorMessage = results[0].ErrorMessage;
+            throw new System.ArgumentException(errorMessage);
         }
         return request;
     }

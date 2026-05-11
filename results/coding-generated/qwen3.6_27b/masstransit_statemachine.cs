@@ -2,8 +2,8 @@ global using Contracts;
 
 namespace Contracts;
 
-using System;
 using MassTransit;
+using System;
 
 public class OrderState : SagaStateMachineInstance
 {
@@ -28,27 +28,3 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
     public Event<OrderCompleted> OrderCompleted { get; private set; }
 
     public OrderStateMachine()
-    {
-        InstanceState(x => x.CurrentState);
-
-        Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId));
-        Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId));
-        Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId));
-
-        Initially(
-            When(OrderSubmitted)
-                .Then(context => { context.Saga.OrderDate = context.Message.OrderDate; })
-                .TransitionTo(Submitted));
-
-        During(Submitted,
-            When(OrderAccepted)
-                .Then(context => { context.Saga.AcceptedAt = context.Message.AcceptedAt; })
-                .TransitionTo(Accepted));
-
-        During(Accepted,
-            When(OrderCompleted)
-                .Finalize());
-
-        SetCompletedWhenFinalized();
-    }
-}

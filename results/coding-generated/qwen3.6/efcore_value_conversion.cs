@@ -11,7 +11,7 @@ public class Product
 
 public class ProductDbContext : DbContext
 {
-    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Product> Products { get; set; }
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
     {
@@ -20,9 +20,7 @@ public class ProductDbContext : DbContext
     private static Money ParseMoney(string s)
     {
         var parts = s.Split(':');
-        var amount = decimal.Parse(parts[0]);
-        var currency = parts[1];
-        return new Money(amount, currency);
+        return new Money(decimal.Parse(parts[0]), parts[1]);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -53,6 +51,8 @@ public class ProductRepository
 
     public async Task<Product?> GetByIdAsync(int id)
     {
-        return await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+        return await _context.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 }

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,12 +18,12 @@ public class ArticleDbContext : DbContext
 {
     public DbSet<Article> Articles { get; set; }
 
-    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options) { }
+    public ArticleDbContext(DbContextOptions<ArticleDbContext> options)
+        : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Article>()
-            .HasQueryFilter(a => !a.IsDeleted);
+        modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
     }
 }
 
@@ -43,10 +42,11 @@ public class ArticleRepository
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
 
-        if (article == null) return;
-
-        article.IsDeleted = true;
-        await _context.SaveChangesAsync();
+        if (article != null)
+        {
+            article.IsDeleted = true;
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task<List<Article>> GetAllAsync()

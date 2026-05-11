@@ -24,45 +24,29 @@ public class StringProcessorTests
 {
     private readonly StringProcessor _sut = new();
 
-    #region Truncate Tests
-
     [Theory]
     [InlineData(null, 5, "")]
     [InlineData("", 5, "")]
-    [InlineData("Hi", 5, "Hi")]
-    [InlineData("Hello", 5, "Hello")]
-    [InlineData("Hello World", 5, "Hello...")]
-    [InlineData("Test", 2, "Te...")]
-    [InlineData("A", 1, "A")]
-    [InlineData("AB", 1, "A...")]
-    public void Truncate_ShouldReturnExpectedResult(string input, int maxLength, string expected)
+    [InlineData("hi", 5, "hi")]
+    [InlineData("hello", 5, "hello")]
+    [InlineData("hello world", 5, "hello...")]
+    public void Truncate_ReturnsExpectedResult(string input, int maxLength, string expected)
     {
         var result = _sut.Truncate(input, maxLength);
         result.Should().Be(expected);
     }
 
-    #endregion
-
-    #region CountWords Tests
-
     [Theory]
     [InlineData(null, 0)]
     [InlineData("", 0)]
-    [InlineData("   ", 0)]
     [InlineData("hello", 1)]
     [InlineData("hello world", 2)]
-    [InlineData("one two three", 3)]
-    [InlineData("  spaced   out  ", 2)]
-    [InlineData("single", 1)]
-    public void CountWords_ShouldReturnExpectedCount(string input, int expected)
+    [InlineData("  hello   world  ", 2)]
+    public void CountWords_ReturnsExpectedCount(string input, int expected)
     {
         var result = _sut.CountWords(input);
         result.Should().Be(expected);
     }
-
-    #endregion
-
-    #region IsPalindrome Tests
 
     [Theory]
     [InlineData(null, false)]
@@ -71,15 +55,9 @@ public class StringProcessorTests
     [InlineData("racecar", true)]
     [InlineData("hello", false)]
     [InlineData("RaceCar", true)]
-    [InlineData("A man a plan a canal Panama", true)]
-    [InlineData("No lemon, no melon", false)] // Note: punctuation is not removed in implementation, so this is false
-    [InlineData("abba", true)]
-    [InlineData("abc", false)]
-    public void IsPalindrome_ShouldReturnExpectedResult(string input, bool expected)
+    public void IsPalindrome_ReturnsExpectedResult(string input, bool expected)
     {
         var result = _sut.IsPalindrome(input);
         result.Should().Be(expected);
     }
-
-    #endregion
 }

@@ -1,10 +1,9 @@
-using System;
-using System.Collections;
-using System.Linq;
-
 public static class MathValidator
 {
-    public static bool IsEven(int n) => n % 2 == 0;
+    public static bool IsEven(int n)
+    {
+        return n % 2 == 0;
+    }
 
     public static bool IsPrime(int n)
     {
@@ -51,7 +50,8 @@ public class MathValidatorTests
     [MemberData(nameof(EvenTestData))]
     public void IsEven_WithMemberData(int n, bool expected)
     {
-        MathValidator.IsEven(n).Should().Be(expected);
+        bool actual = MathValidator.IsEven(n);
+        actual.Should().Be(expected);
     }
 
     [Theory]
@@ -63,7 +63,8 @@ public class MathValidatorTests
     [InlineData(0, false)]
     public void IsPrime_WithInlineData(int n, bool expected)
     {
-        MathValidator.IsPrime(n).Should().Be(expected);
+        bool actual = MathValidator.IsPrime(n);
+        actual.Should().Be(expected);
     }
 
     [Theory]
@@ -72,6 +73,7 @@ public class MathValidatorTests
     [InlineData(3, "positive")]
     public void Classify_WithInlineData(int n, string expected)
     {
-        MathValidator.Classify(n).Should().Be(expected);
+        string actual = MathValidator.Classify(n);
+        actual.Should().Be(expected);
     }
 }

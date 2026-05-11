@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 public class TodoItem
 {
     public int Id { get; set; }
-    public string Title { get; set; } = null!;
+    public string Title { get; set; }
     public bool IsComplete { get; set; }
     public System.DateTime CreatedAt { get; set; }
 }
@@ -12,7 +12,7 @@ public class TodoDbContext : DbContext
 {
     public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options) { }
 
-    public DbSet<TodoItem> TodoItems { get; set; } = null!;
+    public DbSet<TodoItem> TodoItems { get; set; }
 }
 
 public interface ITodoService
@@ -26,11 +26,11 @@ public interface ITodoService
 
 public class TodoService : ITodoService
 {
-    private readonly TodoDbContext db;
+    private readonly TodoDbContext _db;
 
     public TodoService(TodoDbContext db)
     {
-        this.db = db;
+        _db = db;
     }
 
     public async System.Threading.Tasks.Task<TodoItem> CreateAsync(string title)
@@ -41,36 +41,36 @@ public class TodoService : ITodoService
             IsComplete = false,
             CreatedAt = System.DateTime.UtcNow
         };
-        db.TodoItems.Add(item);
-        await db.SaveChangesAsync();
+        _db.TodoItems.Add(item);
+        await _db.SaveChangesAsync();
         return item;
     }
 
     public async System.Threading.Tasks.Task<System.Collections.Generic.List<TodoItem>> GetAllAsync()
     {
-        return await db.TodoItems.ToListAsync();
+        return await _db.TodoItems.ToListAsync();
     }
 
     public async System.Threading.Tasks.Task<TodoItem?> GetByIdAsync(int id)
     {
-        return await db.TodoItems.FindAsync(id);
+        return await _db.TodoItems.FindAsync(id);
     }
 
     public async System.Threading.Tasks.Task<bool> CompleteAsync(int id)
     {
-        var item = await db.TodoItems.FindAsync(id);
+        var item = await _db.TodoItems.FindAsync(id);
         if (item == null) return false;
         item.IsComplete = true;
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
         return true;
     }
 
     public async System.Threading.Tasks.Task<bool> DeleteAsync(int id)
     {
-        var item = await db.TodoItems.FindAsync(id);
+        var item = await _db.TodoItems.FindAsync(id);
         if (item == null) return false;
-        db.TodoItems.Remove(item);
-        await db.SaveChangesAsync();
+        _db.TodoItems.Remove(item);
+        await _db.SaveChangesAsync();
         return true;
     }
 }

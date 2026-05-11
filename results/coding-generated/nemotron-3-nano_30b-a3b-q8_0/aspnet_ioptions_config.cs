@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 public class SmtpOptions
 {
-    public string Host { get; set; } = default!;
+    public string Host { get; set; } = string.Empty;
     public int Port { get; set; }
     public string? Username { get; set; }
 }
@@ -16,20 +16,18 @@ public interface IEmailSender
 
 public class SmtpEmailSender : IEmailSender
 {
-    private readonly IOptions<SmtpOptions> _options;
-
     public SmtpEmailSender(IOptions<SmtpOptions> options)
     {
-        _options = options;
+        Options = options.Value;
     }
 
     public string? LastSentTo { get; set; }
 
-    public SmtpOptions Options => _options.Value;
+    public SmtpOptions Options { get; }
 
-    public Task SendAsync(string to, string subject, string body)
+    public async Task SendAsync(string to, string subject, string body)
     {
         LastSentTo = to;
-        return Task.CompletedTask;
+        return await Task.CompletedTask;
     }
 }

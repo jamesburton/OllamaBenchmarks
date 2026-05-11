@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using System;
+using System.Threading.Tasks;
 
 public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
 

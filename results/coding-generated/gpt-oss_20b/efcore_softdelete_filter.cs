@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +25,8 @@ public class ArticleDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
+        modelBuilder.Entity<Article>()
+            .HasQueryFilter(a => !a.IsDeleted);
     }
 }
 

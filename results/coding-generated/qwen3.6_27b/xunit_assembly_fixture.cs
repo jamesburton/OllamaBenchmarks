@@ -31,9 +31,9 @@ public class FirstCounterTests
     }
 
     [Fact]
-    public void IncrementAndGet_ReturnsGreaterThanZero()
+    public void TestIncrementsCounter()
     {
-        var result = _counter.IncrementAndGet();
+        int result = _counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }
@@ -41,10 +41,10 @@ public class FirstCounterTests
 public class SecondCounterTests
 {
     [Fact]
-    public void IncrementAndGet_ReturnsGreaterThanZero()
+    public void TestIncrementsCounterViaContext()
     {
         var counter = TestContext.Current.GetFixture<SharedCounter>();
-        var result = counter.IncrementAndGet();
+        int result = counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }

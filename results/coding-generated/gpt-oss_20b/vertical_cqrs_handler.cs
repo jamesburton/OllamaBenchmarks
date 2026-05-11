@@ -1,33 +1,21 @@
 using OneOf;
 
-// -----------------------------------------------------------------------------
-// Domain types
-// -----------------------------------------------------------------------------
 public record CreateProductCommand(string Name, decimal Price);
 public record Product(int Id, string Name, decimal Price);
 public record ValidationError(string Message);
 public record DuplicateError(string ExistingName);
 
-// -----------------------------------------------------------------------------
-// Repository interface
-// -----------------------------------------------------------------------------
 public interface IProductRepository
 {
     Task<bool> ExistsAsync(string name);
     Task<Product> AddAsync(Product product);
 }
 
-// -----------------------------------------------------------------------------
-// Generic command handler interface
-// -----------------------------------------------------------------------------
 public interface ICommandHandler<TCommand, TResult>
 {
     Task<TResult> HandleAsync(TCommand command);
 }
 
-// -----------------------------------------------------------------------------
-// CreateProductCommandHandler implementation
-// -----------------------------------------------------------------------------
 public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, OneOf<Product, ValidationError, DuplicateError>>
 {
     private readonly IProductRepository _repository;
@@ -54,27 +42,19 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
     }
 }
 
-// -----------------------------------------------------------------------------
-// Tests
-// -----------------------------------------------------------------------------
 public class CreateProductCommandHandlerTests
 {
     [Fact]
     public async Task HandleAsync_NameIsNullOrWhitespace_ReturnsValidationError()
     {
-        // Arrange
         var repo = Substitute.For<IProductRepository>();
         var handler = new CreateProductCommandHandler(repo);
-        var command = new CreateProductCommand(null, 10m);
 
-        // Act
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(new CreateProductCommand(null, 10));
 
-        // Assert
         result.IsT1.Should().BeTrue();
         result.AsT1.Should().Be(new ValidationError("Name is required"));
 
-        // Verify no repository calls
         await repo.DidNotReceive().ExistsAsync(Arg.Any<string>());
         await repo.DidNotReceive().AddAsync(Arg.Any<Product>());
     }
@@ -82,19 +62,14 @@ public class CreateProductCommandHandlerTests
     [Fact]
     public async Task HandleAsync_PriceIsZeroOrNegative_ReturnsValidationError()
     {
-        // Arrange
         var repo = Substitute.For<IProductRepository>();
         var handler = new CreateProductCommandHandler(repo);
-        var command = new CreateProductCommand("Widget", 0m);
 
-        // Act
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(new CreateProductCommand("Widget", 0));
 
-        // Assert
         result.IsT1.Should().BeTrue();
         result.AsT1.Should().Be(new ValidationError("Price must be positive"));
 
-        // Verify no repository calls
         await repo.DidNotReceive().ExistsAsync(Arg.Any<string>());
         await repo.DidNotReceive().AddAsync(Arg.Any<Product>());
     }
@@ -102,20 +77,15 @@ public class CreateProductCommandHandlerTests
     [Fact]
     public async Task HandleAsync_ProductAlreadyExists_ReturnsDuplicateError()
     {
-        // Arrange
         var repo = Substitute.For<IProductRepository>();
         repo.ExistsAsync("Widget").Returns(Task.FromResult(true));
         var handler = new CreateProductCommandHandler(repo);
-        var command = new CreateProductCommand("Widget", 10m);
 
-        // Act
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(new CreateProductCommand("Widget", 10));
 
-        // Assert
         result.IsT2.Should().BeTrue();
         result.AsT2.Should().Be(new DuplicateError("Widget"));
 
-        // Verify repository calls
         await repo.Received(1).ExistsAsync("Widget");
         await repo.DidNotReceive().AddAsync(Arg.Any<Product>());
     }
@@ -123,25 +93,20 @@ public class CreateProductCommandHandlerTests
     [Fact]
     public async Task HandleAsync_ValidCommand_AddsProductAndReturnsIt()
     {
-        // Arrange
         var repo = Substitute.For<IProductRepository>();
         repo.ExistsAsync("Widget").Returns(Task.FromResult(false));
-        var addedProduct = new Product(1, "Widget", 10m);
-        repo.AddAsync(Arg.Is<Product>(p => p.Id == 0 && p.Name == "Widget" && p.Price == 10m))
+        var addedProduct = new Product(1, "Widget", 10);
+        repo.AddAsync(Arg.Is<Product>(p => p.Name == "Widget" && p.Price == 10 && p.Id == 0))
             .Returns(Task.FromResult(addedProduct));
 
         var handler = new CreateProductCommandHandler(repo);
-        var command = new CreateProductCommand("Widget", 10m);
 
-        // Act
-        var result = await handler.HandleAsync(command);
+        var result = await handler.HandleAsync(new CreateProductCommand("Widget", 10));
 
-        // Assert
         result.IsT0.Should().BeTrue();
         result.AsT0.Should().Be(addedProduct);
 
-        // Verify repository calls
         await repo.Received(1).ExistsAsync("Widget");
-        await repo.Received(1).AddAsync(Arg.Is<Product>(p => p.Id == 0 && p.Name == "Widget" && p.Price == 10m));
+        await repo.Received(1).AddAsync(Arg.Is<Product>(p => p.Name == "Widget" && p.Price == 10 && p.Id == 0));
     }
 }

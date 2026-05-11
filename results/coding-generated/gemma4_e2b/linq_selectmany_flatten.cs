@@ -4,9 +4,13 @@ public static class StaffDirectory
 {
     public static List<string> GetAllEmployees(IEnumerable<Department> departments)
     {
-        return departments
-            .SelectMany(d => d.Employees)
-            .OrderBy(name => name)
-            .ToList();
+        // Flatten all employees lists using SelectMany
+        var allEmployees = departments.SelectMany(d => d.Employees);
+
+        // Order the resulting names alphabetically
+        var orderedEmployees = allEmployees.OrderBy(name => name);
+
+        // Return the result as a List<string>
+        return orderedEmployees.ToList();
     }
 }

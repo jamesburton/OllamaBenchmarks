@@ -1,5 +1,5 @@
-global using Contracts;
 using MassTransit;
+global using Contracts;
 
 namespace Contracts
 {
@@ -14,9 +14,13 @@ namespace Contracts
         public async Task Consume(ConsumeContext<GetProduct> context)
         {
             if (context.Message.ProductId == KnownId)
-                await context.RespondAsync(new ProductResult(KnownId, "Test Widget", 19.99m));
+            {
+                await context.RespondAsync<ProductResult>(new ProductResult(KnownId, "Test Widget", 19.99m));
+            }
             else
-                await context.RespondAsync(new ProductNotFound());
+            {
+                await context.RespondAsync<ProductNotFound>(new ProductNotFound());
+            }
         }
     }
 }

@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Http;
 
-record CreateProductRequest(string Name, decimal Price);
-record ProductResponse(int Id, string Name, decimal Price);
+public record CreateProductRequest(string Name, decimal Price);
 
-static class ProductEndpoints
+public record ProductResponse(int Id, string Name, decimal Price);
+
+public static class ProductEndpoints
 {
     private static int _counter = 0;
 
@@ -13,7 +14,7 @@ static class ProductEndpoints
         {
             return Results.ValidationProblem(new Dictionary<string, string[]>
             {
-                ["Name"] = new[] { "Name is required." }
+                ["Name"] = ["Name is required."]
             });
         }
 
@@ -21,11 +22,11 @@ static class ProductEndpoints
         {
             return Results.ValidationProblem(new Dictionary<string, string[]>
             {
-                ["Price"] = new[] { "Price must be greater than zero." }
+                ["Price"] = ["Price must be greater than zero."]
             });
         }
 
-        int id = ++_counter;
-        return Results.Ok(new ProductResponse(id, request.Name, request.Price));
+        _counter++;
+        return Results.Ok(new ProductResponse(_counter, request.Name, request.Price));
     }
 }

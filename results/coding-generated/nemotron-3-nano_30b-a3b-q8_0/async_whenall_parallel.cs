@@ -1,6 +1,6 @@
 interface IDataLoader
 {
-    Task<string> LoadAsync(string source, CancellationToken ct);
+    System.Threading.Tasks.Task<string> LoadAsync(string source, System.Threading.CancellationToken ct);
 }
 
 class ParallelDataService
@@ -16,13 +16,12 @@ class ParallelDataService
         this.loaderC = loaderC;
     }
 
-    public async Task<List<string>> LoadAllAsync(CancellationToken ct)
+    public async System.Threading.Tasks.Task<List<string>> LoadAllAsync(System.Threading.CancellationToken ct)
     {
         var taskA = loaderA.LoadAsync("sourceA", ct);
         var taskB = loaderB.LoadAsync("sourceB", ct);
         var taskC = loaderC.LoadAsync("sourceC", ct);
-
-        var results = await Task.WhenAll(taskA, taskB, taskC);
-        return new List<string> { results[0], results[1], results[2] };
+        var results = await System.Threading.Tasks.Task.WhenAll(taskA, taskB, taskC);
+        return new System.Collections.Generic.List<string>(new[] { results[0], results[1], results[2] });
     }
 }

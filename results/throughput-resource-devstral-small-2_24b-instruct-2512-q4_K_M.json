@@ -1,0 +1,39 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-05-11T02:05:43.1096837+01:00",
+  "run_finished_at": "2026-05-11T02:06:03.6481947+01:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-devstral-small-2_24b-instruct-2512-q4_K_M.json",
+  "host": "STRIX",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "hostname": "STRIX"
+  },
+  "models": [
+    "devstral-small-2:24b-instruct-2512-q4_K_M"
+  ],
+  "completed_models": [
+    "devstral-small-2:24b-instruct-2512-q4_K_M"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "devstral-small-2:24b-instruct-2512-q4_K_M",
+      "eval_count": 185,
+      "eval_s": 14.411,
+      "toks_per_s": 12.84,
+      "total_s": 14.778,
+      "load_s": 0.159,
+      "cpu_avg_pct": 2.6,
+      "cpu_peak_pct": 3.5,
+      "ram_peak_gb": 0.85,
+      "gpu_util_avg": 70.0,
+      "gpu_util_peak": 93.7,
+      "gpu_mem_peak_gb": 55.85,
+      "ollama_ps": "devstral-small-2:24b-instruct-2512-q4_K_M size=55.1GB vram=55.1GB ctx=262144 quant=Q4_K_M"
+    }
+  ]
+}

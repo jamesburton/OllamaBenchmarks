@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 public class NotFoundException : Exception
 {
@@ -29,20 +28,20 @@ public static class ApiExceptionMapper
         {
             NotFoundException notFound => new ProblemDetails
             {
-                Status = StatusCodes.Status404NotFound,
                 Title = "Not Found",
+                Status = StatusCodes.Status404NotFound,
                 Detail = notFound.ResourceName
-            };
+            },
             ConflictException conflict => new ProblemDetails
             {
-                Status = StatusCodes.Status409Conflict,
                 Title = "Conflict",
+                Status = StatusCodes.Status409Conflict,
                 Detail = conflict.ConflictReason
-            };
+            },
             _ => new ProblemDetails
             {
-                Status = StatusCodes.Status500InternalServerError,
                 Title = "Internal Server Error",
+                Status = StatusCodes.Status500InternalServerError,
                 Detail = ex.Message
             }
         };

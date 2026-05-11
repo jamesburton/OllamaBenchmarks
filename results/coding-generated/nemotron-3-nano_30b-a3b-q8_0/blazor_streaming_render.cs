@@ -15,7 +15,7 @@ public class WeatherPageBase : ComponentBase
 
     public WeatherForecast[]? Forecasts { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedAsync()
     {
         Forecasts = await WeatherService.GetForecastsAsync();
         await base.OnInitializedAsync();

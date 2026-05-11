@@ -1,12 +1,10 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Json.Serialization;
 
 public record GitHubUser(
-    [property: JsonPropertyName("login")] string Login,
-    [property: JsonPropertyName("name")] string Name,
-    [property: JsonPropertyName("public_repos")] int PublicRepos
-);
+    [System.Text.Json.Serialization.JsonPropertyName("login")] string Login,
+    [System.Text.Json.Serialization.JsonPropertyName("name")] string Name,
+    [System.Text.Json.Serialization.JsonPropertyName("public_repos")] int PublicRepos);
 
 public interface IGitHubClient
 {
@@ -32,7 +30,6 @@ public static class GitHubClientExtensions
 {
     public static IServiceCollection AddGitHubClient(this IServiceCollection services)
     {
-        services.AddHttpClient<IGitHubClient, GitHubClient>();
-        return services;
+        return services.AddHttpClient<IGitHubClient, GitHubClient>();
     }
 }

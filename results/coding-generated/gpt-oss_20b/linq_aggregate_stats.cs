@@ -2,10 +2,15 @@ public static class SurveyAnalyzer
 {
     public static (double Mean, double Median, double Min, double Max) ComputeStats(System.Collections.Generic.IEnumerable<double> values)
     {
+        if (values == null)
+        {
+            throw new System.ArgumentException("Input sequence is null");
+        }
+
         var arr = System.Linq.Enumerable.ToArray(values);
         if (arr.Length == 0)
         {
-            throw new System.ArgumentException();
+            throw new System.ArgumentException("Input sequence is empty");
         }
 
         double mean = System.Linq.Enumerable.Average(arr);

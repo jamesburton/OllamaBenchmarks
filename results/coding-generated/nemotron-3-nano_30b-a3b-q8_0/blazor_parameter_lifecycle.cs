@@ -4,20 +4,21 @@ public record UserProfile(int Id, string DisplayName, string Email);
 
 public interface IUserService
 {
-    Task<UserProfile?> GetProfileAsync(int userId);
+    System.Threading.Tasks.Task<UserProfile?> GetProfileAsync(int userId);
 }
 
 public class UserProfileBase : ComponentBase
 {
-    [Parameter] public int UserId { get; set; }
+    [Parameter]
+    public int UserId { get; set; }
 
-    [Inject] public IUserService UserService { get; set; } = null!;
+    [Inject]
+    public IUserService UserService { get; set; } = default!;
 
     public UserProfile? Profile { get; set; }
-
     public bool IsLoading { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async System.Threading.Tasks.Task OnParametersSetAsync()
     {
         IsLoading = true;
         Profile = await UserService.GetProfileAsync(UserId);

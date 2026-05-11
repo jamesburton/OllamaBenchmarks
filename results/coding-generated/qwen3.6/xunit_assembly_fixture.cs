@@ -2,7 +2,7 @@ using System.Threading;
 
 public class SharedCounter : IAsyncLifetime
 {
-    private int counter = 0;
+    private int counter;
 
     public ValueTask InitializeAsync()
     {

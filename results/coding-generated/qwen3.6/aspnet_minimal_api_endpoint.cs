@@ -10,25 +10,17 @@ public static class ProductEndpoints
 
     public static IResult CreateProduct(CreateProductRequest request)
     {
-        var errors = new Dictionary<string, string[]>();
-
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            errors["Name"] = new[] { "Name is required." };
+            return Results.ValidationProblem(new Dictionary<string, string[]> { ["Name"] = ["Name is required."] });
         }
 
         if (request.Price <= 0)
         {
-            errors["Price"] = new[] { "Price must be greater than 0." };
+            return Results.ValidationProblem(new Dictionary<string, string[]> { ["Price"] = ["Price must be greater than zero."] });
         }
 
-        if (errors.Count > 0)
-        {
-            return Results.ValidationProblem(errors);
-        }
-
-        int id = ++_counter;
-
-        return Results.Ok(new ProductResponse(id, request.Name, request.Price));
+        _counter++;
+        return Results.Ok(new ProductResponse(_counter, request.Name, request.Price));
     }
 }

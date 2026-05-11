@@ -1,7 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using System;
-using System.Threading.Tasks;
 
 public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
 
@@ -14,15 +11,12 @@ public interface IWeatherService
 public class WeatherPageBase : ComponentBase
 {
     [Inject]
-    public IWeatherService? WeatherService { get; set; }
+    public IWeatherService WeatherService { get; set; } = default!;
 
-    public WeatherForecast[]? Forecasts { get; set; }
+    public WeatherForecast[]? Forecasts { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
-        if (WeatherService != null)
-        {
-            Forecasts = await WeatherService.GetForecastsAsync();
-        }
+        Forecasts = await WeatherService.GetForecastsAsync();
     }
 }

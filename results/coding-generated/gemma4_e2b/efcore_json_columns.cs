@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System;
 
 // 1. Address class
 public class Address
@@ -25,59 +24,77 @@ public class CompanyDbContext : DbContext
 {
     public DbSet<Company> Companies { get; set; }
 
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
+        : base(options)
     {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // 3. Configure HeadquartersAddress as an owned JSON column
+        // Configure HeadquartersAddress as an owned JSON column
         modelBuilder.Entity<Company>()
-            .OwnsOne(c => c.HeadquartersAddress, b => { b.ToJson(); });
+            .OwnsOne(c => c.HeadquartersAddress, b =>
+            {
+                // Use ToJson() to configure the property as a JSON column
+                b.ToJson();
+            });
     }
 }
 
-// 4. Static class CompanyQueries
+// 4. Static class for queries
 public static class CompanyQueries
 {
-    public static async Task<List<Company>> FindCompaniesByCity(CompanyDbContext db, string city)
+    /// <summary>
+    /// Finds companies where the HeadquartersAddress City matches the given city parameter.
+    /// </summary>
+    public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
-        // Querying based on the owned property's property (City)
-        var companies = await db.Companies
+        return db.Companies
             .Where(c => c.HeadquartersAddress.City == city)
-            .ToListAsync();
-
-        return companies;
+            .ToList();
     }
 }
 
-// Example usage (optional, for completeness, not strictly required by prompt)
+// Example usage (optional, for completeness, not required by prompt)
 /*
 public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Setup DbContext (Example using in-memory for demonstration)
+        // Setup DbContext (using in-memory for demonstration)
         var options = new DbContextOptionsBuilder<CompanyDbContext>()
-            .UseInMemoryDatabase("CompanyDb")
+            .UseInMemoryDatabase(databaseName: "TestDb")
             .Options;
 
         using (var context = new CompanyDbContext(options))
         {
             context.Database.EnsureCreated();
 
-            // Seed Data
-            context.Companies.Add(new Company { Name = "Alpha Corp", HeadquartersAddress = new Address { City = "London", Street = "1 Main St" } });
-            context.Companies.Add(new Company { Name = "Beta Ltd", HeadquartersAddress = new Address { City = "Manchester", Street = "2 High Rd" } });
-            context.Companies.Add(new Company { Name = "Gamma Inc", HeadquartersAddress = new Address { City = "London", Street = "3 Park Ave" } });
-
-            // Test Query
-            Console.WriteLine("Finding companies in London:");
-            var londonCompanies = await CompanyQueries.FindCompaniesByCity(context, "London");
-            foreach (var company in londonCompanies)
+            // Seed data
+            context.Companies.Add(new Company
             {
-                Console.WriteLine($"ID: {company.Id}, Name: {company.Name}, City: {company.HeadquartersAddress.City}");
-            }
+                Name = "Alpha Corp",
+                HeadquartersAddress = new Address { City = "London" }
+            });
+            context.Companies.Add(new Company
+            {
+                Name = "Beta Inc",
+                HeadquartersAddress = new Address { City = "Manchester" }
+            });
+            context.Companies.Add(new Company
+            {
+                Name = "Gamma Ltd",
+                HeadquartersAddress = new Address { City = "London" }
+            });
+
+            await context.SaveChangesAsync();
+
+            // Query using the static method
+            var londonCompanies = CompanyQueries.FindCompaniesByCity(context, "London");
+            Console.WriteLine($"Found {londonCompanies.Count} companies in London.");
+
+            var manchesterCompanies = CompanyQueries.FindCompaniesByCity(context, "Manchester");
+            Console.WriteLine($"Found {manchesterCompanies.Count} companies in Manchester.");
         }
     }
 }

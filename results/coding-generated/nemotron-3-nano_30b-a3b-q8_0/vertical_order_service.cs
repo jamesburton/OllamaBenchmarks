@@ -13,7 +13,7 @@ public class Order
     public string CustomerName { get; set; }
     public System.Collections.Generic.List<OrderItem> Items { get; set; }
     public decimal Total { get; set; }
-    public System.DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 public class CreateOrderRequest
@@ -36,7 +36,10 @@ public interface IOrderRepository
 public class OrderService
 {
     private readonly IOrderRepository _repository;
-    public OrderService(IOrderRepository repository) => _repository = repository;
+    public OrderService(IOrderRepository repository)
+    {
+        _repository = repository;
+    }
 
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
@@ -45,14 +48,13 @@ public class OrderService
             return new ValidationError { Message = "Customer name is required" };
         }
 
-        var items = request.Items;
-        if (items == null || items.Count == 0)
+        if (request.Items == null || request.Items.Count == 0)
         {
             return new ValidationError { Message = "At least one item is required" };
         }
 
         decimal total = 0m;
-        foreach (var item in items)
+        foreach (var item in request.Items)
         {
             total += item.Quantity * item.UnitPrice;
         }
@@ -61,12 +63,12 @@ public class OrderService
         {
             Id = 0,
             CustomerName = request.CustomerName,
-            Items = items,
+            Items = request.Items,
             Total = total,
-            CreatedAt = System.DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow
         };
 
         _repository.Save(order);
-        return OneOf<Order, ValidationError>.FromT0(order);
+        return order;
     }
 }

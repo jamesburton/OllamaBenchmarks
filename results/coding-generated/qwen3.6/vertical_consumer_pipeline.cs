@@ -1,6 +1,8 @@
+global using Contracts;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace Contracts;
 
@@ -10,71 +12,61 @@ public record CustomerNotified(Guid OrderId, string NotificationMessage);
 
 public class PlaceOrderConsumer : IConsumer<PlaceOrder>
 {
-    public async Task Consume(ConsumeContext<PlaceOrder> context)
+    public Task Consume(ConsumeContext<PlaceOrder> context)
     {
-        await context.Publish(new OrderPlaced(context.Message.OrderId, context.Message.CustomerName));
+        return context.Publish(new OrderPlaced(context.Message.OrderId, context.Message.CustomerName));
     }
 }
 
 public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
 {
-    public async Task Consume(ConsumeContext<OrderPlaced> context)
+    public Task Consume(ConsumeContext<OrderPlaced> context)
     {
-        var msg = context.Message;
-        await context.Publish(new CustomerNotified(msg.OrderId, $"Order {msg.OrderId} confirmed for {msg.CustomerName}"));
+        return context.Publish(new CustomerNotified(
+            context.Message.OrderId,
+            $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}"));
     }
 }
 
 public class OrderPipelineTests
 {
-    [Fact]
-    public async Task PlaceOrderConsumer_Should_Publish_OrderPlaced()
-    {
-        var services = new ServiceCollection();
-        services.AddMassTransitTestHarness(cfg =>
-        {
-            cfg.AddConsumer<PlaceOrderConsumer>();
-        });
+    private readonly ITestHarness _harness;
+    private readonly IBus _bus;
 
-        var provider = services.BuildServiceProvider();
-        var harness = provider.GetRequiredService<ITestHarness>();
-
-        await harness.Start();
-
-        var orderId = Guid.NewGuid();
-        var customerName = "Test Customer";
-        await harness.Bus.Publish(new OrderPlaced(orderId, customerName));
-
-        Assert.True(await harness.Consumed.Any<OrderPlaced>());
-        Assert.True(await harness.Published.Any<OrderPlaced>());
-
-        await harness.Stop();
-    }
-
-    [Fact]
-    public async Task FullPipeline_Should_Consume_And_Publish_All_Events()
+    public OrderPipelineTests()
     {
         var services = new ServiceCollection();
         services.AddMassTransitTestHarness(cfg =>
         {
             cfg.AddConsumer<PlaceOrderConsumer>();
             cfg.AddConsumer<NotifyCustomerConsumer>();
+            cfg.UsingInMemory((ctx, ep) => ep.ConfigureEndpoints(ctx));
         });
-
         var provider = services.BuildServiceProvider();
-        var harness = provider.GetRequiredService<ITestHarness>();
+        _harness = provider.GetRequiredService<ITestHarness>();
+        _bus = provider.GetRequiredService<IBus>();
+    }
 
-        await harness.Start();
-
+    [Fact]
+    public async Task PlaceOrderConsumer_should_consume_and_publish_OrderPlaced()
+    {
+        await _harness.Start();
         var orderId = Guid.NewGuid();
-        var customerName = "Test Customer";
-        await harness.Bus.Publish(new OrderPlaced(orderId, customerName));
+        await _bus.Publish(new PlaceOrder(orderId, "Alice"));
 
-        Assert.True(await harness.Consumed.Any<OrderPlaced>());
-        Assert.True(await harness.Published.Any<OrderPlaced>());
-        Assert.True(await harness.Consumed.Any<CustomerNotified>());
-        Assert.True(await harness.Published.Any<CustomerNotified>());
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
+    }
 
-        await harness.Stop();
+    [Fact]
+    public async Task Full_pipeline_should_consume_and_publish_both_events()
+    {
+        await _harness.Start();
+        var orderId = Guid.NewGuid();
+        await _bus.Publish(new PlaceOrder(orderId, "Bob"));
+
+        Assert.True(await _harness.Consumed.Any<PlaceOrder>());
+        Assert.True(await _harness.Published.Any<OrderPlaced>());
+        Assert.True(await _harness.Published.Any<CustomerNotified>());
     }
 }

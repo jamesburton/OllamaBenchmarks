@@ -1,31 +1,33 @@
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
+// Comment entity
 public class Comment
 {
     public int Id { get; set; }
-    public string Text { get; set; } = string.Empty;
+    public string Text { get; set; } = default!;
     public int PostId { get; set; }
     public Post? Post { get; set; }
 }
 
+// Post entity
 public class Post
 {
     public int Id { get; set; }
-    public string Content { get; set; } = string.Empty;
+    public string Content { get; set; } = default!;
     public int BlogId { get; set; }
     public Blog? Blog { get; set; }
     public List<Comment> Comments { get; set; } = new();
 }
 
+// Blog entity
 public class Blog
 {
     public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
+    public string Title { get; set; } = default!;
     public List<Post> Posts { get; set; } = new();
 }
 
+// DbContext
 public class BlogDbContext : DbContext
 {
     public DbSet<Blog> Blogs { get; set; }
@@ -48,19 +50,17 @@ public class BlogDbContext : DbContext
     }
 }
 
+// Repository
 public class BlogRepository
 {
     private readonly BlogDbContext _context;
-    public BlogRepository(BlogDbContext context)
-    {
-        _context = context;
-    }
+    public BlogRepository(BlogDbContext context) => _context = context;
 
-    public Task<Blog?> GetWithPostsAndCommentsAsync(int blogId)
+    public async Task<Blog?> GetWithPostsAndCommentsAsync(int blogId)
     {
-        return _context.Blogs
+        return await _context.Blogs
             .Include(b => b.Posts)
             .ThenInclude(p => p.Comments)
-            .FirstOrDefaultAsync(b => b.Id == blogId);
+            .SingleOrDefaultAsync(b => b.Id == blogId);
     }
 }

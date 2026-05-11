@@ -1,12 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System;
 
-// 1. CreateOrderRequest class
 public class CreateOrderRequest
 {
-    [Required]
+    [Required(ErrorMessage = "Name is required.")]
     public string Name { get; set; }
 
     [Range(0.01, 10000)]
@@ -16,32 +14,39 @@ public class CreateOrderRequest
     public int Quantity { get; set; }
 }
 
-// 2. OrderService class
 public class OrderService
 {
+    /// <summary>
+    /// Validates the order request and confirms the order if valid.
+    /// </summary>
+    /// <param name="request">The order request to validate.</param>
+    /// <returns>The validated order request.</returns>
+    /// <exception cref="ArgumentException">Thrown if validation fails.</exception>
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        var validationContext = new ValidationContext(request, null, null);
+        var validationContext = new ValidationContext(request);
         var validationResults = new List<ValidationResult>();
 
-        bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, true);
+        bool isValid = Validator.TryValidateObject(
+            request,
+            validationContext,
+            validationResults,
+            true // Validate all properties
+        );
 
         if (!isValid)
         {
-            // If validation fails, throw an ArgumentException with details of the first validation error
-            var firstError = validationResults.FirstOrDefault();
-            if (firstError != null)
+            // If validation fails, extract the first error message
+            if (validationResults.Count > 0)
             {
-                throw new ArgumentException($"Validation failed for CreateOrderRequest: {firstError.ErrorMessage}", nameof(request));
+                var firstError = validationResults[0].ErrorMessage;
+                throw new ArgumentException($"Validation failed for order request. First error: {firstError}", nameof(request));
             }
-            else
-            {
-                // Fallback if TryValidateObject returns false but no results are found (should not happen if validationResults is populated correctly)
-                throw new ArgumentException("Validation failed, but no specific error details were provided.", nameof(request));
-            }
+            // Fallback if somehow validation failed but no results were captured (should not happen)
+            throw new ArgumentException("Validation failed, but no specific error details were provided.");
         }
 
-        // If validation passes, return the request as a confirmed order
+        // Validation passed
         return request;
     }
 }

@@ -5,7 +5,9 @@ global using Contracts;
 namespace Contracts;
 
 public record GetProduct(Guid ProductId);
+
 public record ProductResult(Guid ProductId, string Name, decimal Price);
+
 public record ProductNotFound();
 
 public class GetProductConsumer : IConsumer<GetProduct>

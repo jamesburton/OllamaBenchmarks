@@ -24,41 +24,10 @@ public class StringProcessorTests
 {
     [Theory]
     [InlineData(null, 5, "")]
-    [InlineData("", 3, "")]
-    [InlineData("hello", 10, "hello")]
-    [InlineData("1234567890", 10, "1234567890")]
-    [InlineData("1234567890123", 5, "12345...")]
-    public void Truncate_ReturnsExpected(string input, int maxLength, string expected)
+    [InlineData("", 5, "")]
+    [InlineData("hi", 5, "hi")]
+    [InlineData("abcde", 5, "abcde")]
+    [InlineData("abcdef", 5, "abcde...")]
+    public void Truncate_ShouldReturnExpected(string input, int maxLength, string expected)
     {
-        var processor = new StringProcessor();
-        var result = processor.Truncate(input, maxLength);
-        result.Should().Be(expected);
-    }
-
-    [Theory]
-    [InlineData(null, 0)]
-    [InlineData("", 0)]
-    [InlineData("hello", 1)]
-    [InlineData("a b c", 3)]
-    [InlineData("  a   b  c  ", 3)]
-    public void CountWords_ReturnsExpected(string input, int expected)
-    {
-        var processor = new StringProcessor();
-        var result = processor.CountWords(input);
-        result.Should().Be(expected);
-    }
-
-    [Theory]
-    [InlineData(null, false)]
-    [InlineData("", false)]
-    [InlineData("a", true)]
-    [InlineData("madam", true)]
-    [InlineData("hello", false)]
-    [InlineData("RaceCar", true)]
-    public void IsPalindrome_ReturnsExpected(string input, bool expected)
-    {
-        var processor = new StringProcessor();
-        var result = processor.IsPalindrome(input);
-        result.Should().Be(expected);
-    }
-}
+        var result = new StringProcessor().Truncate(input,

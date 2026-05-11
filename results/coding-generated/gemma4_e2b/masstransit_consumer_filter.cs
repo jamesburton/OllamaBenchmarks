@@ -1,37 +1,49 @@
 using MassTransit;
 
-namespace Contracts;
+global using Contracts;
 
-public record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
-public record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
-
-public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
+namespace Contracts
 {
-    public async Task Consume(ConsumeContext<ProcessPayment> context)
+    // 1. ProcessPayment message record
+    public record ProcessPayment(Guid OrderId, decimal Amount, string Currency);
+
+    // 2. PaymentProcessed event record
+    public record PaymentProcessed(Guid OrderId, DateTime ProcessedAt);
+
+    // 3. ProcessPaymentConsumer class
+    public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
     {
-        var msg = context.Message;
-        if (msg.Amount <= 0)
+        public async Task Consume(ConsumeContext<ProcessPayment> context)
         {
-            return;
+            var msg = context.Message;
+
+            // Check if Amount <= 0, return immediately if true
+            if (msg.Amount <= 0)
+            {
+                return;
+            }
+
+            // Otherwise, publish the PaymentProcessed event
+            await context.Publish(new PaymentProcessed(msg.OrderId, DateTime.UtcNow));
         }
-        await context.Publish(new PaymentProcessed(msg.OrderId, DateTime.UtcNow));
-    }
-}
-
-public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymentConsumer>
-{
-    public ProcessPaymentConsumerDefinition()
-    {
-        // Set ConcurrentMessageLimit = 2 in the constructor
-        this.ConcurrentMessageLimit = 2;
     }
 
-    protected override void ConfigureConsumer(
-        IReceiveEndpointConfigurator ep,
-        IConsumerConfigurator<ProcessPaymentConsumer> consumer,
-        IRegistrationContext ctx)
+    // 4. ProcessPaymentConsumerDefinition class
+    public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymentConsumer>
     {
-        // Call ep.UseMessageRetry(r => r.Interval(2, 500))
-        ep.UseMessageRetry(r => r.Interval(2, 500));
+        public ProcessPaymentConsumerDefinition()
+        {
+            // Set ConcurrentMessageLimit = 2 in the constructor
+            this.ConcurrentMessageLimit = 2;
+        }
+
+        protected override void ConfigureConsumer(
+            IReceiveEndpointConfigurator ep,
+            IConsumerConfigurator<ProcessPaymentConsumer> consumer,
+            IRegistrationContext ctx)
+        {
+            // Call ep.UseMessageRetry(r => r.Interval(2, 500))
+            ep.UseMessageRetry(r => r.Interval(2, 500));
+        }
     }
 }

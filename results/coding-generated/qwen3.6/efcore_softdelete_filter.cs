@@ -22,8 +22,7 @@ public class ArticleDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Article>()
-            .HasQueryFilter(a => !a.IsDeleted);
+        modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
     }
 }
 
@@ -38,10 +37,7 @@ public class ArticleRepository
 
     public async Task SoftDeleteAsync(int id)
     {
-        var article = await _context.Articles
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(a => a.Id == id);
-
+        var article = await _context.Articles.IgnoreQueryFilters().FirstOrDefaultAsync(a => a.Id == id);
         if (article != null)
         {
             article.IsDeleted = true;
@@ -49,15 +45,13 @@ public class ArticleRepository
         }
     }
 
-    public async Task<List<Article>> GetAllAsync()
+    public Task<List<Article>> GetAllAsync()
     {
-        return await _context.Articles.ToListAsync();
+        return _context.Articles.ToListAsync();
     }
 
-    public async Task<List<Article>> GetAllIncludingDeletedAsync()
+    public Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        return await _context.Articles
-            .IgnoreQueryFilters()
-            .ToListAsync();
+        return _context.Articles.IgnoreQueryFilters().ToListAsync();
     }
 }

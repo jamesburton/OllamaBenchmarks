@@ -1,8 +1,7 @@
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 public class Customer
 {
@@ -24,30 +23,26 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<Customer> Customers { get; set; }
 
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 }
 
 public record OrderDto(int OrderId, decimal Total, string CustomerName);
 
 public static class OrderQueries
 {
-    public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
+    public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
     {
-        var result = await db.Orders
+        return db.Orders
             .LeftJoin(
                 db.Customers,
                 order => order.CustomerId,
                 customer => customer.Id,
                 (order, customer) => new OrderDto(
-                    OrderId: order.Id,
-                    Total: order.Total,
-                    CustomerName: customer == null ? "Unknown" : customer.Name
+                    order.Id,
+                    order.Total,
+                    customer == null ? "Unknown" : customer.Name
                 )
             )
-            .ToListAsync();
-
-        return result;
+            .ToList();
     }
 }

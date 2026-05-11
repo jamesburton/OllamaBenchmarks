@@ -1,0 +1,22 @@
+Model                                     unset think param                                             think:false explicit                                        
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+gemma4:e2b                                thinking_field=175b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+gemma4                                    no thinking content=2b  preview='18'                          no thinking content=2b  preview='18'                        
+gemma4:26b                                thinking_field=146b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+gemma4:31b                                thinking_field=96b content=2b  preview='18'                   no thinking content=2b  preview='18'                        
+qwen3.6                                   thinking_field=587b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+qwen3.6:27b                               thinking_field=388b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+qwen3:14b                                 thinking_field=591b content=0b  preview=''                    no thinking content=2b  preview='18'                        
+qwen3.5                                   thinking_field=487b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+qwen3.5:4b                                thinking_field=497b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+qwen3.5:9b                                thinking_field=487b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+glm-4.7-flash                             thinking_field=358b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+glm-4.7-flash-reap-toolfix                thinking_field=868b content=0b  preview=''                    no thinking content=752b  preview='18    The user wants me to add two numbers: **17** (which is "seven" in Roman nu'
+nemotron-3-nano                           ERROR: timed out                                              no thinking content=2b  preview='18'                        
+nemotron-3-nano:30b-a3b-q8_0              ERROR: timed out                                              no thinking content=2b  preview='18'                        
+nemotron-3-super                          ERROR: model failed to load, this may be due to resource limitations or an internal err  ERROR: model failed to load, this may be due to resource limitations or an internal err
+nemotron-nano-9b-v2-toolfix               thinking_field=229b content=2b  preview='18'                  no thinking content=2b  preview='18'                        
+gpt-oss:20b                               thinking_field=136b content=2b  preview='18'                  thinking_field=166b content=2b  preview='18'                
+gpt-oss:120b                              ERROR: timed out                                              ERROR: timed out                                            
+lfm2.5-thinking                           thinking_field=712b content=16b  preview='18  \\boxed{18}  '  <think>tags content=747b  preview='<think> Okay, let\'s see what the user is asking here. They said "Add 7 and 11. R'
+lfm2.5-thinking:1.2b                      thinking_field=712b content=16b  preview='18  \\boxed{18}  '  <think>tags content=747b  preview='<think> Okay, let\'s see what the user is asking here. They said "Add 7 and 11. R'

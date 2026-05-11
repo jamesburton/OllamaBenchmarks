@@ -12,7 +12,7 @@ public class Customer
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public Address HomeAddress { get; set; } = new Address();
+    public Address HomeAddress { get; set; }
 
     public Customer()
     {
@@ -47,7 +47,7 @@ public class CustomerRepository
 
     public async Task<Customer> CreateAsync(Customer customer)
     {
-        _context.Customers.Add(customer);
+        await _context.Customers.AddAsync(customer);
         await _context.SaveChangesAsync();
         return customer;
     }

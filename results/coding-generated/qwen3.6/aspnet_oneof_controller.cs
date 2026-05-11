@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
 using OneOf;
+using Microsoft.AspNetCore.Mvc;
 
-public record User
+public class User
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -32,10 +32,9 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Get(int id)
     {
         var result = await _userService.GetByIdAsync(id);
-
         return result.Match<IActionResult>(
             user => Ok(user),
-            notFound => NotFound(),
+            _ => NotFound(),
             err => BadRequest(err.Message)
         );
     }

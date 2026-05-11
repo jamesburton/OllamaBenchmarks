@@ -1,16 +1,14 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 
-record GitHubUser([System.Text.Json.Serialization.JsonPropertyName("login")] string Login,
-    [System.Text.Json.Serialization.JsonPropertyName("name")] string Name,
-    [System.Text.Json.Serialization.JsonPropertyName("public_repos")] int PublicRepos);
+public record GitHubUser([System.Text.Json.Serialization.JsonPropertyName("login")] string Login, [System.Text.Json.Serialization.JsonPropertyName("name")] string Name, [System.Text.Json.Serialization.JsonPropertyName("public_repos")] int PublicRepos);
 
 public interface IGitHubClient
 {
     Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default);
 }
 
-public class GitHubClient
+public class GitHubClient : IGitHubClient
 {
     private readonly HttpClient _httpClient;
 
@@ -29,6 +27,7 @@ public static class GitHubClientExtensions
 {
     public static IServiceCollection AddGitHubClient(this IServiceCollection services)
     {
-        return services.AddHttpClient<IGitHubClient, GitHubClient>();
+        services.AddHttpClient<IGitHubClient, GitHubClient>();
+        return services;
     }
 }

@@ -1,5 +1,5 @@
-global using Contracts;
 using MassTransit;
+global using Contracts;
 
 namespace Contracts
 {
@@ -10,14 +10,16 @@ namespace Contracts
     {
         public async Task Consume(ConsumeContext<SubmitOrder> context)
         {
-            await context.Publish(new OrderSubmitted(context.Message.OrderId, DateTime.UtcNow));
+            var message = context.Message;
+            await context.Publish(new OrderSubmitted(message.OrderId, DateTime.UtcNow));
         }
     }
 
     public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
     {
-        public SubmitOrderConsumerDefinition() : base(4)
+        public SubmitOrderConsumerDefinition()
         {
+            ConcurrentMessageLimit = 4;
         }
 
         protected override void ConfigureConsumer(

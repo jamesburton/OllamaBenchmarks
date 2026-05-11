@@ -2,41 +2,35 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-// 1. Marker interface for order repository
+// Marker interfaces
 public interface IOrderRepository { }
+public interface IOrderService { }
+public interface IEmailNotifier { }
 
-// 2. Concrete implementation with a parameterless constructor
+// Implementations with parameterless constructors
 public class OrderRepository : IOrderRepository
 {
     public OrderRepository() { }
 }
 
-// 3. Marker interface for order service
-public interface IOrderService { }
-
-// 4. Concrete implementation with a parameterless constructor
 public class OrderService : IOrderService
 {
     public OrderService() { }
 }
 
-// 5. Marker interface for email notifier
-public interface IEmailNotifier { }
-
-// 6. Concrete implementation with a parameterless constructor
 public class EmailNotifier : IEmailNotifier
 {
     public EmailNotifier() { }
 }
 
-// 7. Settings class for orders
+// Settings class
 public class OrderSettings
 {
     public string WarehouseCode { get; set; } = string.Empty;
     public int MaxRetries { get; set; }
 }
 
-// 8. Extension method to register services and bind options
+// Extension method for IServiceCollection
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config)
@@ -44,9 +38,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddTransient<IEmailNotifier, EmailNotifier>();
-
         services.Configure<OrderSettings>(config.GetSection("Orders"));
-
         return services;
     }
 }

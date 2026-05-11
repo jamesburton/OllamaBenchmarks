@@ -1,11 +1,11 @@
 using System.Runtime.CompilerServices;
 
-interface IDataSource
+public interface IDataSource
 {
     Task<IReadOnlyList<string>> FetchBatchAsync(int batchNumber, CancellationToken ct);
 }
 
-class DataProcessor
+public class DataProcessor
 {
     public async IAsyncEnumerable<string> ProcessAllBatchesAsync(IDataSource source, [EnumeratorCancellation] CancellationToken ct = default)
     {
@@ -16,7 +16,6 @@ class DataProcessor
                 yield break;
 
             var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
-
             if (batch.Count == 0)
                 yield break;
 

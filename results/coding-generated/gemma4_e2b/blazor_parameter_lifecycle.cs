@@ -9,8 +9,12 @@ public interface IUserService
 
 public class UserProfileBase : ComponentBase
 {
-    [Parameter] public int UserId { get; set; }
-    [Inject] public IUserService UserService { get; set; } = null!;
+    [Parameter]
+    public int UserId { get; set; }
+
+    [Inject]
+    public IUserService UserService { get; set; } = null!;
+
     public UserProfile? Profile { get; set; }
     public bool IsLoading { get; set; }
 
@@ -20,4 +24,10 @@ public class UserProfileBase : ComponentBase
         Profile = await UserService.GetProfileAsync(UserId);
         IsLoading = false;
     }
+}
+
+public class UserProfileComponent : UserProfileBase
+{
+    // This component uses the base class logic and exposes the data.
+    // In a real Blazor scenario, this would be the component definition.
 }
