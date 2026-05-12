@@ -1,58 +1,133 @@
 #!/usr/bin/env python3
-"""Layer 2 chat-mode variant — uses /api/chat (raw=false) instead of /api/generate raw=true.
+"""Layer 2 chat-mode variant — reuses benchmark_coding_layer2's FIM assembly
+but swaps the model call from /api/generate (raw:true) to /api/chat (template applied).
 
-For chat-tuned models that don't handle raw FIM completion well (gemma4, etc.).
-Writes results to coding-{slug}-chat.json so the raw-mode baseline is preserved.
-
-Run with the same dataset as benchmark_coding_layer2.py but the call goes through
-chat completion with the model's normal template applied.
+For chat-tuned models that don't handle raw FIM completion well (gemma4, gpt-oss,
+glm-4.7-flash-reap, LFM2, etc.). Writes results to coding-{slug}-chat.json so the
+raw-mode baseline at coding-{slug}.json is preserved.
 """
 import argparse
 import datetime
 import json
 import os
 import re
-import subprocess
 import sys
-import tempfile
 from typing import Any
 import urllib.error
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(__file__))
+
+# Import the proven raw-mode helpers — we only need to swap the model-call.
+import benchmark_coding_layer2 as L2
+from coding_tasks.code_extractor import extract_csharp
 from coding_tasks.task_runner import (
-    model_slug as base_model_slug,
     sampling_options,
     setup_template_cache,
+    model_slug as base_model_slug,
 )
-from coding_tasks.code_extractor import extract_csharp
 
 
 def model_slug(model: str) -> str:
     return base_model_slug(model)
 
 
-def chat_complete(
+def _inject_pass(program_cs: str) -> str:
+    """Insert Console.WriteLine("PASS") before the last `}` of Main inside Problem."""
+    lines = program_cs.rstrip().splitlines()
+    for i in range(len(lines) - 1, -1, -1):
+        s = lines[i].strip()
+        if s.startswith("Debug.Assert"):
+            lines.insert(i + 1, '    System.Console.WriteLine("PASS");')
+            return "\n".join(lines) + "\n"
+    # Fallback: print before final closing brace
+    for i in range(len(lines) - 1, -1, -1):
+        if lines[i].strip() == "}":
+            lines.insert(i, '    System.Console.WriteLine("PASS");')
+            return "\n".join(lines) + "\n"
+    return program_cs + '\nSystem.Console.WriteLine("PASS");\n'
+
+
+def _extract_method_body_from_full_class(generated: str, method_signature_line: str) -> str | None:
+    """Extract the body content between the method's opening `{` and matching `}`.
+
+    Used when a chat-tuned model returns a complete `class Problem { method {...} }`
+    instead of just the FIM body. We locate the method signature in `generated`,
+    find its opening `{`, then walk forward counting braces until we hit the
+    matching `}`. Returns the body content (without the surrounding braces).
+    Returns None if the method or matching brace cannot be found.
+    """
+    # Find the method line in the generated code (match by the signature head, e.g. "public static bool HasCloseElements")
+    head = method_signature_line.strip().rstrip("{").strip()
+    if not head:
+        return None
+    idx = generated.find(head)
+    if idx < 0:
+        return None
+    # Find the `{` that opens the method body, after idx
+    brace_open = generated.find("{", idx)
+    if brace_open < 0:
+        return None
+    # Walk forward counting braces
+    depth = 1
+    pos = brace_open + 1
+    while pos < len(generated) and depth > 0:
+        ch = generated[pos]
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                # body is generated[brace_open+1 : pos]
+                return generated[brace_open + 1: pos]
+        pos += 1
+    return None
+
+
+def _method_signature_from_prompt(prompt: str) -> str | None:
+    """Pull the method signature line from the dataset prompt.
+
+    The prompt ends with `<modifiers> <return-type> <Name>(...) {`. We return
+    the line containing that signature so we can locate it in the model output.
+    """
+    for line in prompt.rstrip().splitlines()[::-1]:
+        s = line.strip()
+        if (
+            s.endswith("{")
+            and ("public " in s or "private " in s or "static " in s)
+            and "(" in s
+        ):
+            return line
+    return None
+
+
+def _chat_complete(
     model: str,
     prompt: str,
     max_tokens: int = 4096,
     num_ctx: int = 8192,
     seed: int = 42,
     timeout: int = 600,
+    stop_tokens: list[str] | None = None,
 ) -> str:
-    """Call /api/chat (chat-mode, template applied) and return content.
+    """Drop-in replacement for L2._call_ollama_complete that uses /api/chat.
 
-    Notes on think handling for known-difficult models:
-    - gpt-oss family: pass reasoning_effort='low' to keep thinking compact.
-    - models that ignore think:false (gpt-oss, lfm2.5-thinking, glm-4.7-flash-reap):
-      we still send think:False so Ollama puts reasoning in the separate field
-      (not in content), reducing tag-soup; extractor strips remaining <think>.
-    - num_predict bumped to 4096 so reasoning + code fits even for verbose thinkers.
+    The dataset prompt is a fill-in-the-middle prefix (usings + class + method
+    signature). For chat-tuned models, ship the prefix with an explicit
+    instruction to complete the function body and return the full Program.cs in
+    a code fence; extract C# code afterwards.
     """
     options = sampling_options(model)
-    payload: dict = {
+    chat_prompt = (
+        "You are completing a C# program. The code below is the start of a file. "
+        "Continue and finish the function body (and any closing braces it needs). "
+        "Return the COMPLETE Program.cs including the prefix I gave you, wrapped in a "
+        "```csharp code block. Do not add tests or a Main method — those are appended separately.\n\n"
+        "```csharp\n" + prompt.rstrip() + "\n```"
+    )
+    payload: dict[str, Any] = {
         "model": model,
-        "messages": [{"role": "user", "content": prompt}],
+        "messages": [{"role": "user", "content": chat_prompt}],
         "stream": False,
         "think": False,
         "options": {
@@ -65,17 +140,17 @@ def chat_complete(
     }
     if model.startswith("gpt-oss"):
         payload["options"]["reasoning_effort"] = "low"
-    data = json.dumps(payload).encode("utf-8")
+
     req = urllib.request.Request(
         "http://127.0.0.1:11434/api/chat",
-        data=data,
+        data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
         method="POST",
     )
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-        content = body.get("message", {}).get("content", "")
+        content = body.get("message", {}).get("content", "") or ""
         if "<think>" in content:
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
         return content
@@ -84,97 +159,79 @@ def chat_complete(
         return ""
 
 
-def build_program_cs(prompt: str, generated_code: str, tests: str) -> str:
-    """Same as benchmark_coding_layer2._build_program_cs."""
-    USINGS = (
-        "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n"
-        "using System.Text;\nusing System.Text.RegularExpressions;\n"
-        "using System.Diagnostics;\n"
-    )
-    generated_code = generated_code.replace("\r\n", "\n").strip()
-    prompt = prompt.replace("\r\n", "\n").strip()
-    tests = tests.replace("\r\n", "\n").strip()
+def run_problem_chat(problem: dict, model: str, cached_template: str) -> tuple[bool, str]:
+    """Mirror of L2.run_problem but using chat-mode call + smarter extraction.
 
-    if "class Problem" in generated_code:
-        # Code already contains class structure
-        body = generated_code
+    Strategy:
+    1. Ask the model to complete the program in chat mode (with code-fence instruction).
+    2. Extract C# from the response.
+    3. If the extracted code already has `class ` or `using ` (full file) → pass
+       to L2._build_program_cs which handles the has_class branch (adds tests via
+       _wrap_tests_in_main as a separate class).
+    4. If extracted code is just the function body → pass to _build_program_cs
+       which handles the FIM branch (prompt + body + tests).
+    """
+    import shutil
+    import subprocess
+    import tempfile
+
+    prompt: str = problem.get("prompt", "")
+    tests: str = problem.get("tests", "")
+
+    raw_response = _chat_complete(model, prompt)
+    if not raw_response:
+        return False, "Ollama returned empty response"
+
+    generated = extract_csharp(raw_response) or raw_response.strip()
+
+    # Chat-tuned models typically return a complete C# file with the full
+    # `class Problem { method {...} }` re-emitted from the prompt prefix.
+    # The dataset's `tests` block is FIM scaffolding designed to slot inside
+    # the class: it starts with `    }` (close method) then declares Main, and
+    # ends with `}` (close class). To make the existing FIM assembly work, we
+    # need just the method body from the model's output.
+    body = None
+    if "class Problem" in generated and "public static void Main" not in generated:
+        sig = _method_signature_from_prompt(prompt)
+        if sig:
+            body = _extract_method_body_from_full_class(generated, sig)
+    if body is not None:
+        # Use the standard FIM assembly with the extracted body
+        program_cs = L2._build_program_cs(prompt, body, tests)
     else:
-        # Wrap generated code as method bodies inside Problem class
-        body = (
-            "class Problem {\n"
-            "    public static void Main(string[] args) {\n"
-            "        " + tests + "\n"
-            "    }\n"
-            "    " + generated_code + "\n"
-            "}\n"
-        )
-        return USINGS + "\n" + body
-
-    # Tests run via Main if not already present
-    return USINGS + "\n" + body
-
-
-def run_problem(problem: dict, model: str, cached_template: str) -> tuple[bool, str]:
-    """Run one problem in chat mode. Returns (passed, error_str)."""
-    prompt = problem.get("prompt", "")
-    tests = problem.get("tests", "")
-
-    # Ask the model to complete the C# function via chat
-    chat_prompt = (
-        "Complete the following C# code. Provide ONLY the function implementation. "
-        "Do not include the function signature or docstring — start with the function body content. "
-        "Wrap your code in a ```csharp code block.\n\n"
-        f"{prompt}"
-    )
-    raw = chat_complete(model, chat_prompt)
-    if not raw:
-        return False, "empty model response"
-
-    extracted = extract_csharp(raw) or raw.strip()
-
-    # If extracted lacks function signature, prepend the prompt's signature
-    if "public static" not in extracted and "static " not in extracted:
-        body = extracted
-        extracted = prompt.rstrip() + "\n" + body + "\n}"
+        # Fallback: pass whatever we extracted to the existing assembler.
+        program_cs = L2._build_program_cs(prompt, generated, tests)
 
     work_dir = tempfile.mkdtemp(prefix="layer2_chat_")
     try:
-        # Copy cached template
-        import shutil
         shutil.rmtree(work_dir)
         shutil.copytree(cached_template, work_dir)
 
-        program_cs = build_program_cs(prompt, extracted, tests)
         with open(os.path.join(work_dir, "Program.cs"), "w", encoding="utf-8") as fh:
             fh.write(program_cs)
 
-        build = subprocess.run(
-            ["dotnet", "build", "--no-restore"],
-            cwd=work_dir,
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-        if build.returncode != 0:
-            return False, "The build failed. Fix the build errors and run again."
-
-        run = subprocess.run(
-            ["dotnet", "run", "--no-build", "--no-restore"],
-            cwd=work_dir,
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-        if run.returncode != 0:
-            err = (run.stdout + "\n" + run.stderr).strip()
-            return False, err.splitlines()[0] if err else "Process terminated."
-        return True, ""
-    finally:
-        import shutil
         try:
-            shutil.rmtree(work_dir)
-        except Exception:
-            pass
+            result = subprocess.run(
+                ["dotnet", "run", "--no-restore"],
+                cwd=work_dir,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except subprocess.TimeoutExpired:
+            return False, "dotnet run timed out (30 s)"
+
+        stdout = result.stdout or ""
+        stderr = result.stderr or ""
+
+        if result.returncode == 0 and "PASS" in stdout:
+            return True, ""
+
+        error_lines = (stderr or stdout).strip().splitlines()
+        brief = "\n".join(error_lines[:10])
+        return False, brief
+    finally:
+        shutil.rmtree(work_dir, ignore_errors=True)
 
 
 def main():
@@ -187,8 +244,7 @@ def main():
     args = parser.parse_args()
 
     print(f"[setup] Loading dataset: {args.dataset_path}")
-    from benchmark_coding_layer2 import load_dataset
-    problems = load_dataset(args.dataset_path)
+    problems = L2.load_dataset(args.dataset_path)
     if args.limit > 0:
         problems = problems[: args.limit]
     total = len(problems)
@@ -209,9 +265,10 @@ def main():
             name = prob.get("name", f"prob_{i}")
             print(f"  [{i}/{total}] {name} ...", end="", flush=True)
             try:
-                ok, err = run_problem(prob, model, cached_template)
+                ok, err = run_problem_chat(prob, model, cached_template)
             except Exception as exc:
-                ok = False; err = str(exc)
+                ok = False
+                err = str(exc)
             if ok:
                 passed += 1
                 print(" PASS")
@@ -223,7 +280,6 @@ def main():
         rate = passed / total if total else 0
         print(f"  [score] layer2_chat_pass_rate={rate:.4f} ({passed}/{total})")
 
-        # Write to coding-{slug}-chat.json (don't overwrite raw baseline)
         cp_path = os.path.join(args.checkpoint_dir, f"coding-{slug}-chat.json")
         payload = {
             "model": model,
