@@ -1,0 +1,801 @@
+{
+  "model": "gemma4:e2b",
+  "benchmark": "coding-layer2-chat",
+  "layer2_chat_run_started_at": "2026-05-12T09:17:12.114855+00:00",
+  "layer2_chat_run_finished_at": "2026-05-12T09:46:02.826066+00:00",
+  "layer2_chat_pass_rate": 0.41139240506329117,
+  "layer2_chat_passed": 65,
+  "layer2_chat_total": 158,
+  "layer2_chat_results": [
+    {
+      "name": "HumanEval_0_has_close_elements",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_1_separate_paren_groups",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSeparateParenGroups((\"(()()) ((())) () ((())()())\")).Equals((new List<string>(new string[]{(string)\"(()())\", (string)\"((()))\", (string)\"()\", (string)\"((())()())\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_2wzsonp6\\Program.cs:line 43"
+    },
+    {
+      "name": "HumanEval_2_truncate_number",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_3_below_zero",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_4_mean_absolute_deviation",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_5_intersperse",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIntersperse((new List<long>()), (7L)).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_9uetfw63\\Program.cs:line 29"
+    },
+    {
+      "name": "HumanEval_6_parse_nested_parens",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nParseNestedParens((\"(()()) ((())) () ((())()())\")).Equals((new List<long>(new long[]{(long)2L, (long)3L, (long)1L, (long)3L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_ab8xbzzc\\Program.cs:line 113"
+    },
+    {
+      "name": "HumanEval_7_filter_by_substring",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFilterBySubstring((new List<string>()), (\"john\")).Equals((new List<string>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_tnccrnhx\\Program.cs:line 22"
+    },
+    {
+      "name": "HumanEval_8_sum_product",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_9_rolling_max",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nRollingMax((new List<long>())).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_k519193w\\Program.cs:line 32"
+    },
+    {
+      "name": "HumanEval_10_make_palindrome",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_11_string_xor",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_12_longest",
+      "passed": false,
+      "error": "Unhandled exception. System.NullReferenceException: Object reference not set to an instance of an object.\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_tr86l6vo\\Program.cs:line 36"
+    },
+    {
+      "name": "HumanEval_13_greatest_common_divisor",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_14_all_prefixes",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nAllPrefixes((\"\")).Equals((new List<string>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_ut6jevyl\\Program.cs:line 20"
+    },
+    {
+      "name": "HumanEval_15_string_sequence",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_16_count_distinct_characters",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_17_parse_music",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nParseMusic((\"\")).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_zvsomq3g\\Program.cs:line 44"
+    },
+    {
+      "name": "HumanEval_18_how_many_times",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_19_sort_numbers",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSortNumbers((\"three\")).Equals((\"three\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_np2t8upa\\Program.cs:line 47"
+    },
+    {
+      "name": "HumanEval_20_find_closest_elements",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_21_rescale_to_unit",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nRescaleToUnit((new List<float>(new float[]{(float)2.0f, (float)49.9f}))).Equals((new List<float>(new float[]{(float)0.0f, (float)1.0f})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_9w5ut26i\\Program.cs:line 52"
+    },
+    {
+      "name": "HumanEval_22_filter_integers",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFilterIntegers((new List<object>())).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_g4wop5w3\\Program.cs:line 55"
+    },
+    {
+      "name": "HumanEval_23_strlen",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_24_largest_divisor",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_25_factorize",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFactorize((2L)).Equals((new List<long>(new long[]{(long)2L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_zw9voube\\Program.cs:line 46"
+    },
+    {
+      "name": "HumanEval_26_remove_duplicates",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nRemoveDuplicates((new List<long>())).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_vx30qx2r\\Program.cs:line 29"
+    },
+    {
+      "name": "HumanEval_27_flip_case",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_28_concatenate",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_29_filter_by_prefix",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFilterByPrefix((new List<string>()), (\"john\")).Equals((new List<string>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_087kfjo_\\Program.cs:line 22"
+    },
+    {
+      "name": "HumanEval_30_get_positive",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nGetPositive((new List<long>(new long[]{(long)-1L, (long)-2L, (long)4L, (long)5L, (long)6L}))).Equals((new List<long>(new long[]{(long)4L, (long)5L, (long)6L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_e23t3y86\\Program.cs:line 18"
+    },
+    {
+      "name": "HumanEval_31_is_prime",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_33_sort_third",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSortThird((new List<long>(new long[]{(long)5L, (long)6L, (long)3L, (long)4L, (long)8L, (long)9L, (long)2L}))).Equals((new List<long>(new long[]{(long)2L, (long)6L, (long)3L, (long)4L, (long)8L, (long)9L, (long)5L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_rw942rv5\\Program.cs:line 97"
+    },
+    {
+      "name": "HumanEval_34_unique",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nUnique((new List<long>(new long[]{(long)5L, (long)3L, (long)5L, (long)2L, (long)3L, (long)3L, (long)9L, (long)0L, (long)123L}))).Equals((new List<long>(new long[]{(long)0L, (long)2L, (long)3L, (long)5L, (long)9L, (long)123L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_hro6t0nu\\Program.cs:line 16"
+    },
+    {
+      "name": "HumanEval_35_max_element",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_36_fizz_buzz",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_37_sort_even",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSortEven((new List<long>(new long[]{(long)1L, (long)2L, (long)3L}))).Equals((new List<long>(new long[]{(long)1L, (long)2L, (long)3L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_7ksxbfd1\\Program.cs:line 54"
+    },
+    {
+      "name": "HumanEval_39_prime_fib",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_40_triples_sum_to_zero",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_41_car_race_collision",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCarRaceCollision((2L)) == (4L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_lvke61b4\\Program.cs:line 81"
+    },
+    {
+      "name": "HumanEval_42_incr_list",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIncrList((new List<long>())).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_ug3q3ytb\\Program.cs:line 22"
+    },
+    {
+      "name": "HumanEval_43_pairs_sum_to_zero",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_44_change_base",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_45_triangle_area",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_46_fib4",
+      "passed": false,
+      "error": "Unhandled exception. System.IndexOutOfRangeException: Index was outside the bounds of the array.\n   at Problem.Fib4(Int64 n) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_gb0wpipg\\Program.cs:line 45\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_gb0wpipg\\Program.cs:line 51"
+    },
+    {
+      "name": "HumanEval_47_median",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_48_is_palindrome",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_49_modp",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_51_remove_vowels",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_52_below_threshold",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_53_add",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_54_same_chars",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSameChars((\"eabcdzzzz\"), (\"dddzzzzzzzddeddabc\")) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_hk7p6gml\\Program.cs:line 63"
+    },
+    {
+      "name": "HumanEval_55_fib",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_56_correct_bracketing",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_57_monotonic",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_58_common",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCommon((new List<long>(new long[]{(long)1L, (long)4L, (long)3L, (long)34L, (long)653L, (long)2L, (long)5L})), (new List<long>(new long[]{(long)5L, (long)7L, (long)1L, (long)5L, (long)9L, (long)653L, (long)121L}))).Equals((new List<long>(new long[]{(long)1L, (long)5L, (long)653L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_5ofg8vwm\\Program.cs:line 32"
+    },
+    {
+      "name": "HumanEval_59_largest_prime_factor",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_60_sum_to_n",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_61_correct_bracketing",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_62_derivative",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nDerivative((new List<long>(new long[]{(long)3L, (long)1L, (long)2L, (long)4L, (long)5L}))).Equals((new List<long>(new long[]{(long)1L, (long)4L, (long)12L, (long)20L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_efjofvz_\\Program.cs:line 49"
+    },
+    {
+      "name": "HumanEval_63_fibfib",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_64_vowels_count",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_65_circular_shift",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCircularShift((100L), (2L)).Equals((\"001\"))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_rt7ipx3j\\Program.cs:line 76"
+    },
+    {
+      "name": "HumanEval_66_digitSum",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_67_fruit_distribution",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFruitDistribution((\"5 apples and 6 oranges\"), (19L)) == (8L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_l3o4uk_e\\Program.cs:line 90"
+    },
+    {
+      "name": "HumanEval_68_pluck",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nPluck((new List<long>(new long[]{(long)4L, (long)2L, (long)3L}))).Equals((new List<long>(new long[]{(long)2L, (long)1L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_ue6z7ok7\\Program.cs:line 70"
+    },
+    {
+      "name": "HumanEval_69_search",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_70_strange_sort_list",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nStrangeSortList((new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L}))).Equals((new List<long>(new long[]{(long)1L, (long)4L, (long)2L, (long)3L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_d0kvgc9p\\Program.cs:line 61"
+    },
+    {
+      "name": "HumanEval_71_triangle_area",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_72_will_it_fly",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_73_smallest_change",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_74_total_match",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nTotalMatch((new List<string>()), (new List<string>())).Equals((new List<string>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_u7lpz05g\\Program.cs:line 37"
+    },
+    {
+      "name": "HumanEval_75_is_multiply_prime",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIsMultiplyPrime((8L)) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat__rk583sp\\Program.cs:line 71"
+    },
+    {
+      "name": "HumanEval_76_is_simple_power",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_77_iscube",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nIscube((-1L)) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_6e31w4n0\\Program.cs:line 54"
+    },
+    {
+      "name": "HumanEval_78_hex_key",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_79_decimal_to_binary",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_80_is_happy",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_81_numerical_letter_grade",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nNumericalLetterGrade((new List<float>(new float[]{(float)4.0f, (float)3L, (float)1.7f, (float)2L, (float)3.5f}))).Equals((new List<string>(new string[]{(string)\"A+\", (string)\"B\", (string)\"C-\", (string)\"C\", (string)\"A-\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_igoarc18\\Program.cs:line 69"
+    },
+    {
+      "name": "HumanEval_82_prime_length",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_83_starts_one_ends",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_84_solve",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_85_add",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_86_anti_shuffle",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_87_get_row",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_88_sort_array",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSortArray((new List<long>())).Equals((new List<long>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_kuosha0c\\Program.cs:line 48"
+    },
+    {
+      "name": "HumanEval_89_encrypt",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_90_next_smallest",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_91_is_bored",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_92_any_int",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nAnyInt((3.0f), (float)4L, (float)7L) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_3dudacas\\Program.cs:line 68"
+    },
+    {
+      "name": "HumanEval_93_encode",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_94_skjkasdkd",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_95_check_dict_case",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_96_count_up_to",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCountUpTo((5L)).Equals((new List<long>(new long[]{(long)2L, (long)3L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_x59vxwij\\Program.cs:line 65"
+    },
+    {
+      "name": "HumanEval_97_multiply",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_98_count_upper",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_99_closest_integer",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_100_make_a_pile",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nMakeAPile((3L)).Equals((new List<long>(new long[]{(long)3L, (long)5L, (long)7L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_izvy3l95\\Program.cs:line 44"
+    },
+    {
+      "name": "HumanEval_101_words_string",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nWordsString((\"Hi, my name is John\")).Equals((new List<string>(new string[]{(string)\"Hi\", (string)\"my\", (string)\"name\", (string)\"is\", (string)\"John\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_92zpr7z_\\Program.cs:line 31"
+    },
+    {
+      "name": "HumanEval_102_choose_num",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nChooseNum((13L), (12L)) == (-1L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_xsp39ytx\\Program.cs:line 40"
+    },
+    {
+      "name": "HumanEval_104_unique_digits",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nUniqueDigits((new List<long>(new long[]{(long)15L, (long)33L, (long)1422L, (long)1L}))).Equals((new List<long>(new long[]{(long)1L, (long)15L, (long)33L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_v9mv22gv\\Program.cs:line 42"
+    },
+    {
+      "name": "HumanEval_105_by_length",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nByLength((new List<long>(new long[]{(long)2L, (long)1L, (long)1L, (long)4L, (long)5L, (long)8L, (long)2L, (long)3L}))).Equals((new List<string>(new string[]{(string)\"Eight\", (string)\"Five\", (string)\"Four\", (string)\"Three\", (string)\"Two\", (string)\"Two\", (string)\"One\", (string)\"One\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_ajcfmy3p\\Program.cs:line 64"
+    },
+    {
+      "name": "HumanEval_106_f",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_107_even_odd_palindrome",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nEvenOddPalindrome((3L)).Equals((Tuple.Create(1L, 2L)))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_pzigo9mg\\Program.cs:line 48"
+    },
+    {
+      "name": "HumanEval_108_count_nums",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCountNums((new List<long>(new long[]{(long)-1L, (long)-2L, (long)0L}))) == (0L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_c5p1whfb\\Program.cs:line 48"
+    },
+    {
+      "name": "HumanEval_109_move_one_ball",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_110_exchange",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_111_histogram",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nHistogram((\"a b b a\")).Equals((new Dictionary<string,long>(){{\"a\", 2L}, {\"b\", 2L}}))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_tcpmols5\\Program.cs:line 71"
+    },
+    {
+      "name": "HumanEval_112_reverse_delete",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_113_odd_count",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nOddCount((new List<string>(new string[]{(string)\"1234567\"}))).Equals((new List<string>(new string[]{(string)\"the number of odd elements 4n the str4ng 4 of the 4nput.\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_z3okjnc1\\Program.cs:line 38"
+    },
+    {
+      "name": "HumanEval_114_minSubArraySum",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nMinsubarraysum((new List<long>(new long[]{(long)-1L, (long)-2L, (long)-3L}))) == (-6L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_gygkpm6e\\Program.cs:line 31"
+    },
+    {
+      "name": "HumanEval_115_max_fill",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_116_sort_array",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_117_select_words",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSelectWords((\"Mary had a little lamb\"), (4L)).Equals((new List<string>(new string[]{(string)\"little\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_e62yobb2\\Program.cs:line 64"
+    },
+    {
+      "name": "HumanEval_118_get_closest_vowel",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_119_match_parens",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_120_maximum",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nMaximum((new List<long>(new long[]{(long)-3L, (long)-4L, (long)5L})), (3L)).Equals((new List<long>(new long[]{(long)-4L, (long)-3L, (long)5L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_dw3x8nkp\\Program.cs:line 34"
+    },
+    {
+      "name": "HumanEval_121_solution",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSolution((new List<long>(new long[]{(long)5L, (long)8L, (long)7L, (long)1L}))) == (12L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_9im8gvdo\\Program.cs:line 32"
+    },
+    {
+      "name": "HumanEval_122_add_elements",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_123_get_odd_collatz",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_124_valid_date",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_126_is_sorted",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_127_intersection",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_128_prod_signs",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nProdSigns((new List<long>(new long[]{(long)1L, (long)2L, (long)2L, (long)-4L}))).Equals(-9L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_pkcdcbt_\\Program.cs:line 114"
+    },
+    {
+      "name": "HumanEval_129_minPath",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_130_tri",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_131_digits",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_132_is_nested",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_133_sum_squares",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_134_check_if_last_char_is_a_letter",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCheckIfLastCharIsALetter((\"A\")) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_msuzzl17\\Program.cs:line 134"
+    },
+    {
+      "name": "HumanEval_135_can_arrange",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_136_largest_smallest_integers",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nLargestSmallestIntegers((new List<long>(new long[]{(long)2L, (long)4L, (long)1L, (long)3L, (long)5L, (long)7L}))).Equals(Tuple.Create((Nullable<long>)null, 1L))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_irggf_wl\\Program.cs:line 53"
+    },
+    {
+      "name": "HumanEval_138_is_equal_to_sum_even",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_139_special_factorial",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_140_fix_spaces",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_141_file_name_check",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_142_sum_squares",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_143_words_in_sentence",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_144_simplify",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_145_order_by_points",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nOrderByPoints((new List<long>(new long[]{(long)1L, (long)11L, (long)-1L, (long)-11L, (long)-12L}))).Equals((new List<long>(new long[]{(long)-1L, (long)-11L, (long)1L, (long)-12L, (long)11L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_8vrbklps\\Program.cs:line 54"
+    },
+    {
+      "name": "HumanEval_146_specialFilter",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_147_get_max_triples",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_148_bf",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_149_sorted_list_sum",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nSortedListSum((new List<string>(new string[]{(string)\"aa\", (string)\"a\", (string)\"aaa\"}))).Equals((new List<string>(new string[]{(string)\"aa\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_xjbykwyn\\Program.cs:line 45"
+    },
+    {
+      "name": "HumanEval_150_x_or_y",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_151_double_the_difference",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_152_compare",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCompare((new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L, (long)5L, (long)1L})), (new List<long>(new long[]{(long)1L, (long)2L, (long)3L, (long)4L, (long)2L, (long)-2L}))).Equals((new List<long>(new long[]{(long)0L, (long)0L, (long)0L, (long)0L, (long)3L, (long)3L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_3i0ijr4h\\Program.cs:line 32"
+    },
+    {
+      "name": "HumanEval_153_Strongest_Extension",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_154_cycpattern_check",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nCycpatternCheck((\"yello\"), (\"ell\")) == (true)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_88vf68ws\\Program.cs:line 56"
+    },
+    {
+      "name": "HumanEval_155_even_odd_count",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_156_int_to_mini_roman",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_157_right_angle_triangle",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_158_find_max",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_159_eat",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nEat((5L), (6L), (10L)).Equals((new List<long>(new long[]{(long)11L, (long)4L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_rth31l1y\\Program.cs:line 121"
+    },
+    {
+      "name": "HumanEval_160_do_algebra",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nDoAlgebra((new List<string>(new string[]{(string)\"+\", (string)\"*\", (string)\"-\"})), (new List<long>(new long[]{(long)2L, (long)3L, (long)4L, (long)5L}))) == (9L)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_iispstke\\Program.cs:line 80"
+    },
+    {
+      "name": "HumanEval_161_solve",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_162_string_to_md5",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_163_generate_integers",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nGenerateIntegers((2L), (10L)).Equals((new List<long>(new long[]{(long)2L, (long)4L, (long)6L, (long)8L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_y3lphd0z\\Program.cs:line 73"
+    }
+  ]
+}
