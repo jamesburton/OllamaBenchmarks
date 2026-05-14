@@ -1,31 +1,31 @@
 using MassTransit;
-using System;
 
-// Make the Contracts namespace globally visible
+namespace Contracts;
+
 global using Contracts;
 
-namespace Contracts
+public record GetProduct(Guid ProductId);
+public record ProductResult(Guid ProductId, string Name, decimal Price);
+public record ProductNotFound();
+
+public static class ProductMessages
 {
-    public record GetProduct(Guid ProductId);
+    public static Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+}
 
-    public record ProductResult(Guid ProductId, string Name, decimal Price);
+public class GetProductConsumer : IConsumer<GetProduct>
+{
+    public static Guid KnownId { get; } = ProductMessages.KnownId;
 
-    public record ProductNotFound();
-
-    public class GetProductConsumer : IConsumer<GetProduct>
+    public async Task Consume(ConsumeContext<GetProduct> context)
     {
-        public static readonly Guid KnownId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-
-        public async Task Consume(ConsumeContext<GetProduct> context)
+        if (context.Message.ProductId == KnownId)
         {
-            if (context.Message.ProductId == KnownId)
-            {
-                await context.RespondAsync(new ProductResult(KnownId, "Test Widget", 19.99m));
-            }
-            else
-            {
-                await context.RespondAsync(new ProductNotFound());
-            }
+            await context.RespondAsync<ProductResult>(new ProductResult(KnownId, "Test Widget", 19.99m));
+        }
+        else
+        {
+            await context.RespondAsync<ProductNotFound>();
         }
     }
 }

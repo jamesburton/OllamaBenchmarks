@@ -15,12 +15,39 @@ public class InvoiceSaga : SagaStateMachineInstance
 
 public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 {
-    // State definitions
     public State Pending { get; private set; } = null!;
     public State Approved { get; private set; } = null!;
     public State Paid { get; private set; } = null!;
 
-    // Event definitions
     public Event<InvoiceCreated> InvoiceCreated { get; private set; } = null!;
     public Event<InvoiceApproved> InvoiceApproved { get; private set; } = null!;
     public Event<InvoicePaid> InvoicePaid { get; private set; } = null!;
+
+    public InvoiceStateMachine()
+    {
+        InstanceState(x => x.CurrentState);
+
+        Event(() => InvoiceCreated, x => x.CorrelateById(m => m.Message.InvoiceId));
+        Event(() => InvoiceApproved, x => x.CorrelateById(m => m.Message.InvoiceId));
+        Event(() => InvoicePaid, x => x.CorrelateById(m => m.Message.InvoiceId));
+
+        Initially(
+            When(InvoiceCreated)
+                .Then(ctx => ctx.Saga.Amount = ctx.Message.Amount)
+                .TransitionTo(Pending)
+        );
+
+        During(Pending,
+            When(InvoiceApproved)
+                .TransitionTo(Approved)
+        );
+
+        During(Approved,
+            When(InvoicePaid)
+                .TransitionTo(Paid)
+                .Finalize()
+        );
+
+        SetCompletedWhenFinalized();
+    }
+}

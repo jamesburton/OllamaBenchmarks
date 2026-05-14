@@ -1,5 +1,8 @@
 using OneOf;
 
+[GenerateOneOf]
+public partial class GetUserResult : OneOf<User, NotFound, ValidationError> { }
+
 public class OrderItem
 {
     public string ProductName { get; set; }
@@ -54,20 +57,18 @@ public class OrderService
             return new ValidationError { Message = "At least one item is required" };
         }
 
-        decimal total = 0;
-        foreach (var item in request.Items)
-        {
-            total += item.Quantity * item.UnitPrice;
-        }
-
         var order = new Order
         {
-            Id = 0,
             CustomerName = request.CustomerName,
             Items = request.Items,
-            Total = total,
             CreatedAt = DateTime.UtcNow
         };
+
+        order.Total = 0;
+        foreach (var item in request.Items)
+        {
+            order.Total += item.Quantity * item.UnitPrice;
+        }
 
         _repository.Save(order);
         return order;

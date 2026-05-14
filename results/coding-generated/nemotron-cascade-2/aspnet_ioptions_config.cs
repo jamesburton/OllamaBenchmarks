@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
 public class SmtpOptions
 {

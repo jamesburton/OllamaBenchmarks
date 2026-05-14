@@ -1,10 +1,5 @@
-using xUnit.v3;
 using AwesomeAssertions;
-using System.Threading;
-using System.Threading.Tasks;
-
-[CollectionDefinition("Counter")]
-public class CounterCollection : ICollectionFixture<CounterFixture> { }
+using Xunit;
 
 public class CounterService
 {
@@ -17,37 +12,37 @@ public class CounterFixture : IAsyncLifetime
 {
     public CounterService Counter { get; private set; } = null!;
 
-    public ValueTask InitializeAsync()
-    {
-        Counter = new CounterService();
-        return ValueTask.CompletedTask;
-    }
-
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask InitializeAsync() => Counter = new CounterService();
+    public ValueTask DisposeAsync() => default;
 }
 
-[Collection("Counter")]
-public class CounterFirstTests
+[CollectionDefinition("Counter")]
+public class CounterCollection : ICollectionFixture<CounterFixture>
+{
+}
+
+public class CounterFirstTests : IClassFixture<CounterFixture>
 {
     private readonly CounterFixture _fixture;
+
     public CounterFirstTests(CounterFixture fixture) => _fixture = fixture;
 
     [Fact]
-    public void Increment_Should_Increase_Count()
+    public void Increment_Operation_Increases_Count()
     {
         _fixture.Counter.Increment();
         _fixture.Counter.Count.Should().BeGreaterOrEqualTo(1);
     }
 }
 
-[Collection("Counter")]
-public class CounterSecondTests
+public class CounterSecondTests : IClassFixture<CounterFixture>
 {
     private readonly CounterFixture _fixture;
+
     public CounterSecondTests(CounterFixture fixture) => _fixture = fixture;
 
     [Fact]
-    public void Increment_Twice_Should_Increase_Count()
+    public void Double_Increment_Operation_Increases_Count_To_At_Least_2()
     {
         _fixture.Counter.Increment();
         _fixture.Counter.Increment();

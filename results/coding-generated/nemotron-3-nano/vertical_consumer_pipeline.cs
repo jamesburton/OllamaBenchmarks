@@ -1,65 +1,58 @@
-global using Contracts;
-
-using MassTransit;
-
-namespace Contracts
-{
-    public record PlaceOrder(Guid OrderId, string CustomerName);
-    public record OrderPlaced(Guid OrderId, string CustomerName);
-    public record CustomerNotified(Guid OrderId, string NotificationMessage);
-
-    public class PlaceOrderConsumer : IConsumer<PlaceOrder>
-    {
-        public async Task Consume(ConsumeContext<PlaceOrder> context)
-        {
-            var msg = context.Message;
-            await context.Publish(new OrderPlaced(msg.OrderId, msg.CustomerName));
-        }
-    }
-
-    public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
-    {
-        public async Task Consume(ConsumeContext<OrderPlaced> context)
-        {
-            var msg = context.Message;
-            await context.Publish(new CustomerNotified(
-                msg.OrderId,
-                $"Order {msg.OrderId} confirmed for {msg.CustomerName}"
-            ));
-        }
-    }
-}
-
+using System;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
-public class OrderPipelineTests
+namespace Contracts;
+
+public record PlaceOrder(Guid OrderId, string CustomerName);
+public record OrderPlaced(Guid OrderId, string CustomerName);
+public record CustomerNotified(Guid OrderId, string NotificationMessage);
+
+public record PlaceOrderConsumer() : IConsumer<PlaceOrder>
+{
+    public async Task Consume(ConsumeContext<PlaceOrder> context)
+    {
+        await context.Publish(new OrderPlaced(context.Message.OrderId, context.Message.CustomerName));
+    }
+}
+
+public record NotifyCustomerConsumer() : IConsumer<OrderPlaced>
+{
+    public async Task Consume(ConsumeContext<OrderPlaced> context)
+    {
+        await context.Publish(new CustomerNotified(context.Message.OrderId,
+            $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}"));
+    }
+}
+
+public class PlaceOrderPipelineTests
 {
     [Fact]
-    public async Task PlaceOrder_is_consumed_and_OrderPlaced_published()
+    public async Task PlaceOrder_consumer_publishes_OrderPlaced()
     {
         var services = new ServiceCollection();
-        services.AddMassTransitTestHarness(cfg =>
+        services.AddMassTransitTestHarness(x =>
         {
-            cfg.AddConsumer<PlaceOrderConsumer>();
-            cfg.AddConsumer<NotifyCustomerConsumer>();
+            x.AddConsumer<PlaceOrderConsumer>();
         });
 
         var provider = services.BuildServiceProvider();
-        var harness = provider.GetRequiredService<ITestHarness>();
 
+        var harness = provider.GetRequiredService<ITestHarness>();
         await harness.Start();
 
-        var placeOrder = new PlaceOrder(Guid.NewGuid(), "John Doe");
-        await harness.Bus.Publish(placeOrder);
+        var orderId = Guid.NewGuid();
+        var msg = new PlaceOrder(orderId, "Alice");
 
+        await harness.Bus.Publish(msg);
         Assert.True(await harness.Consumed.Any<PlaceOrder>());
         Assert.True(await harness.Published.Any<OrderPlaced>());
     }
 
-    [Fact]
-    public async Task Full_pipeline_publishes_CustomerNotified()
+    [Theory, MemberData(nameof(PipelineData))]
+    public async Task Full_pipeline_publishes_OrderPlaced_and_CustomerNotified(OrderPlaced order, CustomerNotified notified)
     {
         var services = new ServiceCollection();
         services.AddMassTransitTestHarness(cfg =>
@@ -70,13 +63,22 @@ public class OrderPipelineTests
 
         var provider = services.BuildServiceProvider();
         var harness = provider.GetRequiredService<ITestHarness>();
-
         await harness.Start();
 
-        var placeOrder = new PlaceOrder(Guid.NewGuid(), "Jane Smith");
-        await harness.Bus.Publish(placeOrder);
+        var msg = new PlaceOrder(order.OrderId, order.CustomerName);
+        await harness.Bus.Publish(msg);
 
+        Assert.True(await harness.Consumed.Any<PlaceOrder>());
         Assert.True(await harness.Published.Any<OrderPlaced>());
         Assert.True(await harness.Published.Any<CustomerNotified>());
     }
+
+    public static IEnumerable<object[]> PipelineData =>
+        new[]
+        {
+            new object[] {
+                new OrderPlaced(Guid.NewGuid(), "Bob"),
+                new CustomerNotified(Guid.NewGuid(), "Order confirmed")
+            }
+        };
 }

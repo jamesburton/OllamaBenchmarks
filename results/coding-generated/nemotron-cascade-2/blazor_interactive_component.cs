@@ -21,8 +21,5 @@ public class CounterBase : ComponentBase
         await OnCountChanged.InvokeAsync(currentCount);
     }
 
-    public int CurrentCount
-    {
-        get { return currentCount; }
-    }
+    public int CurrentCount => currentCount;
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public static class MathValidator
 {
     public static bool IsEven(int n) => n % 2 == 0;
@@ -6,14 +8,13 @@ public static class MathValidator
     {
         if (n < 2) return false;
         for (int i = 2; i * i <= n; i++)
+        {
             if (n % i == 0) return false;
+        }
         return true;
     }
 
-    public static string Classify(int n)
-    {
-        return n < 0 ? "negative" : n == 0 ? "zero" : "positive";
-    }
+    public static string Classify(int n) => n < 0 ? "negative" : n == 0 ? "zero" : "positive";
 }
 
 public class MathValidatorTests

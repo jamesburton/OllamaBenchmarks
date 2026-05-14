@@ -2,7 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public record Sale(string Product, string Category, decimal Amount, DateOnly Date);
+public class Sale
+{
+    public string Product { get; }
+    public string Category { get; }
+    public decimal Amount { get; }
+    public DateOnly Date { get; }
+
+    public Sale(string product, string category, decimal amount, DateOnly date)
+    {
+        Product = product;
+        Category = category;
+        Amount = amount;
+        Date = date;
+    }
+}
+
 public record CategorySummary(string Category, decimal TotalAmount, decimal AverageAmount, int Count);
 
 public static class SalesAnalyzer
@@ -10,13 +25,14 @@ public static class SalesAnalyzer
     public static List<CategorySummary> SummarizeByCategory(IEnumerable<Sale> sales)
     {
         return sales
-            .GroupBy(s => s.Category)                                   // group by Category
+            .GroupBy(s => s.Category)
             .Select(g => new CategorySummary(
-                g.Key,                                                    // Category
-                g.Sum(s => s.Amount),                                     // TotalAmount
-                g.Average(),                                             // AverageAmount
-                g.Count()))                                                // Count
-            .OrderByDescending(c => c.TotalAmount)                     // order by TotalAmount descending
-            .ToList();                                                 // materialize as List<CategorySummary>
+                g.Key,
+                g.Sum(s => s.Amount),
+                g.Average(s => s.Amount),
+                g.Count()
+            ))
+            .OrderByDescending(ts => ts.TotalAmount)
+            .ToList();
     }
 }

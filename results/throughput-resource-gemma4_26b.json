@@ -1,16 +1,25 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-04-10T17:24:43.7516260+01:00",
-    "run_finished_at":  "2026-04-10T17:34:30.9222447+01:00",
+    "run_started_at":  "2026-05-13T19:15:49.7325080+01:00",
+    "run_finished_at":  "2026-05-13T19:16:40.7574708+01:00",
     "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-gemma4_26b.json",
-    "host":  "FRAMEWORK",
+    "host":  "STRIX",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "hostname":  "FRAMEWORK"
+                         "hostname":  "STRIX"
                      },
     "models":  [
                    "gemma4:26b"
                ],
+    "completed_models":  [
+                             "gemma4:26b"
+                         ],
+    "failed_models":  [
+
+                      ],
+    "incomplete_models":  [
+
+                          ],
     "prompt":  "Write a concise explanation of dependency injection with one short Python example.",
     "num_predict":  192,
     "seed":  42,
@@ -18,17 +27,17 @@
                     {
                         "model":  "gemma4:26b",
                         "eval_count":  192,
-                        "eval_s":  54.646,
-                        "toks_per_s":  3.51,
-                        "total_s":  186.698,
-                        "load_s":  122.286,
-                        "cpu_avg_pct":  4.7,
-                        "cpu_peak_pct":  21.9,
-                        "ram_peak_gb":  24.18,
+                        "eval_s":  3.82,
+                        "toks_per_s":  50.27,
+                        "total_s":  4.293,
+                        "load_s":  0.296,
+                        "cpu_avg_pct":  0,
+                        "cpu_peak_pct":  0,
+                        "ram_peak_gb":  2.08,
                         "gpu_util_avg":  0,
                         "gpu_util_peak":  0,
-                        "gpu_mem_peak_gb":  10.6,
-                        "ollama_ps":  "gemma4:26b size=23.54GB vram=0GB ctx=262144 quant=Q4_K_M"
+                        "gpu_mem_peak_gb":  46.92,
+                        "ollama_ps":  "gemma4:26b size=24.03GB vram=24.03GB ctx=262144 quant=Q4_K_M"
                     }
                 ]
 }

@@ -5,7 +5,7 @@ public interface IProductService
     Task<bool> DeleteAsync(int id);
 }
 
-public class ProductDetailBase : Microsoft.AspNetCore.Components.ComponentBase
+public class ProductDetailBase : ComponentBase
 {
     [Parameter]
     public int ProductId { get; set; }

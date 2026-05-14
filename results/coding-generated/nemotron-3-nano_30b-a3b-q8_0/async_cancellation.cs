@@ -7,9 +7,12 @@ public interface IDataSource
 
 public class DataProcessor
 {
-    public async IAsyncEnumerable<string> ProcessAllBatchesAsync(IDataSource source, [EnumeratorCancellation] CancellationToken ct = default)
+    public async IAsyncEnumerable<string> ProcessAllBatchesAsync(
+        IDataSource source,
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
         int batchNumber = 0;
+
         while (true)
         {
             if (ct.IsCancellationRequested)
@@ -20,7 +23,9 @@ public class DataProcessor
                 yield break;
 
             foreach (var item in batch)
+            {
                 yield return item;
+            }
 
             batchNumber++;
         }

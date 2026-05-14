@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 
-// TodoItem
 public class TodoItem
 {
     public int Id { get; set; }
@@ -9,17 +8,15 @@ public class TodoItem
     public DateTime CreatedAt { get; set; }
 }
 
-// TodoDbContext
-public class TodoDbContext : Microsoft.EntityFrameworkCore.DbContext
+public class TodoDbContext : DbContext
 {
     public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options)
     {
     }
 
-    public DbSet<TodoItem> TodoItems => base.Set<TodoItem>(name: "TodoItems");
+    public DbSet<TodoItem> TodoItems { get; set; }
 }
 
-// ITodoService
 public interface ITodoService
 {
     Task<TodoItem> CreateAsync(string title);
@@ -29,18 +26,18 @@ public interface ITodoService
     Task<bool> DeleteAsync(int id);
 }
 
-// TodoService
 public class TodoService : ITodoService
 {
     private readonly TodoDbContext _db;
-
-    public TodoService(TodoDbContext db) => _db = db;
+    public TodoService(TodoDbContext db)
+    {
+        _db = db;
+    }
 
     public async Task<TodoItem> CreateAsync(string title)
     {
         var item = new TodoItem
         {
-            Id = 0,
             Title = title,
             IsComplete = false,
             CreatedAt = DateTime.UtcNow

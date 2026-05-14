@@ -1,7 +1,4 @@
 using MassTransit;
-using System;
-
-global using Contracts;
 
 namespace Contracts;
 
@@ -13,7 +10,9 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
     public async Task Consume(ConsumeContext<ProcessPayment> context)
     {
         if (context.Message.Amount <= 0)
+        {
             return;
+        }
 
         await context.Publish(new PaymentProcessed(context.Message.OrderId, DateTime.UtcNow));
     }
@@ -21,15 +20,15 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
 
 public class ProcessPaymentConsumerDefinition : ConsumerDefinition<ProcessPaymentConsumer>
 {
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
+                                              IConsumerConfigurator<ProcessPaymentConsumer> configurator,
+                                              IRegistrationContext context)
+    {
+        endpointConfigurator.UseMessageRetry(r => r.Interval(2, 500));
+    }
+
     public ProcessPaymentConsumerDefinition()
     {
         ConcurrentMessageLimit = 2;
-    }
-
-    protected override void ConfigureConsumer(IReceiveEndpointConfigurator ep,
-                                              IConsumerConfigurator<ProcessPaymentConsumer> consumer,
-                                              IRegistrationContext ctx)
-    {
-        ep.UseMessageRetry(r => r.Interval(2, 500));
     }
 }

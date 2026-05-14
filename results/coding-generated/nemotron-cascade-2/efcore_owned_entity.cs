@@ -1,12 +1,17 @@
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
 
 public class Address
 {
     public string Street { get; set; }
     public string City { get; set; }
     public string Zip { get; set; }
+
+    public Address()
+    {
+        Street = string.Empty;
+        City = string.Empty;
+        Zip = string.Empty;
+    }
 }
 
 public class Customer
@@ -42,7 +47,7 @@ public class CustomerRepository
 
     public async Task<Customer> CreateAsync(Customer customer)
     {
-        await _context.Customers.AddAsync(customer);
+        _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
         return customer;
     }

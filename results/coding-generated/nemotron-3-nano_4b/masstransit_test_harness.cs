@@ -2,26 +2,33 @@ using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
+global namespace { }
+
 [Fact]
-public void ProcessPaymentConsumer_ProcessesMessage_PublishesPaymentProcessed()
+public void ProcessPaymentConsumer_Receives_And_Publishes_PaymentProcessed_With_CorrectOrderId()
 {
-    var provider = new ServiceCollection()
+    // Arrange
+    TestHarness harness;
+    using var svc = new ServiceCollection()
         .AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>())
         .BuildServiceProvider(true);
-
-    var harness = provider.GetRequiredService<ITestHarness>();
+    harness = svc.GetRequiredService<TestHarness>();
     await harness.Start();
 
-    var orderId = Guid.NewGuid();
-    var msg = new ProcessPayment(orderId, 0m);
-    await harness.Bus.Publish(msg);
+    // Act
+    await harness.Bus.Publish(new ProcessPayment(Guid.NewGuid(), 10.0));
 
-    var publishedEvent = await harness.Bus.GetMessages(PaymentProcessed);
-    Assert.NotNull(publishedEvent, "A PaymentProcessed event should have been published");
-    Assert.Equal(orderId, publishedEvent.OrderId);
+    var consumedMessages = await harness.Consumed.Any<ProcessPayment>();
+    var publishedMessages = await harness.Published.Any<PaymentProcessed>();
 
-    var consumed = await harness.Consumed.Any<ProcessPayment>().ConfigureAwait(false);
-    var published = await harness.Published.Any<PaymentProcessed>().ConfigureAwait(false);
-    Assert.True(consumed);
-    Assert.True(published);
+    // Assert
+    Assert.True(consumedMessages, "ProcessPayment message was not consumed");
+    Assert.True(publishedMessages, "PaymentProcessed message was not published");
+
+    var consumptionOrder = new[]
+    {
+        Assert.Equal(1, (bool)consumedMessages),
+        Assert.Equal(1, (bool)publishedMessages)
+    };
+    Assert.Multiple(consumptionOrder);
 }

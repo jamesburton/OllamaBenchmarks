@@ -11,7 +11,7 @@ public class Order
 {
     public int Id { get; set; }
     public string CustomerName { get; set; }
-    public List<OrderItem> Items { get; set; }
+    public List<OrderItem> Items { get; set; } = new();
     public decimal Total { get; set; }
     public DateTime CreatedAt { get; set; }
 }
@@ -19,12 +19,12 @@ public class Order
 public class CreateOrderRequest
 {
     public string CustomerName { get; set; }
-    public List<OrderItem> Items { get; set; }
+    public List<OrderItem> Items { get; set; } = new();
 }
 
 public class ValidationError
 {
-    public string Message { get; set; }
+    public string Message { get; set; } = string.Empty;
 }
 
 public interface IOrderRepository
@@ -36,33 +36,51 @@ public interface IOrderRepository
 public class OrderService
 {
     private readonly IOrderRepository _repository;
-    public OrderService(IOrderRepository repository) => _repository = repository;
+    private int _nextId = 1;
+
+    public OrderService(IOrderRepository repository)
+    {
+        _repository = repository;
+    }
 
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
     {
-        if (string.IsNullOrEmpty(request.CustomerName))
-            return OneOf<Order, ValidationError>.FromT1(new ValidationError { Message = "Customer name is required" });
-
-        if (request.Items == null || request.Items.Count == 0)
-            return OneOf<Order, ValidationError>.FromT1(new ValidationError { Message = "At least one item is required" });
-
-        var order = new Order
+        return request switch
         {
-            Id = 0,
-            CustomerName = request.CustomerName,
-            Items = request.Items,
-            Total = 0m,
-            CreatedAt = DateTime.UtcNow
+            {
+                CustomerName: null or "",
+                Items: null or {}
+            } => new ValidationError { Message = "Customer name is required" },
+
+            {
+                Items: null or {}
+            } => new ValidationError { Message = "At least one item is required" },
+
+            {
+                CustomerName: not null or not empty,
+                Items: not null and not {} items
+            } => CreateOrderImpl(request)
         };
 
-        decimal total = 0m;
-        foreach (var item in request.Items)
+        [System.Runtime.CompilerServices.CompilerServices.Unsafe] 
+        static OneOf<Order, ValidationError> CreateOrderImpl(CreateOrderRequest request)
         {
-            total += item.Quantity * item.UnitPrice;
-        }
-        order.Total = total;
+            var order = new Order
+            {
+                Id = _nextId++,
+                CustomerName = request.CustomerName,
+                Items = request.Items.Select(i => new OrderItem
+                {
+                    ProductName = i.ProductName,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice
+                }).ToList(),
+                CreatedAt = DateTime.UtcNow
+            };
 
-        _repository.Save(order);
-        return OneOf<Order, ValidationError>.FromT0(order);
+            order.Total = order.Items.Sum(item => item.Quantity * item.UnitPrice);
+            order.Items.ForEach(item => _repository.Save(order));
+            return order;
+        }
     }
 }

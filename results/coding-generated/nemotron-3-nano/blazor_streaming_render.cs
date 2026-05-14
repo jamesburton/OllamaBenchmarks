@@ -1,23 +1,34 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
+using System;
+using System.Threading.Tasks;
 
-public record WeatherForecast(System.DateOnly Date, int TemperatureC, string Summary);
+public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
 
 public interface IWeatherService
 {
-    System.Threading.Tasks.Task<WeatherForecast[]> GetForecastsAsync();
+    Task<WeatherForecast[]> GetForecastsAsync();
 }
 
 [StreamRendering]
 public class WeatherPageBase : ComponentBase
 {
     [Inject]
-    public IWeatherService WeatherService { get; set; } = default!;
+    public IWeatherService? WeatherService { get; set; }
 
-    public WeatherForecast[]? Forecasts { get; set; } = default;
+    public WeatherForecast[]? Forecasts { get; set; }
 
-    public override async System.Threading.Tasks.Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        Forecasts = (await WeatherService.GetForecastsAsync()).ToArray();
+        if (WeatherService != null)
+        {
+            Forecasts = await WeatherService.GetForecastsAsync();
+        }
+        else
+        {
+            Forecasts = Array.Empty<WeatherForecast>();
+        }
+
         await base.OnInitializedAsync();
     }
 }

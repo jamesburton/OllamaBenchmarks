@@ -1,36 +1,53 @@
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using OneOf;
 
-public class User
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
-}
-
-public record NotFound;
-
-public record ValidationError(string Message);
+record User(int Id, string Name, string Email);
+record NotFound;
+record ValidationError(string Message);
 
 public interface IUserService
 {
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
-public class UsersController
+using OneOf;
+
+public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
-    public UsersController(IUserService userService) => _userService = userService;
+    private readonly IOptions<SmtpOptions> _smtpOptions;
+
+    public UsersController(IUserService userService, IOptions<SmtpOptions> smtpOptions)
+    {
+        _userService = userService;
+        _smtpOptions = smtpOptions;
+    }
 
     public async Task<IActionResult> Get(int id)
     {
-        OneOf<User, NotFound, ValidationError> result = await _userService.GetByIdAsync(id);
+        var result = await _userService.GetByIdAsync(id);
+        return result.Match(
+            user => Ok(user),
+            _ => NotFound(),
+            ValidationError(msg) => BadRequest(new { error = msg })
+        );
+    }
+}
 
-        if (result.TryPickT0(out User user, out var remainder))
-            return Ok(user);
-
-        if (result.TryPickT1(out NotFound notFound, out var remainder2))
-            return NotFound();
-
-        return Results.BadRequest(remainder2.Message);
+// Example usage assumed in service
+public partial class UserService : IUserService
+{
+    public async Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id)
+    {
+        // Example logic returning based on conditions
+        if (id < 0)
+            return OneOf<User, NotFound, ValidationError>.FromT1(new ValidationError($"Invalid ID: {id}"));
+        else if (id == 999)
+            return OneOf<User, NotFound, ValidationError>.FromT1(new NotFound());
+        else
+            return OneOf<User, NotFound, ValidationError>.FromT0(new User(id, "Alice", "a@b.com"));
     }
 }

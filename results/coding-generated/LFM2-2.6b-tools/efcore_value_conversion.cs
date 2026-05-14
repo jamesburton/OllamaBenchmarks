@@ -11,7 +11,7 @@ public class Product
 
     public Product(int id, string name, Money price)
         : this(id, name)
-
+    
     {
         Price = price;
     }

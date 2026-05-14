@@ -1,33 +1,25 @@
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 public class Address
 {
-    public string Street { get; set; }
-    public string City { get; set; }
-    public string Zip { get; set; }
+    public string Street { get; set; } = default!;
+    public string City { get; set; } = default!;
+    public string Zip { get; set; } = default!;
 }
 
 public class Customer
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public Address HomeAddress { get; set; }
-
-    public Customer()
-    {
-        HomeAddress = new Address();
-    }
+    public string Name { get; set; } = default!;
+    public Address HomeAddress { get; set; } = new();
 }
 
 public class CustomerDbContext : DbContext
 {
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Customer> Customers { get; set; } = default!;
 
     public CustomerDbContext(DbContextOptions<CustomerDbContext> options)
-        : base(options)
-    {
-    }
+        : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,7 +39,7 @@ public class CustomerRepository
 
     public async Task<Customer> CreateAsync(Customer customer)
     {
-        await _context.Customers.AddAsync(customer);
+        _context.Customers.Add(customer);
         await _context.SaveChangesAsync();
         return customer;
     }

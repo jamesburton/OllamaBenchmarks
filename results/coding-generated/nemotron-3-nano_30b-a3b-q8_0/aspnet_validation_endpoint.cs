@@ -16,22 +16,21 @@ public class OrderService
 {
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        // Validate the request; validateAllProperties must be true
-        System.ComponentModel.DataAnnotations.Validator.TryValidateObject(
-            request,
-            new System.ComponentModel.ValidationContext(request),
-            out var results,
-            true);
+        var validationContext = new ValidationContext(request);
+        var validationResults = new System.Collections.Generic.List<ValidationResult>();
 
-        if (results != null && results.Count > 0)
+        bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
+        if (!isValid)
         {
-            var first = results[0];
-            var member = string.Join(", ", first.MemberNames);
-            var message = $"{member}: {first.ErrorMessage}";
-            throw new ArgumentException(message, nameof(request));
+            foreach (var vr in validationResults)
+            {
+                if (vr.ErrorMessage != null)
+                {
+                    throw new ArgumentException(vr.ErrorMessage);
+                }
+            }
         }
 
-        // Validation succeeded – return the confirmed order
         return request;
     }
 }

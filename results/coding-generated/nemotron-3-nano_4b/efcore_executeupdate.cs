@@ -1,42 +1,45 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Web.Http;
 
-public class Product
+namespace EF10Demo
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-    public string Category { get; set; } = string.Empty;
-    public DateTime LastModified { get; set; }
-}
-
-public class ProductDbContext : DbContext
-{
-    public DbSet<Product> Products { get; set; }
-
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
-}
-
-public static class ProductOperations
-{
-    public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
+    public class Product
     {
-        // Find all products in the specified category
-        var products = await db.Products.Where(p => p.Category == category).ToListAsync();
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public string Category { get; set; }
+        public DateTime LastModified { get; set; }
+    }
 
-        // Apply the discount and update LastModified for each found product
-        foreach (var p in products)
+    public class ProductDbContext : DbContext
+    {
+        public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
+        public DbSet<Product> Products { get; set; }
+    }
+
+    public static class ProductOperations
+    {
+        public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
         {
-            p.Price = p.Price * (1 - discountPct);
-            p.LastModified = DateTime.UtcNow;
+            var count = 0;
+            var products = await db.Products
+                .Where(p => p.Category == category)
+                .ToListAsync();
+
+            foreach (var product in products)
+            {
+                product.Price = product.Price * (1 - discountPct);
+                product.LastModified = DateTime.UtcNow;
+                count++;
+            }
+
+            await db.SaveChangesAsync();
+            return count;
         }
-
-        // Persist the changes
-        await db.SaveChangesAsync();
-
-        // Return the number of rows that were updated
-        return products.Count;
     }
 }

@@ -19,88 +19,58 @@ public class StringProcessor
         return cleaned.SequenceEqual(cleaned.Reverse());
     }
 }
-
-public class StringProcessorTests
+[Fact]
+public void Truncate_Methods_Parameters_NoUnitTests_Truncate_Should_BeNull_Method_Should_Not_Return_But_Empty_String()
 {
-    [Fact]
-    public void Truncate_ShouldTruncateStringAsExpected(string input, int maxLength)
-    {
-        var p = new StringProcessor();
-        var result = p.Truncate(input, maxLength);
-
-        if (maxLength >= result.Length) result.Should().Be(input);
-        else result.Should().Be(input [..] maxLength + "...");
-    }
-
-    [Theory]
-    [InlineData(null, 0)]
-    [InlineData("", 0)]
-    [InlineData("short", 5)]
-    [InlineData("short===", 5)]
-    [InlineData("long=============", 5)]
-    public void Truncate_ShouldTruncateStringAsExpected_Parameterized(string input, int maxLength)
-    {
-        var p = new StringProcessor();
-        var result = p.Truncate(input, maxLength);
-        if (maxLength >= result.Length) result.Should().Be(input);
-        else result.Should().Be(input [..] maxLength + "...");
-    }
-
-    [Fact]
-    public void CountWords_ShouldReturnZeroForNullOrWhiteSpace(string input)
-    {
-        var p = new StringProcessor();
-        var result = p.CountWords(input);
-        result.Should().Be(0);
-    }
-
-    [Fact]
-    public void CountWords_ShouldCountWords(string input)
-    {
-        var p = new StringProcessor();
-        var words = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        var expected = words.Length;
-        var result = p.CountWords(input);
-        result.Should().Be(expected);
-    }
-
-    [Fact]
-    public void IsPalindrome_ShouldBeTrueForPalindromes(string input)
-    {
-        var p = new StringProcessor();
-        var result = p.IsPalindrome(input);
-        result.Should().BeTrue();
-    }
-
-    [Fact]
-    public void IsPalindrome_ShouldBeFalseForNonPalindromes(string input)
-    {
-        var p = new StringProcessor();
-        var result = p.IsPalindrome(input);
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public void IsPalindrome_ShouldHandleNullAndEmpty(string input)
-    {
-        var p = new StringProcessor();
-        var result = p.IsPalindrome(input);
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public void IsPalindrome_ShouldReturnTrueForSingleChar(string input)
-    {
-        var p = new StringProcessor();
-        var result = p.IsPalindrome(input);
-        result.Should().BeTrue();
-    }
-
-    [Fact]
-    public void IsPalindrome_ShouldReturnTrueForMixedCasePalindrome(string input)
-    {
-        var p = new StringProcessor();
-        var result = p.IsPalindrome(input);
-        result.Should().BeTrue();
-    }
+    var processor = new StringProcessor();
+    var result = processor.Truncate(null, 10);
+    result.Should().Be("");
 }
+[Theory]
+public void Truncate_Methods_Parameters_Truncate_Should_BeNull_Method_Should_Not_Return_But_Empty_String(
+    [InLineData(null)] int dummy
+)
+{
+    var processor = new StringProcessor();
+    var result = processor.Truncate(null, 10);
+    result.Should().Be("");
+}
+[InlineData("")]
+[InLineData("a")]
+[InLineData("ab")]
+[InLineData("abc")]
+
+
+[InLineData(0)]
+
+
+[InLineData(5)]
+[InLineData(10)]
+[InLineData(2)]
+
+
+[InLineData(5)]
+[InLineData(6)]
+[InLineData(7)]
+[InLineData(8)]
+[InLineData(9)]
+[InLineData(3)]
+[InLineData(5)]
+
+
+[InLineData(4)]
+
+
+[InLineData(0)]
+[InLineData(0)]
+[InLineData(10)]
+[InLineData(13)
+[InLineData(10)]
+[InLineData(122)]
+
+
+[InLineData(10)
+[InLineData(2)]
+[InLineData(0)
+[InLineData(10)]
+[InLineData(122)

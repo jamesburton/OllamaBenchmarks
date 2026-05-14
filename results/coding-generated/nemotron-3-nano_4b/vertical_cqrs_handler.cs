@@ -16,25 +16,28 @@ public interface ICommandHandler<TCommand, TResult>
     Task<TResult> HandleAsync(TCommand command);
 }
 
-public partial class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, OneOf<Product, ValidationError, DuplicateError>>
+public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, OneOf<Product, ValidationError, DuplicateError>>
 {
-    private readonly IProductRepository _repo;
+    private readonly IProductRepository repository;
 
-    public CreateProductCommandHandler(IProductRepository repo) => _repo = repo;
+    public CreateProductCommandHandler(IProductRepository repository) => this.repository = repository;
 
-    public async Task<OneOf<Product, ValidationError, DuplicateError>> HandleAsync(CreateProductCommand command)
+    public Task<OneOf<Product, ValidationError, DuplicateError>> HandleAsync(CreateProductCommand command)
     {
         if (string.IsNullOrWhiteSpace(command.Name))
-            return new ValidationError("Name is required").Return<ValidationError>();
+        {
+            return Task.FromResult(new ValidationError("Name is required"));
+        }
 
         if (command.Price <= 0)
-            return new DuplicateError($"Duplicate for name {command.Name}").Return<DuplicateError>();
+        {
+            return Task.FromResult(new ValidationError("Price must be positive"));
+        }
 
-        if (await _repo.ExistsAsync(command.Name))
-            return new DuplicateError($"Duplicate for name {command.Name}").Return<DuplicateError>();
-
-        var product = new Product(0, command.Name, command.Price);
-        var result = await _repo.AddAsync(product).Result;
-        return result.Return();
+        var existsAsync = repository.ExistsAsync(command.Name);
+        return Task.FromResult( existsAsync
+            ? new DuplicateError(command.Name)
+            : await Task.FromResult(repository.AddAsync(new Product(0, command.Name, command.Price)))
+        );
     }
 }

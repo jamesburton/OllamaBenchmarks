@@ -1,8 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum Status { Active, Inactive, Pending }
+public enum Status
+{
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    Active,
+    Inactive,
+    Pending
+}
 
 public class PersonDto
 {

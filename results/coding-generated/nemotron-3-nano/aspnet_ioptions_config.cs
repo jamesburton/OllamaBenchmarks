@@ -15,16 +15,13 @@ public interface IEmailSender
 
 public class SmtpEmailSender : IEmailSender
 {
-    private readonly IOptions<SmtpOptions> _options;
+    public string? LastSentTo { get; set; }
+    public SmtpOptions Options { get; }
 
     public SmtpEmailSender(IOptions<SmtpOptions> options)
     {
-        _options = options;
+        Options = options.Value;
     }
-
-    public string? LastSentTo { get; set; }
-
-    public SmtpOptions Options => _options.Value;
 
     public Task SendAsync(string to, string subject, string body)
     {

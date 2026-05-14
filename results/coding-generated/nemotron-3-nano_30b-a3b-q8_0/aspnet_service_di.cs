@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 public interface IOrderRepository { }
 
@@ -24,7 +25,7 @@ public class EmailNotifier : IEmailNotifier
 
 public class OrderSettings
 {
-    public string WarehouseCode { get; set; }
+    public string WarehouseCode { get; set; } = string.Empty;
     public int MaxRetries { get; set; }
 }
 
@@ -32,10 +33,10 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config)
     {
+        services.Configure<OrderSettings>(config.GetSection("Orders"));
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddTransient<IEmailNotifier, EmailNotifier>();
-        services.Configure<OrderSettings>(config.GetSection("Orders"));
         return services;
     }
 }

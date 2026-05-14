@@ -18,6 +18,9 @@ public class WeatherPageBase : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        Forecasts = await WeatherService!.GetForecastsAsync();
+        if (WeatherService != null)
+        {
+            Forecasts = await WeatherService.GetForecastsAsync();
+        }
     }
 }

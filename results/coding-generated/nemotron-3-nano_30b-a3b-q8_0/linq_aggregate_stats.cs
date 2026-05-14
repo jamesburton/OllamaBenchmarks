@@ -1,21 +1,27 @@
-public static (double Mean, double Median, double Min, double Max) ComputeStats(IEnumerable<double> values)
+public static class SurveyAnalyzer
+{
+    public static (double Mean, double Median, double Min, double Max) ComputeStats(IEnumerable<double> values)
     {
-        var array = System.Linq.Enumerable.ToArray(values);
-        if (array.Length == 0)
-            throw new ArgumentException("Sequence cannot be empty.");
-        double mean = System.Linq.Enumerable.Average(array);
-        double min = System.Linq.Enumerable.Min(array);
-        double max = System.Linq.Enumerable.Max(array);
+        if (!values.Any())
+            throw new ArgumentException("Input sequence cannot be empty.");
 
-        var sorted = System.Linq.Enumerable.OrderBy(array, (double x) => x);
-        var sortedArray = System.Linq.Enumerable.ToArray(sorted);
-        int count = sortedArray.Length;
-        double median;
+        double mean = values.Average();
+        double min = values.Min();
+        double max = values.Max();
+
+        var sorted = values.OrderBy(x => x);
+        int count = sorted.Count();
         if (count % 2 == 1)
-            median = sortedArray[count / 2];
+        {
+            double median = sorted.ElementAt(count / 2);
+            return (mean, median, min, max);
+        }
         else
-            median = (sortedArray[count / 2 - 1] + sortedArray[count / 2]) / 2.0;
-
-        return (mean, median, min, max);
+        {
+            double mid1 = sorted.ElementAt(count / 2 - 1);
+            double mid2 = sorted.ElementAt(count / 2);
+            double median = (mid1 + mid2) / 2;
+            return (mean, median, min, max);
+        }
     }
 }

@@ -1,53 +1,46 @@
 using Microsoft.EntityFrameworkCore;
 
 public record Money(decimal Amount, string Currency);
-
 public class Product
 {
     public int Id { get; set; }
     public string Name { get; set; } = "";
-    public Money Price = new Money(0, "USD");
+    public Money Price { get; set; } = new Money(0, "USD");
 }
-
 public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
-
-    private static string ParseMoney(string s)
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
     {
-        var parts = s.Split(':');
-        if (parts.Length != 2)
-            return s;
-        if (!decimal.TryParse(parts[0], out decimal amount))
-            return s;
-        return new Money(amount, parts[1]);
     }
-
-    public override void OnModelCreating(ModelBuilder modelBuilder)
+    private static Money ParseMoney(string s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return new Money(0, "USD");
+        var parts = s.Split(new[] { ':' }, 2);
+        if (parts.Length == 0) return new Money(0, "USD");
+        var amount = decimal.Parse(parts[0], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
+        var currency = parts.Length > 1 ? parts[1] : "USD";
+        return new Money(amount, currency);
+    }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
             .HasConversion(m => $"{m.Amount}:{m.Currency}", s => ParseMoney(s));
     }
 }
-
 public class ProductRepository
 {
-    private readonly ProductDbContext _context;
-    public ProductRepository(ProductDbContext context) => _context = context;
-
-    public async Task<Product> SaveAsync(Product product)
+    public ProductRepository(ProductDbContext context) => Context = context;
+    private ProductDbContext Context { get; }
+    public Task<Product> SaveAsync(Product product)
     {
-        _context.Products.Add(product);
-        await _context.SaveChangesAsync();
+        Context.Products.Add(product);
+        await Context.SaveChangesAsync();
         return product;
     }
-
-    public async Task<Product?> GetByIdAsync(int id)
+    public Task<Product?> GetByIdAsync(int id)
     {
-        return await _context.Products
-            .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == id);
+        return Context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
     }
 }

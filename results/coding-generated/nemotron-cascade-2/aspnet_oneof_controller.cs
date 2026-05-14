@@ -1,17 +1,15 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
 
 public class User
 {
     public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string Email { get; set; } = null!;
+    public string Name { get; set; }
+    public string Email { get; set; }
 }
 
 public record NotFound;
-
 public record ValidationError(string Message);
 
 public interface IUserService
@@ -19,8 +17,6 @@ public interface IUserService
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
-[ApiController]
-[Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _service;
@@ -35,8 +31,8 @@ public class UsersController : ControllerBase
         OneOf<User, NotFound, ValidationError> result = await _service.GetByIdAsync(id);
         return result.Match<IActionResult>(
             user => Ok(user),
-            _    => NotFound(),
-            err  => BadRequest(err.Message)
+            _ => NotFound(),
+            err => BadRequest(err.Message)
         );
     }
 }

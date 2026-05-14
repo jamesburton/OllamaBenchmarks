@@ -1,20 +1,24 @@
 using System.Threading.Channels;
 
-class DataPipeline
+public class DataPipeline
 {
     private readonly Channel<string> _channel;
-    private readonly ChannelWriter<string> _writer;
+    private readonly CancellationToken _ct = CancellationToken.None;
 
     public DataPipeline(int capacity)
     {
         _channel = Channel.CreateBounded<string>(capacity);
-        _writer = _channel.Writer;
     }
 
-    public ChannelWriter<string> Writer => _writer;
+    public ChannelWriter<string> Writer => _channel.Writer;
 
-    public async IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
-        => _channel.Reader.ReadAllAsync<string>(ct);
+    public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
+    {
+        return _channel.Reader.ReadAllAsync(ct);
+    }
 
-    public async Task CompleteAsync() => await Writer.CompleteAsync();
+    public async Task CompleteAsync()
+    {
+        await Writer.CompleteAsync(_ct);
+    }
 }

@@ -1,4 +1,6 @@
 using OneOf;
+using System;
+using System.Collections.Generic;
 
 public class OrderItem
 {
@@ -11,7 +13,7 @@ public class Order
 {
     public int Id { get; set; }
     public string CustomerName { get; set; }
-    public System.Collections.Generic.List<OrderItem> Items { get; set; }
+    public List<OrderItem> Items { get; set; }
     public decimal Total { get; set; }
     public DateTime CreatedAt { get; set; }
 }
@@ -19,7 +21,7 @@ public class Order
 public class CreateOrderRequest
 {
     public string CustomerName { get; set; }
-    public System.Collections.Generic.List<OrderItem> Items { get; set; }
+    public List<OrderItem> Items { get; set; }
 }
 
 public class ValidationError
@@ -35,10 +37,11 @@ public interface IOrderRepository
 
 public class OrderService
 {
-    private readonly IOrderRepository _repository;
+    private readonly IOrderRepository repository;
+
     public OrderService(IOrderRepository repository)
     {
-        _repository = repository;
+        this.repository = repository;
     }
 
     public OneOf<Order, ValidationError> CreateOrder(CreateOrderRequest request)
@@ -53,22 +56,20 @@ public class OrderService
             return new ValidationError { Message = "At least one item is required" };
         }
 
-        decimal total = 0m;
-        foreach (var item in request.Items)
-        {
-            total += item.Quantity * item.UnitPrice;
-        }
-
         var order = new Order
         {
-            Id = 0,
             CustomerName = request.CustomerName,
             Items = request.Items,
-            Total = total,
             CreatedAt = DateTime.UtcNow
         };
 
-        _repository.Save(order);
+        order.Total = 0m;
+        foreach (var item in request.Items)
+        {
+            order.Total += item.Quantity * item.UnitPrice;
+        }
+
+        repository.Save(order);
         return order;
     }
 }

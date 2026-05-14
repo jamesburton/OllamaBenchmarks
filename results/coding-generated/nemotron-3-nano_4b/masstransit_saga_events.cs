@@ -1,18 +1,12 @@
 global using Contracts;
 using MassTransit;
-
 namespace Contracts;
-
 public class InvoiceSaga : SagaStateMachineInstance
 {
-    public Guid CorrelateId => Guid.NewGuid();
-    public string CurrentState => "";
-    public decimal Amount => 0m;
+    public Guid CorrelationId { get; set; }
+    public string CurrentState { get; set; }
+    public decimal Amount { get; set; }
 }
-
-public record InvoiceCreated(Guid InvoiceId, decimal Amount);
-public record InvoiceApproved(Guid InvoiceId);
-public record InvoicePaid(Guid InvoiceId);
 
 public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 {
@@ -32,14 +26,19 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
         Event(() => InvoicePaid, x => x.CorrelateById(m => m.Message.InvoiceId));
 
         Initially(
-            When(InvoiceCreated).Then(ctx => { ctx.Saga.Amount = ctx.Message.Amount; }).TransitionTo(Pending));
-
+            When(InvoiceCreated)
+                .Then(ctx => { ctx.Saga.Amount = ctx.Message.Amount; }).TransitionTo(Pending));
         During(Pending,
-            When(InvoiceApproved).TransitionTo(Approved));
-
+            When(InvoiceApproved)
+                .TransitionTo(Approved));
         During(Approved,
-            When(InvoicePaid).TransitionTo(Paid).Finalize());
+            When(InvoicePaid)
+                .TransitionTo(Paid).SetCompletedWhenFinalized());
 
         SetCompletedWhenFinalized();
     }
 }
+
+public record InvoiceCreated(Guid InvoiceId, decimal Amount);
+public record InvoiceApproved(Guid InvoiceId);
+public record InvoicePaid(Guid InvoiceId);

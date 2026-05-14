@@ -1,25 +1,30 @@
-public class FakeTimeProvider : System.Threading.TimeProvider
+using System;
+
+abstract class TimeProvider
 {
-    private readonly System.DateTimeOffset _fixedUtcNow;
-    public FakeTimeProvider(System.DateTimeOffset fixedUtcNow)
+    public abstract DateTimeOffset GetUtcNow();
+}
+
+class FakeTimeProvider : TimeProvider
+{
+    private readonly DateTimeOffset _fixedUtcNow;
+
+    public FakeTimeProvider(DateTimeOffset fixedUtcNow)
     {
         _fixedUtcNow = fixedUtcNow;
     }
-    public override System.DateTimeOffset GetUtcNow()
-    {
-        return _fixedUtcNow;
-    }
+
+    public override DateTimeOffset GetUtcNow() => _fixedUtcNow;
 }
 
-public class ExpiryChecker
+class ExpiryChecker
 {
-    private readonly System.Threading.TimeProvider _timeProvider;
-    public ExpiryChecker(System.Threading.TimeProvider timeProvider)
+    private readonly TimeProvider _timeProvider;
+
+    public ExpiryChecker(TimeProvider timeProvider)
     {
         _timeProvider = timeProvider;
     }
-    public bool IsExpired(System.DateTimeOffset expiresAt)
-    {
-        return expiresAt < _timeProvider.GetUtcNow();
-    }
+
+    public bool IsExpired(DateTimeOffset expiresAt) => expiresAt < _timeProvider.GetUtcNow();
 }

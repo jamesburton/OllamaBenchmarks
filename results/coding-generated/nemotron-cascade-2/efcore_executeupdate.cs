@@ -7,15 +7,15 @@ using Microsoft.EntityFrameworkCore;
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; } = null!;
+    public string Name { get; set; }
     public decimal Price { get; set; }
-    public string Category { get; set; } = null!;
+    public string Category { get; set; }
     public DateTime LastModified { get; set; }
 }
 
 public class ProductDbContext : DbContext
 {
-    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<Product> Products { get; set; }
 
     public ProductDbContext(DbContextOptions<ProductDbContext> options)
         : base(options)
@@ -27,6 +27,10 @@ public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
+        if (db == null) throw new ArgumentNullException(nameof(db));
+        if (string.IsNullOrWhiteSpace(category)) throw new ArgumentException("Category cannot be null or empty.", nameof(category));
+        if (discountPct < 0 || discountPct > 1) throw new ArgumentOutOfRangeException(nameof(discountPct), "Discount must be between 0 and 1.");
+
         var products = await db.Products
             .Where(p => p.Category == category)
             .ToListAsync();

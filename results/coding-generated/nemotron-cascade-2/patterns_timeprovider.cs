@@ -1,4 +1,4 @@
-public class FakeTimeProvider : System.TimeProvider
+class FakeTimeProvider : TimeProvider
 {
     private readonly DateTimeOffset _fixedUtcNow;
 
@@ -13,11 +13,11 @@ public class FakeTimeProvider : System.TimeProvider
     }
 }
 
-public class ExpiryChecker
+class ExpiryChecker
 {
-    private readonly System.TimeProvider _timeProvider;
+    private readonly TimeProvider _timeProvider;
 
-    public ExpiryChecker(System.TimeProvider timeProvider)
+    public ExpiryChecker(TimeProvider timeProvider)
     {
         _timeProvider = timeProvider;
     }

@@ -1,85 +1,53 @@
 global using Contracts;
 using MassTransit;
-
 namespace Contracts;
-
-global using Contracts;
-using MassTransit;
-namespace Contracts {
-
-global using Contracts;
-using MassTransit;
-namespace Contracts;
-
-global using Contracts;
-using MassTransit;
-namespace Contracts
-{
-
-global using Contracts;
-using MassTransit;
-namespace Contracts;
-
-namespace MyNamespace;
-public class MyClass { ... }
 
 public class InvoiceSaga : SagaStateMachineInstance
 {
-    public Guid CorrelationId { get; private set; }
-    public string CurrentState { get; private set; } = null!;
-    public decimal Amount { get; private set; }
+    public Guid CorrelationId { get; set; }
+    public string CurrentState { get; set; }
+    public decimal Amount { get; set; }
+    public Guid CurrentOrderId { get; set; }
 }
 
 public record InvoiceCreated(Guid InvoiceId, decimal Amount);
 public record InvoiceApproved(Guid InvoiceId);
 public record InvoicePaid(Guid InvoiceId);
 
-public class ExampleState : SagaStateMachineInstance
+public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
 {
-    public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; }
-}
+    public State Pending { get; private set; }
+    public State Approved { get; private set; }
+    public State Paid { get; private set; }
 
-public class ExampleStateMachine : MassTransitStateMachine<ExampleState>
-{
-    public State NotStarted { get; private set; }
-    public State Processing { get; private set; }
-    public State Completed { get; private set; }
+    public Event<InvoiceCreated> InvoiceCreated { get; private set; }
+    public Event<InvoiceApproved> InvoiceApproved { get; private set; }
+    public Event<InvoicePaid> InvoicePaid { get; private set; }
 
-    public Event<SomeEvent> SomeEvent { get; private set; }
-
-    public Event<SomeEvent> Event1 { get; private set; }
-
-    public ExampleStateMachine()
+    public InvoiceStateMachine()
     {
         InstanceState(x => x.CurrentState);
-        Event(() => SomeEvent, x => x.CorrelateById(m => m.Message.SomeId));
-        Initially(StartWith(NotStarted));
-        During(NotStarted, When(SomeEvent).TransitionTo(Processing));
-        // etc.
-    }
-}
+        Event(() => InvoiceCreated, ctx => ctx.CorrelateById(m => m.Message.InvoiceId));
+        Event(() => InvoiceApproved, ctx => ctx.CorrelateById(m => m.Message.InvoiceId));
+        Event(() => InvoicePaid, ctx => ctx.CorrelateById(m => m.Message.InvoiceId));
 
-public class OrderState : SagaStateMachineInstance
-{
-    public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; }
-}
+        Initially(
+            When(InvoiceCreated)
+                .Then(ctx => ctx.Saga.Amount = ctx.Message.Amount)
+                .TransitionTo(Pending)
+        );
 
-public class OrderStateMachine : MassTransitStateMachine<OrderState>
-{
-    public State NotAccepted { get; private set; }
-    public State Accepted { get; private set; }
-    public State Rejected { get; private set; }
+        During(Pending,
+            When(InvoiceApproved)
+                .TransitionTo(Approved)
+        );
 
-    public Event<OrderAccepted> OrderAcceptedEvent { get; private set; }
-    // ...
+        During(Approved,
+            When(InvoicePaid)
+                .TransitionTo(Paid)
+                .Finalize()
+        );
 
-    public OrderStateMachine()
-    {
-        InstanceState(x => x.CurrentState);
-        Event(() => OrderAcceptedEvent, x => x.CorrelateById(m => m.Message.OrderId));
-        Initially(When(OrderAcceptedEvent).Then(x => x.Instance.CurrentState = "Accepted"));
-        // etc.
+        SetCompletedWhenFinalized();
     }
 }

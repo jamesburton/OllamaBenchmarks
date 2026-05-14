@@ -1,40 +1,37 @@
-public class ThrottledProcessor
+class ThrottledProcessor
 {
-    private readonly SemaphoreSlim _semaphore;
+    private SemaphoreSlim semaphore;
 
     public ThrottledProcessor(int maxConcurrent)
     {
-        _semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
+        semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
     }
 
     public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
-        var results = new List<T>(tasks.Count());
+        List<T> results = new List<T>();
+        var tcsList = new List<Task<T>>();
 
-        var tasksToRun = new List<Task>();
-        var enumerator = tasks.GetEnumerator();
-        foreach (var factory in enumerator)
+        foreach (var taskFactory in tasks)
         {
-            tasksToRun.Add(Task.Run(() => {
-                try
-                {
-                    _ = _semaphore.WaitAsync(ct);
-                    var result = factory(ct);
-                    _semaphore.Release();
-                }
-                catch (OperationCanceledException)
-                {
-                }
-                finally
-                {
-                    _semaphore.Release();
-                }
-            }));
+            Task<T> task = Task<T>.WhenAwaited(taskFactory, ct);
+            tcsList.Add(task);
         }
 
-        var resultsArray = await Task.WhenAll(tasksToRun);
-        foreach (var result in resultsArray)
-            results.Add(result);
+        ct.ConfigureAwait(false);
+
+        if (semaphore.CurrentCount < task.GetHashCode())
+            semaphore.WaitAsync(ct);
+
+        try
+        {
+            var taskResults = await Task.WhenAll(tcsList);
+            results.AddRange(taskResults);
+        }
+        finally
+        {
+            semaphore.Release();
+        }
 
         return results;
     }

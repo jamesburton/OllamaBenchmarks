@@ -8,31 +8,38 @@ public interface IUserService
 
 public class UserDashboard : ComponentBase
 {
-    [CascadingParameter]
-    public Task<AuthenticationState> AuthState { get; set; }
-
     [Inject]
     public IUserService UserService { get; set; } = default!;
 
-    public string? DisplayName { get; set; }
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; } = default!;
 
+    public string? DisplayName { get; set; }
     public bool IsAuthenticated { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthState;
-        if (authState?.User?.Identity?.IsAuthenticated == true)
+        if (AuthState is not null)
         {
-            IsAuthenticated = true;
-            var userName = authState.User.Identity?.Name;
-            DisplayName = string.IsNullOrEmpty(userName)
-                ? "Guest"
-                : await UserService.GetDisplayNameAsync(userName);
-        }
-        else
-        {
-            IsAuthenticated = false;
-            DisplayName = "Guest";
+            var authState = await AuthState;
+            IsAuthenticated = authState.User.Identity?.IsAuthenticated == true;
+
+            if (IsAuthenticated)
+            {
+                var userName = authState.User.Identity?.Name;
+                if (!string.IsNullOrEmpty(userName))
+                {
+                    DisplayName = await UserService.GetDisplayNameAsync(userName);
+                }
+                else
+                {
+                    DisplayName = "Guest";
+                }
+            }
+            else
+            {
+                DisplayName = "Guest";
+            }
         }
     }
 }
