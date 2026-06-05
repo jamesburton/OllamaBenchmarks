@@ -228,7 +228,10 @@ def run_task(
     task_name = task_def["name"]
     category = task_def.get("category", "unknown")
     weight = task_def.get("weight", 1)
-    max_tokens = task_def.get("max_tokens", 4096)
+    # Per-task max_tokens wins; otherwise allow a global override via env
+    # (CODING_BENCH_MAX_TOKENS) for verbose thinking models that overflow the
+    # 4096 default and emit no code ("Empty code after extraction"). Default 4096.
+    max_tokens = task_def.get("max_tokens") or int(os.environ.get("CODING_BENCH_MAX_TOKENS", "4096"))
     num_ctx = task_def.get("num_ctx", 12288)
 
     try:

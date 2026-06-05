@@ -85,6 +85,37 @@ The runner's `setup_template_cache()` will rebuild on next invocation.
 
 The `benchmark_quality.py` quick quality suite uses a 256-token cap for coding answers. Any model that wraps reasoning in `<think>…</think>` (Carnice-V2, GLM-4.5-Air-REAP, several distilled variants) will exhaust the budget before producing code and score 0/5 on coding. That score does not reflect the model's actual coding ability — read L3/L2 numbers for those.
 
+## gemma4:12b — 256K-default offload trap + think-dependent-but-runaway reasoning (2026-06-05)
+
+Three distinct gotchas, all proven on Framework (RTX 3060 12GB eGPU, Ollama 0.30.5):
+
+1. **Needs Ollama >= 0.30.5.** 0.24.0 returns `412: requires a newer version` on pull. 0.30.5 release notes
+   also fix a gemma4:12b floating-point-exception crash. Update before benchmarking.
+
+2. **Default 256K context overflows 12GB → silent partial offload.** `gemma4:12b` defaults to its full 256K
+   context. On a 12GB GPU the 256K KV cache pushes it to partial offload: `ollama ps` shows `size=9.23GB
+   vram=6.52GB` and throughput craters to **5.58 tok/s (FAILS the >10 gate)**. Pinned at `num_ctx=131072`
+   it loads 100% GPU (`size=7.63GB vram=7.63GB`) at **~18.6 tok/s** (warm; ~13.6 when the eGPU is thermally
+   loaded — throughput is thermal-dependent, re-measure warm). Decode speed is context-independent once
+   resident; the 256K slowdown is pure offload. **Always pin `num_ctx<=131072` on a 12GB GPU.** The throughput
+   script gained a `-NumCtx` param for this; coding suites already pin small contexts (L3 12288, L2 8192).
+
+3. **Think-dependent for complex C#, but reasoning is runaway-verbose.** Controlled A/B on one task:
+   think:false emits `with {…}` (missing target) and statement-`switch` → broken; think:true emits
+   `order with {…}` and `order.Total switch {…}` → correct. So the model genuinely needs reasoning for
+   correct C#. BUT it spends ~2000+ tokens thinking even for one-liners, so at the L3 harness's 4096
+   `max_tokens` cap, ~10/50 hard tasks emit only thinking → **"Empty code after extraction"**. Scores:
+   L3 think:false 5/50, think:true@4096 6/50 (both weak). A think:true **@8192** ceiling re-run of the 10
+   starved tasks still scored **0/10** (8 empty) — so on the hardest .NET tasks the model runs away past
+   8192 without converging: a **genuine capability limit, not just budget starvation**. Use
+   `CODING_BENCH_MAX_TOKENS` (new env, default 4096) to raise the budget for verbose thinking models.
+   Despite weak complex-.NET, gemma4:12b is a **strong broad coder**: L2-chat (think:false) **95/158 (0.601)**,
+   quick-quality 11/11. Read L2 + quick-quality, not L3, when judging this model's general coding value.
+
+4. **Unsloth UD-Q4_K_XL == official q4_K_M here.** The dynamic 4-bit quant (via a `FROM`-GGUF Modelfile that
+   copies the official gemma4 RENDERER/PARSER) is a dead tie: 11/11 quick, 95/158 L2, ~19.6 vs ~18.6 tok/s
+   (within variance). No reason to prefer it over the official tag on this hardware.
+
 ---
 
 *Extend and refine these notes as insights are proven*

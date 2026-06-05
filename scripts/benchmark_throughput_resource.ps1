@@ -1,6 +1,7 @@
 param(
   [string[]]$Models,
   [int]$NumPredict = 192,
+  [int]$NumCtx = 0,
   [string]$Prompt = "Write a concise explanation of dependency injection with one short Python example.",
   [int]$Seed = 42,
   [string]$OutputPath,
@@ -56,16 +57,19 @@ function Invoke-OllamaGenerate {
 
   $sampling = Get-SamplingOptions -Model $Model -UseCase "general"
 
+  $genOptions = @{
+    num_predict = $PredictCount
+    temperature = $sampling.temperature
+    top_p = $sampling.top_p
+    seed = $SeedValue
+  }
+  if ($NumCtx -gt 0) { $genOptions.num_ctx = $NumCtx }
+
   $body = @{
     model = $Model
     prompt = $PromptText
     stream = $false
-    options = @{
-      num_predict = $PredictCount
-      temperature = $sampling.temperature
-      top_p = $sampling.top_p
-      seed = $SeedValue
-    }
+    options = $genOptions
   } | ConvertTo-Json -Depth 8 -Compress
 
   Invoke-OllamaWithRetry -Uri "http://127.0.0.1:11434/api/generate" -Body $body
@@ -239,6 +243,7 @@ function New-AggregatePayload {
     incomplete_models = [string[]]@((Get-IncompleteModels))
     prompt = $Prompt
     num_predict = $NumPredict
+    num_ctx = $NumCtx
     seed = $Seed
     results = $results
   }
@@ -248,16 +253,19 @@ foreach ($model in $Models) {
   try {
     $null = Invoke-OllamaGenerate -Model $model -PromptText "Warmup: one short sentence." -PredictCount 16 -SeedValue $Seed
 
+    $measureOptions = @{
+      num_predict = $NumPredict
+      temperature = (Get-SamplingOptions -Model $model -UseCase "general").temperature
+      top_p = (Get-SamplingOptions -Model $model -UseCase "general").top_p
+      seed = $Seed
+    }
+    if ($NumCtx -gt 0) { $measureOptions.num_ctx = $NumCtx }
+
     $body = @{
       model = $model
       prompt = $Prompt
       stream = $false
-      options = @{
-        num_predict = $NumPredict
-        temperature = (Get-SamplingOptions -Model $model -UseCase "general").temperature
-        top_p = (Get-SamplingOptions -Model $model -UseCase "general").top_p
-        seed = $Seed
-      }
+      options = $measureOptions
     } | ConvertTo-Json -Depth 8 -Compress
 
     $job = Start-Job -ScriptBlock {

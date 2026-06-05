@@ -1,0 +1,40 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-06-05T23:14:19.9911861+01:00",
+  "run_finished_at": "2026-06-05T23:14:54.8795749+01:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-gemma4_12b.json",
+  "host": "FRAMEWORK",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "hostname": "FRAMEWORK"
+  },
+  "models": [
+    "gemma4:12b"
+  ],
+  "completed_models": [
+    "gemma4:12b"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "num_ctx": 131072,
+  "seed": 42,
+  "results": [
+    {
+      "model": "gemma4:12b",
+      "eval_count": 192,
+      "eval_s": 10.314,
+      "toks_per_s": 18.62,
+      "total_s": 11.483,
+      "load_s": 0.868,
+      "cpu_avg_pct": 0.0,
+      "cpu_peak_pct": 0.0,
+      "ram_peak_gb": 0.14,
+      "gpu_util_avg": 0.0,
+      "gpu_util_peak": 0.0,
+      "gpu_mem_peak_gb": 0.0,
+      "ollama_ps": "gemma4:12b size=7.63GB vram=7.63GB ctx=131072 quant=Q4_K_M"
+    }
+  ]
+}
