@@ -9,6 +9,8 @@ Pure helper functions are unit-tested in test_build_stack_csharp_dataset.py.
 """
 from __future__ import annotations
 
+import hashlib
+import random
 import re
 
 PERMISSIVE_LICENSES = {
@@ -202,3 +204,35 @@ def to_chat_example(signature: str, body: str) -> dict:
             {"role": "assistant", "content": assistant},
         ]
     }
+
+
+def content_key(example: dict) -> str:
+    """Return a normalized hash key (sha1 of assistant content with whitespace collapsed)."""
+    assistant = example["messages"][-1]["content"]
+    normalized = " ".join(assistant.split())
+    return hashlib.sha1(normalized.encode("utf-8")).hexdigest()
+
+
+def dedup(examples: list[dict]) -> list[dict]:
+    """Keep first occurrence per content_key, preserve order."""
+    seen: set[str] = set()
+    out: list[dict] = []
+    for ex in examples:
+        k = content_key(ex)
+        if k not in seen:
+            seen.add(k)
+            out.append(ex)
+    return out
+
+
+def split_holdout(
+    examples: list[dict], fraction: float = 0.10, seed: int = 42
+) -> tuple[list[dict], list[dict]]:
+    """Return (train, holdout) with holdout size = round(len*fraction), seeded shuffle, deterministic."""
+    idx = list(range(len(examples)))
+    random.Random(seed).shuffle(idx)
+    n_hold = round(len(examples) * fraction)
+    hold_idx = set(idx[:n_hold])
+    train = [ex for i, ex in enumerate(examples) if i not in hold_idx]
+    holdout = [examples[i] for i in idx[:n_hold]]
+    return train, holdout

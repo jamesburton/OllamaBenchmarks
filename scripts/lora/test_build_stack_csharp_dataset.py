@@ -146,3 +146,39 @@ def test_extract_functions_keeps_method_returning_pascalcase():
     fns = b.extract_functions(code)
     assert len(fns) == 1
     assert 'GetPerson' in fns[0][0]
+
+
+def _ex(content):
+    return {"messages": [
+        {"role": "system", "content": b.SYSTEM_PROMPT},
+        {"role": "user", "content": "u"},
+        {"role": "assistant", "content": content},
+    ]}
+
+
+def test_content_key_ignores_whitespace():
+    assert b.content_key(_ex("a  b\n c")) == b.content_key(_ex("a b c"))
+
+
+def test_dedup_removes_duplicates():
+    items = [_ex("same"), _ex("same"), _ex("different")]
+    out = b.dedup(items)
+    assert len(out) == 2
+
+
+def test_split_holdout_sizes():
+    items = [_ex(str(i)) for i in range(100)]
+    train, holdout = b.split_holdout(items, fraction=0.10, seed=42)
+    assert len(holdout) == 10
+    assert len(train) == 90
+    # disjoint
+    train_keys = {b.content_key(x) for x in train}
+    hold_keys = {b.content_key(x) for x in holdout}
+    assert train_keys.isdisjoint(hold_keys)
+
+
+def test_split_holdout_deterministic():
+    items = [_ex(str(i)) for i in range(100)]
+    a1, b1 = b.split_holdout(items, seed=42)
+    a2, b2 = b.split_holdout(items, seed=42)
+    assert [b.content_key(x) for x in b1] == [b.content_key(x) for x in b2]
