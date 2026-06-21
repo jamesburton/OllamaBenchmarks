@@ -18,7 +18,9 @@ MODERN_MARKERS = ("namespace", "record", "async")
 
 
 def passes_license(record: dict) -> bool:
-    val = record.get("license") or record.get("max_stars_repo_licenses")
+    val = record.get("license")
+    if val is None:
+        val = record.get("max_stars_repo_licenses")
     if val is None:
         return False
     licenses = val if isinstance(val, (list, tuple)) else [val]
