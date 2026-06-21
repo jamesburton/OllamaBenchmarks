@@ -41,6 +41,11 @@ def parse_args():
     p.add_argument("--max-steps", type=int, default=-1,
                    help="cap training steps (smoke runs); -1 = full")
     p.add_argument("--phase", type=int, choices=[1, 2], default=1)
+    # adamw_torch is portable; adamw_8bit (bitsandbytes) issues AVX instructions
+    # that crash on pre-AVX CPUs (e.g. T5500's Westmere Xeons → 0xc000001d). LoRA
+    # optimizer state is tiny, so the memory saving from 8bit is negligible.
+    p.add_argument("--optim", default="adamw_torch",
+                   help="HF optimizer name (default adamw_torch; adamw_8bit needs AVX)")
     return p.parse_args()
 
 
@@ -128,7 +133,7 @@ def train(args, examples, bf16_gpu_only: bool):
         packing_strategy="wrapped",
         gradient_checkpointing=True,
         gradient_checkpointing_kwargs={"use_reentrant": False},
-        optim="adamw_8bit",
+        optim=args.optim,
         max_grad_norm=0.3,
         seed=42,
         report_to="none",
