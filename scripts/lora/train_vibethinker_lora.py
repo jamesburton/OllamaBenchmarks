@@ -35,7 +35,7 @@ def parse_args():
     p.add_argument("--batch-size", type=int, default=1)
     p.add_argument("--gradient-accumulation", type=int, default=8)
     p.add_argument("--lr", type=float, default=2e-4)
-    p.add_argument("--max-seq-length", type=int, default=4096)
+    p.add_argument("--max-seq-length", type=int, default=2048)
     p.add_argument("--lora-r", type=int, default=32)
     p.add_argument("--lora-alpha", type=int, default=64)
     p.add_argument("--max-steps", type=int, default=-1,
@@ -119,6 +119,13 @@ def train(args, examples, bf16_gpu_only: bool):
         bf16=bf16_gpu_only,
         fp16=not bf16_gpu_only,
         max_length=args.max_seq_length,
+        # Sequence packing — TRL 0.24 applies formatting_func first (mapping each
+        # example to {"text": ...}), then tokenises, then packs. The SYSTEM_PROMPT
+        # injection in formatting_func therefore runs on every example before packing.
+        # "wrapped" strategy keeps normal padded attention masks so it is compatible
+        # with attn_implementation="eager" (no cross-sample contamination risk).
+        packing=True,
+        packing_strategy="wrapped",
         gradient_checkpointing=True,
         gradient_checkpointing_kwargs={"use_reentrant": False},
         optim="adamw_8bit",
