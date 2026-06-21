@@ -82,3 +82,67 @@ def test_to_chat_example_shape():
     assert "Add(int a, int b)" in ex["messages"][1]["content"]
     assert ex["messages"][2]["content"].startswith("public int Add")
     assert "return a + b;" in ex["messages"][2]["content"]
+
+
+# --- Defect 1: brace matching must not stop at braces inside string literals ---
+
+def test_extract_functions_body_with_brace_in_string():
+    """A `}` inside a double-quoted string must not prematurely close the block."""
+    code = (
+        'public string Foo()\n'
+        '{\n'
+        '    var s = "}";\n'
+        '    return s;\n'
+        '}\n'
+    )
+    fns = b.extract_functions(code)
+    assert len(fns) == 1
+    sig, body = fns[0]
+    body_stripped = body.strip()
+    assert body_stripped.endswith("}")
+    assert 'return s;' in body
+    assert '"}"' in body
+
+
+def test_extract_functions_verbatim_string_brace():
+    """A `}` inside a verbatim string `@\"...\"` must not prematurely close the block."""
+    code = (
+        'public string Bar()\n'
+        '{\n'
+        '    var s = @"a}b";\n'
+        '    return s;\n'
+        '}\n'
+    )
+    fns = b.extract_functions(code)
+    assert len(fns) == 1
+    sig, body = fns[0]
+    body_stripped = body.strip()
+    assert body_stripped.endswith("}")
+    assert 'a}b' in body
+
+
+# --- Defect 2: constructors must not be extracted as methods ---
+
+def test_extract_functions_ignores_constructor():
+    """Constructor signatures must be skipped — no return type means no valid method."""
+    code = (
+        'public Widget(int x)\n'
+        '{\n'
+        '    X = x;\n'
+        '}\n'
+    )
+    fns = b.extract_functions(code)
+    assert fns == []
+
+
+def test_extract_functions_keeps_method_returning_pascalcase():
+    """A method whose return type is a PascalCase class name must NOT be dropped."""
+    code = (
+        'public Person GetPerson(int id)\n'
+        '{\n'
+        '    return null;\n'
+        '}\n'
+    )
+    fns = b.extract_functions(code)
+    assert len(fns) == 1
+    assert 'GetPerson' in fns[0][0]

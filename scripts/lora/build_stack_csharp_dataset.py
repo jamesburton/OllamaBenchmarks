@@ -38,6 +38,16 @@ def is_modern_csharp(text: str) -> bool:
     return any(marker in text for marker in MODERN_MARKERS)
 
 
+# Keywords that may appear as C# modifiers/access specifiers but are never valid
+# return types.  When the token immediately before the method name is one of
+# these, the "match" is actually a constructor (e.g. `public Person(...)` where
+# `public` is mistaken for the return type) — skip it.
+_MODIFIER_KEYWORDS = frozenset({
+    "public", "private", "protected", "internal",
+    "static", "virtual", "override", "sealed", "partial",
+    "new", "extern", "unsafe", "async", "abstract",
+})
+
 SYSTEM_PROMPT = (
     "You are an expert C#/.NET developer. When asked to write code, "
     "return ONLY valid C# code in a single file. Do not include markdown "
@@ -59,15 +69,93 @@ _SIG_RE = re.compile(
 
 
 def _match_block(text: str, brace_start: int) -> int:
-    """Return the index just past the matching close brace, or -1."""
+    """Return the index just past the matching close brace, or -1.
+
+    Scans character-by-character tracking lexical state so that ``{``/``}``
+    inside string literals, char literals, and comments do not affect the brace
+    depth counter.  Recognised states:
+
+    - NORMAL        — regular code; ``{``/``}`` change depth.
+    - STRING        — inside a double-quoted literal ``"..."``; ``\\`` escapes
+                      the next character, including ``\\"``.
+    - VERBATIM      — inside a verbatim string ``@"..."``; ``\\`` is not an
+                      escape character, but ``""`` is an in-string escaped
+                      double-quote (stays in the string).
+    - CHAR          — inside a char literal ``'...'``; ``\\`` escapes the next
+                      character.
+    - LINE_COMMENT  — from ``//`` to end of line.
+    - BLOCK_COMMENT — from ``/*`` to ``*/``.
+    """
+    NORMAL, STRING, VERBATIM, CHAR, LINE_COMMENT, BLOCK_COMMENT = range(6)
+    state = NORMAL
     depth = 0
-    for i in range(brace_start, len(text)):
-        if text[i] == "{":
-            depth += 1
-        elif text[i] == "}":
-            depth -= 1
-            if depth == 0:
-                return i + 1
+    i = brace_start
+    n = len(text)
+
+    while i < n:
+        ch = text[i]
+
+        if state == NORMAL:
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    return i + 1
+            elif ch == "/" and i + 1 < n:
+                nxt = text[i + 1]
+                if nxt == "/":
+                    state = LINE_COMMENT
+                    i += 2
+                    continue
+                elif nxt == "*":
+                    state = BLOCK_COMMENT
+                    i += 2
+                    continue
+            elif ch == "@" and i + 1 < n and text[i + 1] == '"':
+                state = VERBATIM
+                i += 2
+                continue
+            elif ch == '"':
+                state = STRING
+            elif ch == "'":
+                state = CHAR
+
+        elif state == STRING:
+            if ch == "\\":
+                i += 2  # skip escaped character
+                continue
+            elif ch == '"':
+                state = NORMAL
+
+        elif state == VERBATIM:
+            if ch == '"':
+                # A doubled quote is an escaped quote — stay in the string.
+                if i + 1 < n and text[i + 1] == '"':
+                    i += 2
+                    continue
+                else:
+                    state = NORMAL
+
+        elif state == CHAR:
+            if ch == "\\":
+                i += 2  # skip escaped character
+                continue
+            elif ch == "'":
+                state = NORMAL
+
+        elif state == LINE_COMMENT:
+            if ch == "\n":
+                state = NORMAL
+
+        elif state == BLOCK_COMMENT:
+            if ch == "*" and i + 1 < n and text[i + 1] == "/":
+                state = NORMAL
+                i += 2
+                continue
+
+        i += 1
+
     return -1
 
 
@@ -75,6 +163,18 @@ def extract_functions(text: str) -> list[tuple[str, str]]:
     results: list[tuple[str, str]] = []
     for m in _SIG_RE.finditer(text):
         sig = m.group(0).strip()
+
+        # --- Constructor guard ---
+        # Split off the parameter list to get the tokens before the first `(`.
+        # The regex guarantees `(` is present.  The token immediately before the
+        # method name is the return type.  If it is a modifier/access keyword the
+        # match is a constructor (e.g. `public Person(...)` where `public` filled
+        # the "return type" slot), so we skip it.
+        before_paren = sig.split("(")[0]
+        tokens = before_paren.split()
+        if len(tokens) >= 2 and tokens[-2] in _MODIFIER_KEYWORDS:
+            continue
+
         # Find the next '{' after the signature.
         rest = text[m.end():]
         brace_rel = rest.find("{")
