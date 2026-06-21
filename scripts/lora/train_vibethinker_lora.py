@@ -66,7 +66,7 @@ def train(args, examples, bf16_gpu_only: bool):
     from trl import SFTTrainer, SFTConfig
     from datasets import Dataset
 
-    label = "bf16 GPU-only" if bf16_gpu_only else "fp16 CPU/GPU split"
+    label = "bf16 GPU-only" if bf16_gpu_only else "fp16 + CPU offload (device_map=auto)"
     print(f"\n=== Loading {args.base_model} ({label}) ===")
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -81,7 +81,7 @@ def train(args, examples, bf16_gpu_only: bool):
         load_kwargs["device_map"] = {"": "cuda:0"}
     else:
         load_kwargs["torch_dtype"] = torch.float16
-        load_kwargs["device_map"] = {"": "cuda:0"}
+        load_kwargs["device_map"] = "auto"
 
     model = AutoModelForCausalLM.from_pretrained(args.base_model, **load_kwargs)
     model.gradient_checkpointing_enable()
@@ -96,8 +96,11 @@ def train(args, examples, bf16_gpu_only: bool):
     dataset = Dataset.from_list(examples)
 
     def formatting_func(example):
+        messages = example["messages"]
+        if not messages or messages[0].get("role") != "system":
+            messages = [{"role": "system", "content": SYSTEM_PROMPT}] + messages
         return tokenizer.apply_chat_template(
-            example["messages"], tokenize=False, add_generation_prompt=False
+            messages, tokenize=False, add_generation_prompt=False
         )
 
     training_args = SFTConfig(
