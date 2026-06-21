@@ -9,9 +9,13 @@ Pure helper functions are unit-tested in test_build_stack_csharp_dataset.py.
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
+import json
 import random
 import re
+import sys
+from pathlib import Path
 
 PERMISSIVE_LICENSES = {
     "MIT", "Apache-2.0", "BSD-3-Clause", "BSD-2-Clause", "ISC", "MIT-0",
@@ -236,3 +240,67 @@ def split_holdout(
     train = [ex for i, ex in enumerate(examples) if i not in hold_idx]
     holdout = [examples[i] for i in idx[:n_hold]]
     return train, holdout
+
+
+def build(target: int, limit: int | None, seed: int):
+    from datasets import load_dataset
+
+    ds = load_dataset(
+        "bigcode/the-stack-dedup",
+        data_dir="data/c-sharp",
+        split="train",
+        streaming=True,
+    )
+
+    examples: list[dict] = []
+    scanned = 0
+    for record in ds:
+        scanned += 1
+        if limit is not None and scanned > limit:
+            break
+        text = record.get("content") or ""
+        if not passes_license(record):
+            continue
+        if not passes_size(text):
+            continue
+        if not is_modern_csharp(text):
+            continue
+        for sig, body in extract_functions(text):
+            if not passes_size(body, lo=40, hi=6000):
+                continue
+            examples.append(to_chat_example(sig, body))
+        if len(examples) >= target * 3:  # over-collect; dedup trims later
+            break
+
+    examples = dedup(examples)
+    if len(examples) > target:
+        examples = examples[:target]
+    print(f"scanned={scanned} kept={len(examples)}")
+    return split_holdout(examples, fraction=0.10, seed=seed)
+
+
+def write_jsonl(path: Path, rows: list[dict]):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as fh:
+        for row in rows:
+            fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Build Stack v1 C# training set")
+    ap.add_argument("--target", type=int, default=5000)
+    ap.add_argument("--out-dir", type=Path, default=Path(__file__).parent / "data")
+    ap.add_argument("--limit", type=int, default=None,
+                    help="max raw files to scan (for smoke runs)")
+    ap.add_argument("--seed", type=int, default=42)
+    args = ap.parse_args()
+
+    train, holdout = build(args.target, args.limit, args.seed)
+    write_jsonl(args.out_dir / "stack_csharp_train.jsonl", train)
+    write_jsonl(args.out_dir / "stack_csharp_holdout.jsonl", holdout)
+    print(f"train={len(train)} holdout={len(holdout)} -> {args.out_dir}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
