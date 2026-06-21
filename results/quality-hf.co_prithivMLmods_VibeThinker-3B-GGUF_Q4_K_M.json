@@ -1,0 +1,62 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-06-20T14:04:56.475087+00:00",
+  "run_finished_at": "2026-06-20T14:07:25.239756+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-hf.co_prithivMLmods_VibeThinker-3B-GGUF_Q4_K_M.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-06-20T14:05:17.270000+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26220",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 16,
+    "total_memory_gb": 95.47,
+    "python_version": "3.12.2",
+    "ollama_version": "ollama version is 0.30.10",
+    "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.7026",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M"
+  ],
+  "completed_models": [
+    "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "results": [
+    {
+      "model": "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M",
+      "coding_pass": 2,
+      "coding_total": 5,
+      "tool_pass": 0,
+      "tool_total": 4,
+      "agentic_pass": 0,
+      "agentic_total": 2,
+      "score": 2,
+      "score_max": 11
+    }
+  ]
+}

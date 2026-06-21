@@ -9,7 +9,7 @@ Ollama exposes a `think` parameter on `/api/chat` and `/api/generate`, but model
 | Behaviour | Models | What to do |
 | --- | --- | --- |
 | Honors `think:true`/`think:false` cleanly | gemma4 family (e2b/26b/31b), qwen3.6, qwen3.6:27b, qwen3:14b, qwen3.5 (latest/4b/9b), glm-4.7-flash, nemotron-3-nano family, nemotron-nano-9b-v2-toolfix | Run paired variants. `CODING_BENCH_THINK=true` produces `coding-{slug}-think.json`; default produces `coding-{slug}.json`. |
-| Ignores `think:false` (still thinks) | gpt-oss:20b, gpt-oss:120b, lfm2.5-thinking (both sizes), glm-4.7-flash-reap-toolfix | The "no-think" baseline is effectively a think run. A `-think` variant adds little. For gpt-oss, set `reasoning_effort: low\|medium\|high` instead of toggling `think`. |
+| Ignores `think:false` (still thinks) | gpt-oss:20b, gpt-oss:120b, lfm2.5-thinking (both sizes), glm-4.7-flash-reap-toolfix, hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M | The "no-think" baseline is effectively a think run. A `-think` variant adds little. For gpt-oss, set `reasoning_effort: low\|medium\|high` instead of toggling `think`. VibeThinker-3B additionally returns **empty content** when `think:true` is sent — do NOT use `CODING_BENCH_THINK=true` with this model; it produces 0/50. |
 | Rejects `think:true` with `does not support thinking` | granite4:7b-a1b-h, granite4:32b-a9b-h, qwen3-coder-next | Run only the no-think baseline. Delete any `-think` checkpoint that produces 0/50 in <5 s — it's a 400 error not a model failure. |
 
 Probe script: `scripts/probe_default_think.py`. Re-run after Ollama upgrades.
@@ -115,6 +115,18 @@ Three distinct gotchas, all proven on Framework (RTX 3060 12GB eGPU, Ollama 0.30
 4. **Unsloth UD-Q4_K_XL == official q4_K_M here.** The dynamic 4-bit quant (via a `FROM`-GGUF Modelfile that
    copies the official gemma4 RENDERER/PARSER) is a dead tie: 11/11 quick, 95/158 L2, ~19.6 vs ~18.6 tok/s
    (within variance). No reason to prefer it over the official tag on this hardware.
+
+## VibeThinker-3B — think:true returns empty content (2026-06-20)
+
+WeiboAI VibeThinker-3B (Qwen2.5-Coder-3B base, prithivMLmods Q4_K_M GGUF). Two think-flag quirks, both proven on Framework RTX 3060:
+
+1. **Ignores `think:false`** — always emits `<think>...</think>` blocks inside the `content` field regardless of the `think` parameter. The `thinking` field in the response is always empty. The no-think L3 baseline is therefore an effective thinking run. L3/L2 extractors already strip `<think>` tags, so this is transparent to the benchmarks.
+
+2. **`think:true` returns empty content** — sending `think:true` causes Ollama to return a response with empty `content` and empty `thinking`. The model produces nothing useful. **Do NOT run `CODING_BENCH_THINK=true` with this model** — it will produce 0/50 on L3 with no generated code, not a capability signal.
+
+Consequence: no `-think` variant is possible or needed. The single L3 run (`coding-{slug}.json`) is the only meaningful coding score.
+
+Capability note: L3 (.NET) 0/50 and L2 chat 25/158 (0.158) reflect a genuine training domain gap — the model was trained on LeetCode-style competitive programming (Python), math, and STEM, not enterprise .NET APIs. Quality coding score (2/5) is suppressed by the 256-token think budget. See `scripts/lora/` for the C# fine-tuning pipeline targeting this model.
 
 ---
 
