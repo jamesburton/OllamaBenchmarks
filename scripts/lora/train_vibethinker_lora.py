@@ -41,6 +41,8 @@ def parse_args():
     # Anti-forgetting knob: phase-1 5k (r32/lr2e-4/3ep) regressed base reasoning.
     # Gentler runs (r16/alpha32/lr1e-4/2ep/dropout0.1) adapt less aggressively.
     p.add_argument("--lora-dropout", type=float, default=LORA_DROPOUT)
+    p.add_argument("--save-steps", type=int, default=0,
+                   help="checkpoint every N steps (0 = per-epoch); use for long runs")
     p.add_argument("--max-steps", type=int, default=-1,
                    help="cap training steps (smoke runs); -1 = full")
     p.add_argument("--phase", type=int, choices=[1, 2], default=1)
@@ -122,8 +124,12 @@ def train(args, examples, bf16_gpu_only: bool):
         warmup_ratio=0.1,
         lr_scheduler_type="cosine",
         logging_steps=5,
-        save_strategy="epoch",
-        save_total_limit=2,
+        # Long runs (50k @ ~80s/step ≈ 11h) over a held SSH connection: checkpoint
+        # by steps so a dropped connection is recoverable (resume from last ckpt).
+        # --save-steps 0 keeps the original per-epoch behaviour (short runs).
+        save_strategy=("steps" if args.save_steps > 0 else "epoch"),
+        save_steps=(args.save_steps if args.save_steps > 0 else 500),
+        save_total_limit=4,
         bf16=bf16_gpu_only,
         fp16=not bf16_gpu_only,
         max_length=args.max_seq_length,
