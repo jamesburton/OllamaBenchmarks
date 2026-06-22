@@ -15,6 +15,7 @@ import json
 import random
 import re
 import sys
+import textwrap
 from pathlib import Path
 
 PERMISSIVE_LICENSES = {
@@ -23,6 +24,27 @@ PERMISSIVE_LICENSES = {
 }
 
 MODERN_MARKERS = ("namespace", "record", "async")
+
+# Iteration-2 quality gates (phase-1 5k regressed base partly on low-quality
+# training bodies). Prefer code from more-vetted repos, drop symbol-heavy/junk
+# files, and drop minified/generated/data-blob files (very long lines).
+MIN_STARS = 5
+MIN_ALPHANUM_FRACTION = 0.5
+MAX_LINE_LENGTH = 200
+
+
+def passes_quality(record: dict) -> bool:
+    """Repo/file-level quality gate using The Stack metadata fields."""
+    stars = record.get("max_stars_count")
+    if stars is None or float(stars) < MIN_STARS:
+        return False
+    af = record.get("alphanum_fraction")
+    if af is not None and float(af) < MIN_ALPHANUM_FRACTION:
+        return False
+    mll = record.get("max_line_length")
+    if mll is not None and float(mll) > MAX_LINE_LENGTH:
+        return False
+    return True
 
 
 def passes_license(record: dict) -> bool:
@@ -195,12 +217,29 @@ def extract_functions(text: str) -> list[tuple[str, str]]:
     return results
 
 
+def normalize_body(body: str) -> str:
+    """Dedent a method body to column 0.
+
+    Stack bodies keep their original class-level indentation, so the first line
+    (usually `{`) is unindented but inner lines carry 8-12 spaces. textwrap.dedent
+    alone does nothing (no common prefix across all lines). We dedent only the
+    inner lines (everything after the opening brace) by their common indentation,
+    so the model learns cleanly-formatted output instead of over-indented code.
+    """
+    lines = body.splitlines()
+    if len(lines) <= 1:
+        return body.strip()
+    first, rest = lines[0], lines[1:]
+    dedented_rest = textwrap.dedent("\n".join(rest))
+    return (first.strip() + "\n" + dedented_rest).strip()
+
+
 def to_chat_example(signature: str, body: str) -> dict:
     user = (
         "Implement the following C# method. Return only the complete method.\n\n"
         f"{signature}"
     )
-    assistant = f"{signature}\n{body}"
+    assistant = f"{signature}\n{normalize_body(body)}"
     return {
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -260,6 +299,8 @@ def build(target: int, limit: int | None, seed: int):
             break
         text = record.get("content") or ""
         if not passes_license(record):
+            continue
+        if not passes_quality(record):
             continue
         if not passes_size(text):
             continue

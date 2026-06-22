@@ -38,6 +38,9 @@ def parse_args():
     p.add_argument("--max-seq-length", type=int, default=2048)
     p.add_argument("--lora-r", type=int, default=32)
     p.add_argument("--lora-alpha", type=int, default=64)
+    # Anti-forgetting knob: phase-1 5k (r32/lr2e-4/3ep) regressed base reasoning.
+    # Gentler runs (r16/alpha32/lr1e-4/2ep/dropout0.1) adapt less aggressively.
+    p.add_argument("--lora-dropout", type=float, default=LORA_DROPOUT)
     p.add_argument("--max-steps", type=int, default=-1,
                    help="cap training steps (smoke runs); -1 = full")
     p.add_argument("--phase", type=int, choices=[1, 2], default=1)
@@ -92,7 +95,7 @@ def train(args, examples, bf16_gpu_only: bool):
     model.gradient_checkpointing_enable()
 
     lora_config = LoraConfig(
-        r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=LORA_DROPOUT,
+        r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
         bias="none", task_type="CAUSAL_LM", target_modules=TARGET_MODULES,
     )
     model = get_peft_model(model, lora_config)

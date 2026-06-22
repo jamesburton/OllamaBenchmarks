@@ -182,3 +182,45 @@ def test_split_holdout_deterministic():
     a1, b1 = b.split_holdout(items, seed=42)
     a2, b2 = b.split_holdout(items, seed=42)
     assert [b.content_key(x) for x in b1] == [b.content_key(x) for x in b2]
+
+
+def test_passes_quality_accepts_good_repo():
+    rec = {"max_stars_count": 50, "alphanum_fraction": 0.7, "max_line_length": 90}
+    assert b.passes_quality(rec) is True
+
+
+def test_passes_quality_rejects_low_stars():
+    rec = {"max_stars_count": 1, "alphanum_fraction": 0.7, "max_line_length": 90}
+    assert b.passes_quality(rec) is False
+
+
+def test_passes_quality_rejects_missing_stars():
+    assert b.passes_quality({"alphanum_fraction": 0.7}) is False
+
+
+def test_passes_quality_rejects_symbol_heavy():
+    rec = {"max_stars_count": 50, "alphanum_fraction": 0.3, "max_line_length": 90}
+    assert b.passes_quality(rec) is False
+
+
+def test_passes_quality_rejects_minified():
+    rec = {"max_stars_count": 50, "alphanum_fraction": 0.7, "max_line_length": 5000}
+    assert b.passes_quality(rec) is False
+
+
+def test_normalize_body_dedents_inner_lines():
+    # inner lines share an 8-space class indent (return at 12, brace at 8);
+    # dedent removes the common 8 -> clean 4-space body, brace at col 0.
+    body = "{\n            return a + b;\n        }"
+    out = b.normalize_body(body)
+    assert out == "{\n    return a + b;\n}"
+
+
+def test_normalize_body_handles_nested_indent():
+    body = "{\n        if (x) {\n            Foo();\n        }\n    }"
+    out = b.normalize_body(body)
+    # common indentation of inner lines removed, relative nesting preserved
+    assert "if (x) {" in out
+    assert "    Foo();" in out
+    assert out.startswith("{")
+    assert out.rstrip().endswith("}")
