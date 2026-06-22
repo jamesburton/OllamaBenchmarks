@@ -142,7 +142,7 @@ def _chat_complete(
         payload["options"]["reasoning_effort"] = "low"
 
     req = urllib.request.Request(
-        "http://127.0.0.1:11434/api/chat",
+        f'{os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")}/api/chat',
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
         method="POST",

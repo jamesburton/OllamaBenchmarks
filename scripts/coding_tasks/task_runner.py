@@ -19,6 +19,9 @@ import yaml
 
 from coding_tasks.code_extractor import extract_csharp
 
+# Allow targeting a remote Ollama (e.g. a GPU host) without changing call sites.
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
+
 
 @dataclasses.dataclass
 class TaskResult:
@@ -108,7 +111,7 @@ def call_ollama(
     }
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
-        "http://127.0.0.1:11434/api/chat",
+        f"{OLLAMA_HOST}/api/chat",
         data=data,
         headers={"Content-Type": "application/json"},
         method="POST",
