@@ -191,9 +191,14 @@ def run_problem_chat(problem: dict, model: str, cached_template: str) -> tuple[b
     # ends with `}` (close class). To make the existing FIM assembly work, we
     # need just the method body from the model's output.
     body = None
-    if "class Problem" in generated and "public static void Main" not in generated:
+    if "public static void Main" not in generated:
         sig = _method_signature_from_prompt(prompt)
         if sig:
+            # Handles both a full `class Problem { method {...} }` wrapper AND a
+            # bare re-emitted method (signature + body, no class) — the latter is
+            # what instruction-tuned C# models often return. _extract_method_body
+            # locates the signature anywhere in the output and pulls its body, so
+            # the FIM assembly gets just the statements (not a duplicate signature).
             body = _extract_method_body_from_full_class(generated, sig)
     if body is not None:
         # Use the standard FIM assembly with the extracted body
