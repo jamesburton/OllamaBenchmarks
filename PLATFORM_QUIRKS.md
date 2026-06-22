@@ -40,6 +40,19 @@ Long context KV cache costs VRAM (≈ `num_layers * num_heads * head_dim * 2 * n
 
 ## T5500 (older Xeon + RTX A4000-equivalent, 36 GB RAM + 12 GB VRAM)
 
+### Remote LoRA training / model deploy over SSH (2026-06-22)
+
+Running a HuggingFace LoRA fine-tune + deploy on T5500 over SSH hit four host-specific traps, all worked around:
+
+1. **Use `C:\Python311\python.exe`, not the system `python`.** The default `python` (3.14) has a CPU-only torch; the CUDA env (torch 2.11.0+cu126, transformers 5.4, peft, datasets, accelerate, bitsandbytes) lives under `C:\Python311` with `--user` site-packages. See `~/.claude/CUDA_NOTES.md` on T5500. `trl` was the only missing dep (installed `trl==1.6.0`, API-compatible).
+2. **SSH network-logon token cannot traverse reparse/mount points.** The HF cache `C:\Users\james\.cache\huggingface` is a junction to `E:\.cache\huggingface`; downloads over SSH fail with `WinError 448 / untrusted mount point`. Fix: set `HF_HOME=E:\.cache\huggingface` (the real path) for any HF op run over SSH.
+3. **`bitsandbytes` 8-bit optimizer crashes on the Westmere CPU.** `optim="adamw_8bit"` aborts with `0xc000001d STATUS_ILLEGAL_INSTRUCTION` — the dual Xeon X5670 is pre-AVX (SSE4.2 only) and bnb issues AVX. Use `optim="adamw_torch"` (LoRA optimizer state is tiny, no memory downside).
+4. **`ollama create` from safetensors fails `untrusted mount point` opening config.json** — in EVERY context (SSH, scheduled-task-as-SYSTEM, all-on-E: with absolute paths). Ollama's Go safetensors converter rejects the path regardless of token. Workaround: convert HF→GGUF yourself (`convert_hf_to_gguf.py` from a llama.cpp clone — the refactored script needs the repo's `conversion` package, not just pip `gguf`; also `pip install sentencepiece`), then `ollama create FROM model.gguf` — GGUF import skips the converter and succeeds.
+
+**Long jobs over SSH must use a held-open connection or a scheduled task — never `Start-Process` fire-and-forget**, which Windows OpenSSH kills when the launching session closes (a multi-hour training run died seconds after launch this way; the only surviving processes were unrelated).
+
+**Cross-machine benchmark split:** T5500's Ollama (0.30.10) serves remotely over Tailscale (`http://t5500:11434`). The coding runners honor `OLLAMA_HOST` (commit adding support), so you can run the dotnet build/test harness on Framework (warm NuGet/template cache) while generation runs on T5500's GPU.
+
 ### Pre-0.20 Ollama qwen35moe crash
 
 Ollama 0.18.x and 0.20.7 panic at `ggml.go:276` when asked to load qwen35moe 35B variants (qwen3.5:27b/35b, qwen3.6). Small variants (qwen3.5:4b, qwen3.5:9b) of the same architecture load fine. Upgrade Ollama on the host before benchmarking these models; do not use llama-server as a workaround for this arch.
