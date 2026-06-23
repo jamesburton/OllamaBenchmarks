@@ -16,6 +16,19 @@ Both files end with `*Extend and refine these notes as insights are proven*`. Wh
 - Layer 2 chat-mode results land in `coding-{slug}-chat.json` (from `scripts/benchmark_coding_layer2_chat.py`). The raw-mode baseline at `coding-{slug}.json` is preserved.
 - Per-task generated C# code lands in `results/coding-generated/<slug>/<task>.cs`. The L3 directory is overwritten on every run for that slug — make a copy before the next run if you need to diff outputs.
 
+## Cross-machine runs & build-timeout knobs (env)
+
+- **`OLLAMA_HOST`** (e.g. `http://t5500:11434`): generation targets a remote Ollama while this box does the dotnet build/test. Honored by `benchmark_quality.py`, `benchmark_coding_layer2.py` (raw), `benchmark_coding_layer2_chat.py`, and `coding_tasks/task_runner.py` (L3). The standard split is **gen on the GPU host (T5500/Strix), build/test on Framework**; the recorded `ollama_host` in the output confirms where gen ran.
+- Throughput (`benchmark_throughput_resource.ps1`) measures *local* GPU/CPU, so it must run **on the GPU host**, not cross-machine. (A quick tok/s can be read from the API `eval_count/eval_duration` instead.)
+- **Build-timeout overrides** for loaded/disk-starved hosts (cold `dotnet` builds in fresh temp dirs can exceed defaults and mis-score valid runs as timeouts): `L2_RUN_TIMEOUT_S` (default 30; L2 raw + chat), `L3_BUILD_TIMEOUT_S` / `L3_TEST_TIMEOUT_S` (default 60). Set all to ~150 when the host is busy. Symptom of too-tight a budget: a flood of uniform "timed out" fails — re-run with the knobs before trusting the score.
+
+## Layer 4 (agentic / tool-use / long-context) — planned
+
+Layers 1–3 only measure single-shot code gen. For agentic/tool/long-context model classes
+(e.g. Qwen3.5/Qwythos, qwen3.6, gemma4) see **`docs/agentic-tool-longcontext-benchmark-plan.md`**
+— the design for tool-use correctness, agentic C# loops (read/write/build/test until green),
+needle-in-haystack long-context, and KV-VRAM-vs-context scaling. Not yet implemented.
+
 ## `benchmark-models.json` discipline
 
 - `backend_notes[model]` is the single source of truth for per-model commentary. Add a line for every Strix-tested model with throughput, quality, L3, and L2 numbers. When a number is an artifact (e.g. raw-mode L2 for a chat-tuned model), mark it `ARTIFACT` and point at the chat-mode re-run.

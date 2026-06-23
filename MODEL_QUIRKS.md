@@ -128,6 +128,19 @@ Consequence: no `-think` variant is possible or needed. The single L3 run (`codi
 
 Capability note: L3 (.NET) 0/50 and L2 chat 25/158 (0.158) reflect a genuine training domain gap — the model was trained on LeetCode-style competitive programming (Python), math, and STEM, not enterprise .NET APIs. Quality coding score (2/5) is suppressed by the 256-token think budget. See `scripts/lora/` for the C# fine-tuning pipeline targeting this model.
 
+## Qwen3.5 / Qwen3.6 family — clean `thinking` field, and "think hurts .NET L3" (2026-06-23)
+
+`qwen3.5:9b`, `hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M` (Qwen3.5-9B FT),
+and `qwen3.6*` all handle the think flag **cleanly**, unlike VibeThinker:
+
+- They **think by default**; the chain-of-thought goes to a **separate `thinking` field** in the `/api/chat` response, NOT as `<think>...</think>` inside `content`. `content` is therefore always clean — the coding extractors need no special handling.
+- `think:false` **works** (suppresses thinking, returns a direct answer). `think:true` works. No empty-content trap (contrast VibeThinker, which ignores `think:false` and returns empty on `think:true`).
+- The Qwen3.5 arch **loads fine in current Ollama** (no unknown-arch block) for the 9B sizes; large `qwen35moe`/dense 27B-35B variants still panic on some Ollama builds (see backend_notes).
+
+**"Thinking HURTS Coding L3 (.NET)" — consistent across the family:** Qwythos-9B 6/50 no-think vs 4/50 think; qwen3.6 35B-A3B 40/50 vs 35/50; qwen3.6:27b similar. For these .NET framework tasks, use the **no-think baseline**; the paired think variant reliably underperforms (extra reasoning budget diverges rather than helps). Probe with `scripts/check_think_support.py` but expect the separate-field behaviour above.
+
+Fine-tune-vs-base finding: the `Qwythos` "Mythos" fine-tune scores **below** its base `qwen3.5:9b` on C# coding (L2-chat 62 vs 67, L2-raw 50 vs 61) — the tune did not help coding. Its value is agentic/tool/long-context; see `docs/agentic-tool-longcontext-benchmark-plan.md` for the planned Layer 4 suite to measure those strengths.
+
 ---
 
 *Extend and refine these notes as insights are proven*
