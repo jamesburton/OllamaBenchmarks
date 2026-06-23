@@ -11,4 +11,8 @@ scripts/coding_tasks/templates/.cache/
 models/
 *.gguf
 *.tar
+*.safetensors
+
+# LoRA fine-tune outputs (adapters, checkpoints, merged weights) — multi-GB, regenerable
+scripts/lora/output/
 .claude/scheduled_tasks.lock

@@ -65,8 +65,11 @@ def _call_ollama_complete(
         payload["options"]["stop"] = stop_tokens
 
     data = json.dumps(payload).encode("utf-8")
+    # Honor OLLAMA_HOST so raw-mode generation can target a remote Ollama
+    # (e.g. the T5500 GPU); mirrors the chat harness + coding_tasks/task_runner.
+    ollama_host = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
     req = urllib.request.Request(
-        "http://127.0.0.1:11434/api/generate",
+        f"{ollama_host}/api/generate",
         data=data,
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -185,17 +188,21 @@ def run_problem(
         with open(program_path, "w", encoding="utf-8") as fh:
             fh.write(program_cs)
 
-        # 4. Run dotnet run --no-restore
+        # 4. Run dotnet run --no-restore. Cold build+run per task; raise the
+        # budget via L2_RUN_TIMEOUT_S on a loaded/disk-starved host (cf. the
+        # chat harness) so valid runs are not mis-scored as timeouts.
+        run_timeout = int(os.environ.get("L2_RUN_TIMEOUT_S", "30"))
         try:
             result = subprocess.run(
                 ["dotnet", "run", "--no-restore"],
                 cwd=work_dir,
                 capture_output=True,
                 text=True,
-                timeout=30,
+                timeout=run_timeout,
+                stdin=subprocess.DEVNULL,
             )
         except subprocess.TimeoutExpired:
-            return False, "dotnet run timed out (30 s)"
+            return False, f"dotnet run timed out ({run_timeout} s)"
 
         stdout = result.stdout or ""
         stderr = result.stderr or ""

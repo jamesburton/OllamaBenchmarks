@@ -171,13 +171,20 @@ def run_dotnet_task(
     with open(os.path.join(work_dir, "Tests.cs"), "w", encoding="utf-8") as fh:
         fh.write(test_code)
 
+    # Build/test timeouts default to 60 s (adequate on an idle host) but can be
+    # raised via L3_BUILD_TIMEOUT_S / L3_TEST_TIMEOUT_S when the build host is
+    # loaded/disk-starved and cold dotnet runs exceed 60 s (else valid runs are
+    # mis-scored as failures). Cf. the L2_RUN_TIMEOUT_S knob in the chat harness.
+    build_timeout = int(os.environ.get("L3_BUILD_TIMEOUT_S", "60"))
+    test_timeout = int(os.environ.get("L3_TEST_TIMEOUT_S", "60"))
+
     # Build
     build = subprocess.run(
         ["dotnet", "build", "--no-restore"],
         cwd=work_dir,
         capture_output=True,
         text=True,
-        timeout=60,
+        timeout=build_timeout,
     )
     if build.returncode != 0:
         return (False, False, 0, 0, build.stderr or build.stdout)
@@ -188,7 +195,7 @@ def run_dotnet_task(
         cwd=work_dir,
         capture_output=True,
         text=True,
-        timeout=60,
+        timeout=test_timeout,
     )
     output = test.stdout + "\n" + test.stderr
 

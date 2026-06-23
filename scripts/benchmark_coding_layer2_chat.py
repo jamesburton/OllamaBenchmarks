@@ -215,16 +215,22 @@ def run_problem_chat(problem: dict, model: str, cached_template: str) -> tuple[b
         with open(os.path.join(work_dir, "Program.cs"), "w", encoding="utf-8") as fh:
             fh.write(program_cs)
 
+        # Each task builds in a fresh temp dir (no incremental reuse), so the
+        # per-task budget is a COLD build + run. The 30 s default is adequate on
+        # an idle host; on a loaded/disk-starved box cold builds can hit 60-90 s
+        # and silently turn passes into timeouts. Override via L2_RUN_TIMEOUT_S.
+        run_timeout = int(os.environ.get("L2_RUN_TIMEOUT_S", "30"))
         try:
             result = subprocess.run(
                 ["dotnet", "run", "--no-restore"],
                 cwd=work_dir,
                 capture_output=True,
                 text=True,
-                timeout=30,
+                timeout=run_timeout,
+                stdin=subprocess.DEVNULL,
             )
         except subprocess.TimeoutExpired:
-            return False, "dotnet run timed out (30 s)"
+            return False, f"dotnet run timed out ({run_timeout} s)"
 
         stdout = result.stdout or ""
         stderr = result.stderr or ""
