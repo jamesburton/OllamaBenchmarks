@@ -1,0 +1,9 @@
+Results Ok(payload)           // 200
+Results Created("/path", obj // 201
+...
+Results NoContent()           // 204
+...
+Results NotFound()
+...
+Results Problem(detail: "err", statusCode: 500)  // ProblemDetails RFC 9476
+Results ValidationProblem(errors)

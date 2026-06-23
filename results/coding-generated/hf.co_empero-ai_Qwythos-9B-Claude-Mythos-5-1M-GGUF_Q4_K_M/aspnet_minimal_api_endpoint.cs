@@ -1,0 +1,28 @@
+using Microsoft.AspNetCore.Http;
+
+record CreateProductRequest(string Name, decimal Price);
+
+record ProductResponse(int Id, string Name, decimal Price);
+
+static class ProductEndpoints
+{
+    private static int _nextId = 0;
+
+    public static IResult CreateProduct(CreateProductRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name))
+            return Results.ValidationProblem(new Dictionary<string, string[]>
+            {
+                ["Name"] = ["Name is required."]
+            });
+
+        if (request.Price <= 0m)
+            return Results.ValidationProblem(new Dictionary<string, string[]>
+            {
+                ["Price"] = ["Price must be greater than zero."]
+            });
+
+        _nextId++;
+        return Results.Ok(new ProductResponse(_nextId, request.Name, request.Price));
+    }
+}

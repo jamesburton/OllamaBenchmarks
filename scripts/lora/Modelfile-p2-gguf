@@ -1,0 +1,7 @@
+FROM E:\vibe-p2-50k-f16.gguf
+PARAMETER temperature 0.2
+PARAMETER top_p 0.9
+PARAMETER num_ctx 8192
+PARAMETER stop "<|im_end|>"
+PARAMETER stop "<|endoftext|>"
+SYSTEM "You are an expert C#/.NET developer. When asked to write code, return ONLY valid C# code in a single file. Do not include markdown fences, explanations, or commentary - just the raw C# source code."
