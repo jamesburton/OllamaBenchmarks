@@ -142,7 +142,7 @@ def _chat_complete(
         payload["options"]["reasoning_effort"] = "low"
 
     req = urllib.request.Request(
-        "http://127.0.0.1:11434/api/chat",
+        f'{os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")}/api/chat',
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -191,9 +191,14 @@ def run_problem_chat(problem: dict, model: str, cached_template: str) -> tuple[b
     # ends with `}` (close class). To make the existing FIM assembly work, we
     # need just the method body from the model's output.
     body = None
-    if "class Problem" in generated and "public static void Main" not in generated:
+    if "public static void Main" not in generated:
         sig = _method_signature_from_prompt(prompt)
         if sig:
+            # Handles both a full `class Problem { method {...} }` wrapper AND a
+            # bare re-emitted method (signature + body, no class) — the latter is
+            # what instruction-tuned C# models often return. _extract_method_body
+            # locates the signature anywhere in the output and pulls its body, so
+            # the FIM assembly gets just the statements (not a duplicate signature).
             body = _extract_method_body_from_full_class(generated, sig)
     if body is not None:
         # Use the standard FIM assembly with the extracted body
@@ -210,16 +215,22 @@ def run_problem_chat(problem: dict, model: str, cached_template: str) -> tuple[b
         with open(os.path.join(work_dir, "Program.cs"), "w", encoding="utf-8") as fh:
             fh.write(program_cs)
 
+        # Each task builds in a fresh temp dir (no incremental reuse), so the
+        # per-task budget is a COLD build + run. The 30 s default is adequate on
+        # an idle host; on a loaded/disk-starved box cold builds can hit 60-90 s
+        # and silently turn passes into timeouts. Override via L2_RUN_TIMEOUT_S.
+        run_timeout = int(os.environ.get("L2_RUN_TIMEOUT_S", "30"))
         try:
             result = subprocess.run(
                 ["dotnet", "run", "--no-restore"],
                 cwd=work_dir,
                 capture_output=True,
                 text=True,
-                timeout=30,
+                timeout=run_timeout,
+                stdin=subprocess.DEVNULL,
             )
         except subprocess.TimeoutExpired:
-            return False, "dotnet run timed out (30 s)"
+            return False, f"dotnet run timed out ({run_timeout} s)"
 
         stdout = result.stdout or ""
         stderr = result.stderr or ""

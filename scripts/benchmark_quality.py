@@ -230,11 +230,16 @@ def write_json(path: str, payload: dict[str, Any]) -> None:
         handle.write(json.dumps(payload, indent=2) + "\n")
 
 
+# Honor OLLAMA_HOST so generation can target a remote Ollama (e.g. the T5500 GPU)
+# while this script runs on another box. Mirrors coding_tasks/task_runner.py.
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
+
+
 def post_json(path: str, payload: dict, timeout: int = 1200, max_retries: int = 5) -> dict:
     req_data = json.dumps(payload).encode("utf-8")
     for attempt in range(max_retries):
         req = urllib.request.Request(
-            f"http://127.0.0.1:11434{path}",
+            f"{OLLAMA_HOST}{path}",
             data=req_data,
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -596,7 +601,7 @@ def main() -> None:
             "run_started_at": run_started_at.isoformat(),
             "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "output_path": os.path.abspath(args.output),
-            "ollama_host": "http://127.0.0.1:11434",
+            "ollama_host": OLLAMA_HOST,
             "host_details": host_details,
             "models": args.models,
             "completed_models": completed_models,
@@ -619,7 +624,7 @@ def main() -> None:
                     "run_started_at": run_started_at.isoformat(),
                     "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "output_path": os.path.abspath(per_model_path),
-                    "ollama_host": "http://127.0.0.1:11434",
+                    "ollama_host": OLLAMA_HOST,
                     "host_details": host_details,
                     "models": [model],
                     "results": [row],
@@ -635,7 +640,7 @@ def main() -> None:
                     "run_started_at": run_started_at.isoformat(),
                     "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "output_path": os.path.abspath(per_model_path),
-                    "ollama_host": "http://127.0.0.1:11434",
+                    "ollama_host": OLLAMA_HOST,
                     "host_details": host_details,
                     "models": [model],
                     "completed_models": [],
@@ -652,7 +657,7 @@ def main() -> None:
         "run_started_at": run_started_at.isoformat(),
         "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "output_path": os.path.abspath(args.output),
-        "ollama_host": "http://127.0.0.1:11434",
+        "ollama_host": OLLAMA_HOST,
         "host_details": host_details,
         "models": args.models,
         "completed_models": [row["model"] for row in results],
