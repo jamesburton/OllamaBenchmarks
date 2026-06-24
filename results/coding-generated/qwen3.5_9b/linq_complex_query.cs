@@ -2,21 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class Sale
-{
-    public string Product { get; set; } = null!;
-    public string Category { get; set; } = null!;
-    public decimal Amount { get; set; }
-    public DateOnly Date { get; set; }
-}
+public record Sale(
+    string Product,
+    string Category,
+    decimal Amount,
+    DateOnly Date);
 
-public class CategorySummary
-{
-    public string Category { get; set; } = null!;
-    public decimal TotalAmount { get; set; }
-    public decimal AverageAmount { get; set; }
-    public int Count { get; set; }
-}
+public record CategorySummary(
+    string Category,
+    decimal TotalAmount,
+    decimal AverageAmount,
+    int Count);
 
 public static class SalesAnalyzer
 {
@@ -24,14 +20,12 @@ public static class SalesAnalyzer
     {
         return sales
             .GroupBy(s => s.Category)
-            .Select(g => new CategorySummary
-            {
-                Category = g.Key,
-                TotalAmount = g.Sum(s => s.Amount),
-                AverageAmount = g.Average(s => s.Amount),
-                Count = g.Count()
-            })
-            .OrderByDescending(c => c.TotalAmount)
-            .ToList();
+            .Select(g => new CategorySummary(
+                g.Key,
+                g.Sum(x => x.Amount),
+                g.Average(x => x.Amount),
+                g.Count()
+            ))
+            .OrderByDescending(c => c.TotalAmount);
     }
 }

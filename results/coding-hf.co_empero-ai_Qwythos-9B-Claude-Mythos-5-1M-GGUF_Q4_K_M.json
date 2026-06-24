@@ -1,8 +1,8 @@
 {
   "model": "hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M",
   "benchmark": "coding",
-  "run_started_at": "2026-06-23T02:22:18.488880+00:00",
-  "run_finished_at": "2026-06-23T02:33:32.630798+00:00",
+  "run_started_at": "2026-06-24T14:31:16.449473+00:00",
+  "run_finished_at": "2026-06-24T15:22:18.658303+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
@@ -13,7 +13,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 22.44,
+      "generation_time_s": 86.3,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\aspnet_oneof_controller.cs"
     },
     {
@@ -25,7 +25,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 5.53,
+      "generation_time_s": 6.14,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\aspnet_validation_endpoint.cs"
     },
     {
@@ -37,7 +37,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 5.84,
+      "generation_time_s": 6.48,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\aspnet_service_di.cs"
     },
     {
@@ -49,31 +49,31 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 14.05,
+      "generation_time_s": 15.17,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\efcore_leftjoin.cs"
     },
     {
       "task": "efcore_json_columns",
       "category": "efcore",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 7.8,
+      "build_success": true,
+      "tests_passed": 2,
+      "tests_total": 2,
+      "generation_time_s": 9.02,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\efcore_json_columns.cs"
     },
     {
       "task": "efcore_executeupdate",
       "category": "efcore",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 7.88,
+      "build_success": true,
+      "tests_passed": 1,
+      "tests_total": 1,
+      "generation_time_s": 8.36,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\efcore_executeupdate.cs"
     },
     {
@@ -85,7 +85,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 6.95,
+      "generation_time_s": 8.08,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\masstransit_consumer.cs"
     },
     {
@@ -97,7 +97,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 13.28,
+      "generation_time_s": 14.83,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\masstransit_statemachine.cs"
     },
     {
@@ -109,7 +109,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 7.92,
+      "generation_time_s": 8.52,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\masstransit_test_harness.cs"
     },
     {
@@ -121,7 +121,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 4.98,
+      "generation_time_s": 5.42,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\blazor_interactive_component.cs"
     },
     {
@@ -133,7 +133,7 @@
       "build_success": true,
       "tests_passed": 2,
       "tests_total": 2,
-      "generation_time_s": 4.97,
+      "generation_time_s": 5.72,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\blazor_streaming_render.cs"
     },
     {
@@ -145,7 +145,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 6.55,
+      "generation_time_s": 7.94,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\blazor_cascading_auth.cs"
     },
     {
@@ -157,7 +157,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 23.88,
+      "generation_time_s": 24.92,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\xunit_v3_theory_tests.cs"
     },
     {
@@ -169,7 +169,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 17.48,
+      "generation_time_s": 18.12,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\xunit_awesome_nsubstitute.cs"
     },
     {
@@ -181,7 +181,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 6.3,
+      "generation_time_s": 6.8,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\xunit_assembly_fixture.cs"
     },
     {
@@ -193,31 +193,31 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 11.36,
+      "generation_time_s": 11.53,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\linq_complex_query.cs"
     },
     {
       "task": "async_cancellation",
       "category": "async",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 5.53,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generation_time_s": 5.89,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\async_cancellation.cs"
     },
     {
       "task": "vertical_order_service",
       "category": "vertical",
       "weight": 2,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 12.03,
+      "build_success": true,
+      "tests_passed": 6,
+      "tests_total": 6,
+      "generation_time_s": 13.52,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\vertical_order_service.cs"
     },
     {
@@ -229,7 +229,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 9.84,
+      "generation_time_s": 10.28,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\vertical_consumer_pipeline.cs"
     },
     {
@@ -241,55 +241,55 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 22.88,
+      "generation_time_s": 23.7,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\vertical_blazor_crud.cs"
     },
     {
       "task": "linq_selectmany_flatten",
       "category": "linq",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 2.77,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generation_time_s": 2.92,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\linq_selectmany_flatten.cs"
     },
     {
       "task": "linq_set_operations",
       "category": "linq",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 3.88,
+      "build_success": true,
+      "tests_passed": 5,
+      "tests_total": 5,
+      "generation_time_s": 3.98,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\linq_set_operations.cs"
     },
     {
       "task": "linq_aggregate_stats",
       "category": "linq",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 5.2,
+      "build_success": true,
+      "tests_passed": 5,
+      "tests_total": 5,
+      "generation_time_s": 5.59,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\linq_aggregate_stats.cs"
     },
     {
       "task": "linq_todictionary_tolookup",
       "category": "linq",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 3.02,
+      "build_success": true,
+      "tests_passed": 5,
+      "tests_total": 5,
+      "generation_time_s": 3.55,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\linq_todictionary_tolookup.cs"
     },
     {
@@ -301,7 +301,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 5.08,
+      "generation_time_s": 5.31,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\async_whenall_parallel.cs"
     },
     {
@@ -313,7 +313,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 5.12,
+      "generation_time_s": 5.41,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\async_semaphore_throttle.cs"
     },
     {
@@ -325,7 +325,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 3.92,
+      "generation_time_s": 4.02,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\async_channel_pipeline.cs"
     },
     {
@@ -337,7 +337,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 5.01,
+      "generation_time_s": 5.39,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\async_valuetask_cache.cs"
     },
     {
@@ -346,10 +346,10 @@
       "weight": 1,
       "passed": false,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 5.97,
+      "build_success": true,
+      "tests_passed": 1,
+      "tests_total": 3,
+      "generation_time_s": 6.03,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\aspnet_minimal_api_endpoint.cs"
     },
     {
@@ -361,7 +361,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 5.76,
+      "generation_time_s": 5.92,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\aspnet_typed_httpclient.cs"
     },
     {
@@ -373,43 +373,43 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 6.45,
+      "generation_time_s": 6.7,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\aspnet_ioptions_config.cs"
     },
     {
       "task": "aspnet_problemdetails_handler",
       "category": "aspnet",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 7.56,
+      "build_success": true,
+      "tests_passed": 5,
+      "tests_total": 5,
+      "generation_time_s": 7.78,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\aspnet_problemdetails_handler.cs"
     },
     {
       "task": "efcore_include_navigation",
       "category": "efcore",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 12.06,
+      "build_success": true,
+      "tests_passed": 2,
+      "tests_total": 2,
+      "generation_time_s": 13.39,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\efcore_include_navigation.cs"
     },
     {
       "task": "efcore_softdelete_filter",
       "category": "efcore",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 9.61,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generation_time_s": 10.41,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\efcore_softdelete_filter.cs"
     },
     {
@@ -421,7 +421,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 8.75,
+      "generation_time_s": 10.3,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\efcore_owned_entity.cs"
     },
     {
@@ -433,7 +433,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 9.48,
+      "generation_time_s": 10.56,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\efcore_value_conversion.cs"
     },
     {
@@ -445,55 +445,55 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 6.09,
+      "generation_time_s": 6.56,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\masstransit_request_response.cs"
     },
     {
       "task": "masstransit_saga_events",
       "category": "masstransit",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 11.11,
+      "build_success": true,
+      "tests_passed": 2,
+      "tests_total": 2,
+      "generation_time_s": 11.34,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\masstransit_saga_events.cs"
     },
     {
       "task": "masstransit_consumer_filter",
       "category": "masstransit",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 6.84,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generation_time_s": 8.56,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\masstransit_consumer_filter.cs"
     },
     {
       "task": "xunit_memberdata",
       "category": "xunit",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 12.03,
+      "build_success": true,
+      "tests_passed": 25,
+      "tests_total": 25,
+      "generation_time_s": 12.36,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\xunit_memberdata.cs"
     },
     {
       "task": "xunit_class_fixture",
       "category": "xunit",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 11.33,
+      "build_success": true,
+      "tests_passed": 9,
+      "tests_total": 9,
+      "generation_time_s": 11.86,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\xunit_class_fixture.cs"
     },
     {
@@ -505,7 +505,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 7.91,
+      "generation_time_s": 8.2,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\xunit_async_collection.cs"
     },
     {
@@ -517,7 +517,7 @@
       "build_success": true,
       "tests_passed": 7,
       "tests_total": 7,
-      "generation_time_s": 5.89,
+      "generation_time_s": 6.42,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\blazor_form_validation.cs"
     },
     {
@@ -529,7 +529,7 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 5.56,
+      "generation_time_s": 5.89,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\blazor_navigation_redirect.cs"
     },
     {
@@ -541,43 +541,43 @@
       "build_success": true,
       "tests_passed": 3,
       "tests_total": 3,
-      "generation_time_s": 5.01,
+      "generation_time_s": 5.73,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\blazor_parameter_lifecycle.cs"
     },
     {
       "task": "vertical_cqrs_handler",
       "category": "vertical",
       "weight": 2,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 8.61,
+      "build_success": true,
+      "tests_passed": 8,
+      "tests_total": 8,
+      "generation_time_s": 9.05,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\vertical_cqrs_handler.cs"
     },
     {
       "task": "vertical_efcore_service",
       "category": "vertical",
       "weight": 2,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 13.47,
+      "build_success": true,
+      "tests_passed": 8,
+      "tests_total": 8,
+      "generation_time_s": 14.64,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\vertical_efcore_service.cs"
     },
     {
       "task": "patterns_record_with",
       "category": "patterns",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 3.64,
+      "build_success": true,
+      "tests_passed": 6,
+      "tests_total": 6,
+      "generation_time_s": 3.78,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\patterns_record_with.cs"
     },
     {
@@ -586,26 +586,26 @@
       "weight": 1,
       "passed": false,
       "harness_error": null,
-      "build_success": false,
+      "build_success": true,
       "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 3.74,
+      "tests_total": 5,
+      "generation_time_s": 4.45,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\patterns_json_serialization.cs"
     },
     {
       "task": "patterns_timeprovider",
       "category": "patterns",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 4.47,
+      "build_success": true,
+      "tests_passed": 4,
+      "tests_total": 4,
+      "generation_time_s": 5.22,
       "generated_code_path": "results\\coding-generated\\hf.co_empero-ai_Qwythos-9B-Claude-Mythos-5-1M-GGUF_Q4_K_M\\patterns_timeprovider.cs"
     }
   ],
-  "layer3_weighted_score": 0.10909090909090909,
+  "layer3_weighted_score": 0.509090909090909,
   "think_setting": "false",
   "layer2_run_started_at": "2026-06-23T03:23:14.241259+00:00",
   "layer2_run_finished_at": "2026-06-23T03:46:27.103925+00:00",

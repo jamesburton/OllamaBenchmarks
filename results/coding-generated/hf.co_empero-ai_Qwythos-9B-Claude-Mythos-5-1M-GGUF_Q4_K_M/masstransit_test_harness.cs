@@ -5,24 +5,25 @@ using Microsoft.Extensions.DependencyInjection;
 public class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task ProcessPaymentConsumer_WhenMessageReceived_ShouldPublishEvent()
+    public async Task ProcessPaymentConsumer_PublishesProcessedEvent()
     {
         var harness = new ServiceCollection()
             .AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>())
             .BuildServiceProvider(true);
 
-        using (var scope = harness.CreateScope())
-        {
-            var harnessInstance = scope.ServiceProvider.GetRequiredService<ITestHarness>();
-            await harnessInstance.Start();
+        await harness.Start();
 
-            bool consumed = await harness.Consumed.Any<ProcessPayment>();
-            bool published = await harness.Published.Any<PaymentProcessed>();
+        Guid sentOrderId = Guid.NewGuid();
+        decimal amount = 10.5m;
 
-            Assert.Multiple(
-                () => Assert.True(consumed, "Consumer did not receive the message"),
-                () => Assert.True(published, "Event was not published")
-            );
-        }
+        await harness.Bus.Publish(new ProcessPayment(sentOrderId, amount));
+
+        var consumed = await harness.Consumed.Any<ProcessPayment>();
+        var publishedMsg = await harness.Published.Get<PaymentProcessed>();
+
+        Assert.Multiple(
+            () => Assert.True(consumed),
+            () => Assert.True(publishedMsg.OrderId == sentOrderId && !string.IsNullOrEmpty(publishedMsg.TransactionId))
+        );
     }
 }

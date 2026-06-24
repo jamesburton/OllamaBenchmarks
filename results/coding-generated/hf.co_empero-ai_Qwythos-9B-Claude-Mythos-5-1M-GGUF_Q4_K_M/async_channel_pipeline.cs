@@ -18,7 +18,6 @@ public class DataPipeline
 
     public Task CompleteAsync()
     {
-        _channel.Writer.Complete();
-        return Task.CompletedTask;
+        return _channel.Writer.CompleteAsync();
     }
 }

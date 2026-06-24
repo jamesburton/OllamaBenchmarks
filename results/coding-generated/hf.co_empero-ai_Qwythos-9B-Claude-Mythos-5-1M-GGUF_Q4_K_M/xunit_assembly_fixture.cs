@@ -1,5 +1,3 @@
-using System.Threading;
-
 public class SharedCounter : IAsyncLifetime
 {
     private int counter;
@@ -24,18 +22,18 @@ public class SharedCounter : IAsyncLifetime
 public class FirstCounterTests(SharedCounter shared)
 {
     [Fact]
-    public void TestIncrement()
+    public void Test()
     {
         Assert.True(shared.IncrementAndGet() > 0);
     }
 }
 
 public class SecondCounterTests
+    (TestContext.Current.GetFixture<SharedCounter> shared)
 {
     [Fact]
-    public async Task TestIncrementViaContext()
+    public void Test()
     {
-        var fixture = TestContext.Current.GetFixture<SharedCounter>();
-        Assert.True(fixture.IncrementAndGet() > 0);
+        Assert.True(shared.IncrementAndGet() > 0);
     }
 }

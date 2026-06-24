@@ -17,8 +17,8 @@ Secondary: finish the unfinished `qwen3.5:9b` base coding figures (fresh L2-raw 
 - **qwen3.5:9b carry-over is now COMPLETE (2026-06-24, cross-machine: gen on T5500, build on Framework):**
   - L2-chat: **67/158 (0.424)** — committed (`results/coding-qwen3.5_9b-chat.json`).
   - L2-raw: **42/158 (0.266)** — fresh same-day re-run (prior 61/158 was a 2026-04-17 different-setup figure, not comparable; raw mode is noisy for this instruct model → L2-chat is the trusted number).
-  - L3 no-think: **3/50 (0.0545)**; L3 think: **1/50 (0.0182)** — think hurt L3; failures are genuine (46/50 build-fail, real code, 0 harness/timeout errors).
-  - base-vs-Qwythos (same cross-machine setup): base wins L2-chat (67 vs 62); fine-tune marginally wins L2-raw (42 vs 50), L3 no-think (3 vs 6), L3 think (1 vs 4) — all small gaps, both weak coders. Reinforces that Layer 4 is the real differentiator.
+  - L3 no-think: **11/50 (0.218)**; L3 think: **5/50 (0.109)** — CORRECTED 2026-06-24 (earlier 3/50 & 1/50 were the test_project NuGet-restore contamination, now fixed). Think still hurts L3 (11→5).
+  - base-vs-Qwythos (same cross-machine setup): base wins L2-chat (67 vs 62); fine-tune wins L2-raw (42 vs 50) and DECISIVELY wins L3 — no-think **25 vs 11**, think **15 vs 5** (~2.3×). This REVERSES the prior "base beats finetune" read (which rested on contaminated L3 + L2-chat alone): on framework-level .NET the Qwythos fine-tune is the stronger coder.
   - Harness fixes this session: L2-raw now has a wall-clock gen backstop (`L2_GEN_TIMEOUT_S`, default 150) + per-task incremental checkpoint; L3 now merges into `coding-{slug}.json` instead of clobbering `layer2_*`.
 - `qwen3.5:9b` is pulled on T5500 (6.6 GB Q4_K_M). GPU coordination: no lock file exists (T5500 CLAUDE.md = "user-mediated until we build a lock file"); monitor `nvidia-smi` idle + user go-ahead.
 
@@ -56,7 +56,7 @@ Secondary: finish the unfinished `qwen3.5:9b` base coding figures (fresh L2-raw 
 - Comparison cohort for Layer 4: Qwythos-9B (1M), qwen3.5:9b (base), qwen3.6 + qwen3.6:27b, gemma4 family, GLM-4.x, qwen3-coder-next.
 
 ## Next Steps
-1. ~~Finish qwen3.5:9b base figures~~ **DONE (2026-06-24)** — L2-raw 42/158, L3 no-think 3/50, L3 think 1/50; base-vs-Qwythos table + backend_notes updated; L2-raw hang fixed. See Current State.
+1. ~~Finish qwen3.5:9b base figures~~ **DONE (2026-06-24)** — L2-raw 42/158, L3 no-think 11/50, L3 think 5/50 (corrected after the test_project NuGet contamination fix); base-vs-Qwythos table + backend_notes updated; L2-raw hang fixed. See Current State.
 2. ~~Resolve the Layer 4 open questions~~ **DONE (2026-06-24)** — all four answered + a bonus measurement-primitive probe, recorded in `docs/agentic-tool-longcontext-benchmark-plan.md` ("Open questions — RESOLVED"). Headlines: structured `message.tool_calls` (clean T1/T2 parsing); arch GQA-4 / head_dim-256 / no sliding window / 262K base ctx; `/api/ps size_vram` includes KV and KV is pre-allocated by `num_ctx` (so VRAM is measurable over HTTP with tiny prompts); empirical KV ≈34 KiB/token.
 3. ~~Build T5~~ **DONE (2026-06-24)** — `scripts/benchmark_longcontext.py` built, validated, and run for `qwen3.5:9b` on T5500 (`results/longcontext-qwen3.5_9b.json`). Result: **128K fits 100% on-GPU at 9.93GB; 256K spills (16.3GB, 65% GPU)**; decode 43→26.7 tok/s across 4K→128K. This is the **12GB-host curve only** — the 256K+/1M + KV-quant (`OLLAMA_KV_CACHE_TYPE`, needs an Ollama restart → coordinate) story belongs on **Strix (128GB)**, and **Qwythos-9B (1M)** + the rest of the cohort still need the same T5 run. T4 (needle + long-C#) is still a stub in that file — not implemented.
 4. **Build T1/T2 (tool-use + agentic loop)** via a reusable `scripts/coding_tasks/tool_loop.py` driver (extends the quality-suite `TOOL_TASKS`/`PLAN_AGENT_TASKS`). Cross-machine OK. Tool-call parsing confirmed: read `message.tool_calls[].function.{name,arguments}` (arguments already an object).

@@ -1,7 +1,7 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-06-24T04:04:51.191559+00:00",
-  "run_finished_at": "2026-06-24T05:39:13.970853+00:00",
+  "run_started_at": "2026-06-24T15:22:22.948503+00:00",
+  "run_finished_at": "2026-06-24T17:19:09.615248+00:00",
   "models": [
     "qwen3.5:9b"
   ],
@@ -9,8 +9,8 @@
     {
       "model": "qwen3.5:9b",
       "benchmark": "coding",
-      "run_started_at": "2026-06-24T04:04:51.194083+00:00",
-      "run_finished_at": "2026-06-24T05:39:13.844676+00:00",
+      "run_started_at": "2026-06-24T15:22:22.950997+00:00",
+      "run_finished_at": "2026-06-24T17:19:09.431251+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
@@ -21,7 +21,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 104.33,
+          "generation_time_s": 215.45,
           "generated_code_path": null
         },
         {
@@ -33,19 +33,19 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 105.47,
+          "generation_time_s": 109.25,
           "generated_code_path": null
         },
         {
           "task": "aspnet_service_di",
           "category": "aspnet",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 102.39,
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 108.09,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\aspnet_service_di.cs"
         },
         {
@@ -57,7 +57,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.02,
+          "generation_time_s": 107.19,
           "generated_code_path": null
         },
         {
@@ -69,7 +69,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.78,
+          "generation_time_s": 114.19,
           "generated_code_path": null
         },
         {
@@ -81,7 +81,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.59,
+          "generation_time_s": 115.33,
           "generated_code_path": null
         },
         {
@@ -93,7 +93,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 105.83,
+          "generation_time_s": 115.78,
           "generated_code_path": null
         },
         {
@@ -105,7 +105,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.56,
+          "generation_time_s": 117.05,
           "generated_code_path": null
         },
         {
@@ -117,7 +117,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.19,
+          "generation_time_s": 119.41,
           "generated_code_path": null
         },
         {
@@ -129,7 +129,7 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 90.45,
+          "generation_time_s": 103.66,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\blazor_interactive_component.cs"
         },
         {
@@ -141,7 +141,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 104.19,
+          "generation_time_s": 107.2,
           "generated_code_path": null
         },
         {
@@ -153,7 +153,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 105.86,
+          "generation_time_s": 114.34,
           "generated_code_path": null
         },
         {
@@ -165,7 +165,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.14,
+          "generation_time_s": 117.66,
           "generated_code_path": null
         },
         {
@@ -177,7 +177,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.45,
+          "generation_time_s": 122.28,
           "generated_code_path": null
         },
         {
@@ -189,7 +189,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 105.98,
+          "generation_time_s": 122.02,
           "generated_code_path": null
         },
         {
@@ -197,12 +197,12 @@
           "category": "linq",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.69,
-          "generated_code_path": null
+          "generation_time_s": 42.41,
+          "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
@@ -213,19 +213,19 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.22,
+          "generation_time_s": 107.25,
           "generated_code_path": null
         },
         {
           "task": "vertical_order_service",
           "category": "vertical",
           "weight": 2,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 21.41,
+          "build_success": true,
+          "tests_passed": 6,
+          "tests_total": 6,
+          "generation_time_s": 22.83,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\vertical_order_service.cs"
         },
         {
@@ -237,7 +237,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 215.36,
+          "generation_time_s": 223.83,
           "generated_code_path": null
         },
         {
@@ -245,12 +245,12 @@
           "category": "vertical",
           "weight": 2,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 216.47,
-          "generated_code_path": null
+          "generation_time_s": 245.98,
+          "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\vertical_blazor_crud.cs"
         },
         {
           "task": "linq_selectmany_flatten",
@@ -261,7 +261,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.78,
+          "generation_time_s": 112.42,
           "generated_code_path": null
         },
         {
@@ -273,7 +273,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.86,
+          "generation_time_s": 117.12,
           "generated_code_path": null
         },
         {
@@ -285,7 +285,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.2,
+          "generation_time_s": 120.45,
           "generated_code_path": null
         },
         {
@@ -297,7 +297,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.25,
+          "generation_time_s": 122.49,
           "generated_code_path": null
         },
         {
@@ -309,7 +309,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.2,
+          "generation_time_s": 119.66,
           "generated_code_path": null
         },
         {
@@ -321,19 +321,19 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.56,
+          "generation_time_s": 121.95,
           "generated_code_path": null
         },
         {
           "task": "async_channel_pipeline",
           "category": "async",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 105.66,
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 121.88,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\async_channel_pipeline.cs"
         },
         {
@@ -345,7 +345,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.23,
+          "generation_time_s": 106.44,
           "generated_code_path": null
         },
         {
@@ -357,7 +357,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 108.55,
+          "generation_time_s": 115.25,
           "generated_code_path": null
         },
         {
@@ -369,7 +369,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.84,
+          "generation_time_s": 118.44,
           "generated_code_path": null
         },
         {
@@ -381,19 +381,19 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.95,
+          "generation_time_s": 120.81,
           "generated_code_path": null
         },
         {
           "task": "aspnet_problemdetails_handler",
           "category": "aspnet",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 82.31,
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 92.67,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\aspnet_problemdetails_handler.cs"
         },
         {
@@ -405,7 +405,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 104.48,
+          "generation_time_s": 109.0,
           "generated_code_path": null
         },
         {
@@ -417,7 +417,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.27,
+          "generation_time_s": 115.78,
           "generated_code_path": null
         },
         {
@@ -429,7 +429,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.19,
+          "generation_time_s": 118.8,
           "generated_code_path": null
         },
         {
@@ -441,7 +441,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.47,
+          "generation_time_s": 120.97,
           "generated_code_path": null
         },
         {
@@ -453,7 +453,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.59,
+          "generation_time_s": 120.16,
           "generated_code_path": null
         },
         {
@@ -465,7 +465,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 108.36,
+          "generation_time_s": 123.42,
           "generated_code_path": null
         },
         {
@@ -477,7 +477,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.62,
+          "generation_time_s": 122.0,
           "generated_code_path": null
         },
         {
@@ -489,7 +489,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 89.52,
+          "generation_time_s": 100.09,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\xunit_memberdata.cs"
         },
         {
@@ -501,7 +501,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 108.12,
+          "generation_time_s": 109.06,
           "generated_code_path": null
         },
         {
@@ -513,7 +513,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.95,
+          "generation_time_s": 118.47,
           "generated_code_path": null
         },
         {
@@ -525,7 +525,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.09,
+          "generation_time_s": 121.03,
           "generated_code_path": null
         },
         {
@@ -537,7 +537,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.12,
+          "generation_time_s": 122.92,
           "generated_code_path": null
         },
         {
@@ -549,7 +549,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 108.12,
+          "generation_time_s": 123.61,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\blazor_parameter_lifecycle.cs"
         },
         {
@@ -561,7 +561,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 213.78,
+          "generation_time_s": 242.67,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\vertical_cqrs_handler.cs"
         },
         {
@@ -570,10 +570,10 @@
           "weight": 2,
           "passed": false,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 143.77,
+          "build_success": true,
+          "tests_passed": 6,
+          "tests_total": 8,
+          "generation_time_s": 147.91,
           "generated_code_path": "results\\coding-generated\\qwen3.5_9b\\vertical_efcore_service.cs"
         },
         {
@@ -585,7 +585,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 105.19,
+          "generation_time_s": 108.66,
           "generated_code_path": null
         },
         {
@@ -597,7 +597,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 106.19,
+          "generation_time_s": 117.0,
           "generated_code_path": null
         },
         {
@@ -609,11 +609,11 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 107.05,
+          "generation_time_s": 120.11,
           "generated_code_path": null
         }
       ],
-      "layer3_weighted_score": 0.01818181818181818,
+      "layer3_weighted_score": 0.10909090909090909,
       "think_setting": "true"
     }
   ]
