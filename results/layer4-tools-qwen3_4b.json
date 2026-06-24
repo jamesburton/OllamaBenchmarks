@@ -1,0 +1,89 @@
+{
+  "benchmark": "layer4-tools-t1-t2",
+  "model": "qwen3:4b",
+  "ollama_host": "http://t5500:11434",
+  "think_setting": "false",
+  "run_started_at": "2026-06-24T12:54:39.386932+00:00",
+  "run_finished_at": "2026-06-24T12:55:50.284437+00:00",
+  "t1_score": 0.16666666666666666,
+  "t1_passed": 1,
+  "t1_total": 6,
+  "t1_results": [
+    {
+      "case": "single",
+      "passed": false,
+      "detail": {
+        "calls": []
+      }
+    },
+    {
+      "case": "multi_distractor",
+      "passed": false,
+      "detail": {
+        "calls": []
+      }
+    },
+    {
+      "case": "nested_args",
+      "passed": false,
+      "detail": {
+        "calls": []
+      }
+    },
+    {
+      "case": "parallel",
+      "passed": false,
+      "detail": {
+        "n_calls": 0,
+        "calls": []
+      }
+    },
+    {
+      "case": "abstention",
+      "passed": true,
+      "detail": {
+        "n_calls": 0,
+        "content_head": "Okay, the user is asking for the capital of France. Let me think. I need to chec"
+      }
+    },
+    {
+      "case": "sequential_dep",
+      "passed": false,
+      "detail": {
+        "chained": false,
+        "stop": "no_tool_call",
+        "steps": [],
+        "seen": {}
+      }
+    }
+  ],
+  "t2_score": 0.0,
+  "t2_correct": 0,
+  "t2_total": 2,
+  "t2_results": [
+    {
+      "finished": false,
+      "correct": false,
+      "answer": null,
+      "steps": [],
+      "n_steps": 0,
+      "stop_reason": "no_tool_call",
+      "kv_final_price": null,
+      "error_injected": false,
+      "recovered": true,
+      "scenario": "multi_step"
+    },
+    {
+      "finished": false,
+      "correct": false,
+      "answer": null,
+      "steps": [],
+      "n_steps": 0,
+      "stop_reason": "no_tool_call",
+      "kv_final_price": null,
+      "error_injected": true,
+      "recovered": false,
+      "scenario": "error_recovery"
+    }
+  ]
+}
