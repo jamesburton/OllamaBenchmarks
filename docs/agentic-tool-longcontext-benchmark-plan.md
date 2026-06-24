@@ -100,11 +100,16 @@ gemma4 family (long ctx + vision), GLM-4.x, and the strongest coders on hand
 (qwen3-coder-next, gemma4:12b). The point is a **cross-model agentic/tool/long-context
 chart** the way `strix_summary_chart.py` does for L1–L3 today.
 
-## Open questions to resolve first (next session)
-- Qwen3.5 attention details (GQA heads, sliding window?) — read the model card / config; T5 confirms empirically.
-- Does Ollama's bundled llama.cpp support KV-cache quant + flash-attn for `qwen3.5` arch?
-- Tool-call format: confirm Ollama returns structured `message.tool_calls` for these models (vs inline text) — dictates T1/T2 parsing.
-- Token-accounting for the long-context sweeps (use `prompt_eval_count` from the API to hit exact lengths).
+## Open questions — RESOLVED 2026-06-24
+
+Probed against `qwen3.5:9b` on T5500 (Ollama 0.30.10) + the `Qwen/Qwen3.5-9B` HF `config.json`.
+
+- **Qwen3.5 attention (Q1):** `model_type qwen3_5`, arch `Qwen3_5ForConditionalGeneration` (multimodal). **32 layers, 16 query heads, 4 KV heads → GQA group size 4. head_dim 256** (note: *double* the usual 128 → heavy KV). hidden 4096, rope_theta 1e7, max_position 262144. **No sliding window** (full attention; `sliding_window`/`use_sliding_window`/`max_window_layers` all absent). `ollama show` reports base **context length 262144 (262K)**, capabilities completion/vision/tools/thinking — the "1M" is Qwythos's rope-extended claim, base is 262K.
+  - **KV-cache math** (per token, f16): `2·layers·kv_heads·head_dim·2B = 2·32·4·256·2 = 131072 B = 128 KiB/token` ⇒ **~1.28 GiB per 10k tokens**. Full 262K ≈ **~32 GiB f16** — does NOT fit Framework's 12 GB 3060 even with q4_0 KV (~8 GiB) + 6.6 GB weights. Long ctx ⇒ needs KV quant *and* a big-VRAM host (Strix 128 GB), or heavy ctx truncation. T5 measures the real curve.
+- **Flash-attn / KV-quant (Q2):** Ollama 0.30.10 exposes the server-level `OLLAMA_FLASH_ATTENTION` and `OLLAMA_KV_CACHE_TYPE` (`q8_0`/`q4_0`) knobs; **neither is currently set on T5500** (defaults: f16 KV). Testing KV-quant requires **restarting the shared Ollama** with the env var → coordinate via the user. Open empirical sub-question for T5: does the bundled llama.cpp FA kernel support **head_dim 256** for `qwen35` (some FA impls cap/specialise head_dim) — confirm by toggling the flag and watching load logs + VRAM.
+- **Tool-call format (Q3):** Ollama returns **structured** `message.tool_calls` for qwen3.5 — `[{id, function:{name, arguments:{…}}}]` with `arguments` already parsed to an object (not a JSON string), `content` empty on a tool turn, `done_reason: stop`. T1/T2 parse `message.tool_calls[].function.{name,arguments}` directly; no inline-text scraping.
+- **Token accounting (Q4):** `prompt_eval_count` (prompt tokens) and `eval_count` (generated tokens) are present on every `/api/generate` + `/api/chat` response — use `prompt_eval_count` to hit exact target lengths in the T4/T5 sweeps.
+- **T5 measurement primitive (probed 3 loads on T5500, qwen3.5:9b):** `/api/ps` `size_vram` **includes the KV cache** and KV is **pre-allocated by `num_ctx`**, NOT grown by actual tokens — confirmed: num_ctx 8k→32k moved `size_vram` 5.88→6.74 GB, while a 4032-token prompt at num_ctx=8k left it unchanged at 5.88 GB (== the 2-token load). **Implications for the harness:** measure the whole VRAM curve over HTTP with **tiny prompts** at each `num_ctx` (no large prefill, no CPU-offload-prefill risk, `nvidia-smi` optional); use `size_vram < size` as the fit/offload detector; only send a real ~L-token prompt for the *throughput* metric, and only where it fits fully. **Empirical KV cost ≈ 35 KiB/token** (0.86 GB / 24576 tokens of Δnum_ctx) — far below the 128 KiB/token f16 hand-calc above (likely default KV layout/flash-attn or a head_dim nuance; report the *measured* number). So the 12 GB fit boundary is ~180k tokens, not ~34k — 128k context plausibly fits f16 on a 3060. T5 confirms the exact curve.
 
 ## Immediate carry-over (unfinished from the 2026-06-23 session)
 - `qwen3.5:9b` (base) needs a **fresh L2-raw re-run** (today's hung at ~121/158; on-disk file is a stale 2026-04-17 prior) **+ L3 no-think + L3 think** to complete the base-vs-Qwythos coding comparison. Model is pulled on T5500.
