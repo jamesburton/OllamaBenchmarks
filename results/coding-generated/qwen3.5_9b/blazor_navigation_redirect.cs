@@ -1,31 +1,21 @@
 using Microsoft.AspNetCore.Components;
 
-public interface IProductService
+[Inject] public NavigationManager Nav { get; set; } = null!;
+
+[Inject] public IProductService ProductService { get; set; } = null!;
+
+public string? ErrorMessage { get; set; }
+
+public async Task DeleteProduct()
 {
-    Task<bool> DeleteAsync(int id);
-}
+    var result = await ProductService.DeleteAsync(ProductId);
 
-public class ProductDetailBase : ComponentBase
-{
-    [Parameter] public int ProductId { get; set; }
-
-    [Inject] public NavigationManager Nav { get; set; } = null!;
-
-    [Inject] public IProductService ProductService { get; set; } = null!;
-
-    public string? ErrorMessage { get; set; }
-
-    public async Task DeleteProduct()
+    if (result)
     {
-        var result = await ProductService.DeleteAsync(ProductId);
-
-        if (result)
-        {
-            Nav.NavigateTo("/products");
-        }
-        else
-        {
-            ErrorMessage = "Delete failed";
-        }
+        Nav.NavigateTo("/products");
+    }
+    else
+    {
+        ErrorMessage = "Delete failed";
     }
 }

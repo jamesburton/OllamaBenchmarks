@@ -2,24 +2,23 @@ using Microsoft.EntityFrameworkCore;
 
 public class Address
 {
-    public string Street { get; set; }
-    public string City { get; set; }
-    public string Zip { get; set; }
+    public string Street { get; set; } = "";
+    public string City { get; set; } = "";
+    public string Zip { get; set; } = "";
 }
 
 public class Customer
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public Address HomeAddress { get; set; } = new Address();
+    public string Name { get; set; } = "";
+    public Address HomeAddress { get; set; } = new();
 }
 
 public class CustomerDbContext : DbContext
 {
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<Customer> Customers => Set<Customer>();
 
-    public CustomerDbContext(DbContextOptions<CustomerDbContext> options)
-        : base(options)
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options)
     {
     }
 
@@ -39,15 +38,13 @@ public class CustomerRepository
         _context = context;
     }
 
-    public async Task<Customer> CreateAsync(Customer customer)
+    public Task<Customer> CreateAsync(Customer customer)
     {
-        await _context.Customers.AddAsync(customer);
-        await _context.SaveChangesAsync();
-        return customer;
+        return _context.Add(customer).ThenSaveAsync();
     }
 
-    public async Task<Customer?> GetByIdAsync(int id)
+    public Task<Customer?> GetByIdAsync(int id)
     {
-        return await _context.Customers.FindAsync(id);
+        return _context.Customers.FindAsync(id);
     }
 }

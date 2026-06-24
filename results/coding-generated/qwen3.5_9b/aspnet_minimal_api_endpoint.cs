@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
-[Required]
-public record CreateProductRequest([property: Positional] string Name, [property: Positional] decimal Price);
+public record CreateProductRequest([property: Position(0)] string Name, [property: Position(1)] decimal Price);
 
 public record ProductResponse(int Id, string Name, decimal Price);
 
-public static class ProductEndpoints
+internal static class ProductEndpoints
 {
     private static int _counter = 0;
 
@@ -20,7 +19,7 @@ public static class ProductEndpoints
             errors["Name"] = ["Name is required."];
         }
 
-        if (request.Price <= 0)
+        if (request.Price <= 0m)
         {
             errors["Price"] = ["Price must be greater than zero."];
         }
@@ -31,7 +30,8 @@ public static class ProductEndpoints
         }
 
         _counter++;
-        var id = _counter;
-        return Results.Ok(new ProductResponse(id, request.Name, request.Price));
+
+        var response = new ProductResponse(_counter, request.Name, request.Price);
+        return Results.Ok(response);
     }
 }

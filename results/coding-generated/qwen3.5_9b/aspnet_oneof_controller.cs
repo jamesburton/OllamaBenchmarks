@@ -1,20 +1,11 @@
-public record User
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
-}
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
-public record NotFound;
+// Top-level types (Global Namespace)
 
-public record ValidationError(string Message);
-
-public interface IUserService
-{
-    Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
-}
-
-public class UsersController
+[ApiController]
+[Route("api/[controller]/users")] // Route: /api/users/{id} based on controller name and route template logic, adjusted to match requirement "GET /api/users/{id}"
+public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
 
@@ -23,13 +14,36 @@ public class UsersController
         _userService = userService;
     }
 
+    // Action named 'Get' as required
+    [HttpGet("{id}")] 
     public async Task<IActionResult> Get(int id)
     {
-        var result = await _userService.GetByIdAsync(id);
-        return result.Match<IActionResult>(
+        OneOf<User, NotFound, ValidationError> result = await _userService.GetByIdAsync(id);
+
+        return result.Match(
             user => Ok(user),
-            _ => NotFound(),
-            err => BadRequest(err.Message)
+            notFound => StatusCode((int)HttpStatusCode.NotFound), // 404
+            err => BadRequest(err.Message)                        // 400 with message
         );
     }
+}
+
+// Record for NotFound (parameterless constructor required)
+public record NotFound;
+
+// Record for ValidationError (single string Message parameter)
+public record ValidationError(string Message);
+
+// Class for User (not a positional record, supports object initializer syntax)
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Email { get; set; } = null!;
+}
+
+// Interface for the service
+public interface IUserService
+{
+    Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }

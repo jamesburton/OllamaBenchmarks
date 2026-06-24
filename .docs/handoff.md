@@ -14,11 +14,13 @@ Secondary: finish the unfinished `qwen3.5:9b` base coding figures (fresh L2-raw 
 ## Current State
 - **Design doc DONE, implementation NOT started:** `docs/agentic-tool-longcontext-benchmark-plan.md` is the complete, actionable spec (T1 tool-use correctness, T2 agentic loop, T3 agentic C# read/write/build/test loop, T4 long-context needle + long-C#, T5 KV-VRAM-vs-context scaling). Build the harnesses it lists.
 - **All prior work committed & pushed to `main`** (HEAD `ce583ae`). Working tree clean. The `feature/vibethinker-csharp-finetune` branch was merged and deleted.
-- **qwen3.5:9b carry-over is INCOMPLETE:**
-  - L2-chat: **67/158 (0.424)** — done, fresh, committed (`results/coding-qwen3.5_9b-chat.json`).
-  - L2-raw: today's run **HUNG at task ~121/158** and never wrote; `results/coding-qwen3.5_9b.json` on disk is a **stale 2026-04-17** prior (61/158). Needs a fresh re-run.
-  - L3 (no-think + think): **not run** (deferred so the GPU was freed for other work).
-- `qwen3.5:9b` is pulled on T5500 (6.6 GB Q4_K_M). GPU is idle/free.
+- **qwen3.5:9b carry-over is now COMPLETE (2026-06-24, cross-machine: gen on T5500, build on Framework):**
+  - L2-chat: **67/158 (0.424)** — committed (`results/coding-qwen3.5_9b-chat.json`).
+  - L2-raw: **42/158 (0.266)** — fresh same-day re-run (prior 61/158 was a 2026-04-17 different-setup figure, not comparable; raw mode is noisy for this instruct model → L2-chat is the trusted number).
+  - L3 no-think: **3/50 (0.0545)**; L3 think: **1/50 (0.0182)** — think hurt L3; failures are genuine (46/50 build-fail, real code, 0 harness/timeout errors).
+  - base-vs-Qwythos (same cross-machine setup): base wins L2-chat (67 vs 62); fine-tune marginally wins L2-raw (42 vs 50), L3 no-think (3 vs 6), L3 think (1 vs 4) — all small gaps, both weak coders. Reinforces that Layer 4 is the real differentiator.
+  - Harness fixes this session: L2-raw now has a wall-clock gen backstop (`L2_GEN_TIMEOUT_S`, default 150) + per-task incremental checkpoint; L3 now merges into `coding-{slug}.json` instead of clobbering `layer2_*`.
+- `qwen3.5:9b` is pulled on T5500 (6.6 GB Q4_K_M). GPU coordination: no lock file exists (T5500 CLAUDE.md = "user-mediated until we build a lock file"); monitor `nvidia-smi` idle + user go-ahead.
 
 ## Key Decisions Made
 - **Q4_K_M for Qwythos** (not f16) so it matches the base model's quant → apples-to-apples; also dodged an Ollama f16-validation failure that was actually disk-space, not a bad GGUF.
@@ -33,7 +35,7 @@ Secondary: finish the unfinished `qwen3.5:9b` base coding figures (fresh L2-raw 
 - Reading per-task results by **grepping after the phase marker** (`sed -n '/[2\/4] L2-raw/,$p'`) — both L2-chat and L2-raw print `[N/158]`, so a naive `tail` mixes phases.
 
 ## What Didn't Work
-- **L2-raw harness hangs on long unattended runs**: a generation request orphaned and blew past its urllib timeout while Ollama itself stayed healthy (confirmed via a fresh test gen). Investigate the read-timeout robustness in `scripts/benchmark_coding_layer2.py` before trusting long raw runs. The chained 4-phase suite (`scripts/lora/run_qwen35_9b_suite.ps1`) got stuck here.
+- **L2-raw harness hangs on long unattended runs** — FIXED (2026-06-24). A generation request orphaned and blew past its urllib *socket* timeout while Ollama stayed healthy. Fix: each gen call now runs in a module-level `ThreadPoolExecutor` with a hard wall-clock backstop (`L2_GEN_TIMEOUT_S`, default 150) that abandons the worker and fails just that task; plus per-task incremental checkpointing so a stall can't lose the whole run. The 2026-06-24 full re-run completed all 158 with 0 timeouts. (Still avoid the chained suite `scripts/lora/run_qwen35_9b_suite.ps1`; run L2/L3 as separate invocations.)
 - Estimating ETA by eyeball — real pace was ~78 s/task (L2 phase = ~3.4 h), ~4× my guesses. Measure from result JSON `*_run_started_at/finished_at`.
 - `git merge -F -` (stdin) — not supported; use a message file.
 
@@ -54,7 +56,7 @@ Secondary: finish the unfinished `qwen3.5:9b` base coding figures (fresh L2-raw 
 - Comparison cohort for Layer 4: Qwythos-9B (1M), qwen3.5:9b (base), qwen3.6 + qwen3.6:27b, gemma4 family, GLM-4.x, qwen3-coder-next.
 
 ## Next Steps
-1. **Finish qwen3.5:9b base figures** (quick win, GPU free): from Framework, `OLLAMA_HOST=http://t5500:11434`, `L2_RUN_TIMEOUT_S=150 L3_BUILD_TIMEOUT_S=150 L3_TEST_TIMEOUT_S=150` — re-run L2-raw (`benchmark_coding_layer2.py`), then L3 no-think and L3 think (`benchmark_coding_layer3.py`, `--output results/coding-layer3-qwen3.5_9b[-think].json`). Watch the L2-raw hang; if it recurs, fix the timeout in the raw harness first. Then complete the base-vs-Qwythos table and update `qwen3.5:9b` backend_notes; commit.
+1. ~~Finish qwen3.5:9b base figures~~ **DONE (2026-06-24)** — L2-raw 42/158, L3 no-think 3/50, L3 think 1/50; base-vs-Qwythos table + backend_notes updated; L2-raw hang fixed. See Current State.
 2. **Resolve the Layer 4 open questions** (above) — read the Qwen3.5 model card/config, probe Ollama tool-call output format and KV-cache-quant support. Cheap, unblocks the harness design.
 3. **Build T5 first (long-context VRAM/throughput sweep)** — it directly answers the user's headline question ("long context without massive VRAM?") and is the simplest harness (num_ctx sweep + nvidia-smi on the GPU host). `scripts/benchmark_longcontext.py`.
 4. **Build T1/T2 (tool-use + agentic loop)** via a reusable `scripts/coding_tasks/tool_loop.py` driver (extends the quality-suite `TOOL_TASKS`/`PLAN_AGENT_TASKS`). Cross-machine OK.

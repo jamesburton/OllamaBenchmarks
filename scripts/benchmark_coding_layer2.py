@@ -7,6 +7,7 @@ dotnet, run, and scored pass@1.
 """
 
 import argparse
+import concurrent.futures
 import datetime
 import json
 import os
@@ -29,6 +30,53 @@ from coding_tasks.task_runner import sampling_options
 # ---------------------------------------------------------------------------
 # Completion-mode generation (fill-in-the-middle for MultiPL-E)
 # ---------------------------------------------------------------------------
+
+# Module-level executor used to put a hard wall-clock deadline on each
+# generation request. A long unattended raw run once stalled at task ~121/158:
+# a request orphaned and blew past the socket timeout while Ollama itself
+# stayed healthy. The socket timeout alone is therefore not a sufficient
+# backstop, so we run each call in this executor and abandon (not join) a
+# worker that exceeds the deadline. A leaked worker eventually unwinds when its
+# own socket timeout fires; we never block the main loop on it. NOTE: do not
+# use `with ThreadPoolExecutor()` here — its shutdown would join the leaked
+# worker and reproduce the exact hang this guards against.
+_GEN_EXECUTOR = concurrent.futures.ThreadPoolExecutor(
+    max_workers=4, thread_name_prefix="l2gen"
+)
+
+
+def _generate_completion(
+    model: str,
+    prompt: str,
+    stop_tokens: list[str] | None,
+) -> str:
+    """Generate a completion under a hard wall-clock deadline.
+
+    ``L2_GEN_TIMEOUT_S`` (default 150) tunes the inner socket timeout; the outer
+    wall-clock backstop is that value plus a small buffer, so the socket timeout
+    normally fires first and the executor only catches a truly orphaned request.
+    On deadline we fail the current task (return "") and the loop continues.
+    """
+    gen_timeout = int(os.environ.get("L2_GEN_TIMEOUT_S", "150"))
+    fut = _GEN_EXECUTOR.submit(
+        _call_ollama_complete,
+        model,
+        prompt,
+        2048,
+        4096,
+        42,
+        gen_timeout,
+        stop_tokens,
+    )
+    try:
+        return fut.result(timeout=gen_timeout + 30)
+    except concurrent.futures.TimeoutError:
+        print(
+            f"    [complete] wall-clock deadline exceeded "
+            f"({gen_timeout + 30} s); abandoning request"
+        )
+        return ""
+
 
 def _call_ollama_complete(
     model: str,
@@ -155,16 +203,10 @@ def run_problem(
     tests: str = problem.get("tests", "")
     stop_tokens: list[str] = problem.get("stop_tokens") or ["\n    }\n"]
 
-    # 1. Generate code using completion mode (fill-in-the-middle)
-    raw_response = _call_ollama_complete(
-        model,
-        prompt,
-        max_tokens=2048,
-        num_ctx=4096,
-        seed=42,
-        timeout=120,
-        stop_tokens=stop_tokens,
-    )
+    # 1. Generate code using completion mode (fill-in-the-middle), under a
+    # hard wall-clock deadline so an orphaned request fails this task rather
+    # than stalling the whole run (see _generate_completion).
+    raw_response = _generate_completion(model, prompt, stop_tokens)
 
     if not raw_response:
         return False, "Ollama returned empty response"
@@ -384,6 +426,11 @@ def main() -> None:
         slug = model_slug(model)
         print(f"\n[model] {model} (slug={slug})")
 
+        # Read the existing file once up front so the incremental writes below
+        # preserve any prior layer3_* fields while we overlay layer2 results.
+        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
+        checkpoint = read_checkpoint(checkpoint_path)
+
         model_run_started_at = datetime.datetime.now(datetime.timezone.utc)
         passed_count = 0
         problem_records: list[dict[str, Any]] = []
@@ -411,6 +458,24 @@ def main() -> None:
                 "error": error,
             })
 
+            # Incremental checkpoint after every task: a stall must lose at most
+            # the current task (not hours of work), and the growing file makes
+            # progress observable mid-run. pass_rate here is the running rate
+            # over completed tasks; the final write below corrects it to /total.
+            checkpoint.update({
+                "model": model,
+                "benchmark": "coding",
+                "layer2_run_started_at": model_run_started_at.isoformat(),
+                "layer2_run_finished_at": datetime.datetime.now(
+                    datetime.timezone.utc
+                ).isoformat(),
+                "layer2_pass_rate": passed_count / idx,
+                "layer2_passed": passed_count,
+                "layer2_total": total,
+                "layer2_results": problem_records,
+            })
+            write_checkpoint(checkpoint_path, checkpoint)
+
         model_run_finished_at = datetime.datetime.now(datetime.timezone.utc)
         pass_rate = passed_count / total
 
@@ -419,22 +484,11 @@ def main() -> None:
             f"({passed_count}/{total} problems passed)"
         )
 
-        # --- Checkpoint: merge layer2 result into existing file if present ---
-        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
-        checkpoint = read_checkpoint(checkpoint_path)
-
-        # Preserve existing data, overlay layer2 fields
+        # Final write: stamp the true finish time and full-denominator rate.
         checkpoint.update({
-            "model": model,
-            "benchmark": "coding",
-            "layer2_run_started_at": model_run_started_at.isoformat(),
             "layer2_run_finished_at": model_run_finished_at.isoformat(),
             "layer2_pass_rate": pass_rate,
-            "layer2_passed": passed_count,
-            "layer2_total": total,
-            "layer2_results": problem_records,
         })
-
         write_checkpoint(checkpoint_path, checkpoint)
         print(f"  [checkpoint] Written to {checkpoint_path}")
 

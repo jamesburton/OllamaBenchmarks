@@ -8,22 +8,25 @@ public interface ISoftDeletable
 public class Article : ISoftDeletable
 {
     public int Id { get; set; }
-    public string Title { get; set; }
+    public string Title { get; set; } = null!;
     public bool IsDeleted { get; set; }
 }
 
 public class ArticleDbContext : DbContext
 {
-    public DbSet<Article> Articles { get; set; }
+    public DbSet<Article> Articles => Set<Article>();
 
-    public ArticleDbContext(DbContextOptions<ArticleDbContext> options)
-        : base(options)
+    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options)
     {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
+
+        // Ensure the IsDeleted property is mapped correctly if using default conventions, 
+        // though explicit configuration isn't strictly necessary for this example.
+        base.OnModelCreating(modelBuilder);
     }
 }
 
@@ -38,22 +41,28 @@ public class ArticleRepository
 
     public Task SoftDeleteAsync(int id)
     {
-        var article = _context.Articles.IgnoreQueryFilters().FirstOrDefault(a => a.Id == id);
-        if (article != null)
+        var article = _context.Articles.IgnoreQueryFilters().Find(id);
+
+        if (article == null)
         {
-            article.IsDeleted = true;
-            return _context.SaveChangesAsync();
+            return Task.CompletedTask; // Does nothing if not found
         }
-        return Task.CompletedTask;
+
+        article.IsDeleted = true;
+        return _context.SaveChangesAsync();
     }
 
     public Task<List<Article>> GetAllAsync()
     {
-        return _context.Articles.ToListAsync();
+        // The query filter automatically handles excluding deleted articles here.
+        var articles = _context.Articles.ToListAsync();
+        return articles;
     }
 
     public Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        return _context.Articles.IgnoreQueryFilters().ToListAsync();
+        // Ignore the global query filter to include soft-deleted records.
+        var articles = _context.Articles.IgnoreQueryFilters().ToListAsync();
+        return articles;
     }
 }

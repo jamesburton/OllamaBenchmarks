@@ -29,6 +29,18 @@ def write_json(path: str, payload: dict[str, Any]) -> None:
         fh.write(json.dumps(payload, indent=2) + "\n")
 
 
+def read_json(path: str) -> dict[str, Any]:
+    """Read an existing JSON checkpoint, or return an empty dict if absent.
+
+    Used to merge layer3 results into a coding-{slug}.json that may already
+    hold layer2_* fields, so neither layer clobbers the other.
+    """
+    if os.path.isfile(path):
+        with open(path, "r", encoding="utf-8") as fh:
+            return json.load(fh)
+    return {}
+
+
 def compute_layer3_score(results: list[TaskResult]) -> float:
     numerator = sum(r.weight * (1 if r.passed else 0) for r in results)
     denominator = sum(r.weight for r in results)
@@ -122,19 +134,24 @@ def main() -> None:
             f"({sum(1 if r.passed else 0 for r in task_results)}/{len(task_results)} tasks passed)"
         )
 
-        checkpoint_payload: dict[str, Any] = {
+        think_env = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
+        suffix = "-think" if think_env in ("1", "true", "yes", "on", "low", "medium", "high") else ""
+        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
+
+        # Merge layer3 fields into any existing per-model file rather than
+        # overwriting it: coding-{slug}.json is the shared coding record holding
+        # both layers, and the L2 harness preserves layer3 the same way. A plain
+        # overwrite here would silently wipe a prior layer2_* run for this slug.
+        checkpoint_payload: dict[str, Any] = read_json(checkpoint_path)
+        checkpoint_payload.update({
             "model": model,
             "benchmark": "coding",
             "run_started_at": model_run_started_at.isoformat(),
             "run_finished_at": model_run_finished_at.isoformat(),
             "layer3_results": [dataclasses.asdict(r) for r in task_results],
             "layer3_weighted_score": layer3_score,
-        }
-
-        think_env = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
-        suffix = "-think" if think_env in ("1", "true", "yes", "on", "low", "medium", "high") else ""
-        checkpoint_payload["think_setting"] = think_env or "false"
-        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
+            "think_setting": think_env or "false",
+        })
         write_json(checkpoint_path, checkpoint_payload)
         print(f"  [checkpoint] Written to {checkpoint_path}")
 

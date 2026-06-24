@@ -1,15 +1,25 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EFCore10Example
+namespace App.Core.Entities
 {
+    [ComplexType]
+    public class Address
+    {
+        public string Street { get; set; } = null!;
+        public string City { get; set; } = null!;
+    }
+
     public class Customer
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        public string Name { get; set; } = null!;
+        public string Email { get; set; } = null!;
+
+        // Optional JSON property for demonstration of EF10 features mentioned in reference
+        [ComplexType] 
+        public Address? Address { get; set; }
     }
 
     public class Order
@@ -18,42 +28,67 @@ namespace EFCore10Example
         public int CustomerId { get; set; }
         public decimal Total { get; set; }
         public DateTime OrderDate { get; set; }
+
+        // Navigation property for clarity, though not strictly needed for the LeftJoin query shown below
+        public virtual Customer? Customer { get; set; }
     }
 
     public class AppDbContext : DbContext
     {
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<Customer> Customers => Set<Customer>();
 
-        public AppDbContext(DbContextOptions<AppDbContext> options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) 
             : base(options)
         {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Optional: Configure JSON conversion if Address is used as a complex type with JSON column
+            /*
+            builder.Entity<Customer>()
+                .Property(c => c.Address)
+                .HasJsonConversion(); 
+             */
+
             base.OnModelCreating(modelBuilder);
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 
-    public record OrderDto(int OrderId, decimal Total, string CustomerName);
+    // DTO for the query result
+    public record OrderDto(
+        int OrderId, 
+        decimal Total, 
+        string CustomerName
+    );
 
     public static class OrderQueries
     {
-        public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
+        /// <summary>
+        /// Retrieves all orders joined with customers using EF Core 10's LeftJoin.
+        /// If no customer matches an order, the CustomerName is set to "Unknown".
+        /// </summary>
+        public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
         {
-            return db.Orders
+            var query = await db.Orders
                 .LeftJoin(
                     db.Customers,
                     order => order.CustomerId,
                     customer => customer.Id,
                     (order, customer) => new OrderDto(
-                        order.Id,
-                        order.Total,
-                        customer == null ? "Unknown" : customer.Name
+                        orderId: order.Id, 
+                        Total: order.Total, 
+                        CustomerName: customer == null ? "Unknown" : customer.Name
                     )
-                )
-                .ToList();
+                ).ToListAsync();
+
+            return query;
         }
     }
 }

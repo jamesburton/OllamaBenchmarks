@@ -1,11 +1,13 @@
-using System;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.DependencyInjection;
 
 public class SmtpOptions
 {
-    public string Host { get; set; } = string.Empty;
+    public string Host { get; set; } = null!;
+
+    [Range(1, 65535)]
     public int Port { get; set; }
+
     public string? Username { get; set; }
 }
 
@@ -16,14 +18,19 @@ public interface IEmailSender
 
 public class SmtpEmailSender : IEmailSender
 {
-    private readonly SmtpOptions _options;
+    private readonly OptionsMonitor<SmtpOptions> _optionsMonitor;
 
     public string? LastSentTo { get; set; }
-    public SmtpOptions Options => _options;
+
+    public SmtpOptions Options => _optionsMonitor.CurrentValue;
 
     public SmtpEmailSender(IOptions<SmtpOptions> options)
     {
-        _options = options.Value;
+        var monitor = new OptionsMonitor<SmtpOptions>(options);
+        this._optionsMonitor = monitor;
+
+        // Initialize with current value to ensure property is accessible immediately
+        _ = monitor.CurrentValue; 
     }
 
     public Task SendAsync(string to, string subject, string body)
