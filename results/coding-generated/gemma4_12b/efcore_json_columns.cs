@@ -1,7 +1,6 @@
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
 public class Address
 {
@@ -21,8 +20,7 @@ public class CompanyDbContext : DbContext
 {
     public DbSet<Company> Companies { get; set; }
 
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
-        : base(options)
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options)
     {
     }
 

@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
-using System.Reflection;
 
 public class CreateOrderRequest
 {
@@ -21,15 +19,9 @@ public class OrderService
         var context = new ValidationContext(request);
         var results = new List<ValidationResult>();
 
-        bool isValid = Validator.TryValidateObject(
-            request, 
-            context, 
-            results, 
-            validateAllProperties: true);
-
-        if (!isValid || results.Count > 0)
+        if (!Validator.TryValidateObject(request, context, results, true))
         {
-            var firstError = results[0].ErrorMessage ?? "Unknown validation error";
+            var firstError = results.FirstOrDefault()?.ErrorMessage ?? "Unknown validation error";
             throw new ArgumentException($"Validation failed: {firstError}");
         }
 

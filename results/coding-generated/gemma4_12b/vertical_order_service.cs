@@ -11,15 +11,15 @@ public class Order
 {
     public int Id { get; set; }
     public string CustomerName { get; set; }
-    public System.Collections.Generic.List<OrderItem> Items { get; set; }
+    public List<OrderItem> Items { get; set; }
     public decimal Total { get; set; }
-    public System.DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 public class CreateOrderRequest
 {
     public string CustomerName { get; set; }
-    public System.Collections.Generic.List<OrderItem> Items { get; set; }
+    public List<OrderItem> Items { get; set; }
 }
 
 public class ValidationError
@@ -54,22 +54,17 @@ public class OrderService
             return new ValidationError { Message = "At least one item is required" };
         }
 
-        decimal total = 0;
-        foreach (var item in request.Items)
-        {
-            total += item.Quantity * item.UnitPrice;
-        }
-
         var order = new Order
         {
-            Id = 1, // ID assignment logic would typically come from the repository or a generator
             CustomerName = request.CustomerName,
             Items = request.Items,
-            Total = total,
-            CreatedAt = System.DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow
         };
 
+        order.Total = order.Items.Sum(x => x.Quantity * x.UnitPrice);
+
         _repository.Save(order);
+
         return order;
     }
 }

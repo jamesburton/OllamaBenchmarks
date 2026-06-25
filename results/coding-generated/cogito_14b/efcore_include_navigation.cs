@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-public class Comment
+public class Comment 
 {
     public int Id { get; set; }
     public string Text { get; set; } = default!;
@@ -8,7 +8,7 @@ public class Comment
     public Post? Post { get; set; }
 }
 
-public class Post
+public class Post 
 {
     public int Id { get; set; }
     public string Content { get; set; } = default!;
@@ -17,7 +17,7 @@ public class Post
     public List<Comment> Comments { get; set; } = new();
 }
 
-public class Blog
+public class Blog 
 {
     public int Id { get; set; }
     public string Title { get; set; } = default!;
@@ -30,7 +30,10 @@ public class BlogDbContext : DbContext
     public DbSet<Post> Posts { get; set; } = default!;
     public DbSet<Comment> Comments { get; set; } = default!;
 
-    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
+    public BlogDbContext(DbContextOptions<BlogDbContext> options) 
+        : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -50,7 +53,7 @@ public class BlogRepository
 {
     private readonly BlogDbContext _context;
 
-    public BlogRepository(BlogDbContext context)
+    public BlogRepository(BlogDbContext context) 
     {
         _context = context;
     }

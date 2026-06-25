@@ -9,6 +9,7 @@ public interface IUserService
 public class UserDashboard : ComponentBase
 {
     [CascadingParameter] public Task<AuthenticationState> AuthState { get; set; } = default!;
+
     [Inject] public IUserService UserService { get; set; } = default!;
 
     public string? DisplayName { get; private set; }
@@ -17,12 +18,11 @@ public class UserDashboard : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthState;
-        var identity = authState.User?.Identity;
-        if (identity?.IsAuthenticated == true)
+        if (authState.User.Identity?.IsAuthenticated == true)
         {
             IsAuthenticated = true;
-            var name = identity.Name;
-            DisplayName = await UserService.GetDisplayNameAsync(name);
+            var nameClaim = authState.User.Identity.Name;
+            DisplayName = await UserService.GetDisplayNameAsync(nameClaim);
         }
         else
         {

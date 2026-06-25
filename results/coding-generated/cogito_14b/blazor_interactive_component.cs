@@ -12,6 +12,7 @@ public class CounterBase : ComponentBase
 
     protected override void OnInitialized()
     {
+        base.OnInitialized();
         currentCount = InitialCount;
     }
 

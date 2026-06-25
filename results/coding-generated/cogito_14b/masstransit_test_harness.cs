@@ -2,40 +2,44 @@ using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-public class ProcessPaymentTests
+public class ProcessPaymentConsumerTests
 {
-    private readonly ServiceCollection _services;
-    private readonly IServiceProvider _provider;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ITestHarness _harness;
 
-    public ProcessPaymentTests()
+    public ProcessPaymentConsumerTests()
     {
-        _services = new ServiceCollection();
-        _services.AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>());
-        _provider = _services.BuildServiceProvider(true);
-        _harness = _provider.GetRequiredService<ITestHarness>();
+        var services = new ServiceCollection();
+        services.AddMassTransitTestHarness(cfg => cfg.AddConsumer<ProcessPaymentConsumer>());
+        _serviceProvider = services.BuildServiceProvider(true);
+        _harness = _serviceProvider.GetRequiredService<ITestHarness>();
     }
 
     [Fact]
-    public async Task ProcessPayment_Consumer_Received_PaymentProcessed_Published()
+    public async Task ProcessPayment_Consumer_Received_And_PaymentProcessed_Published()
     {
-        // Arrange
-        var orderId = Guid.NewGuid();
-        var amount = 100.00m;
-        var payment = new ProcessPayment(orderId, amount);
-
-        // Act
         await _harness.Start();
-        await _harness.Bus.Publish(payment);
 
-        // Assert
-        var consumed = await _harness.Consumed.Any<ProcessPayment>();
-        var published = await _harness.Published.Any<PaymentProcessed>();
+        var orderId = Guid.NewGuid();
+        var amount = 10.99m;
+
+        // Publish the message
+        await _harness.Bus.Publish(new ProcessPayment(orderId, amount));
+
+        // Check if consumer received the message
+        bool consumed = await _harness.Consumed.Any<ProcessPayment>();
+
+        // Check if PaymentProcessed was published with correct OrderId
+        var paymentProcessedMessages = await _harness.Published.Select<PaymentProcessed>()
+            .Where(p => p.OrderId == orderId)
+            .ToListAsync();
+
+        bool published = paymentProcessedMessages.Count > 0;
 
         Assert.Multiple(() =>
         {
-            Assert.True(consumed, "ProcessPayment message was consumed");
-            Assert.True(published, "PaymentProcessed message was published");
+            Assert.True(consumed, "ProcessPayment message was not consumed");
+            Assert.True(published, "No PaymentProcessed message with matching OrderId was published");
         });
     }
 }

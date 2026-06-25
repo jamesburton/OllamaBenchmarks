@@ -28,41 +28,36 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 
 public class NotificationServiceTests
 {
-    private readonly IUserRepository _repo = Substitute.For<IUserRepository>();
-    private readonly IEmailService _email = Substitute.For<IEmailService>();
-    private readonly NotificationService _sut;
-
-    public NotificationServiceTests()
+    [Fact]
+    public async Task NotifyUserAsync_WhenUserExists_SendsEmail()
     {
-        _sut = new NotificationService(_repo, _email);
+        // Arrange
+        var repo = Substitute.For<IUserRepository>();
+        var email = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, email);
+
+        var user = new User { Id = 1, Name = "John Doe", Email = "john@example.com" };
+        repo.GetByIdAsync(1).Returns(user);
+
+        // Act
+        await service.NotifyUserAsync(1);
+
+        // Assert
+        email.Received().SendWelcomeAsync(user.Email);
     }
 
     [Fact]
-    public async Task NotifyUserAsync_WhenUserExists_SendsEmailWithCorrectAddress()
+    public async Task NotifyUserAsync_WhenUserDoesNotExist_ThrowsException()
     {
         // Arrange
-        var userId = 1;
-        var user = new User { Id = userId, Name = "John Doe", Email = "john@example.com" };
-        _repo.GetByIdAsync(userId).Returns(user);
+        var repo = Substitute.For<IUserRepository>();
+        var email = Substitute.For<IEmailService>();
+        var service = new NotificationService(repo, email);
 
-        // Act
-        await _sut.NotifyUserAsync(userId);
+        repo.GetByIdAsync(99).Returns((User?)null);
 
-        // Assert
-        _email.Received(1).SendWelcomeAsync(user.Email);
-    }
-
-    [Fact]
-    public async Task NotifyUserAsync_WhenUserDoesNotExist_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        var userId = 99;
-        _repo.GetByIdAsync(userId).Returns((User?)null);
-
-        // Act
-        Func<Task> act = () => _sut.NotifyUserAsync(userId);
-
-        // Assert
+        // Act & Assert
+        Func<Task> act = () => service.NotifyUserAsync(99);
         await act.Should().ThrowAsync<InvalidOperationException>();
     }
 }

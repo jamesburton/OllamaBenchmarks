@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 
 public record UserProfile(int Id, string DisplayName, string Email);
 
-public interface IUserService
+public interface IUserService 
 {
     Task<UserProfile?> GetProfileAsync(int userId);
 }
@@ -10,7 +10,9 @@ public interface IUserService
 public class UserProfileBase : ComponentBase
 {
     [Parameter] public int UserId { get; set; }
+
     [Inject] public IUserService UserService { get; set; } = null!;
+
     public UserProfile? Profile { get; private set; }
     public bool IsLoading { get; private set; }
 

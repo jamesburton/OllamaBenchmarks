@@ -30,10 +30,17 @@ public class OrderStateMachine : MassTransitStateMachine<OrderState>
 
         Configure(x =>
         {
-            x.OrderSubmitted(m => m.CorrelateById(m.Message.OrderId));
-            x.OrderAccepted(m => m.CorrelateById(m.Message.OrderId));
-            x.OrderCompleted(m => m.CorrelateById(m.Message.OrderId));
+            x.CorrelateById(m => m.Message.OrderId);
         });
+
+        OrderSubmitted.SetCorrelationHandler(x => 
+            x.CorrelateById(m => m.Message.OrderId));
+
+        OrderAccepted.SetCorrelationHandler(x => 
+            x.CorrelateById(m => m.Message.OrderId));
+
+        OrderCompleted.SetCorrelationHandler(x => 
+            x.CorrelateById(m => m.Message.OrderId));
 
         Initially(
             When(OrderSubmitted)

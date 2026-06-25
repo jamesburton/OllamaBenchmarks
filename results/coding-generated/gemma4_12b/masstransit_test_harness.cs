@@ -5,17 +5,17 @@ using Microsoft.Extensions.DependencyInjection;
 public class ProcessPaymentTests
 {
     [Fact]
-    public async Task ProcessPayment_ShouldProcessAndPublishCorrectEvent()
+    public async Task ProcessPayment_ShouldBeConsumedAndPublishPaymentProcessed()
     {
         // Arrange
-        var services = new ServiceCollection();
-        services.AddMassTransitTestHarness(cfg =>
-        {
-            cfg.AddConsumer<ProcessPaymentConsumer>();
-        });
+        var provider = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg =>
+            {
+                cfg.AddConsumer<ProcessPaymentConsumer>();
+            })
+            .BuildServiceProvider(true);
 
-        var provider = services.BuildServiceProvider(true);
-        var harness = provider.GetRequiredService<ITestHarness>();
+        ITestHarness harness = provider.GetRequiredService<ITestHarness>();
         await harness.Start();
 
         var orderId = Guid.NewGuid();
@@ -25,8 +25,13 @@ public class ProcessPaymentTests
         await harness.Bus.Publish(message);
 
         // Assert
+        // Since Assert.Multiple does not support async lambdas, we await the results first.
         bool wasConsumed = await harness.Consumed.Any<ProcessPayment>();
         bool wasPublished = await harness.Published.Any<PaymentProcessed>();
 
         Assert.Multiple(
-            () => Assert.True(wasConsumed,
+            () => Assert.True(wasConsumed, "The ProcessPayment message should have been consumed by the consumer."),
+            () => Assert.True(wasPublished, "The PaymentProcessed event should have been published.")
+        );
+    }
+}

@@ -9,20 +9,24 @@ public class Product
 
 public class ProductDbContext : DbContext
 {
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options) { }
     public DbSet<Product> Products { get; set; } = default!;
+
+    public ProductDbContext(DbContextOptions<ProductDbContext> options) 
+        : base(options)
+    {
+    }
 }
 
 public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        var products = await db.Products
+        var productsToUpdate = await db.Products
             .Where(p => p.Category == category)
             .ToListAsync();
 
         int count = 0;
-        foreach (var product in products)
+        foreach (var product in productsToUpdate)
         {
             product.Price *= (1 - discountPct);
             product.LastModified = DateTime.UtcNow;

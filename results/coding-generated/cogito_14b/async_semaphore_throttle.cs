@@ -10,15 +10,14 @@ public class ThrottledProcessor
     public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
         var taskList = new List<Task<T>>();
-        var results = new List<T>();
 
         foreach (var taskFactory in tasks)
         {
-            await _semaphore.WaitAsync(ct);
+            await _semaphore.WaitAsync(ct).ConfigureAwait(false);
+
             try
             {
-                var task = taskFactory(ct);
-                taskList.Add(task);
+                taskList.Add(taskFactory(ct));
             }
             catch
             {
@@ -27,8 +26,12 @@ public class ThrottledProcessor
             }
         }
 
-        var completedTasks = await Task.WhenAll(taskList);
-        results.AddRange(completedTasks);
+        var results = new List<T>(taskList.Count);
+
+        foreach (var result in await Task.WhenAll(taskList))
+        {
+            results.Add(result);
+        }
 
         return results;
     }

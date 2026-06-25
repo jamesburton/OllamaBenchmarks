@@ -2,7 +2,6 @@ global using Contracts;
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace Contracts;
 
@@ -22,34 +21,35 @@ public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
 {
     public async Task Consume(ConsumeContext<OrderPlaced> context)
     {
-        await context.Publish(new CustomerNotified(
-            context.Message.OrderId,
-            $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}"));
+        var msg = context.Message;
+        await context.Publish(new CustomerNotified(msg.OrderId, $"Order {msg.OrderId} confirmed for {msg.CustomerName}"));
     }
 }
 
 public class PipelineTests
 {
+    private readonly IServiceProvider _provider;
+
+    public PipelineTests()
+    {
+        var services = new ServiceCollection();
+        services.AddMassTransit(cfg =>
+        {
+            cfg.AddConsumer<PlaceOrderConsumer>();
+            cfg.AddConsumer<NotifyCustomerConsumer>();
+        });
+        _provider = services.BuildServiceProvider();
+    }
+
     [Fact]
-    public async Task PlaceOrder_ShouldConsumeAndPublishOrderPlaced()
+    public async Task PlaceOrder_ShouldPublishOrderPlaced()
     {
         // Arrange
-        var provider = new ServiceCollection()
-            .AddMassTransit(cfg =>
-            {
-                cfg.AddConsumer<PlaceOrderConsumer>();
-                cfg.AddConsumer<NotifyCustomerConsumer>();
-            })
-            .BuildServiceProvider(true);
-
-        var harness = provider.GetRequiredService<ITestHarness>();
+        var harness = _provider.GetRequiredService<ITestHarness>();
         await harness.Start();
 
-        var orderId = Guid.NewGuid();
-        var message = new PlaceOrder(orderId, "John Doe");
-
         // Act
-        await harness.Bus.Publish(message);
+        await harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "John Doe"));
 
         // Assert
         Assert.True(await harness.Consumed.Any<PlaceOrder>());
@@ -57,25 +57,14 @@ public class PipelineTests
     }
 
     [Fact]
-    public async Task FullPipeline_ShouldReachCustomerNotified()
+    public async Task FullPipeline_ShouldComplete()
     {
         // Arrange
-        var provider = new ServiceCollection()
-            .AddMassTransit(cfg =>
-            {
-                cfg.AddConsumer<PlaceOrderConsumer>();
-                cfg.AddConsumer<NotifyCustomerConsumer>();
-            })
-            .BuildServiceProvider(true);
-
-        var harness = provider.GetRequiredService<ITestHarness>();
+        var harness = _provider.GetRequiredService<ITestHarness>();
         await harness.Start();
 
-        var orderId = Guid.NewGuid();
-        var message = new PlaceOrder(orderId, "Jane Doe");
-
         // Act
-        await harness.Bus.Publish(message);
+        await harness.Bus.Publish(new PlaceOrder(Guid.NewGuid(), "John Doe"));
 
         // Assert
         Assert.True(await harness.Published.Any<OrderPlaced>());

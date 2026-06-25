@@ -21,12 +21,19 @@ public class SharedCounter : IAsyncLifetime
     }
 }
 
-public class FirstCounterTests(SharedCounter counter)
+public class FirstCounterTests
 {
-    [Fact]
-    public void Test_ConstructorInjection()
+    private readonly SharedCounter _counter;
+
+    public FirstCounterTests(SharedCounter counter)
     {
-        var result = counter.IncrementAndGet();
+        _counter = counter;
+    }
+
+    [Fact]
+    public void IncrementAndGet_ReturnsGreaterThanZero()
+    {
+        var result = _counter.IncrementAndGet();
         Assert.True(result > 0);
     }
 }
@@ -34,7 +41,7 @@ public class FirstCounterTests(SharedCounter counter)
 public class SecondCounterTests
 {
     [Fact]
-    public void Test_FixtureRetrieval()
+    public void GetFixture_IncrementAndGet_ReturnsGreaterThanZero()
     {
         var counter = TestContext.Current.GetFixture<SharedCounter>();
         var result = counter.IncrementAndGet();

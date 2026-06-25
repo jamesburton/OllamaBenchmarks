@@ -15,37 +15,37 @@ public class ThrottledProcessor
 
     public Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
-        var taskList = tasks.Select(async taskFactory =>
-        {
-            await _semaphore.WaitAsync(ct).ConfigureAwait(false);
-            try
-            {
-                return await taskFactory(ct).ConfigureAwait(false);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }).ToList();
+        var taskFactories = tasks.ToList();
+        var tasksToAwait = new List<Task<T>>();
 
-        var results = new Task<T>[taskList.Count];
-        for (int i = 0; i < taskList.Count; i++)
+        foreach (var factory in taskFactories)
         {
-            results[i] = taskList[i];
+            // Create a wrapper task that handles the semaphore logic for each individual item
+            var task = Task.Run(async () =>
+            {
+                await _semaphore.WaitAsync(ct).ConfigureAwait(false);
+                try
+                {
+                    return await factory(ct).ConfigureAwait(false);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }, ct).Unwrap();
+
+            tasksToAwait.Add(task);
         }
 
-        return Task.1WhenAll(results).ContinueWith(t =>
-        {
-            var list = new List<T>();
-            foreach (var result in t.Result)
-            {
-                list.Add(result);
-            }
-            return list;
-        });
+        // Wait for all tasks to complete and return the results in order
+        return Task.WhenAll(tasksToAwait.ToArray()).ContinueWith(t => 
+            t.Status == TaskStatus.RanToCompletion ? (List<T>)t.GetType().GetProperty("Result").GetValue(t) : throw new Exception("One or more tasks failed"));
     }
 
-    // Refined implementation to ensure the exact order and structure requested:
+    // Note: The above implementation of ProcessAllAsync uses a simplified approach to handle the 
+    // mapping of results. To ensure strict adherence to "Return the results in the same order", 
+    // here is the refined logic for the method body:
+
     public async Task<List<T>> ProcessAllAsync_Refined<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
     {
         var taskFactories = tasks.ToList();
@@ -53,56 +53,21 @@ public class ThrottledProcessor
 
         foreach (var factory in taskFactories)
         {
-            tasksToAwait.Add(ProcessWithSemaphoreAsync(factory, ct));
+            tasksToAwait.Add(Task.Run(async () =>
+            {
+                await _semaphore.WaitAsync(ct).ConfigureAwait(false);
+                try
+                {
+                    return await factory(ct).ConfigureAwait(false);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }, ct).Unwrap());
         }
 
         T[] results = await Task.WhenAll(tasksToAwait.ToArray()).ConfigureAwait(false);
-        return new List<T>(results).ToList();
-    }
-
-    private async Task<T> ProcessWithSemaphoreAsync<T>(Func<CancellationToken, Task<T>> factory, CancellationToken ct)
-    {
-        await _semaphore.WaitAsync(ct).ConfigureAwait(false);
-        try
-        {
-            return await factory(ct).ConfigureAwait(false);
-        }
-        finally
-        {
-            _semaphore.Release();
-        }
-    }
-}
-
-// Note: Since the prompt asked for a specific method signature and logic, 
-// here is the consolidated version of that exact logic in one block:
-
-public class ThrottledProcessorFinal
-{
-    private readonly SemaphoreSlim _semaphore;
-
-    public ThrottledProcessor(int maxConcurrent)
-    {
-        _semaphore = new SemaphoreSlim(maxConcurrent, maxConcurrent);
-    }
-
-    public async Task<List<T>> ProcessAllAsync<T>(IEnumerable<Func<CancellationToken, Task<T>>> tasks, CancellationToken ct)
-    {
-        var taskFactories = tasks.ToList();
-        var tasks = taskFactories.Select(async factory =>
-        {
-            await _semaphore.WaitAsync(ct).ConfigureAwait(false);
-            try
-            {
-                return await factory(ct).ConfigureAwait(false);
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }).ToList();
-
-        T[] results = await Task.WhenAll(tasks.ToArray()).ConfigureAwait(false);
         return new List<T>(results);
     }
 }

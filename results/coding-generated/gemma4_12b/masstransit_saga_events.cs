@@ -1,6 +1,5 @@
 global using Contracts;
 using MassTransit;
-
 namespace Contracts;
 
 public record InvoiceCreated(Guid InvoiceId, decimal Amount);

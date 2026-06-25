@@ -1,24 +1,27 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-public enum Status
+public enum Status 
 {
     Active,
-    Inactive,
+    Inactive, 
     Pending
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum Status { Active, Inactive, Pending }
 
 public class PersonDto
 {
     [JsonPropertyName("full_name")]
     public string FullName { get; set; }
 
-    [JsonPropertyName("age")]
+    [JsonPropertyName("age")]       
     public int Age { get; set; }
 
-    [JsonIgnore]
+    [JsonIgnore]                   
     public string InternalId { get; set; }
 
-    [JsonPropertyName("status")]
+    [JsonPropertyName("status")]   
     public Status Status { get; set; }
 }

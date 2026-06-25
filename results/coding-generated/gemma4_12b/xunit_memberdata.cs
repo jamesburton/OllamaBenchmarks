@@ -22,7 +22,7 @@ public static class MathValidator
 
 public class MathValidatorTests
 {
-    public static IEnumerable<object[]> EvenTestData => new[]
+    public static IEnumerable<object[]> EvenTestData => new List<object[]>
     {
         new object[] { 2, true },
         new object[] { 3, false },

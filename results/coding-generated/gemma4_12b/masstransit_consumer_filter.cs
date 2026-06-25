@@ -11,12 +11,10 @@ public class ProcessPaymentConsumer : IConsumer<ProcessPayment>
 {
     public async Task Consume(ConsumeContext<ProcessPayment> context)
     {
-        if (context.Message.Amount <= 0)
+        if (context.Message.Amount > 0)
         {
-            return;
+            await context.Publish(new PaymentProcessed(context.Message.OrderId, DateTime.UtcNow));
         }
-
-        await context.Publish(new PaymentProcessed(context.Message.OrderId, DateTime.UtcNow));
     }
 }
 

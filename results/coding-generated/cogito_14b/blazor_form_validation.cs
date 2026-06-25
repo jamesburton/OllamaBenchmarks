@@ -3,28 +3,23 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.ComponentModel.DataAnnotations;
 
 [Required]
-public class ContactModel
-{
+public class ContactModel {
     public string Name { get; set; } = "";
-    [EmailAddress]
+    [EmailAddress] 
     public string Email { get; set; } = "";
     [Range(1, 120)]
     public int Age { get; set; }
 }
 
-public class ContactFormBase : ComponentBase
-{
+public class ContactFormBase : ComponentBase {
     public ContactModel Model { get; set; } = new();
     public EditContext EditCtx { get; set; } = null!;
-    public bool IsSubmitted { get; set; }
+    public bool IsSubmitted { get; private set; }
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() => 
         EditCtx = new EditContext(Model);
-    }
 
-    public void HandleValidSubmit()
-    {
+    public void HandleValidSubmit() {
         IsSubmitted = true;
     }
 }

@@ -1,3 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
+using AwesomeAssertions;
+
 public class InMemoryStore : IAsyncLifetime
 {
     public Dictionary<string, string> Data { get; private set; } = new();
@@ -25,16 +31,22 @@ public class StoreService
         _store = store;
     }
 
-    public string? Get(string key) => _store.Data.TryGetValue(key, out var v) ? v : null;
+    public string? Get(string key)
+    {
+        return _store.Data.TryGetValue(key, out var v) ? v : null;
+    }
 
-    public void Set(string key, string value) => _store.Data[key] = value;
+    public void Set(string key, string value)
+    {
+        _store.Data[key] = value;
+    }
 }
 
-public class StoreServiceTests : IClassFixture<InMemoryStore>
+public class StoreServiceTests(InMemoryStore store) : IClassFixture<InMemoryStore>
 {
     private readonly StoreService _service;
 
-    public StoreServiceTests(InMemoryStore store)
+    public StoreServiceTests()
     {
         _service = new StoreService(store);
     }
