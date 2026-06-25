@@ -1,7 +1,7 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-06-23T00:03:57.874054+00:00",
-  "run_finished_at": "2026-06-23T00:12:11.464584+00:00",
+  "run_started_at": "2026-06-24T19:13:20.477002+00:00",
+  "run_finished_at": "2026-06-24T19:52:00.433019+00:00",
   "models": [
     "vibethinker-3b-cs:50k-q4"
   ],
@@ -9,8 +9,8 @@
     {
       "model": "vibethinker-3b-cs:50k-q4",
       "benchmark": "coding",
-      "run_started_at": "2026-06-23T00:03:57.875063+00:00",
-      "run_finished_at": "2026-06-23T00:12:11.429148+00:00",
+      "run_started_at": "2026-06-24T19:13:20.484105+00:00",
+      "run_finished_at": "2026-06-24T19:51:59.835431+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
@@ -21,7 +21,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 11.66,
+          "generation_time_s": 25.03,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\aspnet_oneof_controller.cs"
         },
         {
@@ -33,7 +33,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.73,
+          "generation_time_s": 3.66,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\aspnet_validation_endpoint.cs"
         },
         {
@@ -45,7 +45,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.28,
+          "generation_time_s": 2.22,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\aspnet_service_di.cs"
         },
         {
@@ -57,7 +57,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.53,
+          "generation_time_s": 2.11,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\efcore_leftjoin.cs"
         },
         {
@@ -69,7 +69,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.45,
+          "generation_time_s": 2.27,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\efcore_json_columns.cs"
         },
         {
@@ -81,7 +81,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.39,
+          "generation_time_s": 2.0,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\efcore_executeupdate.cs"
         },
         {
@@ -93,7 +93,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.55,
+          "generation_time_s": 1.97,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\masstransit_consumer.cs"
         },
         {
@@ -105,7 +105,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.44,
+          "generation_time_s": 2.27,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\masstransit_statemachine.cs"
         },
         {
@@ -117,7 +117,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.91,
+          "generation_time_s": 2.23,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\masstransit_test_harness.cs"
         },
         {
@@ -129,7 +129,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.72,
+          "generation_time_s": 3.88,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\blazor_interactive_component.cs"
         },
         {
@@ -141,7 +141,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.48,
+          "generation_time_s": 2.67,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\blazor_streaming_render.cs"
         },
         {
@@ -153,19 +153,19 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.66,
+          "generation_time_s": 3.17,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\blazor_cascading_auth.cs"
         },
         {
           "task": "xunit_v3_theory_tests",
           "category": "xunit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 2.56,
+          "build_success": true,
+          "tests_passed": 8,
+          "tests_total": 8,
+          "generation_time_s": 2.81,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\xunit_v3_theory_tests.cs"
         },
         {
@@ -177,7 +177,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.39,
+          "generation_time_s": 2.61,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\xunit_awesome_nsubstitute.cs"
         },
         {
@@ -189,7 +189,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 47.38,
+          "generation_time_s": 47.44,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\xunit_assembly_fixture.cs"
         },
         {
@@ -201,7 +201,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.38,
+          "generation_time_s": 2.0,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\linq_complex_query.cs"
         },
         {
@@ -213,7 +213,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.42,
+          "generation_time_s": 1.53,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\async_cancellation.cs"
         },
         {
@@ -225,7 +225,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.12,
+          "generation_time_s": 2.42,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\vertical_order_service.cs"
         },
         {
@@ -237,7 +237,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 3.25,
+          "generation_time_s": 3.45,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\vertical_consumer_pipeline.cs"
         },
         {
@@ -249,7 +249,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.28,
+          "generation_time_s": 1.7,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\vertical_blazor_crud.cs"
         },
         {
@@ -261,7 +261,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.8,
+          "generation_time_s": 1.88,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\linq_selectmany_flatten.cs"
         },
         {
@@ -273,7 +273,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.39,
+          "generation_time_s": 1.78,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\linq_set_operations.cs"
         },
         {
@@ -285,7 +285,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 3.12,
+          "generation_time_s": 3.64,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\linq_aggregate_stats.cs"
         },
         {
@@ -297,7 +297,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.28,
+          "generation_time_s": 1.58,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\linq_todictionary_tolookup.cs"
         },
         {
@@ -309,7 +309,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.39,
+          "generation_time_s": 1.67,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\async_whenall_parallel.cs"
         },
         {
@@ -321,7 +321,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.39,
+          "generation_time_s": 1.88,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\async_semaphore_throttle.cs"
         },
         {
@@ -333,7 +333,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 47.16,
+          "generation_time_s": 47.06,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\async_channel_pipeline.cs"
         },
         {
@@ -345,7 +345,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.39,
+          "generation_time_s": 1.47,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\async_valuetask_cache.cs"
         },
         {
@@ -357,7 +357,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 3.5,
+          "generation_time_s": 3.8,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\aspnet_minimal_api_endpoint.cs"
         },
         {
@@ -369,7 +369,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.25,
+          "generation_time_s": 2.53,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\aspnet_typed_httpclient.cs"
         },
         {
@@ -381,7 +381,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.64,
+          "generation_time_s": 1.89,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\aspnet_ioptions_config.cs"
         },
         {
@@ -393,7 +393,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.42,
+          "generation_time_s": 2.45,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\aspnet_problemdetails_handler.cs"
         },
         {
@@ -405,7 +405,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 5.69,
+          "generation_time_s": 5.66,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\efcore_include_navigation.cs"
         },
         {
@@ -417,7 +417,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.17,
+          "generation_time_s": 1.44,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\efcore_softdelete_filter.cs"
         },
         {
@@ -429,7 +429,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 4.38,
+          "generation_time_s": 4.95,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\efcore_owned_entity.cs"
         },
         {
@@ -441,7 +441,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.59,
+          "generation_time_s": 1.89,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\efcore_value_conversion.cs"
         },
         {
@@ -453,7 +453,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 3.08,
+          "generation_time_s": 3.22,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\masstransit_request_response.cs"
         },
         {
@@ -465,7 +465,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.73,
+          "generation_time_s": 1.78,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\masstransit_saga_events.cs"
         },
         {
@@ -477,7 +477,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.89,
+          "generation_time_s": 1.83,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\masstransit_consumer_filter.cs"
         },
         {
@@ -489,7 +489,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.81,
+          "generation_time_s": 2.06,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\xunit_memberdata.cs"
         },
         {
@@ -501,7 +501,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.76,
+          "generation_time_s": 2.5,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\xunit_class_fixture.cs"
         },
         {
@@ -513,7 +513,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.53,
+          "generation_time_s": 1.92,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\xunit_async_collection.cs"
         },
         {
@@ -525,7 +525,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.72,
+          "generation_time_s": 3.39,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\blazor_form_validation.cs"
         },
         {
@@ -537,7 +537,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.69,
+          "generation_time_s": 3.14,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\blazor_navigation_redirect.cs"
         },
         {
@@ -549,7 +549,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.5,
+          "generation_time_s": 3.47,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\blazor_parameter_lifecycle.cs"
         },
         {
@@ -561,7 +561,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.7,
+          "generation_time_s": 1.91,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\vertical_cqrs_handler.cs"
         },
         {
@@ -573,7 +573,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.8,
+          "generation_time_s": 2.75,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\vertical_efcore_service.cs"
         },
         {
@@ -585,7 +585,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.76,
+          "generation_time_s": 1.58,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\patterns_record_with.cs"
         },
         {
@@ -597,7 +597,7 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 2.47,
+          "generation_time_s": 2.81,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\patterns_json_serialization.cs"
         },
         {
@@ -609,11 +609,11 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 1.19,
+          "generation_time_s": 2.05,
           "generated_code_path": "results\\coding-generated\\vibethinker-3b-cs_50k-q4\\patterns_timeprovider.cs"
         }
       ],
-      "layer3_weighted_score": 0.0,
+      "layer3_weighted_score": 0.01818181818181818,
       "think_setting": "false"
     }
   ]
