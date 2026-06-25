@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-public record NotFound;
-public record ValidationError(string Message);
-
+// User class with public properties for object initializer syntax
 public class User
 {
     public int Id { get; set; }
@@ -11,11 +9,19 @@ public class User
     public string Email { get; set; }
 }
 
+// NotFound record with parameterless constructor
+public record NotFound;
+
+// ValidationError record with Message parameter
+public record ValidationError(string Message);
+
+// IUserService interface
 public interface IUserService
 {
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
+// UsersController
 [ApiController]
 [Route("api/users")]
 public class UsersController : ControllerBase
@@ -27,10 +33,11 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
-    [HttpGet("{id}")]
+    // Controller action named Get
     public async Task<IActionResult> Get(int id)
     {
         var result = await _userService.GetByIdAsync(id);
+
         return result.Match<IActionResult>(
             user => Ok(user),
             _ => NotFound(),

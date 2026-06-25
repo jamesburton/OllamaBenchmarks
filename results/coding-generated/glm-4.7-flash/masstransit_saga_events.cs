@@ -1,5 +1,6 @@
 global using Contracts;
 using MassTransit;
+
 namespace Contracts;
 
 public record InvoiceCreated(Guid InvoiceId, decimal Amount);
@@ -34,19 +35,16 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
         Initially(
             When(InvoiceCreated)
                 .Then(ctx => ctx.Saga.Amount = ctx.Message.Amount)
-                .TransitionTo(Pending)
-        );
+                .TransitionTo(Pending));
 
         During(Pending,
             When(InvoiceApproved)
-                .TransitionTo(Approved)
-        );
+                .TransitionTo(Approved));
 
         During(Approved,
             When(InvoicePaid)
                 .TransitionTo(Paid)
-                .Finalize()
-        );
+                .Finalize());
 
         SetCompletedWhenFinalized();
     }

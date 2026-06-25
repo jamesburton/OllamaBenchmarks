@@ -1,60 +1,55 @@
-using System;
-using System.Threading.Tasks;
-using FluentAssertions;
-using NSubstitute;
-using NUnit.Framework;
 using AwesomeAssertions;
+using NSubstitute;
+using Xunit;
 
 namespace NotificationServiceTests
 {
-    [TestFixture]
     public class NotificationServiceTests
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IEmailService _emailService;
-        private readonly NotificationService _notificationService;
-
-        [SetUp]
-        public void Setup()
-        {
-            var userRepository = Substitute.For<IUserRepository>();
-            var emailService = Substitute.For<IEmailService>();
-
-            _userRepository.GetByIdAsync(Arg.Any<int>()).Returns(Task.Run(async (id) =>
-            {
-                if (id == 1)
-                    return new User { Id = id, Name = "John Doe", Email = "john.doe@example.com" };
-                else
-                    throw new InvalidOperationException("User not found");
-            }));
-
-            _emailService.SendWelcomeAsync(Arg.Any<string>()).Returns(Task.Run(async email =>
-            {
-                if (email == "john.doe@example.com")
-                    return true;
-                else
-                    throw new ArgumentException("Invalid email address");
-            }));
-
-            _notificationService = new NotificationService(userRepository, emailService);
-        }
-
-        [Test]
+        [Fact]
         public async Task NotifyUserAsync_HappyPath()
         {
-            await _notificationService.NotifyUserAsync(1);
+            // Arrange
+            var emailService = Substitute.For<IEmailService>();
+            var userRepository = Substitute.For<IUserRepository>();
 
-            Assert.That(_userRepository.Received(). GetByIdAsync(1), Times.Once);
-            Assert.That(_emailService.Received(). SendWelcomeAsync("john.doe@example.com"), Times.Once);
+            var notificationService = new NotificationService(userRepository, emailService);
+
+            var user = new User { Id = 1, Name = "John Doe", Email = "john.doe@example.com" };
+
+            // Act
+            await notificationService.NotifyUserAsync(1);
+
+            // Assert
+            emailService.SendWelcomeAsync.ConvertedTo(x => x.To).Should().Be("john.doe@example.com");
         }
 
-        [Test]
-        public void NotifyUserAsync_UserNotFound_Throws()
+        [Fact]
+        public async Task NotifyUserAsync_UserNotFound()
         {
-            Action action = () => _notificationService.NotifyUserAsync(2);
+            // Arrange
+            var emailService = Substitute.For<IEmailService>();
+            var userRepository = Substitute.For<IUserRepository>();
 
-            action.Should().Throw<InvalidOperationException>()
-                .WithMessage("User not found");
+            var notificationService = new NotificationService(userRepository, emailService);
+
+            var user = null;
+
+            // Act & Assert (using AwesomeAssertions)
+            await Assert.ThrowsAsync<InvalidOperationException>(() => notificationService.NotifyUserAsync(1));
+        }
+
+        [Fact]
+        public void NotifyUserAsync_ReceivedCalls()
+        {
+            // Arrange
+            var emailService = Substitute.For<IEmailService>();
+            var userRepository = Substitute.For<IUserRepository>();
+
+            var notificationService = new NotificationService(userRepository, emailService);
+
+            // Act & Assert (using AwesomeAssertions)
+            notificationService.Received().NotifyUserAsync(1);
         }
     }
 }

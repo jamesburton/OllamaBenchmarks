@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 public class SmtpOptions
 {
-    public string Host { get; set; }
+    public string Host { get; set; } = string.Empty;
     public int Port { get; set; }
     public string? Username { get; set; }
 }
@@ -15,13 +15,12 @@ public interface IEmailSender
 
 public class SmtpEmailSender : IEmailSender
 {
-    private readonly IOptions<SmtpOptions> _options;
     public string? LastSentTo { get; set; }
-    public SmtpOptions Options => _options.Value;
+    public SmtpOptions Options { get; }
 
     public SmtpEmailSender(IOptions<SmtpOptions> options)
     {
-        _options = options;
+        Options = options.Value;
     }
 
     public Task SendAsync(string to, string subject, string body)

@@ -22,47 +22,43 @@ public class StringProcessor
 
 public class StringProcessorTests
 {
-    private readonly StringProcessor _sut;
-
-    public StringProcessorTests(StringProcessor sut)
+    [Theory]
+    [InlineData(null, 5)]
+    [InlineData("", 5)]
+    [InlineData("hello", 5)]
+    [InlineData("hello", 5)]
+    [InlineData("hello world", 5)]
+    public void Truncate(string input, int maxLength)
     {
-        _sut = sut;
+        var sut = new StringProcessor();
+        var result = sut.Truncate(input, maxLength);
+        result.Should().Be(input.Length <= maxLength ? input : input[..maxLength] + "...");
     }
 
     [Theory]
-    [InlineData(null, 5, "")]
-    [InlineData("", 5, "")]
-    [InlineData("hello", 5, "hello")]
-    [InlineData("hello", 0, "...")]
-    [InlineData("hello world", 5, "hello...")]
-    public void Truncate(string input, int maxLength, string expected)
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("hello")]
+    [InlineData("hello world")]
+    [InlineData("hello   world")]
+    public void CountWords(string input)
     {
-        var result = _sut.Truncate(input, maxLength);
-        result.Should().Be(expected);
+        var sut = new StringProcessor();
+        var result = sut.CountWords(input);
+        result.Should().Be(input.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length);
     }
 
     [Theory]
-    [InlineData(null, 0)]
-    [InlineData("", 0)]
-    [InlineData("hello", 1)]
-    [InlineData("hello world", 2)]
-    [InlineData("hello  world", 2)]
-    public void CountWords(string input, int expected)
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("a")]
+    [InlineData("racecar")]
+    [InlineData("hello")]
+    [InlineData("RaceCar")]
+    public void IsPalindrome(string input)
     {
-        var result = _sut.CountWords(input);
-        result.Should().Be(expected);
-    }
-
-    [Theory]
-    [InlineData(null, false)]
-    [InlineData("", false)]
-    [InlineData("a", true)]
-    [InlineData("racecar", true)]
-    [InlineData("hello", false)]
-    [InlineData("RaceCar", true)]
-    public void IsPalindrome(string input, bool expected)
-    {
-        var result = _sut.IsPalindrome(input);
-        result.Should().Be(expected);
+        var sut = new StringProcessor();
+        var result = sut.IsPalindrome(input);
+        result.Should().Be(input.Length <= 1 || input.ToLowerInvariant().Replace(" ", "").SequenceEqual(input.ToLowerInvariant().Replace(" ", "").Reverse()));
     }
 }

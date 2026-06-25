@@ -1,30 +1,59 @@
 using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 
-public class WeatherForecast {
-    public DateTime Date { get; set; }
-    public int TemperatureC { get; set; }
-    public string Summary { get; set; }
-}
+public record WeatherForecast(DateTime Date, int TemperatureC, string Summary);
 
-public interface IWeatherService {
+public interface IWeatherService
+{
     Task<WeatherForecast[]> GetForecastsAsync();
 }
 
-public abstract class WeatherPageBase : ComponentBase, IDisposable
+public class WeatherPageBase : ComponentBase, IDisposable
 {
-    [Parameter] private string _city;
-    [Inject] private readonly IWeatherService _weatherService;
+    [Parameter]
+    public DateTime? InitialDate { get; set; }
 
-    protected List<WeatherForecast> Forecasts { get; set; } = new List<WeatherForecast>();
+    [Inject]
+    private IWeatherService _weatherService { get; set; } = default;
 
-    public async Task OnInitializedAsync()
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> OnChange { get; set; }
+
+    [CascadingParameter]
+    public ThemeState Theme { get; set; }
+
+    private WeatherForecast[]? _forecasts;
+    public WeatherForecast[] Forecasts
     {
-        Forecasts = await _weatherService.GetForecastsAsync();
+        get => _forecasts ??= new WeatherForecast[0];
+        set => Set(ref _forecasts, value);
     }
 
-    public void Dispose()
+    protected override async Task OnInitializedAsync()
     {
-        // Implement IDisposable pattern
+        if (InitialDate != null)
+        {
+            var dateOnly = InitialDate.Value;
+            await RefreshForecastsAsync(dateOnly);
+        }
+    }
+
+    private async Task RefreshForecastsAsync(DateTime dateOnly)
+    {
+        _forecasts = await _weatherService.GetForecastsAsync();
+        StateHasChanged();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && _weatherService != null)
+        {
+            _weatherService.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }

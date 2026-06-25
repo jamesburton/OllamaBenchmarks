@@ -15,7 +15,7 @@ public class DataProcessor
 
         while (true)
         {
-            // 1. Check cancellation
+            // 1. Check cancellation → yield break if cancelled (do NOT throw OperationCanceledException)
             if (ct.IsCancellationRequested)
             {
                 yield break;
@@ -33,6 +33,11 @@ public class DataProcessor
             // 4. Yield items
             foreach (var item in batch)
             {
+                if (ct.IsCancellationRequested)
+                {
+                    yield break;
+                }
+
                 yield return item;
             }
 

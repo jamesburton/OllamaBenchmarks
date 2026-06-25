@@ -41,7 +41,7 @@ gemma3 by contrast has a real TEMPLATE block (`<start_of_turn>user…<end_of_tur
 
 ## glm-4.7-flash and glm-4.7-flash-reap-toolfix
 
-- `glm-4.7-flash` (base): honors `think:false` per the probe, but on long coding prompts still produces reasoning-style content that the extractor strips to empty. L3 with `think:false` was 0/50; `think:true` was 34/50 (0.673). Force `CODING_BENCH_THINK=true` for any meaningful coding score.
+- `glm-4.7-flash` (base): honors `think:false` cleanly. L3 corrected (2026-06-25): **35/50 (0.691) nothink** vs 34/50 (0.673) think — nothink marginally edges think. Prior 0/50 nothink was NuGet-restore contamination, not reasoning-content leakage. Both modes usable; nothink is the recommended baseline.
 - `glm-4.7-flash-reap-toolfix` (Cerebras REAP-pruned + tool-template fix): also ignores `think:false`. L2 raw 2/158 is an artifact — extraction fails because reasoning is mixed into `content`. Chat-mode L2 re-run is the only meaningful score.
 
 ## Carnice-V2 27b and GLM-4.5-Air-REAP

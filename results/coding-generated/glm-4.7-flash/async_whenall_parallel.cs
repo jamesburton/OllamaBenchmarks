@@ -5,25 +5,25 @@ public interface IDataLoader
 
 public class ParallelDataService
 {
-    private readonly IDataLoader loaderA;
-    private readonly IDataLoader loaderB;
-    private readonly IDataLoader loaderC;
+    private readonly IDataLoader _loaderA;
+    private readonly IDataLoader _loaderB;
+    private readonly IDataLoader _loaderC;
 
     public ParallelDataService(IDataLoader loaderA, IDataLoader loaderB, IDataLoader loaderC)
     {
-        this.loaderA = loaderA;
-        this.loaderB = loaderB;
-        this.loaderC = loaderC;
+        _loaderA = loaderA;
+        _loaderB = loaderB;
+        _loaderC = loaderC;
     }
 
     public async Task<List<string>> LoadAllAsync(CancellationToken ct)
     {
-        var taskA = loaderA.LoadAsync("sourceA", ct);
-        var taskB = loaderB.LoadAsync("sourceB", ct);
-        var taskC = loaderC.LoadAsync("sourceC", ct);
+        var taskA = _loaderA.LoadAsync("sourceA", ct);
+        var taskB = _loaderB.LoadAsync("sourceB", ct);
+        var taskC = _loaderC.LoadAsync("sourceC", ct);
 
         await Task.WhenAll(taskA, taskB, taskC);
 
-        return new List<string> { await taskA, await taskB, await taskC };
+        return new List<string> { taskA.Result, taskB.Result, taskC.Result };
     }
 }

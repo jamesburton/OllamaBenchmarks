@@ -1,126 +1,24 @@
+using System.Threading.Channels;
+
 public class DataPipeline
-        {
-            // Fields needed to store the channel and writer
-            private readonly Channel<string> _channel;
-            public ChannelWriter<string> Writer { get; }
+{
+    private readonly Channel<string> _channel;
 
-            // Constructor
-            public DataPipeline(int capacity)
-            {
-                _channel = Channel.CreateBounded<string>(capacity);
-                Writer = _channel.Writer;
-            }
-
-            // ReadAllAsync method
-            public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
-            {
-                return _channel.Reader.ReadAllAsync(ct);
-            }
-
-            // CompleteAsync method
-            public Task CompleteAsync()
-            {
-                Writer.Complete();
-                return Task.CompletedTask;
-            }
-        }
-
-using System.Threading.Channels;
-
-    public class DataPipeline
+    public DataPipeline(int capacity)
     {
-        private readonly Channel<string> _channel;
-        public ChannelWriter<string> Writer { get; }
-
-        public DataPipeline(int capacity)
-        {
-            _channel = Channel.CreateBounded<string>(capacity);
-            Writer = _channel.Writer;
-        }
-
-        public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
-        {
-            return _channel.Reader.ReadAllAsync(ct);
-        }
-
-        public Task CompleteAsync()
-        {
-            Writer.Complete();
-            return Task.CompletedTask;
-        }
+        _channel = Channel.CreateBounded<string>(capacity);
     }
 
-using System.Threading.Channels;
+    public ChannelWriter<string> Writer => _channel.Writer;
 
-    public class DataPipeline
+    public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
     {
-        private readonly Channel<string> _channel;
-        public ChannelWriter<string> Writer { get; }
-
-        public DataPipeline(int capacity)
-        {
-            _channel = Channel.CreateBounded<string>(capacity);
-            Writer = _channel.Writer;
-        }
-
-        public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
-        {
-            return _channel.Reader.ReadAllAsync(ct);
-        }
-
-        public Task CompleteAsync()
-        {
-            Writer.Complete();
-            return Task.CompletedTask;
-        }
+        return _channel.Reader.ReadAllAsync(ct);
     }
 
-using System.Threading.Channels;
-
-    public class DataPipeline
+    public Task CompleteAsync()
     {
-        private readonly Channel<string> _channel;
-        public ChannelWriter<string> Writer { get; }
-
-        public DataPipeline(int capacity)
-        {
-            _channel = Channel.CreateBounded<string>(capacity);
-            Writer = _channel.Writer;
-        }
-
-        public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
-        {
-            return _channel.Reader.ReadAllAsync(ct);
-        }
-
-        public Task CompleteAsync()
-        {
-            Writer.Complete();
-            return Task.CompletedTask;
-        }
+        Writer.Complete();
+        return Task.CompletedTask;
     }
-
-using System.Threading.Channels;
-
-    public class DataPipeline
-    {
-        private readonly Channel<string> _channel;
-        public ChannelWriter<string> Writer { get; }
-
-        public DataPipeline(int capacity)
-        {
-            _channel = Channel.CreateBounded<string>(capacity);
-            Writer = _channel.Writer;
-        }
-
-        public IAsyncEnumerable<string> ReadAllAsync(CancellationToken ct)
-        {
-            return _channel.Reader.ReadAllAsync(ct);
-        }
-
-        public Task CompleteAsync()
-        {
-            Writer.Complete();
-            return Task.CompletedTask;
-        }
-    }
+}

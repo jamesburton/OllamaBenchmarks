@@ -1,53 +1,44 @@
-using System;
-using System.Threading.Tasks;
+using System.Threading;
 
-namespace SharedCounter
+public class SharedCounter : IAsyncLifetime
 {
-    public class SharedCounter : IAsyncLifetime
+    private int counter = 0;
+
+    public ValueTask InitializeAsync()
     {
-        private int _counter = 0;
+        Interlocked.Increment(ref counter);
+        return default;
+    }
 
-        public ValueTask InitializeAsync()
-        {
-            Interlocked.Increment(ref _counter);
-            return default;
-        }
+    public ValueTask DisposeAsync()
+    {
+        return default;
+    }
 
-        public ValueTask DisposeAsync()
-        {
-            return default;
-        }
-
-        public int IncrementAndGet()
-        {
-            var result = Interlocked.Increment(ref _counter);
-            if (result == 0)
-                throw new InvalidOperationException("Counter is zero");
-            return result;
-        }
+    public int IncrementAndGet()
+    {
+        return Interlocked.Add(ref counter, 1);
     }
 }
 
-namespace FirstCounterTests
+public class FirstCounterTests
 {
-    using System.Threading.Tasks;
-
     [Fact]
-    public async Task Test1()
+    public void Test()
     {
-        // Inject SharedCounter via constructor or use Fixture
-        var counter = await TestContext.Current.GetFixture<SharedCounter>().IncrementAndGet();
-        Assert.True(counter > 0);
+        var sharedCounter = new SharedCounter();
+        Assert.Greater(sharedCounter.IncrementAndGet(), 0);
     }
 }
 
-namespace SecondCounterTests
+public class SecondCounterTests
 {
     [Fact]
-    public void Test2()
+    public void Test()
     {
-        // Use TestContext to get the fixture instead of constructor injection
-        var counter = TestContext.Current.GetFixture<SharedCounter>().IncrementAndGet();
-        Assert.True(counter > 0);
+        using (var fixture = TestContext.Current.GetFixture<SharedCounter>())
+        {
+            Assert.Greater(fixture.IncrementAndGet(), 0);
+        }
     }
 }

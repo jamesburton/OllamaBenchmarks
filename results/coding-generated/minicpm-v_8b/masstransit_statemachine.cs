@@ -1,86 +1,763 @@
-using System;
-using System.Threading.Tasks;
+using Contracts;
 using MassTransit;
-using MassTransit.Saga;
+using System;
 
-public class OrderState : SagaStateMachineInstance<OrderState>
+namespace OrderStateMachine
 {
-    public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; }
-
-    protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine)
+    public class OrderState : SagaStateMachineInstance<OrderState>
     {
-        stateMachine
-            .When(x => x.OrderSubmitted)
-                .SetProperty("OrderDate", DateTime.UtcNow);
-            .When(x => x.OrderAccepted)
-                .SetProperty("AcceptedAt", DateTime.UtcNow);
+        public Guid CorrelationId { get; set; }
+        public string CurrentState { get; set; }
 
-        stateMachine
-            .During("Submitted")
-                .When(x => x.OrderAccepted)
-                    .SetState("Accepted");
-            .When(x => x.OrderCompleted)
-                .Finalize();
-    }
-}
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine)
+        {
+            stateMachine.SetCompletedWhenFinalized();
+        }
 
-public class OrderStateMachine : MassTransitStateMachine<OrderState>
-{
-    public State Submitted { get; private set; }
-    public Event<OrderSubmitted> OrderSubmitted { get; private set; }
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            if (state.OrderDate == null)
+                throw new Exception("OrderDate is not set");
 
-    protected override void ConfigureSaga(OrderStateMachine stateMachine)
-    {
-        stateMachine
-            .When(x => x.OrderSubmitted)
-                .SetProperty("OrderDate", DateTime.UtcNow);
-            .When(x => x.OrderAccepted)
-                .SetState("Accepted");
-            .When(x => x.OrderCompleted)
-                .Finalize();
-    }
+            if (!string.IsNullOrEmpty(state.CurrentState))
+                return;
 
-    protected override void ConfigureSagaStates(OrderStateMachine stateMachine)
-    {
-        stateMachine
-            .During("Submitted")
-                .When(x => x.OrderAccepted)
-                    .SetState("Accepted");
-            .When(x => x.OrderCompleted)
-                .Finalize();
-    }
-}
+            if (state.OrderDate != null && !state.OrderDate.Equals(DateTime.MinValue))
+                state.CurrentState = "Submitted";
+        }
 
-public class OrderSubmitted : Event<OrderState>
-{
-    public Guid OrderId { get; set; }
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
 
-    protected override void ConfigureSaga(OrderSubmitted eventRecord, OrderState state)
-    {
-        if (state.OrderDate == null) throw new InvalidOperationException("Order submitted without date");
-        eventRecord.OrderId = state.OrderDate;
-    }
-}
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
 
-public class OrderAccepted : Event<OrderState>
-{
-    public Guid OrderId { get; set; }
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
 
-    protected override void ConfigureSaga(OrderAccepted eventRecord, OrderState state)
-    {
-        if (state.AcceptedAt == null) throw new InvalidOperationException("Order accepted without date");
-        eventRecord.OrderId = state.AcceptedAt;
-    }
-}
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
 
-public class OrderCompleted : Event<OrderState>
-{
-    public Guid OrderId { get; set; }
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
 
-    protected override void ConfigureSaga(OrderCompleted eventRecord, OrderState state)
-    {
-        if (state.AcceptedAt == null) throw new InvalidOperationException("Order completed without date");
-        eventRecord.OrderId = state.AcceptedAt;
-    }
-}
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState");
+            }
+        }
+
+        protected override void ConfigureSaga(SagaStateMachine<OrderState> stateMachine, OrderState state)
+        {
+            switch (state.CurrentState)
+            {
+                case "Submitted":
+                    if (state.AcceptedAt == null)
+                        throw new Exception("AcceptedAt is not set");
+
+                    state.CurrentState = "Accepted";
+                    break;
+                case "Accepted":
+                    // Do nothing
+                    break;
+                default:
+                    throw new Exception("Invalid CurrentState

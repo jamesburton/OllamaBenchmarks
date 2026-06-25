@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 
 public enum Status
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     Active,
     Inactive,
     Pending

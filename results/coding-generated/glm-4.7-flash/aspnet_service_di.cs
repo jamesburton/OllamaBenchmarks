@@ -3,28 +3,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 public interface IOrderRepository { }
 
-public class OrderRepository : IOrderRepository
-{
-    public OrderRepository() { }
-}
+public class OrderRepository : IOrderRepository { }
 
 public interface IOrderService { }
 
-public class OrderService : IOrderService
-{
-    public OrderService() { }
-}
+public class OrderService : IOrderService { }
 
 public interface IEmailNotifier { }
 
-public class EmailNotifier : IEmailNotifier
-{
-    public EmailNotifier() { }
-}
+public class EmailNotifier : IEmailNotifier { }
 
 public class OrderSettings
 {
-    public string WarehouseCode { get; set; }
+    public string WarehouseCode { get; set; } = string.Empty;
     public int MaxRetries { get; set; }
 }
 

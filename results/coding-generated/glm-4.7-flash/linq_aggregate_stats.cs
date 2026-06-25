@@ -2,7 +2,7 @@ public static class SurveyAnalyzer
 {
     public static (double Mean, double Median, double Min, double Max) ComputeStats(IEnumerable<double> values)
     {
-        if (!values.Any())
+        if (values == null || !values.Any())
         {
             throw new ArgumentException("Input sequence cannot be empty.");
         }
@@ -11,8 +11,8 @@ public static class SurveyAnalyzer
         double min = values.Min();
         double max = values.Max();
 
-        var sortedValues = values.OrderBy(x => x).ToList();
-        int count = sortedValues.Count;
+        double[] sortedValues = values.OrderBy(v => v).ToArray();
+        int count = sortedValues.Length;
         double median;
 
         if (count % 2 == 1)

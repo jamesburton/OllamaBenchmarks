@@ -7,7 +7,7 @@ public interface IUserService
     Task<UserProfile?> GetProfileAsync(int userId);
 }
 
-public class UserProfileBase : ComponentBase
+public class UserProfileBase : Microsoft.AspNetCore.Components.ComponentBase
 {
     [Parameter]
     public int UserId { get; set; }

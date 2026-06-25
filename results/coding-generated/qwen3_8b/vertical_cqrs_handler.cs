@@ -1,19 +1,19 @@
 using OneOf;
 
-public record CreateProductCommand(string Name, decimal Price);
-public record Product(int Id, string Name, decimal Price);
-public record ValidationError(string Message);
-public record DuplicateError(string ExistingName);
+public record CreateProductCommand(string Name, decimal Price)
+public record Product(int Id, string Name, decimal Price)
+public record ValidationError(string Message)
+public record DuplicateError(string ExistingName)
 
 public interface IProductRepository
 {
-    Task<bool> ExistsAsync(string name);
-    Task<Product> AddAsync(Product product);
+    Task<bool> ExistsAsync(string name)
+    async Task<Product> AddAsync(Product product)
 }
 
 public interface ICommandHandler<TCommand, TResult>
 {
-    Task<TResult> HandleAsync(TCommand command);
+    Task<TResult> HandleAsync(TCommand command)
 }
 
 public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, OneOf<Product, ValidationError, DuplicateError>>

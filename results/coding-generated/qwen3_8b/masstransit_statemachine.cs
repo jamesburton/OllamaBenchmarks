@@ -28,9 +28,23 @@ namespace Contracts
         {
             InstanceState(x => x.CurrentState);
 
-            Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId));
-            Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId));
-            Event(() => OrderCompleted, x => x.CorrelateById(m => m.Message.OrderId));
+            Event(() => OrderSubmitted, x =>
+            {
+                x.CorrelateById(m => m.Message.OrderId);
+                x.UseMessageId(m => m.Message.OrderId);
+            });
+
+            Event(() => OrderAccepted, x =>
+            {
+                x.CorrelateById(m => m.Message.OrderId);
+                x.UseMessageId(m => m.Message.OrderId);
+            });
+
+            Event(() => OrderCompleted, x =>
+            {
+                x.CorrelateById(m => m.Message.OrderId);
+                x.UseMessageId(m => m.Message.OrderId);
+            });
 
             Initially(
                 When(OrderSubmitted)

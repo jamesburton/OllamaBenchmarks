@@ -1,27 +1,29 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
-public partial class CounterBase : ComponentBase
+public class CounterBase : ComponentBase
 {
-    [Parameter] public int InitialCount { get; set; }
+    [Parameter] public int InitialCount { get; set; } = 0;
     [Parameter] public EventCallback<int> OnCountChanged { get; set; }
 
-    private int _currentCount = 0;
+    private int _currentCount;
 
     protected override void OnInitialized()
     {
         _currentCount = InitialCount;
     }
 
-    public int CurrentCount
-    {
-        get => _currentCount;
-        private set => SetProperty(ref _currentCount, value);
-    }
-
     public async Task IncrementCount()
     {
         await StateHasChangedAsync();
+        _currentCount++;
         if (OnCountChanged != null)
-            OnCountChanged.InvokeAsync(CurrentCount + 1);
+            await OnCountChanged.InvokeAsync(_currentCount);
+    }
+
+    public int CurrentCount
+    {
+        get { return _currentCount; }
     }
 }

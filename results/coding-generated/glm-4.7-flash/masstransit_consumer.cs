@@ -1,7 +1,5 @@
 using MassTransit;
 
-global using Contracts;
-
 namespace Contracts;
 
 public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
@@ -24,7 +22,10 @@ public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsu
         ConcurrentMessageLimit = 4;
     }
 
-    protected override void ConfigureConsumer(IReceiveEndpointConfigurator ep, IConsumerConfigurator<SubmitOrderConsumer> consumer, IRegistrationContext ctx)
+    protected override void ConfigureConsumer(
+        IReceiveEndpointConfigurator ep,
+        IConsumerConfigurator<SubmitOrderConsumer> consumer,
+        IRegistrationContext ctx)
     {
         ep.UseMessageRetry(r => r.Interval(3, 1000));
     }

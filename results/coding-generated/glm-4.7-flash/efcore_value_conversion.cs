@@ -25,10 +25,7 @@ public class ProductDbContext : DbContext
     {
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
-            .HasConversion(
-                m => $"{m.Amount}:{m.Currency}",
-                s => ParseMoney(s)
-            );
+            .HasConversion(m => $"{m.Amount}:{m.Currency}", s => ParseMoney(s));
     }
 }
 

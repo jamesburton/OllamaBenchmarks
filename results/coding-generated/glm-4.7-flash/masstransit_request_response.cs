@@ -1,7 +1,5 @@
 using MassTransit;
 
-global using Contracts;
-
 namespace Contracts;
 
 public record GetProduct(Guid ProductId);

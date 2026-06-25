@@ -55,6 +55,8 @@ public class ArticleRepository
 
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        return await _context.Articles.IgnoreQueryFilters().ToListAsync();
+        return await _context.Articles
+            .IgnoreQueryFilters()
+            .ToListAsync();
     }
 }

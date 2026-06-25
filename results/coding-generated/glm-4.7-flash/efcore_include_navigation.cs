@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 public class Comment
 {
     public int Id { get; set; }
-    public string Text { get; set; }
+    public string Text { get; set; } = string.Empty;
     public int PostId { get; set; }
     public Post? Post { get; set; }
 }
@@ -11,7 +11,7 @@ public class Comment
 public class Post
 {
     public int Id { get; set; }
-    public string Content { get; set; }
+    public string Content { get; set; } = string.Empty;
     public int BlogId { get; set; }
     public Blog? Blog { get; set; }
     public List<Comment> Comments { get; set; } = new();
@@ -20,7 +20,7 @@ public class Post
 public class Blog
 {
     public int Id { get; set; }
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
     public List<Post> Posts { get; set; } = new();
 }
 
@@ -30,24 +30,26 @@ public class BlogDbContext : DbContext
     public DbSet<Post> Posts { get; set; }
     public DbSet<Comment> Comments { get; set; }
 
-    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
+    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Blog>(entity =>
         {
             entity.HasMany(b => b.Posts)
-                  .WithOne(p => p.Blog)
-                  .HasForeignKey(p => p.BlogId)
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithOne(p => p.Blog)
+                .HasForeignKey(p => p.BlogId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Post>(entity =>
         {
             entity.HasMany(p => p.Comments)
-                  .WithOne(c => c.Post)
-                  .HasForeignKey(c => c.PostId)
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithOne(c => c.Post)
+                .HasForeignKey(c => c.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

@@ -1,11 +1,16 @@
-public class CounterService
+[CollectionDefinition("Counter")]
+class CounterCollection : ICollectionFixture<CounterFixture>
 {
-    public int Count { get; private set; }
+}
+
+class CounterService
+{
+    public int Count { get; private set; } = 0;
     public void Increment() => Count++;
     public void Reset() => Count = 0;
 }
 
-public class CounterFixture : IAsyncLifetime
+class CounterFixture : IAsyncLifetime
 {
     public CounterService Counter { get; private set; } = null!;
     public ValueTask InitializeAsync()
@@ -13,22 +18,14 @@ public class CounterFixture : IAsyncLifetime
         Counter = new CounterService();
         return default;
     }
-    public ValueTask DisposeAsync()
-    {
-        return default;
-    }
-}
-
-[CollectionDefinition("Counter")]
-public class CounterCollection : ICollectionFixture<CounterFixture>
-{
+    public ValueTask DisposeAsync() => default;
 }
 
 [Collection("Counter")]
-public class CounterFirstTests(CounterFixture fixture)
+class CounterFirstTests(CounterFixture fixture)
 {
     [Fact]
-    public void TestIncrement()
+    void Test()
     {
         fixture.Counter.Increment();
         fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
@@ -36,10 +33,10 @@ public class CounterFirstTests(CounterFixture fixture)
 }
 
 [Collection("Counter")]
-public class CounterSecondTests(CounterFixture fixture)
+class CounterSecondTests(CounterFixture fixture)
 {
     [Fact]
-    public void TestIncrementTwice()
+    void Test()
     {
         fixture.Counter.Increment();
         fixture.Counter.Increment();

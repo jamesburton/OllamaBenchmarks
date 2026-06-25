@@ -3,24 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyNamespace
+namespace OrderService
 {
     public interface IOrderRepository
     {
-        Task<IEnumerable<Order>> GetOrders();
-    }
-
-    public class Order
-    {
-        public string WarehouseCode { get; set; }
-        public int MaxRetries { get; set; }
-    }
-
-    public interface IOrderService
-    {
-        Task<Order> CreateOrder(string name, int qty);
-        Task<Order> UpdateOrder(int orderId, string name, int qty);
-        Task DeleteOrder(int orderId);
+        Task AddOrder(string warehouseCode, int maxRetries);
     }
 
     public class OrderRepository : IOrderRepository
@@ -32,106 +19,82 @@ namespace MyNamespace
             _emailNotifier = emailNotifier;
         }
 
-        public async Task<IEnumerable<Order>> GetOrders()
+        public async Task AddOrder(string warehouseCode, int maxRetries)
         {
-            // Implement logic to retrieve orders from a database or other data source.
-            return new List<Order>();
+            // Implementation goes here...
         }
     }
 
-    public class EmailNotifier
+    public interface IOrderService
     {
-        private readonly string _warehouseCode;
-
-        public EmailNotifier(string warehouseCode)
-        {
-            _warehouseCode = warehouseCode;
-        }
-
-        public void SendNotification(string name, int qty)
-        {
-            // Implement logic to send an email notification.
-        }
-    }
-
-    public interface IEmailNotifier
-    {
-        void SendNotification(string name, int qty);
+        Task PlaceOrder();
     }
 
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly IEmailNotifier _emailNotifier;
+        private readonly OrderSettings _settings;
 
-        public OrderService(IOrderRepository orderRepository, IEmailNotifier emailNotifier)
+        public OrderService(IOrderRepository orderRepository, OrderSettings settings)
         {
             _orderRepository = orderRepository;
-            _emailNotifier = emailNotifier;
+            _settings = settings;
         }
 
-        public async Task<Order> CreateOrder(string name, int qty)
+        public async Task PlaceOrder()
         {
-            // Implement logic to create a new order.
-            return new Order { WarehouseCode = "ABC", MaxRetries = 3 };
+            // Implementation goes here...
+        }
+    }
+
+    public interface IEmailNotifier
+    {
+        void Notify(string email);
+    }
+
+    public class EmailNotifier : IEmailNotifier
+    {
+        private readonly string _email;
+
+        public EmailNotifier(string email)
+        {
+            _email = email;
         }
 
-        public async Task<Order> UpdateOrder(int orderId, string name, int qty)
+        public void Notify(string email)
         {
-            var existingOrder = await _orderRepository.GetOrders().FirstOrDefaultAsync(o => o.Id == orderId);
-            if (existingOrder == null) throw new ArgumentException("Order not found.");
-
-            // Implement logic to update the order.
-            return new Order { WarehouseCode = "ABC", MaxRetries = 3 };
-        }
-
-        public async Task DeleteOrder(int orderId)
-        {
-            var existingOrder = await _orderRepository.GetOrders().FirstOrDefaultAsync(o => o.Id == orderId);
-            if (existingOrder == null) throw new ArgumentException("Order not found.");
-
-            // Implement logic to delete the order.
+            // Implementation goes here...
         }
     }
 
     public class OrderSettings
     {
-        [Config]
-        public string WarehouseCode { get; set; } = "ABC";
-
-        [Config]
-        public int MaxRetries { get; set; } = 3;
+        public string WarehouseCode { get; set; }
+        public int MaxRetries { get; set; }
     }
 
-    public static class ServiceCollectionExtensions
+    static class ServiceCollectionExtensions
     {
-        public static void AddOrderServices(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config)
         {
-            // Register IOrderRepository → OrderRepository as scoped.
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IEmailNotifier, EmailNotifier>();
+            services.AddTransient<OrderSettings>(c => config.GetSection("Orders").Get<OrderSettings>());
+            return services;
+        }
+    }
 
-            // Register IEmailNotifier → EmailNotifier as transient.
-            services.AddTransient<IEmailNotifier, EmailNotifier>();
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddOrderServices(config =>
+                config.WarehouseCode = "ABC123", 
+                config.MaxRetries = 5);
 
-            // Bind OrderSettings from config section "Orders" using the options pattern.
-            var orderSettings = config.GetSection("Orders").Get<Dictionary<string, object>>();
-            if (orderSettings == null) throw new ArgumentException("Order settings not found in configuration.");
-
-            var warehouseCode = orderSettings["WarehouseCode"] as string;
-            var maxRetries = orderSettings["MaxRetries"] as int;
-
-            // Register IOrderService → OrderService using the scoped IOrderRepository.
-            services.AddScoped<IOrderService, (IOrderRepository orderRepository) =>
-                new OrderService(orderRepository, warehouseCode));
-
-            // Register EmailNotifier with WarehouseCode and MaxRetries from config section "Orders".
-            var emailNotifier = new EmailNotifier(warehouseCode);
-            if (maxRetries > 0)
-            {
-                emailNotifier.MaxRetries = maxRetries;
-            }
-
-            services.AddSingleton<IEmailNotifier, emailNotifier>();
+            var app = builder.Build();
+            app.Run();
         }
     }
 }

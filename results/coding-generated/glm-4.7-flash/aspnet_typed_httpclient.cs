@@ -9,18 +9,11 @@ public interface IGitHubClient
     Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default);
 }
 
-public class GitHubClient : IGitHubClient
+public class GitHubClient(HttpClient httpClient)
 {
-    private readonly HttpClient _httpClient;
-
-    public GitHubClient(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
-
     public async Task<GitHubUser?> GetUserAsync(string username, CancellationToken ct = default)
     {
-        return await _httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
+        return await httpClient.GetFromJsonAsync<GitHubUser>($"/users/{username}", ct);
     }
 }
 

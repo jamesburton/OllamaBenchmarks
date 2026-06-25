@@ -28,18 +28,12 @@ public class AppDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         // Add connection string here if needed.
-        base.OnConfiguring(options);
+        options.UseSqlServer("Data Source=(localdb)\\mssqllocaldb;Initial Catalog=TestDb");
     }
 
-    public static async Task<List<OrderDto>> GetOrdersWithCustomers(AppDbContext db)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
     {
-        var query = from o in db.Orders
-                    .LeftJoin(db.Customers, order => order.CustomerId,
-                        customer => customer.Id,
-                        (order, customer) => new { order.Id, CustomerName = customer == null ? "N/A" : customer.Name })
-                    select new OrderDto(o.Id, o.Total, o.CustomerName);
-
-        return await query.ToListAsync();
     }
 }
 
@@ -48,4 +42,27 @@ public class OrderDto
     public int OrderId { get; set; }
     public decimal Total { get; set; }
     public string CustomerName { get; set; }
+
+    public OrderDto(int orderId, decimal total, string customerName)
+    {
+        OrderId = orderId;
+        Total = total;
+        CustomerName = customerName ?? "Unknown";
+    }
+}
+
+public static class OrderQueries
+{
+    public static List<OrderDto> GetOrdersWithCustomers(AppDbContext db)
+    {
+        var query = db.Orders
+            .LeftJoin(
+                db.Customers,
+                order => order.CustomerId,
+                customer => customer.Id,
+                (order, customer) => new { order.Id, CustomerName = customer == null ? "N/A" : customer.Name }
+            );
+
+        return query.Select(o => new OrderDto(o.OrderId, o.Total, o.CustomerName)).ToList();
+    }
 }

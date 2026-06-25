@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 public class Address
 {
     public string Street { get; set; }
-    public string City { get; set; }
+    public string City { get; set)
     public string Zip { get; set; }
 }
 
@@ -11,19 +11,17 @@ public class Customer
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public Address HomeAddress { get; set; }
-
-    public Customer()
-    {
-        HomeAddress = new Address();
-    }
+    public Address HomeAddress { get; set; } = new Address();
 }
 
 public class CustomerDbContext : DbContext
 {
     public DbSet<Customer> Customers { get; set; }
 
-    public CustomerDbContext(DbContextOptions<CustomerDbContext> options) : base(options) { }
+    public CustomerDbContext(DbContextOptions<CustomerDbContext> options)
+        : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,7 +40,7 @@ public class CustomerRepository
 
     public async Task<Customer> CreateAsync(Customer customer)
     {
-        _context.Customers.Add(customer);
+        await _context.Customers.AddAsync(customer);
         await _context.SaveChangesAsync();
         return customer;
     }

@@ -1,22 +1,4 @@
-[Fact]
-public void TestNotFound()
-{
-    var repo = Substitute.For<IUserRepository>(p => new MockUserRepository());
-    var email = Substitute.For<IEmailService>(p => new MockEmailService());
-    var service = new NotificationService(repo, email);
-
-    try
-    {
-        await service NotifyUserAsync(123);
-    }
-    catch (InvalidOperationException ex)
-    {
-        // assert that the exception was thrown
-        // maybe also verify no received calls were made.
-        // Use assertion: we can't directly assert inside catch? Actually we can use `await` with `.Should().ThrowAsync`.
-        // But we need to capture the action that would have been performed if not caught?
-    }
-}
+using NSubstitute;
 
 public interface IUserRepository
 {
@@ -24,31 +6,80 @@ public interface IUserRepository
     Task SaveAsync(User user);
 }
 
-var repo = Substitute.For<IUserRepository>(p => new MockUserRepository());
-var email = Substitute.For<IEmailService>(p => new MockEmailService());
-var service = new NotificationService(repo, email);
+public interface IEmailService
+{
+    Task SendWelcomeAsync(string email);
+}
 
-var repo = Substitute.For<IUserRepository>(p => new UserRepository();
+public record User(int Id { get; init; }
+                string Name { get; init; } = "";
+                string Email { get; init; } = "";
+);
+
+public class NotificationService(IUserRepository repo, IEmailService email)
+{
+    public async Task NotifyUserAsync(int userId)
+    {
+        var user = await repo obtainedAsync(userId)
+            ?? throw new InvalidOperationException("User not found");
+        await email.SendWelcomeAsync(user.Email);
+    }
+}
+
+var repo = Substitute.For<IUserRepository>();
+var email = Substitute.For<IEmailService>();
+
+public static class NotificationServiceWrapper
+{
+    public static Task NotifyUserAsync(int userId) => 
+        NotificationService repo => new NotificationService(repo, email).NotifyUserAsync(userId);
+}
 
 var service = Substitute.For<IOrderService>();
-var multi = Substitute.For<IFoo, IBar>(); // multiple interfaces
+testReceives = TestContext.Current.GetFixture<...>();
+testReceives.Received().Should().HasCall(Arg.Any<Order>());
 
-service.Received().Process(Arg.Any<Order>());
+var mock = Substitute.For<...>();
+mock.Received().Should().HasCall(Arg.Any<...>());
 
-service.Received().Process(Arg.Any<Order>());
-service.Received(2).Process(Arg Any<Order>());
-service.DidNotReceive().Cancel(Arg.Any<int>());
-Received.InOrder(() =>
+var service = Substitute.For<IOrderService>();
+testReceives = TestContext.Current.GetFixture<...>();
+testReceives.Received().Should().HasCall(Arg.Any<Order>());
+
+var service = Substitute.For<...>();
+test = TestContext.Current.GetFixture<...>();
+test.Received().Should().HasCall(Arg.Any<Order>());
+
+var notification = TestContext.Current.GetFixture<NotificationService>();
+
+public static class NotificationTest
 {
-    service.Validate(order);
-    service.Process(order);
-});
+    [Fact]
+    public void HappyPath()
+    {
+        var repo = Substitute.For<IUserRepository>();
+        var email = Substitute.For<IEmailService>();
+        var notification = new NotificationService(repo, email);
+        // call async method using await; but in test we need to use Task.Run or something.
+        Task.Run(() => notification NotifyUserAsync(123));
+        // Now verify Received calls
+        var received = TestContext.Current.GetFixture<NotificationService>();
+        assert (!received == null);
+        // maybe check that received.Received() was called
+    }
+}
 
-var repo = Substitute.For<IUserRepository>(p => new MockUserRepository());
-var email = Substitute.For<IEmailService>(p => new MockEmailService());
+Assert.Multiple(
+    () => notification.Received(),
+    () => repo.GetUserAsync(123).Result;
+);
 
-var service = new NotificationService(repo, email);
+var service = Substitute.For<IOrderService>();
+testReceives = TestContext.Current.GetFixture<...>();
+testReceives.Received().Should().HasCall(Arg.Any<Order>());
 
-await service NotifyUserAsync(123);
+var received = TestContext.Current.Received();
 
-service.GetOrder(1).Returns(new Order { Id = 1 });
+var service = Substitute.For<IOrderService>();
+testReceives = TestContext.Current.GetFixture<...>();
+testReceives.Received().Should().HasCall(Arg.Any<Order>());

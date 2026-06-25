@@ -1,9 +1,6 @@
-public class CounterService
+[CollectionDefinition("Counter")]
+public class CounterCollection : ICollectionFixture<CounterFixture>
 {
-    public int Count { get; private set; } = 0;
-
-    public void Increment() => Count++;
-    public void Reset() => Count = 0;
 }
 
 public class CounterFixture : IAsyncLifetime
@@ -16,48 +13,44 @@ public class CounterFixture : IAsyncLifetime
         return default;
     }
 
-    public ValueTask DisposeAsync() => default;
-}
-
-[CollectionDefinition("Counter")]
-public class CounterCollection : ICollectionFixture<CounterFixture>
-{
-    // No test methods here
-}
-
-[Collection("Counter")]
-public class CounterFirstTests
-{
-    private readonly CounterFixture _fixture;
-
-    public CounterFirstTests(CounterFixture fixture)
+    public ValueTask DisposeAsync()
     {
-        _fixture = fixture;
+        return default;
+    }
+}
+
+public class CounterService
+{
+    public int Count { get; private set; } = 0;
+
+    public void Increment()
+    {
+        Count++;
     }
 
+    public void Reset()
+    {
+        Count = 0;
+    }
+}
+
+public class CounterFirstTests([Collection("Counter")] CounterFixture fixture)
+{
     [Fact]
-    public void Test()
+    public void Should_Increment_Count()
     {
-        _fixture.Counter.Increment();
-        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
+        fixture.Counter.Increment();
+        fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
     }
 }
 
-[Collection("Counter")]
-public class CounterSecondTests
+public class CounterSecondTests([Collection("Counter")] CounterFixture fixture)
 {
-    private readonly CounterFixture _fixture;
-
-    public CounterSecondTests(CounterFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     [Fact]
-    public void Test()
+    public void Should_Increment_Count_Twice()
     {
-        _fixture.Counter.Increment();
-        _fixture.Counter.Increment();
-        _fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
+        fixture.Counter.Increment();
+        fixture.Counter.Increment();
+        fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
     }
 }

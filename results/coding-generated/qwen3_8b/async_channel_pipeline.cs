@@ -16,7 +16,7 @@ public class DataPipeline
         return _channel.Reader.ReadAllAsync(ct);
     }
 
-    public async Task CompleteAsync()
+    public Task CompleteAsync()
     {
         _channel.Writer.Complete();
         return Task.CompletedTask;

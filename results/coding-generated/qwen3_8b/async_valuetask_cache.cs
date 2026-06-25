@@ -5,23 +5,25 @@ interface IExpensiveService
 
 class CachingService
 {
-    private readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
-    private readonly IExpensiveService _inner;
+    private readonly IExpensiveService inner;
+    private readonly Dictionary<string, string> cache = new Dictionary<string, string>();
 
     public CachingService(IExpensiveService inner)
     {
-        _inner = inner;
+        this.inner = inner;
     }
 
-    public async ValueTask<string> GetAsync(string key)
+    public ValueTask<string> GetAsync(string key)
     {
-        if (_cache.TryGetValue(key, out var cachedValue))
+        if (cache.TryGetValue(key, out string cachedValue))
         {
             return new ValueTask<string>(cachedValue);
         }
 
-        var result = await _inner.ComputeAsync(key);
-        _cache[key] = result;
-        return new ValueTask<string>(result);
+        return inner.ComputeAsync(key).ContinueWith(task =>
+        {
+            cache[key] = task.Result;
+            return task.Result;
+        });
     }
 }
