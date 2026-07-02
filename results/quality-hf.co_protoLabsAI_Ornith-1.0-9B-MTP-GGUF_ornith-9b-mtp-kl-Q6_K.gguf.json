@@ -1,0 +1,62 @@
+{
+  "benchmark": "quality",
+  "run_started_at": "2026-06-29T07:35:12.883351+00:00",
+  "run_finished_at": "2026-06-29T07:52:24.351752+00:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\quality-hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q6_K.gguf.json",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "captured_at": "2026-06-29T07:35:32.072089+00:00",
+    "hostname": "Framework",
+    "host_slug": "framework",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26220",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Framework",
+    "model": "Laptop 13 (Intel Core Ultra Series 1)",
+    "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "logical_cpu_count": 16,
+    "total_memory_gb": 95.47,
+    "python_version": "3.12.2",
+    "ollama_version": "ollama version is 0.30.11",
+    "gpus": [
+      {
+        "Name": "Intel(R) Arc(TM) Graphics",
+        "AdapterRAM": 2147479552,
+        "DriverVersion": "32.0.101.8826",
+        "VideoProcessor": "Intel(R) Arc(TM) Graphics Family",
+        "Status": "OK"
+      },
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "Error"
+      }
+    ]
+  },
+  "models": [
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q6_K.gguf"
+  ],
+  "completed_models": [
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q6_K.gguf"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "results": [
+    {
+      "model": "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q6_K.gguf",
+      "coding_pass": 5,
+      "coding_total": 5,
+      "tool_pass": 4,
+      "tool_total": 4,
+      "agentic_pass": 2,
+      "agentic_total": 2,
+      "score": 11,
+      "score_max": 11
+    }
+  ]
+}

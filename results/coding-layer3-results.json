@@ -1,16 +1,16 @@
 {
   "benchmark": "coding",
-  "run_started_at": "2026-06-29T00:40:05.693363+00:00",
-  "run_finished_at": "2026-06-29T01:32:40.772046+00:00",
+  "run_started_at": "2026-06-29T11:44:44.212863+00:00",
+  "run_finished_at": "2026-06-29T12:17:09.843890+00:00",
   "models": [
-    "richardyoung/qwythos-9b-abliterated:Q4_K_M"
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q8_0.gguf"
   ],
   "results": [
     {
-      "model": "richardyoung/qwythos-9b-abliterated:Q4_K_M",
+      "model": "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q8_0.gguf",
       "benchmark": "coding",
-      "run_started_at": "2026-06-29T00:40:05.694858+00:00",
-      "run_finished_at": "2026-06-29T01:32:40.754945+00:00",
+      "run_started_at": "2026-06-29T11:44:44.218401+00:00",
+      "run_finished_at": "2026-06-29T12:17:09.812498+00:00",
       "layer3_results": [
         {
           "task": "aspnet_oneof_controller",
@@ -21,8 +21,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 57.12,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\aspnet_oneof_controller.cs"
+          "generation_time_s": 162.95,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\aspnet_oneof_controller.cs"
         },
         {
           "task": "aspnet_validation_endpoint",
@@ -33,20 +33,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 25.5,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\aspnet_validation_endpoint.cs"
+          "generation_time_s": 12.83,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\aspnet_validation_endpoint.cs"
         },
         {
           "task": "aspnet_service_di",
           "category": "aspnet",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 39.2,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\aspnet_service_di.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 15.66,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\aspnet_service_di.cs"
         },
         {
           "task": "efcore_leftjoin",
@@ -57,68 +57,68 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 45.86,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\efcore_leftjoin.cs"
+          "generation_time_s": 39.66,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\efcore_leftjoin.cs"
         },
         {
           "task": "efcore_json_columns",
           "category": "efcore",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 2,
-          "tests_total": 2,
-          "generation_time_s": 25.67,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\efcore_json_columns.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 16.19,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\efcore_json_columns.cs"
         },
         {
           "task": "efcore_executeupdate",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 21.17,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\efcore_executeupdate.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 22.52,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\efcore_executeupdate.cs"
         },
         {
           "task": "masstransit_consumer",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 32.02,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\masstransit_consumer.cs"
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 1,
+          "generation_time_s": 19.44,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\masstransit_consumer.cs"
         },
         {
           "task": "masstransit_statemachine",
           "category": "masstransit",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 100.75,
-          "generated_code_path": null
+          "generation_time_s": 24.2,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\masstransit_statemachine.cs"
         },
         {
           "task": "masstransit_test_harness",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 47.67,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\masstransit_test_harness.cs"
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 16.66,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\masstransit_test_harness.cs"
         },
         {
           "task": "blazor_interactive_component",
@@ -129,8 +129,8 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 21.45,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\blazor_interactive_component.cs"
+          "generation_time_s": 7.38,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\blazor_interactive_component.cs"
         },
         {
           "task": "blazor_streaming_render",
@@ -141,8 +141,8 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 21.64,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\blazor_streaming_render.cs"
+          "generation_time_s": 7.83,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\blazor_streaming_render.cs"
         },
         {
           "task": "blazor_cascading_auth",
@@ -153,20 +153,20 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 39.48,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\blazor_cascading_auth.cs"
+          "generation_time_s": 10.31,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\blazor_cascading_auth.cs"
         },
         {
           "task": "xunit_v3_theory_tests",
           "category": "xunit",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 99.44,
-          "generated_code_path": null
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 21,
+          "tests_total": 24,
+          "generation_time_s": 20.97,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\xunit_v3_theory_tests.cs"
         },
         {
           "task": "xunit_awesome_nsubstitute",
@@ -177,8 +177,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 101.44,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\xunit_awesome_nsubstitute.cs"
+          "generation_time_s": 24.2,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\xunit_awesome_nsubstitute.cs"
         },
         {
           "task": "xunit_assembly_fixture",
@@ -189,32 +189,32 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 51.92,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\xunit_assembly_fixture.cs"
+          "generation_time_s": 9.67,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\xunit_assembly_fixture.cs"
         },
         {
           "task": "linq_complex_query",
           "category": "linq",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 5,
-          "tests_total": 5,
-          "generation_time_s": 20.45,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\linq_complex_query.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 11.64,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\linq_complex_query.cs"
         },
         {
           "task": "async_cancellation",
           "category": "async",
           "weight": 1,
-          "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 100.41,
-          "generated_code_path": null
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 8.11,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\async_cancellation.cs"
         },
         {
           "task": "vertical_order_service",
@@ -225,32 +225,32 @@
           "build_success": true,
           "tests_passed": 6,
           "tests_total": 6,
-          "generation_time_s": 88.78,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\vertical_order_service.cs"
+          "generation_time_s": 18.12,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\vertical_order_service.cs"
         },
         {
           "task": "vertical_consumer_pipeline",
           "category": "vertical",
           "weight": 2,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 203.64,
-          "generated_code_path": null
+          "generation_time_s": 21.06,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\vertical_consumer_pipeline.cs"
         },
         {
           "task": "vertical_blazor_crud",
           "category": "vertical",
           "weight": 2,
           "passed": false,
-          "harness_error": "Empty code after extraction",
+          "harness_error": null,
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 203.02,
-          "generated_code_path": null
+          "generation_time_s": 34.58,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\vertical_blazor_crud.cs"
         },
         {
           "task": "linq_selectmany_flatten",
@@ -261,20 +261,20 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 20.61,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\linq_selectmany_flatten.cs"
+          "generation_time_s": 5.25,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\linq_selectmany_flatten.cs"
         },
         {
           "task": "linq_set_operations",
           "category": "linq",
           "weight": 1,
-          "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 99.91,
-          "generated_code_path": null
+          "passed": true,
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 5,
+          "tests_total": 5,
+          "generation_time_s": 6.52,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\linq_set_operations.cs"
         },
         {
           "task": "linq_aggregate_stats",
@@ -285,8 +285,8 @@
           "build_success": true,
           "tests_passed": 5,
           "tests_total": 5,
-          "generation_time_s": 33.36,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\linq_aggregate_stats.cs"
+          "generation_time_s": 8.62,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\linq_aggregate_stats.cs"
         },
         {
           "task": "linq_todictionary_tolookup",
@@ -297,8 +297,8 @@
           "build_success": true,
           "tests_passed": 5,
           "tests_total": 5,
-          "generation_time_s": 19.62,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\linq_todictionary_tolookup.cs"
+          "generation_time_s": 5.08,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\linq_todictionary_tolookup.cs"
         },
         {
           "task": "async_whenall_parallel",
@@ -309,8 +309,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 19.17,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\async_whenall_parallel.cs"
+          "generation_time_s": 8.39,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\async_whenall_parallel.cs"
         },
         {
           "task": "async_semaphore_throttle",
@@ -321,20 +321,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 80.3,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\async_semaphore_throttle.cs"
+          "generation_time_s": 11.08,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\async_semaphore_throttle.cs"
         },
         {
           "task": "async_channel_pipeline",
           "category": "async",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 3,
-          "tests_total": 3,
-          "generation_time_s": 10.78,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\async_channel_pipeline.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 6.3,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\async_channel_pipeline.cs"
         },
         {
           "task": "async_valuetask_cache",
@@ -345,20 +345,20 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 43.36,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\async_valuetask_cache.cs"
+          "generation_time_s": 8.73,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\async_valuetask_cache.cs"
         },
         {
           "task": "aspnet_minimal_api_endpoint",
           "category": "aspnet",
           "weight": 1,
           "passed": false,
-          "harness_error": "Empty code after extraction",
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 100.97,
-          "generated_code_path": null
+          "harness_error": null,
+          "build_success": true,
+          "tests_passed": 1,
+          "tests_total": 3,
+          "generation_time_s": 10.05,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\aspnet_minimal_api_endpoint.cs"
         },
         {
           "task": "aspnet_typed_httpclient",
@@ -369,8 +369,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 18.5,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\aspnet_typed_httpclient.cs"
+          "generation_time_s": 9.77,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\aspnet_typed_httpclient.cs"
         },
         {
           "task": "aspnet_ioptions_config",
@@ -381,8 +381,8 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 28.12,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\aspnet_ioptions_config.cs"
+          "generation_time_s": 9.64,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\aspnet_ioptions_config.cs"
         },
         {
           "task": "aspnet_problemdetails_handler",
@@ -393,8 +393,8 @@
           "build_success": true,
           "tests_passed": 5,
           "tests_total": 5,
-          "generation_time_s": 30.69,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\aspnet_problemdetails_handler.cs"
+          "generation_time_s": 11.47,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\aspnet_problemdetails_handler.cs"
         },
         {
           "task": "efcore_include_navigation",
@@ -405,32 +405,32 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 32.0,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\efcore_include_navigation.cs"
+          "generation_time_s": 19.59,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\efcore_include_navigation.cs"
         },
         {
           "task": "efcore_softdelete_filter",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 38.74,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\efcore_softdelete_filter.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 14.8,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\efcore_softdelete_filter.cs"
         },
         {
           "task": "efcore_owned_entity",
           "category": "efcore",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 24.7,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\efcore_owned_entity.cs"
+          "build_success": true,
+          "tests_passed": 2,
+          "tests_total": 2,
+          "generation_time_s": 12.98,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\efcore_owned_entity.cs"
         },
         {
           "task": "efcore_value_conversion",
@@ -441,20 +441,20 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 48.59,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\efcore_value_conversion.cs"
+          "generation_time_s": 15.23,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\efcore_value_conversion.cs"
         },
         {
           "task": "masstransit_request_response",
           "category": "masstransit",
           "weight": 1,
-          "passed": true,
+          "passed": false,
           "harness_error": null,
-          "build_success": true,
-          "tests_passed": 2,
-          "tests_total": 2,
-          "generation_time_s": 30.52,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\masstransit_request_response.cs"
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 9.47,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\masstransit_request_response.cs"
         },
         {
           "task": "masstransit_saga_events",
@@ -465,20 +465,20 @@
           "build_success": true,
           "tests_passed": 2,
           "tests_total": 2,
-          "generation_time_s": 40.97,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\masstransit_saga_events.cs"
+          "generation_time_s": 16.69,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\masstransit_saga_events.cs"
         },
         {
           "task": "masstransit_consumer_filter",
           "category": "masstransit",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 40.7,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\masstransit_consumer_filter.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 10.25,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\masstransit_consumer_filter.cs"
         },
         {
           "task": "xunit_memberdata",
@@ -489,8 +489,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 56.19,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\xunit_memberdata.cs"
+          "generation_time_s": 17.0,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\xunit_memberdata.cs"
         },
         {
           "task": "xunit_class_fixture",
@@ -501,8 +501,8 @@
           "build_success": true,
           "tests_passed": 9,
           "tests_total": 9,
-          "generation_time_s": 74.55,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\xunit_class_fixture.cs"
+          "generation_time_s": 16.86,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\xunit_class_fixture.cs"
         },
         {
           "task": "xunit_async_collection",
@@ -513,8 +513,8 @@
           "build_success": false,
           "tests_passed": 0,
           "tests_total": 0,
-          "generation_time_s": 85.8,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\xunit_async_collection.cs"
+          "generation_time_s": 12.05,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\xunit_async_collection.cs"
         },
         {
           "task": "blazor_form_validation",
@@ -525,8 +525,8 @@
           "build_success": true,
           "tests_passed": 7,
           "tests_total": 7,
-          "generation_time_s": 37.05,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\blazor_form_validation.cs"
+          "generation_time_s": 8.8,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\blazor_form_validation.cs"
         },
         {
           "task": "blazor_navigation_redirect",
@@ -537,20 +537,20 @@
           "build_success": true,
           "tests_passed": 3,
           "tests_total": 3,
-          "generation_time_s": 26.06,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\blazor_navigation_redirect.cs"
+          "generation_time_s": 8.53,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\blazor_navigation_redirect.cs"
         },
         {
           "task": "blazor_parameter_lifecycle",
           "category": "blazor",
           "weight": 1,
-          "passed": false,
+          "passed": true,
           "harness_error": null,
-          "build_success": false,
-          "tests_passed": 0,
-          "tests_total": 0,
-          "generation_time_s": 27.31,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\blazor_parameter_lifecycle.cs"
+          "build_success": true,
+          "tests_passed": 3,
+          "tests_total": 3,
+          "generation_time_s": 7.61,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\blazor_parameter_lifecycle.cs"
         },
         {
           "task": "vertical_cqrs_handler",
@@ -561,8 +561,8 @@
           "build_success": true,
           "tests_passed": 8,
           "tests_total": 8,
-          "generation_time_s": 29.78,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\vertical_cqrs_handler.cs"
+          "generation_time_s": 11.91,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\vertical_cqrs_handler.cs"
         },
         {
           "task": "vertical_efcore_service",
@@ -573,8 +573,8 @@
           "build_success": true,
           "tests_passed": 8,
           "tests_total": 8,
-          "generation_time_s": 40.5,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\vertical_efcore_service.cs"
+          "generation_time_s": 21.06,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\vertical_efcore_service.cs"
         },
         {
           "task": "patterns_record_with",
@@ -585,8 +585,8 @@
           "build_success": true,
           "tests_passed": 6,
           "tests_total": 6,
-          "generation_time_s": 20.06,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\patterns_record_with.cs"
+          "generation_time_s": 6.91,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\patterns_record_with.cs"
         },
         {
           "task": "patterns_json_serialization",
@@ -597,8 +597,8 @@
           "build_success": true,
           "tests_passed": 5,
           "tests_total": 5,
-          "generation_time_s": 25.22,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\patterns_json_serialization.cs"
+          "generation_time_s": 22.08,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\patterns_json_serialization.cs"
         },
         {
           "task": "patterns_timeprovider",
@@ -609,12 +609,12 @@
           "build_success": true,
           "tests_passed": 4,
           "tests_total": 4,
-          "generation_time_s": 16.89,
-          "generated_code_path": "results\\coding-generated\\richardyoung_qwythos-9b-abliterated_Q4_K_M\\patterns_timeprovider.cs"
+          "generation_time_s": 7.28,
+          "generated_code_path": "results\\coding-generated\\hf.co_protoLabsAI_Ornith-1.0-9B-MTP-GGUF_ornith-9b-mtp-kl-Q8_0.gguf\\patterns_timeprovider.cs"
         }
       ],
-      "layer3_weighted_score": 0.509090909090909,
-      "think_setting": "true"
+      "layer3_weighted_score": 0.5818181818181818,
+      "think_setting": "false"
     }
   ]
 }

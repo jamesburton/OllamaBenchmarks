@@ -30,6 +30,16 @@ By default Ollama unloads a model after 4 minutes of idle. The L3 coding benchma
 
 ## Framework 16 (Intel Core Ultra + RTX 3060 12 GB)
 
+### `OLLAMA_INTEL_GPU=1` silently routes models to Intel Arc, falling back to CPU (2026-06-29)
+
+Framework 16 has both an Intel Arc iGPU (2 GB shared RAM) and an RTX 3060 eGPU (12 GB). When `OLLAMA_INTEL_GPU=1` is set in the user environment, Ollama preferentially tries to load models on the Intel Arc backend before CUDA. Because no model larger than ~1.5 GB fits in 2 GB, all loads silently fall back to 100% CPU (2–3 tok/s on a ~9 B model). `nvidia-smi` shows the RTX 3060 healthy with ~12 GB free — the symptom is invisible without checking `ollama ps`.
+
+**Symptom:** `ollama ps` shows `100% CPU` for a model that should fit in 12 GB. `nvidia-smi` shows GPU free and healthy.
+
+**Fix:** Restart Ollama with `OLLAMA_INTEL_GPU=0`. Because Ollama is a per-user tray-app service, the env var must be set *before launching the tray app* — an in-session `$env:OLLAMA_INTEL_GPU=0` override works if you `Stop-Process ollama` and then `Start-Process ollama app.exe` in the same shell (the child process inherits the session's env). Verify with `ollama ps` — look for `100% GPU`.
+
+Setting `OLLAMA_INTEL_GPU=1` was useful during the SYCL iGPU exploration (Framework no-eGPU baseline). Keep it at 0 for any session where the RTX 3060 is attached.
+
 ### GPU offload sweet spot
 
 The RTX 3060 has 12 GB VRAM. Models up to ~6–7 GB run fully on GPU. Models in the 9–11 GB range partially offload and lose half their speed because of CPU/GPU transfer. Models above 12 GB run with `cpu_avg_pct` > 20% and tok/s drops by 4–10×. The "fully GPU fits" tier is the sweet spot: nemotron-3-nano:4b (3 GB, 84 tok/s), gemma4:e2b (9 GB, 89 tok/s), cogito:8b (4.9 GB, 61 tok/s).
