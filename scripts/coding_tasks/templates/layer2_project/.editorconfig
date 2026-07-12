@@ -1,0 +1,7 @@
+# Targeted exclusion only: IDE0055 (formatting) breaks the build for LLM-generated
+# code that doesn't match exact IDE style (whitespace/brace placement), which is
+# irrelevant to correctness for this benchmark harness. No `root = true` here --
+# this intentionally still inherits/merges with any ancestor .editorconfig (e.g.
+# a machine-wide one) rather than isolating from it; only this one rule is excluded.
+[*.cs]
+dotnet_diagnostic.IDE0055.severity = none

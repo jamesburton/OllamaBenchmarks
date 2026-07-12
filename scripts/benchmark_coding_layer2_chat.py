@@ -107,7 +107,7 @@ def _chat_complete(
     max_tokens: int = 4096,
     num_ctx: int = 8192,
     seed: int = 42,
-    timeout: int = 600,
+    timeout: int | None = None,
     stop_tokens: list[str] | None = None,
 ) -> str:
     """Drop-in replacement for L2._call_ollama_complete that uses /api/chat.
@@ -117,6 +117,13 @@ def _chat_complete(
     instruction to complete the function body and return the full Program.cs in
     a code fence; extract C# code afterwards.
     """
+    if timeout is None:
+        # Was hardcoded to 600s. Under OLLAMA_NUM_PARALLEL>1, concurrent decode
+        # streams roughly halve (or worse) each other's effective tok/s (see
+        # MODEL_QUIRKS.md perf-lever entry), so multi-hundred-token completions
+        # routinely blew past 600s (observed 500-response-at-exactly-600s during
+        # cross-machine 2-worker testing, 2026-07-10). Override via L2_CHAT_TIMEOUT_S.
+        timeout = int(os.environ.get("L2_CHAT_TIMEOUT_S", "600"))
     options = sampling_options(model)
     chat_prompt = (
         "You are completing a C# program. The code below is the start of a file. "

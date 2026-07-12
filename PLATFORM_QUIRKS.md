@@ -16,6 +16,32 @@ By default Ollama assumes the iGPU has only ~64 GB available (its half of the un
 
 Ollama refuses to load large models on Strix when the BIOS UMA frame buffer is set high (≥ 64 GB). The cause is that the UMA reservation creates a hard partition, and Ollama's allocator double-counts it. The fix is to reduce the BIOS UMA frame buffer to 16–32 GB and let `OLLAMA_GPU_MEMORY=120G` (above) handle dynamic allocation. After changing the BIOS setting, a full power-cycle (not just reboot) is required for the firmware to release the reserved pool.
 
+### 96 GB BIOS VRAM split caps Ollama loads at the Windows commit limit (2026-07-04)
+
+With the BIOS UMA frame buffer set to 96 GB (the dedicated-VRAM split used for llama.cpp Vulkan work), Windows sees only 31.6 GB RAM, giving a commit limit of ~67 GB (RAM + pagefile). Ollama's ROCm allocations for model weights are charged against Windows *commit*, not just the carve-out — so any model whose weights + KV + host buffers exceed ~67 GB fails at load with `ggml_backend_cpu_buffer_type_alloc_buffer` / `ROCm_Host` OOM errors at seemingly arbitrary small allocations (the failing alloc is just whichever one crosses the ceiling; observed 52 MB, 5.4 GB, and 32 GB variants on successive attempts of the same model).
+
+**Symptom:** mistral-medium-3.5 (80 GB Q4) loads 89/89 layers to ROCm0 fine, then dies on a small host buffer. Perfmon shows `\Memory\Committed Bytes` pinned at 66.5 GB vs a 67.4 GB limit during load.
+
+**Fix:** BIOS UMA frame buffer back to 16–32 GB (see entry above) so Windows sees ~96–112 GB and the commit limit roughly doubles; `OLLAMA_GPU_MEMORY=120G` then handles GPU allocation dynamically. That is the config that loaded the 86 GB nemotron-3-super. A pagefile expansion cannot substitute when C: lacks ~60 GB free.
+
+**Extra host cost for multimodal models:** mistral-medium-3.5 ships a ~2.5B Pixtral vision tower that Ollama's ROCm build loads on the **CPU backend** (~5.4 GB host RAM), on top of the text weights — budget for it on any multimodal load.
+
+### `Stop-Process -Name ollama,"ollama app"` orphans `llama-server.exe`, leaking the whole model's RAM (2026-07-05)
+
+Restarting Ollama to pick up a new environment variable (e.g. `OLLAMA_KV_CACHE_TYPE`, `OLLAMA_NUM_PARALLEL` — see MODEL_QUIRKS mistral-medium-3.5 perf-lever section) via `Get-Process -Name "ollama","ollama app" | Stop-Process -Force` kills the tray app and the main server, but **does not kill the actual `llama-server.exe` child process** it spawned. That child survives as an orphan, still holding the *entire* loaded model in memory (observed: 59.6 GB private / 23.5 GB working set for a 62 GB IQ3_M model) — and since the new `ollama.exe` instance starts with fresh scheduler state, `ollama ps` reports **no models loaded** even while the zombie is alive and draining memory. Repeated restarts compound: each one leaks another full copy.
+
+**Symptom:** `Get-Counter '\Memory\Available MBytes'` reads in the hundreds of MB (observed as low as 432 MB) on a box with 31.6 GB "visible" RAM, `\Memory\Committed Bytes` sits far above what any *tracked* process should need (observed 84+ GB), a subsequent model (re)load fails with `cudaMalloc failed: out of memory` / `failed to allocate ROCm0 buffer of size <full-model-bytes>` even though the box loaded the same model minutes earlier — and `ollama ps` shows nothing, so the natural instinct ("no model is loaded, there's no reason this should OOM") is misleading. Find the real consumer with `Get-Process | Sort-Object WorkingSet64 -Descending | Select -First 15` — look for a `llama-server` entry Ollama itself no longer knows about.
+
+**Fix:** always include `llama-server` in the `Stop-Process -Name` list when restarting Ollama for env-var changes: `Get-Process -Name "ollama","ollama app","llama-server" -ErrorAction SilentlyContinue | Stop-Process -Force`. Killing the orphan directly (`taskkill /F /PID <pid>`) recovered 432 MB → 24.4 GB available instantly on this box, confirming it as the sole cause — no reboot needed. `scripts/perf_lever_service_sweep.ps1` was fixed to include this after hitting the bug live.
+
+### `OLLAMA_HOST=0.0.0.0:11434` in user env silently zeroes every benchmark (2026-07-04)
+
+The user env on Strix sets `OLLAMA_HOST=0.0.0.0:11434` so the Ollama *server* binds all interfaces (remote boxes reach it over Tailscale). But every benchmark script honors `OLLAMA_HOST` as the *client* URL, and `0.0.0.0` without a scheme is not fetchable — urllib fails instantly with `URLError: unknown url type: 0.0.0.0`.
+
+**Symptom:** an entire chain (throughput + quality + L3) "completes" in ~90 seconds with 0 scores everywhere; L3 logs `[call_ollama] Error: URLError` on every task. The 0/50 is an artifact, not a model result — delete the JSONs.
+
+**Fix:** set `OLLAMA_HOST=http://127.0.0.1:11434` in the session that launches local benchmark runs (leave the User-scope bind setting alone). Any 0-score result that arrived suspiciously fast should be checked against this first.
+
 ### `OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_SKIP_MEMORY_CHECK=1`
 
 Both help on Strix. Flash attention is a meaningful tok/s win on long contexts; the memory check is overly conservative for unified-memory layouts and refuses to load models that would actually fit.

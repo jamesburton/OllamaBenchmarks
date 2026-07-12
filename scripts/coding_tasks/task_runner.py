@@ -47,14 +47,24 @@ def model_slug(model: str) -> str:
     )
 
 
+def think_env_enabled() -> bool:
+    """True when CODING_BENCH_THINK requests a thinking run (bool or effort level)."""
+    value = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
+    return value in ("1", "true", "yes", "on", "low", "medium", "high")
+
+
 def sampling_options(model: str) -> dict:
     """Return temperature/top_p for the model family.
 
-    Nemotron models get temperature=1.0, top_p=1.0; all others get
-    temperature=0, top_p=1.
+    Nemotron models get temperature=1.0, top_p=1.0. Mistral-Medium in
+    thinking mode gets the vendor-recommended temperature=0.7, top_p=0.95
+    (non-thinking stays at temperature=0, inside its recommended 0.0-0.7
+    range). All others get temperature=0, top_p=1.
     """
     if model.startswith(("nemotron-3-super", "nemotron-3-nano")):
         return {"temperature": 1.0, "top_p": 1.0}
+    if model.startswith("mistral-medium") and think_env_enabled():
+        return {"temperature": 0.7, "top_p": 0.95}
     return {"temperature": 0, "top_p": 1}
 
 

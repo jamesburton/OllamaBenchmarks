@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-29T00:00:00.000000+00:00",
+  "updated_at": "2026-07-12T00:00:00.000000+00:00",
   "slug_convention": "The :latest tag is the default for any model and MUST be omitted from model names and slugs. Only explicit non-default tags (e.g. :14b, :q8_0, :bf16) are included.",
   "methodology_notes": {
     "layer2_raw_vs_chat": "Layer 2 (HumanEval-CS, 158 tasks) historically uses scripts/benchmark_coding_layer2.py which calls /api/generate with raw:true. This bypasses the model's chat template / RENDERER / PARSER and sends the C# function signature as a raw completion prefix. Completion-friendly models (granite4, OmniCoder, qwen-coder, gemma3, shenwen-coderV2) handle this well and score 25-50%. Chat-tuned and thinking-default models (gemma4 family, gpt-oss, glm-4.7-flash-reap, lfm2.5-thinking, LFM2, phi4-mini) score 1-10% because they cannot interpret the raw prefix without their chat wrappers. For these models, also run scripts/benchmark_coding_layer2_chat.py which uses /api/chat (template applied, num_predict=4096, num_ctx=8192, reasoning_effort=low for gpt-oss). Chat-mode results are stored in coding-{slug}-chat.json and listed alongside the raw-mode score in this file. Headline 'L2' for chat-tuned models should use the chat-mode score; raw-mode is a methodological footnote.",
@@ -74,6 +74,8 @@
     "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q6_K.gguf"
   ],
   "local_installed": [
+    "codegemma:latest",
+    "codegemma:2b",
     "cogito:8b",
     "cogito-2.1:671b-cloud",
     "deepseek-v3.2:cloud",
@@ -90,6 +92,8 @@
     "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M"
   ],
   "effective_models": [
+    "codegemma:latest",
+    "codegemma:2b",
     "cogito:8b",
     "cogito:14b",
     "gemma3:4b",
@@ -176,6 +180,8 @@
     "hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M"
   ],
   "backend_notes": {
+    "codegemma:latest": "Google CodeGemma 9B (Q4_0, 8.5GB), instruction-tuned code model. Strix: 35.21 tok/s, 8.5GB VRAM, 0.18s load. Quality quick suite 4/11 (coding 4/5, tool 0/4, agentic 0/2 â€” no native tool-calling support at all, both plan-agent and direct tool-call tasks fail outright). Coding L2 (HumanEval-CS, 158 tasks): RAW 50/158 (0.316), CHAT 51/158 (0.323) â€” raw and chat modes agree closely, unlike gemma3/gemma4-family models with template-bypass artifacts; either mode is trustworthy here. Coding L3 (.NET, 50 tasks, think:false): 21/50 (0.382) weighted. Ranks solidly mid-pack for single-shot code gen (below top-5 L2 ~0.49-0.52 and top-5 L3 ~0.80-0.86) but well above the field floor, and notably ahead of several much larger/newer models on L2 (e.g. beats qwen3.5:4b 0.291, shenwen-coderV2 0.266, devstral-small-2 0.234). Zero tool/agentic capability is the standout weakness vs top-5 models (qwen3.6, qwen3.6:27b, devstral-small-2 all score 11/11 quality). FINE-TUNE VIABILITY: reasonable small-model (9B, 8.5GB) target specifically for C#/.NET code completion or bolting on tool-calling via SFT â€” its underlying single-shot coding competence (comparable to mid-tier 14-27B models) is real and non-trivial, and the tool-calling gap is a well-understood, fixable fine-tuning target rather than a fundamental capability ceiling. GOTCHA (2026-07-12): a stale `OLLAMA_HOST=0.0.0.0:11434` (no scheme, invalid client target) in the shell silently produced a 0/11 quality score via the harness's broad except-and-continue error handling before this was caught and fixed â€” always confirm OLLAMA_HOST is a valid `http://host:port` before trusting a near-zero score.",
+    "codegemma:2b": "Google CodeGemma 2B (Q4_0, 1.8GB), BASE/completion-only model â€” NOT instruction-tuned, unlike codegemma:latest. Strix: reported 117.82 tok/s is an ARTIFACT (eval_count=4, the model degenerated into short garbage almost immediately on the throughput probe's natural-language prompt; not a real steady-state rate). Quality quick suite: genuine 0/11 (confirmed via manual probe: both raw-generate and /api/chat on natural-language/instruction prompts degenerate into repetition or garbage like a bare 'ipynb\\n' â€” this is real base-model behaviour, not a harness/env bug, unlike the codegemma:latest 0/11 false-negative below). Also tried the model's proper FIM special tokens (`<|fim_prefix|>`/`<|fim_suffix|>`/`<|fim_middle|>`) manually via raw generate to see if genuine FIM formatting would help â€” they are NOT registered as special tokens by this Ollama GGUF pull (echoed back as literal text), so FIM-templated prompting is not usable through this harness/model pull either. Coding L2 RAW (HumanEval-CS structured prefix, i.e. its home-turf task shape): 26/158 (0.165) â€” genuinely useful, non-zero: the dataset's natural `class Problem { method(...) {` prefix shape is closer to what a FIM-only base model expects than an ad-hoc bare prompt. Coding L2 CHAT: 3/158 (0.019) â€” expected collapse, confirms it cannot use instruction/chat framing at all. Coding L3 (.NET, agentic/multi-file): 0/50 (0.000) â€” genuine hard zero, consistent with total lack of instruction-following (L3 requires following natural-language task descriptions, not just completing a fill-in-the-blank prefix). FINE-TUNE VIABILITY: NOT a good target for general instruction-following/agentic coding â€” you'd be doing full instruction-tuning from scratch, not adapting existing capability. Could be viable narrowly for raw FIM-style IDE autocomplete (small footprint, 1.8GB, fast load) given its non-trivial 16.5% raw-completion score, but that is a materially different use case than a coding assistant and untested here beyond the L2 raw dataset shape.",
     "qwen3.5:35b-a3b-q2_k_l": "Runs via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 still fails to load qwen35moe.",
     "omnicoder:9b-q4_k_m": "Benchmarked via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 imports it, but local runner allocation fails on this machine.",
     "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m": "Benchmarked via llama-server/OpenAI-compatible API on this host. Ollama 0.17.8-rc4 imports it, but local runner cannot load qwen35.",
