@@ -12,6 +12,7 @@ import json
 import os
 import re
 import sys
+import time
 from typing import Any
 import urllib.error
 import urllib.request
@@ -25,6 +26,7 @@ from coding_tasks.task_runner import (
     sampling_options,
     setup_template_cache,
     model_slug as base_model_slug,
+    retry_wait_seconds,
 )
 
 
@@ -148,22 +150,34 @@ def _chat_complete(
     if model.startswith("gpt-oss"):
         payload["options"]["reasoning_effort"] = "low"
 
-    req = urllib.request.Request(
-        f'{os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")}/api/chat',
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-        content = body.get("message", {}).get("content", "") or ""
-        if "<think>" in content:
-            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
-        return content
-    except (urllib.error.URLError, OSError, TimeoutError) as exc:
-        print(f"    [chat] Error: {type(exc).__name__}: {exc}")
-        return ""
+    data = json.dumps(payload).encode("utf-8")
+    max_retries = int(os.environ.get("OLLAMA_MAX_RETRIES", "6"))
+    for attempt in range(max_retries):
+        req = urllib.request.Request(
+            f'{os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")}/api/chat',
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+            content = body.get("message", {}).get("content", "") or ""
+            if "<think>" in content:
+                content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+            return content
+        except urllib.error.HTTPError as exc:
+            if exc.code in (429, 503) and attempt < max_retries - 1:
+                wait = retry_wait_seconds(exc, attempt)
+                print(f"    [chat] {exc.code} rate-limited, waiting {wait:.0f}s (attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait)
+                continue
+            print(f"    [chat] Error: HTTPError {exc.code}: {exc}")
+            return ""
+        except (urllib.error.URLError, OSError, TimeoutError) as exc:
+            print(f"    [chat] Error: {type(exc).__name__}: {exc}")
+            return ""
+    return ""
 
 
 def run_problem_chat(problem: dict, model: str, cached_template: str) -> tuple[bool, str]:
@@ -276,11 +290,31 @@ def main():
     for model in args.models:
         slug = model_slug(model)
         print(f"\n[model] {model} (slug={slug}-chat)")
-        started = datetime.datetime.now(datetime.timezone.utc)
-        passed = 0
+
+        cp_path = os.path.join(args.checkpoint_dir, f"coding-{slug}-chat.json")
         records = []
+        done_names = set()
+        started = datetime.datetime.now(datetime.timezone.utc)
+        if os.path.exists(cp_path):
+            try:
+                with open(cp_path, "r", encoding="utf-8") as fh:
+                    prior = json.load(fh)
+                records = prior.get("layer2_chat_results", []) or []
+                done_names = {r["name"] for r in records}
+                if prior.get("layer2_chat_run_started_at"):
+                    started = datetime.datetime.fromisoformat(prior["layer2_chat_run_started_at"])
+                if done_names:
+                    print(f"  [resume] {len(done_names)} problem(s) already completed, skipping")
+            except (json.JSONDecodeError, OSError, KeyError) as exc:
+                print(f"  [resume] Could not read existing checkpoint ({exc}), starting fresh")
+                records = []
+                done_names = set()
+
+        passed = sum(1 for r in records if r.get("passed"))
         for i, prob in enumerate(problems, 1):
             name = prob.get("name", f"prob_{i}")
+            if name in done_names:
+                continue
             print(f"  [{i}/{total}] {name} ...", end="", flush=True)
             try:
                 ok, err = run_problem_chat(prob, model, cached_template)
@@ -294,11 +328,30 @@ def main():
                 first = err.splitlines()[0] if err else "unknown"
                 print(f" FAIL  ({first[:80]})")
             records.append({"name": name, "passed": ok, "error": err})
+
+            # Checkpoint after every task (not just at the end) so a mid-run
+            # crash/reboot/network loss only costs the in-flight task, not the
+            # whole run -- this harness has no other progress log. Rate/counts
+            # are computed against records-so-far so a resumed run's partial
+            # file is always a valid, self-consistent snapshot.
+            done_so_far = len(records)
+            payload = {
+                "model": model,
+                "benchmark": "coding-layer2-chat",
+                "layer2_chat_run_started_at": started.isoformat(),
+                "layer2_chat_run_finished_at": None,
+                "layer2_chat_pass_rate": passed / done_so_far if done_so_far else 0,
+                "layer2_chat_passed": passed,
+                "layer2_chat_total": total,
+                "layer2_chat_results": records,
+            }
+            with open(cp_path, "w", encoding="utf-8") as fh:
+                fh.write(json.dumps(payload, indent=2) + "\n")
+
         finished = datetime.datetime.now(datetime.timezone.utc)
         rate = passed / total if total else 0
         print(f"  [score] layer2_chat_pass_rate={rate:.4f} ({passed}/{total})")
 
-        cp_path = os.path.join(args.checkpoint_dir, f"coding-{slug}-chat.json")
         payload = {
             "model": model,
             "benchmark": "coding-layer2-chat",

@@ -4,6 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <!-- Minimal test-only deps: the Layer 4 T3 fixtures are pure C# and need only
        xunit. Kept lean (no MassTransit/EF/etc.) so restore is reliable and fast

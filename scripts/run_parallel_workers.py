@@ -79,11 +79,25 @@ def base_env():
     # completions routinely exceeded it (observed 500-at-exactly-600s during
     # cross-machine testing). 1200s gives real headroom.
     env.setdefault("L2_CHAT_TIMEOUT_S", "1200")
+    # L3's per-task generation call was hardcoded 600s; same slow-model +
+    # concurrency reasoning as L2_CHAT_TIMEOUT_S above, worse under think:high
+    # (extra reasoning tokens). Observed 100% TimeoutError at 600s cross-machine
+    # (2026-07-13). Give it the same headroom as L2 chat.
+    env.setdefault("L3_GEN_TIMEOUT_S", "1200")
     return env
 
 
-def run_workers(cmds, envs, log_paths):
-    """Launch len(cmds) subprocesses concurrently, wait for all, return exit codes."""
+def run_workers(cmds, envs, log_paths, on_tick=None, tick_interval=60):
+    """Launch len(cmds) subprocesses concurrently, wait for all, return exit codes.
+
+    If on_tick is given, it's called every tick_interval seconds while any
+    worker is still running (and once more after they all exit) -- used to
+    write a live merged-results snapshot so progress is observable and a
+    crash/reboot mid-run only loses the current tick's window, not the whole
+    run (worker checkpoints themselves are per-task; this just re-merges them).
+    """
+    import time
+
     procs = []
     handles = []
     for cmd, env, log_path in zip(cmds, envs, log_paths):
@@ -93,6 +107,18 @@ def run_workers(cmds, envs, log_paths):
         proc = subprocess.Popen(cmd, cwd=REPO_ROOT, env=env, stdout=handle, stderr=subprocess.STDOUT)
         procs.append(proc)
         handles.append(handle)
+
+    while True:
+        all_done = all(proc.poll() is not None for proc in procs)
+        if on_tick is not None:
+            try:
+                on_tick()
+            except Exception as exc:
+                print(f"[merge-tick] Error during periodic merge (non-fatal): {exc}")
+        if all_done:
+            break
+        time.sleep(tick_interval)
+
     codes = [proc.wait() for proc in procs]
     for handle in handles:
         handle.close()
@@ -138,7 +164,12 @@ def run_l2_stage(args, chat: bool):
     setup_template_cache(template_dir, cache_dir)
 
     work_root = os.path.join(args.work_root, "l2chat" if chat else "l2raw")
-    shutil.rmtree(work_root, ignore_errors=True)
+    # NOTE: no rmtree here -- if a prior run left per-worker checkpoints in
+    # this work_root, benchmark_coding_layer2[_chat].py resumes from them
+    # (skips already-completed problem names). split_round_robin is a
+    # deterministic function of (problems, workers), so re-splitting onto
+    # the same worker{i} dirs lines shards up with the right resume state
+    # as long as --dataset-path and --workers are unchanged across runs.
     shards = split_round_robin(problems, args.workers)
 
     cmds, envs, log_paths, worker_dirs = [], [], [], []
@@ -159,11 +190,6 @@ def run_l2_stage(args, chat: bool):
         log_paths.append(os.path.join(worker_dir, "log.txt"))
         worker_dirs.append(worker_dir)
 
-    started = datetime.datetime.now(datetime.timezone.utc)
-    codes = run_workers(cmds, envs, log_paths)
-    finished = datetime.datetime.now(datetime.timezone.utc)
-    print(f"[done] Worker exit codes: {codes}")
-
     slug = model_slug(args.model)
     suffix = "-chat" if chat else ""
     results_key = "layer2_chat_results" if chat else "layer2_results"
@@ -172,49 +198,61 @@ def run_l2_stage(args, chat: bool):
     rate_key = "layer2_chat_pass_rate" if chat else "layer2_pass_rate"
     benchmark_name = "coding-layer2-chat" if chat else "coding"
 
-    all_records = []
-    for worker_dir in worker_dirs:
-        worker_checkpoint = os.path.join(worker_dir, f"coding-{slug}{suffix}.json")
-        data = read_json(worker_checkpoint)
-        all_records.extend(data.get(results_key, []))
+    started = datetime.datetime.now(datetime.timezone.utc)
 
-    merged_passed = sum(1 for r in all_records if r.get("passed"))
-    merged_total = len(all_records)
-    merged_rate = merged_passed / merged_total if merged_total else 0.0
+    def merge_and_write(finished_at=None):
+        all_records = []
+        for worker_dir in worker_dirs:
+            worker_checkpoint = os.path.join(worker_dir, f"coding-{slug}{suffix}.json")
+            data = read_json(worker_checkpoint)
+            all_records.extend(data.get(results_key, []))
 
-    if chat:
-        # Dedicated file, no other layer writes here -- plain overwrite is safe.
-        out_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
-        payload = {
-            "model": args.model,
-            "benchmark": benchmark_name,
-            "layer2_chat_run_started_at": started.isoformat(),
-            "layer2_chat_run_finished_at": finished.isoformat(),
-            rate_key: merged_rate,
-            passed_key: merged_passed,
-            total_key: merged_total,
-            results_key: all_records,
-            "merged_from_workers": args.workers,
-        }
-        write_json(out_path, payload)
-    else:
-        # Shared coding-{slug}.json -- read-then-update to preserve layer3_*.
-        out_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
-        checkpoint = read_json(out_path)
-        checkpoint.update({
-            "model": args.model,
-            "benchmark": benchmark_name,
-            "layer2_run_started_at": started.isoformat(),
-            "layer2_run_finished_at": finished.isoformat(),
-            rate_key: merged_rate,
-            passed_key: merged_passed,
-            total_key: merged_total,
-            results_key: all_records,
-            "layer2_merged_from_workers": args.workers,
-        })
-        write_json(out_path, checkpoint)
+        merged_passed = sum(1 for r in all_records if r.get("passed"))
+        merged_total = len(all_records)
+        merged_rate = merged_passed / merged_total if merged_total else 0.0
 
-    print(f"[score] {rate_key}={merged_rate:.4f} ({merged_passed}/{merged_total})")
+        if chat:
+            # Dedicated file, no other layer writes here -- plain overwrite is safe.
+            out_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
+            payload = {
+                "model": args.model,
+                "benchmark": benchmark_name,
+                "layer2_chat_run_started_at": started.isoformat(),
+                "layer2_chat_run_finished_at": finished_at.isoformat() if finished_at else None,
+                rate_key: merged_rate,
+                passed_key: merged_passed,
+                total_key: merged_total,
+                results_key: all_records,
+                "merged_from_workers": args.workers,
+            }
+            write_json(out_path, payload)
+        else:
+            # Shared coding-{slug}.json -- read-then-update to preserve layer3_*.
+            out_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
+            checkpoint = read_json(out_path)
+            checkpoint.update({
+                "model": args.model,
+                "benchmark": benchmark_name,
+                "layer2_run_started_at": started.isoformat(),
+                "layer2_run_finished_at": finished_at.isoformat() if finished_at else None,
+                rate_key: merged_rate,
+                passed_key: merged_passed,
+                total_key: merged_total,
+                results_key: all_records,
+                "layer2_merged_from_workers": args.workers,
+            })
+            write_json(out_path, checkpoint)
+        print(f"[merge-tick] {rate_key}={merged_rate:.4f} ({merged_passed}/{merged_total}) -> {out_path}", flush=True)
+        return out_path
+
+    codes = run_workers(cmds, envs, log_paths, on_tick=merge_and_write, tick_interval=90)
+    finished = datetime.datetime.now(datetime.timezone.utc)
+    print(f"[done] Worker exit codes: {codes}")
+
+    out_path = merge_and_write(finished_at=finished)
+    with open(out_path, "r", encoding="utf-8") as fh:
+        final_payload = json.load(fh)
+    print(f"[score] {rate_key}={final_payload[rate_key]:.4f} ({final_payload[passed_key]}/{final_payload[total_key]})")
     print(f"[checkpoint] Merged result written to {out_path}")
 
 
@@ -239,7 +277,10 @@ def run_l3_stage(args):
         setup_template_cache(template_dir, cache_dir)
 
     work_root = os.path.join(args.work_root, "l3think" if args.think else "l3nothink")
-    shutil.rmtree(work_root, ignore_errors=True)
+    # NOTE: no rmtree here -- see the matching comment in run_l2_stage. Task
+    # shards are deterministic given the same task_dir/workers, so re-copying
+    # them into worker{i}/tasks is safe and benchmark_coding_layer3.py resumes
+    # from any existing worker checkpoint (skips already-completed task names).
     shards = split_round_robin(task_paths, args.workers)
 
     cmds, envs, log_paths, worker_dirs = [], [], [], []
@@ -264,40 +305,46 @@ def run_l3_stage(args):
         log_paths.append(os.path.join(worker_dir, "log.txt"))
         worker_dirs.append(worker_dir)
 
+    slug = model_slug(args.model)
+    suffix = "-think" if args.think else ""
     started = datetime.datetime.now(datetime.timezone.utc)
-    codes = run_workers(cmds, envs, log_paths)
+
+    def merge_and_write(finished_at=None):
+        all_results = []
+        for worker_dir in worker_dirs:
+            worker_checkpoint = os.path.join(worker_dir, f"coding-{slug}{suffix}.json")
+            data = read_json(worker_checkpoint)
+            all_results.extend(data.get("layer3_results", []))
+
+        numerator = sum(r.get("weight", 1) * (1 if r.get("passed") else 0) for r in all_results)
+        denominator = sum(r.get("weight", 1) for r in all_results)
+        merged_score = numerator / denominator if denominator else 0.0
+
+        out_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
+        checkpoint = read_json(out_path)
+        checkpoint.update({
+            "model": args.model,
+            "benchmark": "coding",
+            "run_started_at": started.isoformat(),
+            "run_finished_at": finished_at.isoformat() if finished_at else None,
+            "layer3_results": all_results,
+            "layer3_weighted_score": merged_score,
+            "think_setting": "high" if args.think else "false",
+            "layer3_merged_from_workers": args.workers,
+        })
+        write_json(out_path, checkpoint)
+        passed = sum(1 for r in all_results if r.get("passed"))
+        print(f"[merge-tick] layer3_weighted_score={merged_score:.4f} ({passed}/{len(all_results)} tasks passed) -> {out_path}", flush=True)
+        return out_path
+
+    codes = run_workers(cmds, envs, log_paths, on_tick=merge_and_write, tick_interval=90)
     finished = datetime.datetime.now(datetime.timezone.utc)
     print(f"[done] Worker exit codes: {codes}")
 
-    slug = model_slug(args.model)
-    suffix = "-think" if args.think else ""
-
-    all_results = []
-    for worker_dir in worker_dirs:
-        worker_checkpoint = os.path.join(worker_dir, f"coding-{slug}{suffix}.json")
-        data = read_json(worker_checkpoint)
-        all_results.extend(data.get("layer3_results", []))
-
-    numerator = sum(r.get("weight", 1) * (1 if r.get("passed") else 0) for r in all_results)
-    denominator = sum(r.get("weight", 1) for r in all_results)
-    merged_score = numerator / denominator if denominator else 0.0
-
-    out_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
-    checkpoint = read_json(out_path)
-    checkpoint.update({
-        "model": args.model,
-        "benchmark": "coding",
-        "run_started_at": started.isoformat(),
-        "run_finished_at": finished.isoformat(),
-        "layer3_results": all_results,
-        "layer3_weighted_score": merged_score,
-        "think_setting": "high" if args.think else "false",
-        "layer3_merged_from_workers": args.workers,
-    })
-    write_json(out_path, checkpoint)
-
-    passed = sum(1 for r in all_results if r.get("passed"))
-    print(f"[score] layer3_weighted_score={merged_score:.4f} ({passed}/{len(all_results)} tasks passed)")
+    out_path = merge_and_write(finished_at=finished)
+    with open(out_path, "r", encoding="utf-8") as fh:
+        final_payload = json.load(fh)
+    print(f"[score] layer3_weighted_score={final_payload['layer3_weighted_score']:.4f} ({sum(1 for r in final_payload['layer3_results'] if r.get('passed'))}/{len(final_payload['layer3_results'])} tasks passed)")
     print(f"[checkpoint] Merged result written to {out_path}")
 
 

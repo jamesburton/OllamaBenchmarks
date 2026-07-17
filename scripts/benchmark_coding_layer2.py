@@ -431,12 +431,22 @@ def main() -> None:
         checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
         checkpoint = read_checkpoint(checkpoint_path)
 
-        model_run_started_at = datetime.datetime.now(datetime.timezone.utc)
-        passed_count = 0
-        problem_records: list[dict[str, Any]] = []
+        problem_records: list[dict[str, Any]] = list(checkpoint.get("layer2_results") or [])
+        done_names = {r["name"] for r in problem_records}
+        passed_count = sum(1 for r in problem_records if r.get("passed"))
+        if done_names:
+            print(f"  [resume] {len(done_names)} problem(s) already completed, skipping")
+        model_run_started_at_str = checkpoint.get("layer2_run_started_at")
+        model_run_started_at = (
+            datetime.datetime.fromisoformat(model_run_started_at_str)
+            if model_run_started_at_str
+            else datetime.datetime.now(datetime.timezone.utc)
+        )
 
         for idx, problem in enumerate(problems, start=1):
             name = problem.get("name", f"problem_{idx}")
+            if name in done_names:
+                continue
             print(f"  [{idx}/{total}] {name} ...", end="", flush=True)
 
             try:
@@ -469,7 +479,7 @@ def main() -> None:
                 "layer2_run_finished_at": datetime.datetime.now(
                     datetime.timezone.utc
                 ).isoformat(),
-                "layer2_pass_rate": passed_count / idx,
+                "layer2_pass_rate": passed_count / len(problem_records),
                 "layer2_passed": passed_count,
                 "layer2_total": total,
                 "layer2_results": problem_records,

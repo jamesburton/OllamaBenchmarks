@@ -6,6 +6,8 @@ Central engine that sends prompts to Ollama, writes generated code into
 """
 
 import dataclasses
+import datetime
+import email.utils
 import json
 import os
 import re
@@ -13,6 +15,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import urllib.error
 import urllib.request
 
 import yaml
@@ -21,6 +24,27 @@ from coding_tasks.code_extractor import extract_csharp
 
 # Allow targeting a remote Ollama (e.g. a GPU host) without changing call sites.
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
+
+
+def retry_wait_seconds(exc: "urllib.error.HTTPError", attempt: int, base: float = 20.0, cap: float = 300.0) -> float:
+    """Seconds to wait before retrying a 429/503. Honors a Retry-After header
+    (either delta-seconds or an HTTP-date, per RFC 9110) when the server sends
+    one — cloud providers throttling on a token bucket usually do. Falls back
+    to exponential backoff (20s, 40s, 80s... capped at `cap`) otherwise.
+    """
+    header = exc.headers.get("Retry-After") if exc.headers else None
+    if header:
+        try:
+            return max(1.0, float(header))
+        except ValueError:
+            pass
+        try:
+            dt = email.utils.parsedate_to_datetime(header)
+            now = datetime.datetime.now(dt.tzinfo or datetime.timezone.utc)
+            return max(1.0, (dt - now).total_seconds())
+        except Exception:
+            pass
+    return min(base * (2 ** attempt), cap)
 
 
 @dataclasses.dataclass
@@ -120,23 +144,34 @@ def call_ollama(
         },
     }
     data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        f"{OLLAMA_HOST}/api/chat",
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-        content = body.get("message", {}).get("content", "")
-        # Strip thinking tags if present (some models use <think>...</think>)
-        if "<think>" in content:
-            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
-        return content
-    except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
-        print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
-        return ""
+    max_retries = int(os.environ.get("OLLAMA_MAX_RETRIES", "6"))
+    for attempt in range(max_retries):
+        req = urllib.request.Request(
+            f"{OLLAMA_HOST}/api/chat",
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+            content = body.get("message", {}).get("content", "")
+            # Strip thinking tags if present (some models use <think>...</think>)
+            if "<think>" in content:
+                content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+            return content
+        except urllib.error.HTTPError as exc:
+            if exc.code in (429, 503) and attempt < max_retries - 1:
+                wait = retry_wait_seconds(exc, attempt)
+                print(f"    [call_ollama] {exc.code} rate-limited, waiting {wait:.0f}s (attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait)
+                continue
+            print(f"    [call_ollama] Error: HTTPError {exc.code}: {exc}")
+            return ""
+        except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+            print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
+            return ""
+    return ""
 
 
 def setup_template_cache(template_dir: str, cache_dir: str) -> str:
@@ -255,8 +290,13 @@ def run_task(
     num_ctx = task_def.get("num_ctx", 12288)
 
     try:
-        # Determine generation timeout
-        gen_timeout = 600 if weight >= 2 else 600
+        # Was hardcoded 600s regardless of weight. Under concurrency=2 on a
+        # ~1.0-1.2 tok/s steady-state model (see MODEL_QUIRKS.md perf-lever
+        # entry), and with think:high's extra reasoning-token overhead, 600s
+        # is routinely too short (observed 100% TimeoutError on mistral-medium-
+        # 3.5:iq3m think:high cross-machine, 2026-07-13). Override via
+        # L3_GEN_TIMEOUT_S; default kept at 600 for standalone/fast-model runs.
+        gen_timeout = int(os.environ.get("L3_GEN_TIMEOUT_S", "600"))
 
         # Call Ollama and measure time
         t0 = time.monotonic()

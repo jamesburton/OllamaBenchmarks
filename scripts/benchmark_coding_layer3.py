@@ -92,14 +92,30 @@ def main() -> None:
     all_model_results: list[dict[str, Any]] = []
 
     for model in args.models:
-        model_run_started_at = datetime.datetime.now(datetime.timezone.utc)
         slug = model_slug(model)
         print(f"\n[model] {model} (slug={slug})")
 
-        task_results: list[TaskResult] = []
+        think_env = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
+        suffix = "-think" if think_env in ("1", "true", "yes", "on", "low", "medium", "high") else ""
+        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
+
+        checkpoint_payload: dict[str, Any] = read_json(checkpoint_path)
+        prior_results = checkpoint_payload.get("layer3_results") or []
+        done_names = {r["task"] for r in prior_results}
+        task_results: list[TaskResult] = [TaskResult(**r) for r in prior_results]
+        if done_names:
+            print(f"  [resume] {len(done_names)} task(s) already completed, skipping")
+        model_run_started_at_str = checkpoint_payload.get("run_started_at")
+        model_run_started_at = (
+            datetime.datetime.fromisoformat(model_run_started_at_str)
+            if model_run_started_at_str
+            else datetime.datetime.now(datetime.timezone.utc)
+        )
 
         for yaml_path in task_paths:
             task_name = os.path.splitext(os.path.basename(yaml_path))[0]
+            if task_name in done_names:
+                continue
             print(f"  [task] {task_name} ...", end="", flush=True)
 
             task_def = load_task(yaml_path, args.references_dir)
@@ -125,6 +141,19 @@ def main() -> None:
             status = "PASS" if result.passed else "FAIL"
             extra = f" ({result.harness_error})" if result.harness_error else ""
             print(f" {status}{extra}")
+
+            # Incremental checkpoint after every task: a stall/crash must lose
+            # at most the current task, mirroring the L2 harnesses' pattern.
+            checkpoint_payload.update({
+                "model": model,
+                "benchmark": "coding",
+                "run_started_at": model_run_started_at.isoformat(),
+                "run_finished_at": None,
+                "layer3_results": [dataclasses.asdict(r) for r in task_results],
+                "layer3_weighted_score": compute_layer3_score(task_results),
+                "think_setting": think_env or "false",
+            })
+            write_json(checkpoint_path, checkpoint_payload)
 
         layer3_score = compute_layer3_score(task_results)
         model_run_finished_at = datetime.datetime.now(datetime.timezone.utc)

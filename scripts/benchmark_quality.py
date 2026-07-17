@@ -4,6 +4,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import textwrap
 import time
@@ -11,6 +12,9 @@ from typing import Any
 import urllib.request
 
 from collect_host_info import build_host_info
+
+sys.path.insert(0, os.path.dirname(__file__))
+from coding_tasks.task_runner import retry_wait_seconds
 
 CODING_TASKS = [
     (
@@ -235,7 +239,9 @@ def write_json(path: str, payload: dict[str, Any]) -> None:
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
 
 
-def post_json(path: str, payload: dict, timeout: int = 1200, max_retries: int = 5) -> dict:
+def post_json(path: str, payload: dict, timeout: int = 1200, max_retries: int = None) -> dict:
+    if max_retries is None:
+        max_retries = int(os.environ.get("OLLAMA_MAX_RETRIES", "6"))
     req_data = json.dumps(payload).encode("utf-8")
     for attempt in range(max_retries):
         req = urllib.request.Request(
@@ -248,9 +254,9 @@ def post_json(path: str, payload: dict, timeout: int = 1200, max_retries: int = 
             with urllib.request.urlopen(req, timeout=timeout) as response:
                 return json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
-            if e.code == 429 and attempt < max_retries - 1:
-                wait = min(30 * (2 ** attempt), 300)  # 30s, 60s, 120s, 240s, 300s
-                print(f"    [429 rate-limited] waiting {wait}s (attempt {attempt+1}/{max_retries})")
+            if e.code in (429, 503) and attempt < max_retries - 1:
+                wait = retry_wait_seconds(e, attempt, base=30.0)
+                print(f"    [{e.code} rate-limited] waiting {wait:.0f}s (attempt {attempt+1}/{max_retries})")
                 time.sleep(wait)
                 continue
             raise
