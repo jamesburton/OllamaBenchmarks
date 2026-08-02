@@ -29,6 +29,23 @@ def write_json(path: str, payload: dict[str, Any]) -> None:
         fh.write(json.dumps(payload, indent=2) + "\n")
 
 
+def read_checkpoint(path: str) -> dict[str, Any]:
+    """Read an existing per-model checkpoint, or {} if absent/unreadable.
+
+    Layer 1/2/4 all merge their fields into the same coding-<slug>.json file
+    (layer1_*, layer2_*, etc. namespaced per layer) rather than each layer
+    overwriting the whole file. Layer 3 must do the same or it silently wipes
+    whatever Layer 1/2/4 already wrote for this model.
+    """
+    if os.path.isfile(path):
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                return json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            pass
+    return {}
+
+
 def compute_layer3_score(results: list[TaskResult]) -> float:
     numerator = sum(r.weight * (1 if r.passed else 0) for r in results)
     denominator = sum(r.weight for r in results)
@@ -85,6 +102,7 @@ def main() -> None:
         print(f"\n[model] {model} (slug={slug})")
 
         task_results: list[TaskResult] = []
+        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
 
         for yaml_path in task_paths:
             task_name = os.path.splitext(os.path.basename(yaml_path))[0]
@@ -114,6 +132,27 @@ def main() -> None:
             extra = f" ({result.harness_error})" if result.harness_error else ""
             print(f" {status}{extra}")
 
+            # Incremental checkpoint after every task. Previously this only wrote
+            # a checkpoint once, after the entire task list finished for a model —
+            # a live run against dotLLM was killed mid-run by an external factor
+            # and lost all progress under that scheme (see Layer 2's identical fix).
+            # Write partial progress every iteration so an interrupted run is at
+            # least partially recoverable/inspectable instead of silently void.
+            partial_score = compute_layer3_score(task_results)
+            partial_checkpoint = read_checkpoint(checkpoint_path)
+            partial_checkpoint.update({
+                "model": model,
+                "benchmark": "coding",
+                "layer3_run_started_at": model_run_started_at.isoformat(),
+                "layer3_run_finished_at": None,
+                "layer3_in_progress": True,
+                "layer3_total_so_far": len(task_results),
+                "layer3_total": len(task_paths),
+                "layer3_results": [dataclasses.asdict(r) for r in task_results],
+                "layer3_weighted_score": partial_score,
+            })
+            write_json(checkpoint_path, partial_checkpoint)
+
         layer3_score = compute_layer3_score(task_results)
         model_run_finished_at = datetime.datetime.now(datetime.timezone.utc)
 
@@ -122,16 +161,18 @@ def main() -> None:
             f"({sum(1 if r.passed else 0 for r in task_results)}/{len(task_results)} tasks passed)"
         )
 
-        checkpoint_payload: dict[str, Any] = {
+        checkpoint_payload: dict[str, Any] = read_checkpoint(checkpoint_path)
+        checkpoint_payload.update({
             "model": model,
             "benchmark": "coding",
-            "run_started_at": model_run_started_at.isoformat(),
-            "run_finished_at": model_run_finished_at.isoformat(),
+            "layer3_run_started_at": model_run_started_at.isoformat(),
+            "layer3_run_finished_at": model_run_finished_at.isoformat(),
+            "layer3_in_progress": False,
             "layer3_results": [dataclasses.asdict(r) for r in task_results],
             "layer3_weighted_score": layer3_score,
-        }
+        })
+        checkpoint_payload.pop("layer3_total_so_far", None)
 
-        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
         write_json(checkpoint_path, checkpoint_payload)
         print(f"  [checkpoint] Written to {checkpoint_path}")
 
