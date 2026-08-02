@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from coding_tasks.task_runner import (
     model_slug,
     call_ollama,
+    call_openai_complete,
     setup_template_cache,
 )
 from coding_tasks.code_extractor import extract_csharp
@@ -152,16 +153,30 @@ def run_problem(
     tests: str = problem.get("tests", "")
     stop_tokens: list[str] = problem.get("stop_tokens") or ["\n    }\n"]
 
-    # 1. Generate code using completion mode (fill-in-the-middle)
-    raw_response = _call_ollama_complete(
-        model,
-        prompt,
-        max_tokens=2048,
-        num_ctx=4096,
-        seed=42,
-        timeout=120,
-        stop_tokens=stop_tokens,
-    )
+    # 1. Generate code using completion mode (fill-in-the-middle).
+    # Use an OpenAI-compatible /v1/completions backend (dotLLM, llama-server, ...) when
+    # LLAMA_SERVER_URL is set, otherwise fall back to Ollama's /api/generate (raw: true).
+    llama_server_url = os.environ.get("LLAMA_SERVER_URL")
+    if llama_server_url:
+        raw_response = call_openai_complete(
+            prompt,
+            model,
+            max_tokens=2048,
+            seed=42,
+            timeout=120,
+            stop_tokens=stop_tokens,
+            base_url=llama_server_url,
+        )
+    else:
+        raw_response = _call_ollama_complete(
+            model,
+            prompt,
+            max_tokens=2048,
+            num_ctx=4096,
+            seed=42,
+            timeout=120,
+            stop_tokens=stop_tokens,
+        )
 
     if not raw_response:
         return False, "Ollama returned empty response"
