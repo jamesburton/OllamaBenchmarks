@@ -1,0 +1,212 @@
+{
+  "model": "ggml-model-i2_s",
+  "benchmark": "coding",
+  "layer2_run_started_at": "2026-08-02T22:36:11.799159+00:00",
+  "layer2_run_finished_at": "2026-08-02T23:30:14.038708+00:00",
+  "layer2_in_progress": false,
+  "layer2_pass_rate": 0.0,
+  "layer2_passed": 0,
+  "layer2_total": 40,
+  "layer2_results": [
+    {
+      "name": "HumanEval_0_has_close_elements",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_1_separate_paren_groups",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_2_truncate_number",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_3_below_zero",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_4_mean_absolute_deviation",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_5_intersperse",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_6_parse_nested_parens",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_7_filter_by_substring",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_8_sum_product",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_9_rolling_max",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_10_make_palindrome",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_11_string_xor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_12_longest",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_13_greatest_common_divisor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_14_all_prefixes",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_15_string_sequence",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_16_count_distinct_characters",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_17_parse_music",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_18_how_many_times",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_19_sort_numbers",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_20_find_closest_elements",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_21_rescale_to_unit",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_22_filter_integers",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_23_strlen",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_24_largest_divisor",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_25_factorize",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_26_remove_duplicates",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_27_flip_case",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_28_concatenate",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_29_filter_by_prefix",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_30_get_positive",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_31_is_prime",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_33_sort_third",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_34_unique",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_35_max_element",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_36_fizz_buzz",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_37_sort_even",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_39_prime_fib",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_40_triples_sum_to_zero",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    },
+    {
+      "name": "HumanEval_41_car_race_collision",
+      "passed": false,
+      "error": "Ollama returned empty response"
+    }
+  ]
+}
