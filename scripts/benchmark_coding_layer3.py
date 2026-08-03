@@ -76,6 +76,9 @@ def main() -> None:
     parser.add_argument("--resume", action="store_true",
                          help="Skip tasks already present in an existing coding-<slug>.json checkpoint "
                               "(from a prior run that was interrupted) instead of re-running them.")
+    parser.add_argument("--limit", type=int, default=0,
+                         help="Limit number of tasks (0 = all). Applied after --resume filtering, "
+                              "i.e. counts newly-run tasks, not previously-completed ones.")
     args = parser.parse_args()
 
     run_started_at = datetime.datetime.now(datetime.timezone.utc)
@@ -116,16 +119,33 @@ def main() -> None:
             if already_done:
                 print(f"[resume] {len(already_done)} task(s) already completed in a prior run — skipping them")
 
+        newly_run_count = 0
         for yaml_path in task_paths:
-            task_name = os.path.splitext(os.path.basename(yaml_path))[0]
+            filename_task_name = os.path.splitext(os.path.basename(yaml_path))[0]
 
-            if task_name in already_done:
-                task_results.append(TaskResult(**already_done[task_name]))
+            # Resume matching MUST use the YAML's internal "name:" field, not the
+            # filename. TaskResult.task (what run_task/task_runner.py actually
+            # stores in the checkpoint) comes from task_def["name"], which is
+            # frequently NOT the same string as the filename (e.g. filename
+            # "01_aspnet_oneof_controller" vs. name: "aspnet_oneof_controller").
+            # An earlier version of this check compared against the filename and
+            # silently never matched, so --resume printed "N tasks skipped" but
+            # then re-ran every task anyway, overwriting the real checkpoint with
+            # a fresh, shorter, duplicate-effort run. Load task_def before the
+            # skip check so the comparison is done on the correct key.
+            task_def = load_task(yaml_path, args.references_dir)
+            actual_task_name = task_def.get("name", filename_task_name)
+
+            if actual_task_name in already_done:
+                task_results.append(TaskResult(**already_done[actual_task_name]))
                 continue
 
-            print(f"  [task] {task_name} ...", end="", flush=True)
+            if args.limit > 0 and newly_run_count >= args.limit:
+                continue
+            newly_run_count += 1
 
-            task_def = load_task(yaml_path, args.references_dir)
+            print(f"  [task] {filename_task_name} ...", end="", flush=True)
+
             template_name = task_def.get("template", "test_project")
             cached_template_path = cached_templates.get(template_name)
 
