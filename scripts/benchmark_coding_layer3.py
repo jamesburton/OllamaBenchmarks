@@ -73,6 +73,9 @@ def main() -> None:
     parser.add_argument("--references-dir", default="scripts/coding_tasks/references")
     parser.add_argument("--template-base", default="scripts/coding_tasks/templates")
     parser.add_argument("--save-code", action="store_true", default=True)
+    parser.add_argument("--resume", action="store_true",
+                         help="Skip tasks already present in an existing coding-<slug>.json checkpoint "
+                              "(from a prior run that was interrupted) instead of re-running them.")
     args = parser.parse_args()
 
     run_started_at = datetime.datetime.now(datetime.timezone.utc)
@@ -104,8 +107,22 @@ def main() -> None:
         task_results: list[TaskResult] = []
         checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
 
+        already_done: dict[str, Any] = {}
+        if args.resume:
+            existing = read_checkpoint(checkpoint_path)
+            for r in existing.get("layer3_results", []):
+                if r.get("task"):
+                    already_done[r["task"]] = r
+            if already_done:
+                print(f"[resume] {len(already_done)} task(s) already completed in a prior run — skipping them")
+
         for yaml_path in task_paths:
             task_name = os.path.splitext(os.path.basename(yaml_path))[0]
+
+            if task_name in already_done:
+                task_results.append(TaskResult(**already_done[task_name]))
+                continue
+
             print(f"  [task] {task_name} ...", end="", flush=True)
 
             task_def = load_task(yaml_path, args.references_dir)
