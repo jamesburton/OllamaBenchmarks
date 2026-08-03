@@ -372,6 +372,87 @@ def free_gb(path: Path) -> float:
     return free / (1024 ** 3)
 
 
+_LIST_ORPHAN_PULLS_PS = r"""
+$pulls = @(Get-CimInstance Win32_Process -Filter "Name='ollama.exe'" |
+           Where-Object { $_.CommandLine -like '*pull*' })
+$out = foreach ($p in $pulls) {
+  $alive = $null -ne (Get-Process -Id $p.ParentProcessId -ErrorAction SilentlyContinue)
+  [pscustomobject]@{ pid = $p.ProcessId; ppid = $p.ParentProcessId
+                     parentAlive = $alive; cmd = $p.CommandLine }
+}
+@($out) | ConvertTo-Json -Compress
+"""
+
+
+def ollama_blob_dir() -> Path:
+    root = os.environ.get("OLLAMA_MODELS")
+    if root:
+        return Path(root) / "blobs"
+    return Path.home() / ".ollama" / "models" / "blobs"
+
+
+def cleanup_orphaned_pulls(log):
+    """Kill `ollama pull` processes orphaned by a previous queue run, then drop
+    the partial blobs they were writing.
+
+    The fetch-ahead design starts model i+1's pull as a child of the queue. If
+    the queue dies or is killed between models, that child keeps downloading
+    with no parent -- observed 2026-08-03, when a 17.5GB partial was still
+    growing hours after its parent had exited, and a restarted queue would have
+    raced it on the same blob.
+
+    Deliberately conservative: only pulls whose PARENT IS GONE are killed, so a
+    concurrently-running queue or a manual `ollama pull` is left alone. Partial
+    blobs are only removed once no pull process of any kind remains, because a
+    live pull's partials are its working state -- deleting those would corrupt
+    a download this queue does not own.
+    """
+    if os.name != "nt":
+        return  # process inspection here is Windows-specific (this box is Strix/Windows)
+    try:
+        res = subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-Command",
+             _LIST_ORPHAN_PULLS_PS],
+            capture_output=True, text=True, timeout=60)
+        entries = json.loads(res.stdout.strip() or "[]")
+    except (OSError, subprocess.SubprocessError, json.JSONDecodeError, ValueError) as exc:
+        log(f"  [startup] could not inspect ollama pull processes ({exc}); skipping sweep")
+        return
+    if isinstance(entries, dict):  # ConvertTo-Json unwraps a single object
+        entries = [entries]
+
+    orphans = [e for e in entries if not e.get("parentAlive")]
+    live = [e for e in entries if e.get("parentAlive")]
+    for e in orphans:
+        cmd = (e.get("cmd") or "").strip()
+        log(f"  [startup] killing orphaned pull (pid {e['pid']}, dead parent "
+            f"{e['ppid']}): {cmd}")
+        subprocess.run(["taskkill", "/PID", str(e["pid"]), "/F"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if live:
+        log(f"  [startup] leaving {len(live)} pull(s) with a live parent alone; "
+            f"not touching partial blobs")
+        return
+    if not orphans:
+        return
+
+    blob_dir = ollama_blob_dir()
+    freed = 0
+    removed = 0
+    for blob in blob_dir.glob("*-partial*"):
+        try:
+            size = blob.stat().st_size
+            blob.unlink()
+        except OSError as exc:
+            log(f"  [startup] could not remove {blob.name}: {exc}")
+            continue
+        freed += size
+        removed += 1
+    if removed:
+        log(f"  [startup] removed {removed} orphaned partial blob(s), "
+            f"~{freed / (1024 ** 3):.1f}GB")
+
+
 def headroom_ok(log, state, read_free=None, settle_s=RECLAIM_SETTLE_S,
                 poll_s=RECLAIM_POLL_S, sleep=time.sleep):
     """Free space vs MIN_FREE_GB_TO_PULL, tolerant of a lagging `ollama rm`.
@@ -547,6 +628,8 @@ def main():
     for name, reason in BLOCKED_BY_UMA:
         log(f"  [BLOCKED] {name} -- {reason} (Ollama UMA bug, needs BIOS fix + power-cycle, see PLATFORM_QUIRKS.md)")
 
+    cleanup_orphaned_pulls(log)
+
     # Set when a settle-wait has already timed out without recovering headroom,
     # and cleared whenever a reclaim actually removes something. Without it, a
     # genuine out-of-space pass would burn RECLAIM_SETTLE_S on every remaining
@@ -587,6 +670,41 @@ def main():
 
     # --- Tier 3: fetch-ahead, bench-behind ---
     pull_procs = {}
+    # model -> (log path, open handle) for the in-flight pull. Before 2026-08-03
+    # pull output went to DEVNULL, so every failure logged an identical
+    # "[FAIL] ... (exit 1)" with no way to tell a nonexistent tag from a gated
+    # repo from a transient network drop -- four such failures had to be
+    # researched by hand against the Ollama and HF APIs to be told apart.
+    pull_logs = {}
+
+    def finish_pull_log(model):
+        """Close a pull's log handle and return a one-line failure summary."""
+        entry = pull_logs.pop(model, None)
+        if entry is None:
+            return ""
+        path, handle = entry
+        try:
+            handle.close()
+        except OSError:
+            pass
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        # `ollama pull` redraws progress with \r, so split on it too and drop the
+        # progress frames -- what's wanted is the error text after them. Braille
+        # spinner glyphs (U+2800-U+28FF) are stripped and consecutive repeats
+        # collapsed, otherwise "pulling manifest" redraws fill the last-3-lines
+        # window and push the actual error out of it.
+        cleaned = []
+        for line in text.replace("\r", "\n").splitlines():
+            line = "".join(c for c in line if not ("⠀" <= c <= "⣿")).strip()
+            if not line or "%" in line or "▕" in line or "▁" in line:
+                continue
+            if cleaned and cleaned[-1] == line:
+                continue
+            cleaned.append(line)
+        return " | ".join(cleaned[-3:])[:400]
 
     def start_pull(model):
         # Skip the pull attempt entirely for models already installed --
@@ -606,8 +724,17 @@ def main():
                 f"below {MIN_FREE_GB_TO_PULL}GB safety margin")
             return None
         log(f"  [fetch] starting background pull: {model}")
-        proc = subprocess.Popen(["ollama", "pull", model], cwd=REPO_ROOT,
-                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        pull_log = LOG_DIR / f"gap-fill-pull-{model_slug(model)}.log"
+        try:
+            handle = open(pull_log, "w", encoding="utf-8", errors="replace")
+        except OSError:
+            handle = None
+        proc = subprocess.Popen(
+            ["ollama", "pull", model], cwd=REPO_ROOT,
+            stdout=handle if handle else subprocess.DEVNULL,
+            stderr=subprocess.STDOUT if handle else subprocess.DEVNULL)
+        if handle:
+            pull_logs[model] = (pull_log, handle)
         return proc
 
     if TIER3:
@@ -626,8 +753,10 @@ def main():
         if i + 1 < len(TIER3):
             pull_procs[TIER3[i + 1]] = start_pull(TIER3[i + 1])
 
+        detail = finish_pull_log(model) if proc is not None else ""
         if proc is not None and proc.returncode not in (0, None):
-            log(f"  [FAIL] pull failed for {model} (exit {proc.returncode}), skipping benchmarks")
+            log(f"  [FAIL] pull failed for {model} (exit {proc.returncode}), skipping benchmarks"
+                + (f" -- {detail}" if detail else " -- (no output captured)"))
             continue
         if proc is None and not is_installed(model):
             log(f"  [SKIP] {model} not installed and fetch was skipped (disk headroom)")
