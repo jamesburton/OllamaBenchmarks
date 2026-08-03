@@ -140,10 +140,22 @@ TIER3 = [
     "cogito:14b",
     "nemotron-cascade-2",
     "RogerBen/qwen3.5-35b-opus-distill",
-    "qwen3.5:35b-a3b-q2_k_l",
+    # Removed 2026-08-03: "qwen3.5:35b-a3b-q2_k_l" -- library/qwen3.5 publishes
+    # no q2_k_l for 35b-a3b (only q4_K_M/q8_0/int4/int8/bf16/mxfp8/nvfp4), and
+    # that exact quant is already covered by the bartowski entry below, which
+    # has been fetched+scored+reclaimed. Pure duplicate; failed every pass.
     "hf.co/bottlecapai/ThinkingCap-Qwen3.6-27B-GGUF:Q4_K_M",
-    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
-    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
+    # Removed 2026-08-03: "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k"
+    # -- no Q2_K build of this distill exists under any namespace (checked the
+    # kwangsuklee / moophlo / juilpark / sinhang / zierocode / ImpurestClub
+    # re-uploads). Dropped rather than substituted: swapping in a different
+    # quant would silently change what the score means.
+    # Repointed 2026-08-03: was "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
+    # which is unnamespaced and so resolved against library/qwen3.5, where these
+    # community distills have never existed. These re-uploads also bake the quant
+    # into the REPO NAME and publish only :latest, so a quant-suffixed tag can
+    # never match. Exact Q3_K_M equivalent (14GB, 256K ctx):
+    "yolo0perris/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-GGUF_Q3_K_M",
     "hf.co/Abiray/Nanbeige4.2-3B-GGUF:Q4_K_M",
     # Added 2026-07-22: sweep of every model referenced in results/*.json with
     # partial coverage that predates the gap-fill queue (found via the same
@@ -255,7 +267,10 @@ TIER3 = [
     "qwen2.5vl:7b",
     "qwen3.5:122b",
     "qwen3.5:122b-a10b",
-    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-v2-q4_k_m",
+    # Removed 2026-08-03: "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-v2-q4_k_m"
+    # -- same unnamespaced-tag problem as the q2_k/q3_k_m entries above. No exact
+    # v2 Q4_K_M re-upload exists; the only v2 build found is
+    # ImpurestClub/...-v2-q3km (Q3, not Q4), so there is nothing to repoint to.
     "qwen3.5:35b-a3b",
     "qwen3.5:4b",
     "qwen3.6-unsloth-iq2_m",
