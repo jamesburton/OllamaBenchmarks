@@ -1,0 +1,633 @@
+#!/usr/bin/env python3
+"""Sequential gap-fill queue: work through models missing benchmark stats.
+
+Three tiers, run strictly in order (Strix's iGPU hosts one model at a time,
+so inference is never parallelized -- only fetching is):
+
+  1. Already-installed models with partial coverage (just missing L2/L3/etc).
+  2. Already-installed models with zero coverage.
+  3. Not-yet-installed models (HF/Ollama pulls) -- fetched one entry AHEAD of
+     the currently-benching model, so download time overlaps with GPU time
+     instead of stalling the queue. Each tier-3 entry is removed from
+     benchmark-models.json's missing_from_local once its pipeline completes.
+
+Waits for any currently-running pipeline (matched by a log file containing a
+"pipeline finished" marker) before starting its own first model, so it can be
+launched while another gap-fill/one-off benchmark is still in flight.
+
+Disk-safety guard: before pulling a not-yet-installed model, checks free
+space on the Ollama models drive. Models whose expected size is unknown and
+large (flagged in HUGE_MODELS below) are skipped with a warning rather than
+blindly pulled -- this box was at ~100GB free / 95% full when this queue was
+authored, and this is a long unattended run.
+
+Usage:
+    python scripts/run_gap_fill_queue.py
+    python scripts/run_gap_fill_queue.py --wait-for-log results/overnight-logs/bonsai-q1_0-pipeline.log
+"""
+import argparse
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+RESULTS_DIR = REPO_ROOT / "results"
+LOG_DIR = RESULTS_DIR / "overnight-logs"
+BENCHMARK_MODELS_JSON = REPO_ROOT / "benchmark-models.json"
+DATASET_PATH = "scripts/coding_tasks/datasets/data/humaneval-cs-reworded.json"
+
+# Tier 0: explicit priority -- top-3 model by L3 with zero L2 data.
+# qwen3-coder-next:latest moved to BLOCKED_BY_UMA 2026-07-20 -- see there.
+TIER0 = []
+
+# Tier 1: installed, partial coverage. (model, stages_to_run)
+TIER1 = [
+    "nemotron-3-nano:latest",
+    "nemotron-3-nano:4b",
+    "nemotron-nano-9b-v2-toolfix:latest",
+    "lfm2.5-thinking:1.2b",
+    "LFM2-2.6b-tools:latest",
+    "phi4-mini:latest",
+    "sam860/lfm2:2.6b",
+    # Added 2026-07-22: already-accessible cloud model with partial coverage
+    # (quality 10/11, L3 40/50 already recorded) found via a sweep of every
+    # model with results/*.json data that predates the gap-fill queue.
+    "minimax-m3:cloud",
+]
+
+# Tier 2: installed, zero coverage.
+TIER2 = [
+    "devstral:24b",
+    "qwen36-bartowski:q4km",
+    "qwen36-apex:balanced",
+    "qwen3:4b-instruct",
+    "qwen3:0.6b",
+    "gemma4:e4b",
+    # Added 2026-07-30: found via the CURRENT_QUALITY_MAX sweep (stale /5
+    # quality runs, see that constant's definition below). These four are
+    # already installed (confirmed via `ollama list`) but were never tracked
+    # in any tier, so nothing was ever refreshing their quality score --
+    # zero fetch cost. Placed in TIER2 for tracking, but also added to
+    # KEEP_INSTALLED below per explicit user correction: the user already
+    # wants this gemma4/glm-4.7-flash set kept on disk long-term, not
+    # reclaimed once scored. A bare-name/no-tag duplicate of each ("gemma4",
+    # "glm-4.7-flash") also appeared in the stale sweep but shares the same
+    # model_slug() as the :latest-tagged entry here, so no separate line is
+    # needed for those.
+    "gemma4:latest",
+    "gemma4:31b",
+    "gemma4:e2b",
+    "glm-4.7-flash:latest",
+]
+
+# 2026-07-25: disk kept hitting the 25GB safety margin because freshly-fetched
+# Tier3 models (14-28GB each) accumulate faster than anything gets reclaimed.
+# User approved generalizing the one-off qwen36-bartowski/apex reclaim into a
+# blanket policy: every TIER2/TIER3 model gets `ollama rm`'d automatically
+# once its full pipeline (quality/throughput/L3/L2raw/L2chat) is confirmed
+# complete. TIER0/TIER1 are NOT auto-reclaimed -- those are the
+# already-installed, partial-coverage models the user is actively tracking.
+# KEEP_INSTALLED is the explicit exemption list for TIER2/TIER3 models the
+# user wants to keep on disk after scoring (e.g. for real-task/LoRA use).
+KEEP_INSTALLED = {
+    # step-3.5-flash-reap-121b-8k:latest (Q5_K_M) was kept here 2026-07-25 to
+    # survive the deferred L2 chat resume; that run finished (158/158 L2 chat,
+    # 50/50 L3, 158/158 L2 raw) and the model was reclaimed 2026-07-27 to free
+    # 85GB. A Q4_K_M re-run is planned (see the TIER3 exclusion note below and
+    # models/step-3.5-flash-reap-121b-8k-q4km.Modelfile) -- not queued here
+    # automatically since it needs a manual `ollama create` first.
+    #
+    # Added 2026-07-30 per explicit user correction: these were added to
+    # TIER2 (auto-reclaim) as part of the CURRENT_QUALITY_MAX stale-quality
+    # fix, but the user already wants this gemma4/glm-4.7-flash/gpt-oss set
+    # kept on disk long-term (real-task use, not just benchmark scoring) --
+    # they stay in TIER2 for tracking/reclaim-eligibility bookkeeping, but
+    # this set exempts them from actually being deleted once scored. Only
+    # genuinely new fetches (qwen3-coder:30b, qwen3.5:9b, the nvidia
+    # Nemotron-Nano-9B-v2 and unsloth GLM-4.7-Flash-REAP-23B-A3B GGUFs) get
+    # removed after retesting, per the same instruction.
+    "gemma4:latest",
+    "gemma4:31b",
+    "gemma4:e2b",
+    "glm-4.7-flash:latest",
+    "gpt-oss:20b",
+}
+
+# Tier 3: not installed -- needs a pull. Ordered smallest/most-relevant first
+# where size is known or guessable.
+TIER3 = [
+    "granite4:7b-a1b-h",
+    "gemma3:4b",
+    "zac/phi4-tools",
+    "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
+    "hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M",
+    "omnicoder:9b-q4_k_m",
+    "gemma3:12b",
+    "mistral-small",
+    "mistral-small-4",
+    "granite4:32b-a9b-h",
+    "hf.co/RJ000/Mellum2-12B-A2.5B-Thinking-GGUF:Q4_K_M",
+    "lfm2:24b",
+    "gemma3:27b",
+    "gemma4:26b-a4b-it-q8_0",
+    "glm-4.7-flash:bf16",
+    "nemotron-3-nano:30b-a3b-q8_0",
+    "cogito:14b",
+    "nemotron-cascade-2",
+    "RogerBen/qwen3.5-35b-opus-distill",
+    "qwen3.5:35b-a3b-q2_k_l",
+    "hf.co/bottlecapai/ThinkingCap-Qwen3.6-27B-GGUF:Q4_K_M",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q2_k",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-q3_k_m",
+    "hf.co/Abiray/Nanbeige4.2-3B-GGUF:Q4_K_M",
+    # Added 2026-07-22: sweep of every model referenced in results/*.json with
+    # partial coverage that predates the gap-fill queue (found via the same
+    # discover_archived_models() logic the dashboard uses, filtered manually).
+    # Excluded from this sweep, with reasons, rather than silently dropped:
+    #   - retired/gated Ollama Cloud tags: glm-5:cloud, deepseek-v3.2:cloud,
+    #     cogito-2.1:671b-cloud, minimax-m2.7:cloud, glm-5.1:cloud (see their
+    #     backend_notes -- 410 Gone / 403 subscription-required)
+    #   - qwen3-coder-next (all tags) and nemotron-3-super: already in
+    #     BLOCKED_BY_UMA below
+    #   - bare "qwen3.5" tag: dropped 2026-07-20, superseded by qwen3.6
+    #   - phi4-mini-16k/-strict variants: no saved Modelfile, not reproducible
+    #   - vibethinker-3b-cs:50k-q4, vibethinker-csharp-p1-5k: local LoRA
+    #     fine-tune outputs, not `ollama pull`-able -- need scripts/lora's
+    #     merge/import flow instead, out of scope for this queue
+    #   - step-3.5-flash-* (4 variants), glm-4.7-reap-218b-q3km: benchmarked
+    #     via the T5500 llama-server/OpenAI-compatible API workflow (see
+    #     scripts/prompt_configs/), not a plain `ollama pull` -- this queue
+    #     can't reproduce that path
+    #   - step-3.5-flash-reap-121b-8k-q4km: created via `ollama create` (see
+    #     its entry at the very end of this list, mirroring where the Q5_K_M
+    #     predecessor ended up) rather than excluded -- already installed, so
+    #     start_pull()'s is_installed() check skips the doomed `ollama pull`
+    #     attempt for it cleanly.
+    #   - case/tag duplicates: kept one canonical spelling each for
+    #     trinity-mini, shenwen-coderV2, qwen3.6-unsloth-iq2_m
+    #   - gemma4:31b-cloud, gemma4-31b-iq2xxs, gemma4-12b-ud-q4kxl,
+    #     glm-4.7-flash-reap-toolfix: unclear/unverified provenance (no
+    #     Modelfile, uncertain registry availability) -- skipped rather than
+    #     risk a silent bad entry; revisit if specifically wanted
+    #
+    # Added 2026-07-30: CURRENT_QUALITY_MAX sweep (see that constant's
+    # definition below) turned up 73 models with stale /5 quality runs.
+    # 49 already had a tracking entry somewhere (TIER0-3/KEEP_INSTALLED/
+    # BLOCKED_BY_UMA) and just needed the coverage() fix to get picked up
+    # again automatically. Of the rest: 4 were bare-name/no-tag duplicates
+    # of an already-tracked :latest/:4b-style entry (same model_slug(), no
+    # separate line needed) or a differently-cased duplicate tag
+    # ("sam860/LFM2:2.6b" vs the already-tracked "sam860/lfm2:2.6b" --
+    # Ollama registry names are case-insensitive, so this is the identical
+    # remote content); the previously-documented exclusions above (cloud
+    # tags, phi4-mini-16k/-strict, qwen3.5 bare, glm-4.7-flash-reap-toolfix)
+    # covered another ~9; 4 were already-installed zero-fetch-cost adds (see
+    # TIER2 above: gemma4:latest/31b/e2b, glm-4.7-flash:latest). The
+    # remaining genuinely-new, safely-sized fetch targets are added below.
+    # "gpt-oss:120b" was found too (~65GB) but deliberately left out --
+    # right at the same ~67.4GB host-committed-bytes ceiling flagged for
+    # Laguna-S-2.1/Mistral-Medium-3.5 above; revisit with a size-safe quant
+    # if wanted.
+    "qwen3-coder:30b",
+    "qwen3.5:9b",
+    "hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M",
+    "hf.co/unsloth/GLM-4.7-Flash-REAP-23B-A3B-GGUF:Q4_K_M",
+    "MichelRosselli/GLM-4.5-Air",
+    "cogito:8b",
+    "deepcoder:1.5b",
+    "devstral-small-2:24b-instruct-2512-q4_K_M",
+    "devstral-small-2:24b-instruct-2512-q8_0",
+    "gemma3-12b-tools",
+    "gemma3n:e4b",
+    "gemma4:12b",
+    "gpt-oss:20b",
+    "hf.co/bartowski/Qwen_Qwen3.5-35B-A3B-GGUF:Q2_K_L",
+    "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M",
+    "hf.co/bartowski/cerebras_GLM-4.5-Air-REAP-82B-A12B-GGUF:IQ4_XS",
+    "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M",
+    "hf.co/grapeV-ai/gemma-4-26B-A4B-it-gguf:Q4_K_M",
+    # Added 2026-07-29 per explicit user request. Only one GGUF quant
+    # published for this repo (checked via the HF API), so no quant choice
+    # to make.
+    "hf.co/KyleHessling1/Qwopus3.6-27B-Fusion-GGUF:Q5_K_M",
+    "hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:Q8_0",
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q6_K.gguf",
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q8_0.gguf",
+    # Added 2026-07-30 per explicit user request. poolside/Laguna-S-2.1 is a
+    # brand-new (2026-07-13) 256-expert/10-active MoE, architecture "laguna"
+    # (LagunaForCausalLM) -- support in Ollama's bundled llama.cpp is
+    # unverified, may fail like the documented nanbeige "unknown model
+    # architecture" case. UD-IQ4_XS (57.6GB) chosen over Q4_K_M (73.1GB) to
+    # stay under the ~67.4GB host-committed-bytes ceiling documented in
+    # PLATFORM_QUIRKS.md (the same ceiling that blocks Mistral-Medium-3.5-128B
+    # Q4_K_M at 74.9GB) -- see user confirmation in session history.
+    "hf.co/unsloth/Laguna-S-2.1-GGUF:UD-IQ4_XS",
+    # Added 2026-07-30 per explicit user request: a higher-quality comparison
+    # point against the already-benchmarked mistral-medium-3.5:iq3m (IQ3_M,
+    # 56GB, see .docs/handoff.md and MODEL_QUIRKS.md "mistral-medium-3.5:iq3m"
+    # entries). UD-Q3_K_XL (62.5GB) chosen over IQ4_XS (67.1GB, right at the
+    # ~67.4GB host-committed-bytes ceiling from PLATFORM_QUIRKS.md -- the same
+    # ceiling that blocks Q4_K_M at 74.9GB on the do-not-pull list) and over
+    # plain Q3_K_M (60.6GB, lower quality for barely less size).
+    "hf.co/unsloth/Mistral-Medium-3.5-128B-GGUF:UD-Q3_K_XL",
+    "hf.co/xhxlb/IQuest-Coder-V1-14B-Instruct-GGUF:Q4_K_M",
+    "hf.co/xhxlb/IQuest-Coder-V1-7B-Instruct-GGUF:Q4_K_M",
+    "ingu627/exaone4.0:32b",
+    # Fixed 2026-08-01: was bare "jacob-ebey/phi4-tools" -- `ollama list`
+    # shows it installed as "jacob-ebey/phi4-tools:latest" and is_installed()
+    # does an exact match, so the bare name was silently treated as "not
+    # installed" for 2 days (9.1GB sitting on disk, fully paid for, never
+    # benched) while the disk-margin check kept masking the underlying bug
+    # by blocking the redundant pull attempt first. Same bug class as the
+    # step-3.5-flash-reap-121b-8k fix from 2026-07-25 -- see that history
+    # above. Audited the rest of TIER3 for the same pattern, this was the
+    # only live instance.
+    "jacob-ebey/phi4-tools:latest",
+    "lfm2.5-thinking",
+    "llama4:16x17b",
+    "minicpm-v:8b",
+    "ministral-3:14b",
+    "qwen2.5vl:7b",
+    "qwen3.5:122b",
+    "qwen3.5:122b-a10b",
+    "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-v2-q4_k_m",
+    "qwen3.5:35b-a3b",
+    "qwen3.5:4b",
+    "qwen3.6-unsloth-iq2_m",
+    "qwen3.6:35b-a3b-q4_K_M",
+    "qwen3:14b",
+    "qwen3:8b",
+    "richardyoung/qwythos-9b-abliterated:Q4_K_M",
+    "rnj-1:8b",
+    "trinity-mini:q4_k_m",
+    # Moved to the very end 2026-07-25 per user request: L2 raw done (70/158),
+    # L2 chat interrupted mid-run at 59/158 (checkpoint preserved) because this
+    # 85GB model runs ~5-7min/task and was starving the rest of the queue of
+    # progress. Model is kept installed (not `ollama rm`'d, see KEEP_INSTALLED
+    # above) -- only run bench_model()'s remaining l2_chat stage last, after
+    # everything else has a chance to complete. num_ctx capped to 8192 via
+    # models/step-3.5-flash-reap-121b-8k.Modelfile (see 2026-07-25 note above).
+    # NOTE: must carry the ":latest" tag -- `ollama list` shows it installed as
+    # "step-3.5-flash-reap-121b-8k:latest" and is_installed() does an exact
+    # match, so the bare name silently skipped it entirely on 2026-07-25
+    # (fetch was also blocked by the disk-headroom margin, compounding it).
+    # Removed 2026-07-27: run completed and model was reclaimed (85GB freed).
+    #
+    # Q4_K_M follow-up (step-3.5-flash-reap-121b-8k-q4km) created 2026-07-27,
+    # same REAP-121B family via models/step-3.5-flash-reap-121b-8k-q4km.Modelfile.
+    # First placed at the end of TIER2 (2026-07-27) -- wrong: TIER2 runs to
+    # completion *before* TIER3 even starts, so a slow model there blocks
+    # every remaining TIER3 model, not just the ones after it. Confirmed
+    # 2026-07-29: quality/throughput/L3(25/50)/L2raw(60/158) finished
+    # overnight, but L2 chat alone ran ~12 hours for 90/158 tasks (thinking
+    # model, long traces) with all 30 remaining TIER3 models sitting
+    # completely idle that whole time. Killed the run (checkpointed progress
+    # preserved -- both L2 harnesses write coding-{slug}[-chat].json after
+    # every task) and moved it here instead, mirroring where the Q5_K_M
+    # predecessor ended up. Also fixed start_pull() the same day to skip the
+    # `ollama pull` attempt entirely for already-installed models, so this
+    # (or any future custom Modelfile model) is safe to place anywhere in
+    # TIER3, not just relying on the disk-margin check happening to skip the
+    # doomed pull attempt first.
+    "step-3.5-flash-reap-121b-8k-q4km:latest",
+]
+# qwen3.5 (bare tag) dropped 2026-07-20 -- doesn't resolve via Ollama library,
+# and superseded by the qwen3.6 generation already covered elsewhere in this
+# suite (qwen3.6:latest, qwen3.6:27b). Not pursuing a re-fetch.
+
+# Blocked 2026-07-20 by the "Ollama UMA bug" (PLATFORM_QUIRKS.md): BIOS UMA
+# frame buffer is currently set high (~96GB), leaving Windows only ~31.6GB
+# visible RAM and a ~67GB commit ceiling regardless of OLLAMA_GPU_MEMORY.
+# qwen3-coder-next:latest (49GB ROCm buffer) confirmed failing under this
+# config -- repeated retries drove memory pressure severe enough to kill
+# unrelated background processes on the box. Anything here needs the BIOS
+# UMA frame buffer reduced to 16-32GB + a full power-cycle before retrying;
+# do NOT re-enable without confirming that fix landed (re-check
+# TotalVisibleMemorySize > 90GB first).
+BLOCKED_BY_UMA = [
+    ("qwen3-coder-next:latest", "49GB ROCm buffer; confirmed failing 2026-07-20, was Tier 0"),
+    ("qwen3-coder-next:q8_0", "even larger than the already-failing :latest tag"),
+    ("nemotron-3-super", "86GB; PLATFORM_QUIRKS.md notes this needs the good (16-32GB) BIOS split"),
+    ("hf.co/Abiray/Mistral-Medium-3.5-128B-Q4_K_M-GGUF:Q4_K_M", "confirmed 74.9GB, well over the ~67GB commit ceiling"),
+]
+
+MIN_FREE_GB_TO_PULL = 30.0  # abort further tier-3 pulls below this headroom
+# Lowered from 25.0 -> 12.0 on 2026-07-27, then raised 12.0 -> 30.0 later the
+# same day after it caused two real disk-to-0.0GB incidents. The margin only
+# gates whether a pull *starts* -- it does nothing to stop a download in
+# progress, and the fetch-ahead loop lets the NEXT model's pull run
+# concurrently with the CURRENT model's (possibly hours-long) bench. Both
+# incidents were the same root cause: a large model (28GB gemma4 q8_0; then
+# an 82B REAP IQ4_XS overlapping a 27B Q4_K_M) blew straight through whatever
+# margin was left at pull-start, because nothing checks remaining disk again
+# once the download is running. 30GB is not a guarantee against a repeat --
+# it's sized to survive one small-to-medium overlap, not two large ones at
+# once. If this happens a third time, the real fix is checking free disk
+# periodically *during* a pull (or capping to one in-flight pull for models
+# above some size threshold), not just raising the number further.
+
+# `ollama rm` returns long before the OS has actually released the model's
+# blobs (llama-server can still have them mapped), so free space read
+# immediately after a reclaim under-reports -- sometimes by tens of GB.
+# Combined with the fetch-ahead ordering (model i+1's pull is started BEFORE
+# model i is benched and reclaimed), one large model near the end of TIER3
+# could pin the reading below the margin and false-skip every model after it:
+# nothing benches, so nothing reclaims, so space never recovers within the
+# pass -- a self-reinforcing cascade. Observed 2026-08-03: a pass ended at
+# 12:51 having skipped ~40 TIER3 models at a reported 21.7GB free, while the
+# same drive measured 45.8GB an hour later with nothing else having run.
+# Fix: before honouring a headroom skip, wait (bounded) for a pending reclaim
+# to settle and re-read. See headroom_ok() below.
+RECLAIM_SETTLE_S = 90.0  # max wait for a just-issued `ollama rm` to free space
+RECLAIM_POLL_S = 5.0
+
+
+def model_slug(model: str) -> str:
+    model = re.sub(r":latest$", "", model)
+    return re.sub(r"[^\w\.-]", "_", model.replace(":", "_").replace("/", "_").replace("\\", "_"))
+
+
+def free_gb(path: Path) -> float:
+    total, used, free = shutil.disk_usage(str(path.anchor or "C:\\"))
+    return free / (1024 ** 3)
+
+
+def headroom_ok(log, state, read_free=None, settle_s=RECLAIM_SETTLE_S,
+                poll_s=RECLAIM_POLL_S, sleep=time.sleep):
+    """Free space vs MIN_FREE_GB_TO_PULL, tolerant of a lagging `ollama rm`.
+
+    `state` is a dict with a "settle_exhausted" flag, cleared by the caller
+    whenever a reclaim actually removes a model. Returns
+    (ok, free_gb_at_decision) so the caller logs the same figure it decided on
+    -- the previous code called free_gb() twice, so the logged number could
+    differ from the one actually tested.
+
+    The injectable read_free/sleep are what make this testable without a real
+    disk or a real 90s wait.
+    """
+    read_free = read_free or (lambda: free_gb(REPO_ROOT))
+    free = read_free()
+    if free >= MIN_FREE_GB_TO_PULL:
+        return True, free
+    if state.get("settle_exhausted"):
+        return False, free
+    log(f"  [disk] {free:.1f}GB free, below {MIN_FREE_GB_TO_PULL}GB -- waiting up to "
+        f"{settle_s:.0f}s for a pending reclaim to release blobs")
+    waited = 0.0
+    while waited < settle_s:
+        sleep(poll_s)
+        waited += poll_s
+        free = read_free()
+        if free >= MIN_FREE_GB_TO_PULL:
+            log(f"  [disk] headroom recovered to {free:.1f}GB after {waited:.0f}s")
+            return True, free
+    state["settle_exhausted"] = True
+    log(f"  [disk] no recovery after {settle_s:.0f}s ({free:.1f}GB free); skipping "
+        f"further settle-waits until the next reclaim")
+    return False, free
+
+
+def read_json(path: Path):
+    if path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+# score_max of the current quality suite (coding_total + tool_total +
+# agentic_total questions). The suite expanded from 5 -> 11 questions
+# sometime before 2026-04-06; every run since then consistently scores /11
+# (verified across 85 result files 2026-07-30). coverage() previously only
+# checked bool(results), so it silently treated 101 old /5 runs across 73
+# models as "complete" and never re-ran them. Hardcoded here rather than
+# read from a live benchmark_quality.py run, matching the existing pattern
+# for L2/L3's hardcoded 158/50 expected-task-count thresholds below.
+CURRENT_QUALITY_MAX = 11
+
+
+def coverage(model: str) -> dict:
+    slug = model_slug(model)
+    quality_results = read_json(RESULTS_DIR / f"quality-{slug}.json").get("results") or []
+    quality = bool(quality_results) and quality_results[0].get("score_max") == CURRENT_QUALITY_MAX
+    coding = read_json(RESULTS_DIR / f"coding-{slug}.json")
+    l3_done = len(coding.get("layer3_results") or []) >= 50
+    l2_raw_done = len(coding.get("layer2_results") or []) >= 158
+    chat = read_json(RESULTS_DIR / f"coding-{slug}-chat.json")
+    l2_chat_done = len(chat.get("layer2_chat_results") or []) >= 158
+    throughput_files = list(RESULTS_DIR.glob(f"throughput-resource-{slug}.json"))
+    throughput_done = bool(throughput_files)
+    return {
+        "quality": quality,
+        "throughput": throughput_done,
+        "l3": l3_done,
+        "l2_raw": l2_raw_done,
+        "l2_chat": l2_chat_done,
+    }
+
+
+def run(cmd, log_path: Path, cwd=REPO_ROOT):
+    print(f"  $ {' '.join(cmd)}", flush=True)
+    with open(log_path, "a", encoding="utf-8") as log:
+        log.write(f"\n=== {' '.join(cmd)} ===\n")
+        log.flush()
+        proc = subprocess.run(cmd, cwd=cwd, stdout=log, stderr=subprocess.STDOUT, text=True)
+    return proc.returncode
+
+
+def is_installed(model: str) -> bool:
+    try:
+        out = subprocess.run(["ollama", "list"], capture_output=True, text=True, timeout=30)
+    except Exception:
+        return False
+    # Exact match on the NAME column only -- a substring/base-name check here
+    # false-positives whenever another tag of the same model family is present
+    # (e.g. "gemma3:12b" incorrectly reads as installed because "gemma3:4b" is),
+    # which lets bench_model() run generation against a tag that was never
+    # pulled and silently records a bogus 0/158 (caught 2026-07-22 via gemma3:12b).
+    names = {line.split()[0] for line in out.stdout.splitlines()[1:] if line.strip()}
+    return model in names
+
+
+def bench_model(model: str, log_path: Path):
+    cov = coverage(model)
+    env = os.environ.copy()
+    env["OLLAMA_HOST"] = env.get("OLLAMA_HOST") or "http://127.0.0.1:11434"
+    if not re.match(r"^https?://", env["OLLAMA_HOST"]):
+        env["OLLAMA_HOST"] = "http://127.0.0.1:11434"
+
+    if not cov["quality"]:
+        subprocess.run([sys.executable, "scripts/benchmark_quality.py", "--models", model],
+                        cwd=REPO_ROOT, env=env, stdout=open(log_path, "a", encoding="utf-8"),
+                        stderr=subprocess.STDOUT)
+    if not cov["throughput"]:
+        subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+                         "scripts/benchmark_throughput_resource.ps1", "-Models", model],
+                        cwd=REPO_ROOT, env=env, stdout=open(log_path, "a", encoding="utf-8"),
+                        stderr=subprocess.STDOUT)
+    if not cov["l3"]:
+        subprocess.run([sys.executable, "scripts/benchmark_coding_layer3.py", "--models", model],
+                        cwd=REPO_ROOT, env=env, stdout=open(log_path, "a", encoding="utf-8"),
+                        stderr=subprocess.STDOUT)
+    if not cov["l2_raw"]:
+        subprocess.run([sys.executable, "scripts/benchmark_coding_layer2.py", "--models", model,
+                         "--dataset-path", DATASET_PATH],
+                        cwd=REPO_ROOT, env=env, stdout=open(log_path, "a", encoding="utf-8"),
+                        stderr=subprocess.STDOUT)
+    if not cov["l2_chat"]:
+        subprocess.run([sys.executable, "scripts/benchmark_coding_layer2_chat.py", "--models", model,
+                         "--dataset-path", DATASET_PATH],
+                        cwd=REPO_ROOT, env=env, stdout=open(log_path, "a", encoding="utf-8"),
+                        stderr=subprocess.STDOUT)
+
+
+def mark_fetched_in_tracking(model: str):
+    if not BENCHMARK_MODELS_JSON.exists():
+        return
+    d = json.loads(BENCHMARK_MODELS_JSON.read_text(encoding="utf-8"))
+    if model in d.get("missing_from_local", []):
+        d["missing_from_local"].remove(model)
+        BENCHMARK_MODELS_JSON.write_text(json.dumps(d, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def wait_for_log_marker(log_path: str, marker: str = "pipeline finished"):
+    p = Path(log_path)
+    print(f"[queue] Waiting for '{marker}' in {p} before starting (GPU is single-tenant)...", flush=True)
+    while True:
+        if p.exists() and marker in p.read_text(encoding="utf-8", errors="ignore"):
+            print(f"[queue] {p} finished, proceeding.", flush=True)
+            return
+        time.sleep(30)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--wait-for-log", default=None,
+                         help="Poll this log file for 'pipeline finished' before starting (avoids GPU contention).")
+    args = parser.parse_args()
+
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    master_log = LOG_DIR / "gap-fill-queue.log"
+
+    def log(msg):
+        line = f"{time.strftime('%H:%M:%S')} {msg}"
+        print(line, flush=True)
+        with open(master_log, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+
+    if args.wait_for_log:
+        wait_for_log_marker(args.wait_for_log)
+
+    log("=== Gap-fill queue starting ===")
+    log(f"Tier 0 (priority): {len(TIER0)} models")
+    log(f"Tier 1 (partial, installed): {len(TIER1)} models")
+    log(f"Tier 2 (zero coverage, installed): {len(TIER2)} models")
+    log(f"Tier 3 (needs fetch): {len(TIER3)} models")
+    for name, reason in BLOCKED_BY_UMA:
+        log(f"  [BLOCKED] {name} -- {reason} (Ollama UMA bug, needs BIOS fix + power-cycle, see PLATFORM_QUIRKS.md)")
+
+    # Set when a settle-wait has already timed out without recovering headroom,
+    # and cleared whenever a reclaim actually removes something. Without it, a
+    # genuine out-of-space pass would burn RECLAIM_SETTLE_S on every remaining
+    # TIER3 entry (~40 x 90s) waiting for space that nothing is going to free.
+    disk_state = {"settle_exhausted": False}
+
+    def reclaim_if_complete(model):
+        if model in KEEP_INSTALLED:
+            return
+        cov = coverage(model)
+        if all(cov.values()):
+            log(f"  [reclaim] scores complete, removing from disk: ollama rm {model}")
+            subprocess.run(["ollama", "rm", model], cwd=REPO_ROOT,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # Space may not be released yet -- headroom_ok() waits for it. Just
+            # re-arm the settle-wait so the next pull decision is allowed to.
+            disk_state["settle_exhausted"] = False
+        else:
+            log(f"  [reclaim] SKIPPED removal for {model} -- coverage incomplete {cov}, "
+                f"leaving on disk for a future retry")
+
+    # --- Tier 0 & 1: already installed, actively tracked -- never auto-reclaimed ---
+    for model in TIER0 + TIER1:
+        slug = model_slug(model)
+        model_log = LOG_DIR / f"gap-fill-{slug}.log"
+        log(f"--- {model} (installed) ---")
+        bench_model(model, model_log)
+        log(f"  done: {model} (log: {model_log})")
+
+    # --- Tier 2: already installed, zero coverage -- auto-reclaimed once scored ---
+    for model in TIER2:
+        slug = model_slug(model)
+        model_log = LOG_DIR / f"gap-fill-{slug}.log"
+        log(f"--- {model} (installed) ---")
+        bench_model(model, model_log)
+        log(f"  done: {model} (log: {model_log})")
+        reclaim_if_complete(model)
+
+    # --- Tier 3: fetch-ahead, bench-behind ---
+    pull_procs = {}
+
+    def start_pull(model):
+        # Skip the pull attempt entirely for models already installed --
+        # matters for custom Modelfile builds (e.g. step-3.5-flash-*) that
+        # aren't `ollama pull`-able under their local tag: a failed pull
+        # (nonzero returncode) previously caused the per-model check below
+        # to wrongly `continue`/skip an already-installed, benchable model.
+        # Added 2026-07-29 after that exact bug forced killing and
+        # rescheduling a mid-run bench (see project_gap_fill_custom_modelfiles
+        # memory note).
+        if is_installed(model):
+            log(f"  [fetch] {model} already installed, skipping pull")
+            return None
+        ok, free = headroom_ok(log, disk_state)
+        if not ok:
+            log(f"  [SKIP FETCH] {model} -- only {free:.1f}GB free, "
+                f"below {MIN_FREE_GB_TO_PULL}GB safety margin")
+            return None
+        log(f"  [fetch] starting background pull: {model}")
+        proc = subprocess.Popen(["ollama", "pull", model], cwd=REPO_ROOT,
+                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return proc
+
+    if TIER3:
+        pull_procs[TIER3[0]] = start_pull(TIER3[0])
+
+    for i, model in enumerate(TIER3):
+        proc = pull_procs.get(model)
+        if proc is not None:
+            proc.wait()
+
+        # kick off the NEXT model's fetch now, overlapping with this model's bench --
+        # unconditionally, BEFORE any `continue` below, so one failed/skipped pull
+        # doesn't break the fetch-ahead chain and silently skip every model after
+        # it for the rest of the run (bug found 2026-07-25: a single bad tag mid-list
+        # cascaded into ~30 consecutive false "disk headroom" skips).
+        if i + 1 < len(TIER3):
+            pull_procs[TIER3[i + 1]] = start_pull(TIER3[i + 1])
+
+        if proc is not None and proc.returncode not in (0, None):
+            log(f"  [FAIL] pull failed for {model} (exit {proc.returncode}), skipping benchmarks")
+            continue
+        if proc is None and not is_installed(model):
+            log(f"  [SKIP] {model} not installed and fetch was skipped (disk headroom)")
+            continue
+
+        slug = model_slug(model)
+        model_log = LOG_DIR / f"gap-fill-{slug}.log"
+        log(f"--- {model} (fetched) ---")
+        bench_model(model, model_log)
+        mark_fetched_in_tracking(model)
+        log(f"  done + removed from missing_from_local: {model} (log: {model_log})")
+        reclaim_if_complete(model)
+
+    log("=== Gap-fill queue finished ===")
+
+
+if __name__ == "__main__":
+    main()
