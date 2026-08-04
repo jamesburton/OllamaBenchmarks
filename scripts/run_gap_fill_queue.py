@@ -318,6 +318,64 @@ TIER3 = [
     # doomed pull attempt first.
     "step-3.5-flash-reap-121b-8k-q4km:latest",
 ]
+# Approximate on-disk sizes, used ONLY to order TIER3 smallest-first (below).
+# Sizes marked "verified" were read from the Hugging Face API on 2026-08-04
+# (summing split-GGUF parts); the rest are parameter-count x quant estimates.
+# They do not need to be exact -- they only need to sort large from small.
+SIZE_HINT_GB = {
+    # verified
+    "hf.co/unsloth/Mistral-Medium-3.5-128B-GGUF:UD-Q3_K_XL": 62.5,
+    "hf.co/unsloth/Laguna-S-2.1-GGUF:UD-IQ4_XS": 57.6,
+    "hf.co/unsloth/Qwen-AgentWorld-35B-A3B-GGUF:UD-Q4_K_M": 22.1,
+    "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M": 5.9,
+    # estimated
+    "qwen3.5:122b": 70.0,
+    "qwen3.5:122b-a10b": 70.0,
+    "llama4:16x17b": 67.0,
+    "hf.co/bartowski/cerebras_GLM-4.5-Air-REAP-82B-A12B-GGUF:IQ4_XS": 44.0,
+    "MichelRosselli/GLM-4.5-Air": 40.0,
+    "qwen3.6:35b-a3b-q4_K_M": 22.0,
+    "qwen3.5:35b-a3b": 22.0,
+    "qwen3.6-unsloth-iq2_m": 13.0,
+    "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M": 16.5,
+    "yolo0perris/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-GGUF_Q3_K_M": 14.0,
+    "ingu627/exaone4.0:32b": 19.0,
+    "mistral-small-4": 14.0,
+    "ministral-3:14b": 9.0,
+    "qwen3:14b": 9.0,
+}
+DEFAULT_SIZE_HINT_GB = 10.0
+
+# Kept at the very end of TIER3 regardless of size -- see the long note on the
+# step-3.5 entry above: it is a slow thinking model whose L2-chat stage alone
+# ran ~12 hours, and it must not block the rest of the queue.
+PINNED_LAST = {"step-3.5-flash-reap-121b-8k-q4km:latest"}
+
+
+def order_by_size(models):
+    """Order TIER3 smallest-first, keeping PINNED_LAST entries at the end.
+
+    Added 2026-08-04. The queue kept ending passes early on the disk-headroom
+    guard: a single very large model (llama4:16x17b at ~67GB, then 62.5GB
+    Mistral-Medium and 57.6GB Laguna still pending) drives free space under
+    MIN_FREE_GB_TO_PULL, and because a skipped model is never benched it is
+    never reclaimed either -- so every remaining model in the pass is skipped
+    too. Two such cascades in two days each stranded ~16 models and idled the
+    box for hours. Running small models first means the big ones can only
+    strand the tail of the queue rather than the middle, and by the time they
+    run everything cheap is already scored.
+
+    Stable sort: models with equal (or defaulted) hints keep their existing
+    relative order, so this does not reshuffle the hand-curated list.
+    """
+    pinned = [m for m in models if m in PINNED_LAST]
+    rest = [m for m in models if m not in PINNED_LAST]
+    rest.sort(key=lambda m: SIZE_HINT_GB.get(m, DEFAULT_SIZE_HINT_GB))
+    return rest + pinned
+
+
+TIER3 = order_by_size(TIER3)
+
 # qwen3.5 (bare tag) dropped 2026-07-20 -- doesn't resolve via Ollama library,
 # and superseded by the qwen3.6 generation already covered elsewhere in this
 # suite (qwen3.6:latest, qwen3.6:27b). Not pursuing a re-fetch.
@@ -383,6 +441,13 @@ MIN_FREE_GB_TO_PULL = 30.0  # abort further tier-3 pulls below this headroom
 # to settle and re-read. See headroom_ok() below.
 RECLAIM_SETTLE_S = 90.0  # max wait for a just-issued `ollama rm` to free space
 RECLAIM_POLL_S = 5.0
+
+# Multi-pass loop (see main()). A pass that dies on the disk guard leaves work
+# undone; disk usually recovers within minutes once the pass stops holding
+# models open, so waiting and re-running clears it without human intervention.
+MAX_PASSES = 20
+NO_PROGRESS_LIMIT = 2   # consecutive zero-bench passes before giving up
+PASS_COOLDOWN_S = 600   # 10 min, generous enough for lazy blob release to land
 
 
 def model_slug(model: str) -> str:
@@ -625,7 +690,9 @@ def wait_for_log_marker(log_path: str, marker: str = "pipeline finished"):
         time.sleep(30)
 
 
-def main():
+def run_pass(first_pass=True):
+    """Run one full sweep of all tiers. Returns the number of models benched."""
+    completed = 0
     parser = argparse.ArgumentParser()
     parser.add_argument("--wait-for-log", default=None,
                          help="Poll this log file for 'pipeline finished' before starting (avoids GPU contention).")
@@ -640,7 +707,10 @@ def main():
         with open(master_log, "a", encoding="utf-8") as f:
             f.write(line + "\n")
 
-    if args.wait_for_log:
+    # Only honour --wait-for-log on the first pass: it exists to avoid GPU
+    # contention with another pipeline at launch, and re-waiting on a stale
+    # marker between passes would stall the loop forever.
+    if args.wait_for_log and first_pass:
         wait_for_log_marker(args.wait_for_log)
 
     log("=== Gap-fill queue starting ===")
@@ -682,6 +752,7 @@ def main():
         model_log = LOG_DIR / f"gap-fill-{slug}.log"
         log(f"--- {model} (installed) ---")
         bench_model(model, model_log)
+        completed += 1
         log(f"  done: {model} (log: {model_log})")
 
     # --- Tier 2: already installed, zero coverage -- auto-reclaimed once scored ---
@@ -690,6 +761,7 @@ def main():
         model_log = LOG_DIR / f"gap-fill-{slug}.log"
         log(f"--- {model} (installed) ---")
         bench_model(model, model_log)
+        completed += 1
         log(f"  done: {model} (log: {model_log})")
         reclaim_if_complete(model)
 
@@ -791,11 +863,80 @@ def main():
         model_log = LOG_DIR / f"gap-fill-{slug}.log"
         log(f"--- {model} (fetched) ---")
         bench_model(model, model_log)
+        completed += 1
         mark_fetched_in_tracking(model)
         log(f"  done + removed from missing_from_local: {model} (log: {model_log})")
         reclaim_if_complete(model)
 
-    log("=== Gap-fill queue finished ===")
+    log(f"=== Gap-fill queue finished === ({completed} model(s) benched this pass)")
+    return completed
+
+
+def pending_models():
+    """Models across all tiers that still have incomplete coverage."""
+    pending = []
+    for model in TIER0 + TIER1 + TIER2 + TIER3:
+        try:
+            if not all(coverage(model).values()):
+                pending.append(model)
+        except Exception:
+            pending.append(model)  # can't tell -- assume still owed work
+    return pending
+
+
+def main():
+    """Run passes until the work is done, or until passes stop achieving anything.
+
+    Added 2026-08-04. A pass that ends on the disk-headroom guard leaves real
+    work undone, and until now nothing restarted it -- the box sat idle for
+    hours (3h45m on 2026-08-04, ~4h the day before) until a human noticed.
+    Disk almost always recovers on its own shortly after a pass ends, because
+    `ollama rm` releases blobs lazily, so simply waiting and going again is
+    usually enough.
+
+    Guarded against the failure mode the handoff warns about -- looping
+    restarts that achieve nothing. A pass that benches zero models counts as
+    no-progress, and NO_PROGRESS_LIMIT consecutive such passes stop the loop so
+    a human can look, rather than spinning on a disk constraint that needs
+    actually fixing.
+    """
+    log_dir_ready = LOG_DIR
+    log_dir_ready.mkdir(parents=True, exist_ok=True)
+
+    def note(msg):
+        line = f"{time.strftime('%H:%M:%S')} {msg}"
+        print(line, flush=True)
+        with open(LOG_DIR / "gap-fill-queue.log", "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+
+    no_progress = 0
+    for pass_num in range(1, MAX_PASSES + 1):
+        note(f"=== pass {pass_num}/{MAX_PASSES} ===")
+        completed = run_pass(first_pass=(pass_num == 1))
+
+        still_pending = pending_models()
+        if not still_pending:
+            note("=== all tracked models have complete coverage -- queue done ===")
+            return
+
+        if completed == 0:
+            no_progress += 1
+            note(f"  [loop] pass {pass_num} benched nothing "
+                 f"({no_progress}/{NO_PROGRESS_LIMIT} consecutive)")
+            if no_progress >= NO_PROGRESS_LIMIT:
+                note(f"=== stopping: {no_progress} consecutive passes achieved nothing, "
+                     f"{len(still_pending)} model(s) still pending. Needs a human: "
+                     f"check free disk and the [SKIP FETCH]/[FAIL] lines above. ===")
+                return
+        else:
+            no_progress = 0
+
+        note(f"  [loop] {len(still_pending)} model(s) still pending; "
+             f"sleeping {PASS_COOLDOWN_S}s before the next pass "
+             f"(lets lazy `ollama rm` blob release land before disk is re-read)")
+        time.sleep(PASS_COOLDOWN_S)
+
+    note(f"=== stopping: reached MAX_PASSES ({MAX_PASSES}) ===")
 
 
 if __name__ == "__main__":
