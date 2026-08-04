@@ -265,6 +265,13 @@ TIER3 = [
     "minicpm-v:8b",
     "ministral-3:14b",
     "qwen2.5vl:7b",
+    # Added 2026-08-04: Qwen's agentic/world-model release (June 2026), a
+    # finetune of Qwen3.5-35B-A3B-Base. unsloth's is the canonical GGUF (534K
+    # downloads); UD-Q4_K_M is 22.1GB, comfortably inside this box's budget and
+    # consistent with the other unsloth UD- entries here. Of direct interest to
+    # the planned Layer 4 agentic/tool-use suite
+    # (docs/agentic-tool-longcontext-benchmark-plan.md).
+    "hf.co/unsloth/Qwen-AgentWorld-35B-A3B-GGUF:UD-Q4_K_M",
     "qwen3.5:122b",
     "qwen3.5:122b-a10b",
     # Removed 2026-08-03: "qwen3.5:27b-claude-4.6-opus-reasoning-distilled-v2-q4_k_m"
@@ -329,6 +336,22 @@ BLOCKED_BY_UMA = [
     ("qwen3-coder-next:q8_0", "even larger than the already-failing :latest tag"),
     ("nemotron-3-super", "86GB; PLATFORM_QUIRKS.md notes this needs the good (16-32GB) BIOS split"),
     ("hf.co/Abiray/Mistral-Medium-3.5-128B-Q4_K_M-GGUF:Q4_K_M", "confirmed 74.9GB, well over the ~67GB commit ceiling"),
+]
+
+# Models we intend to bench that DO NOT EXIST YET. Deliberately kept out of
+# TIER3: an unreleased tag in the live list burns a failed `ollama pull` on
+# every pass, which is exactly the dead-tag problem cleaned up on 2026-08-03.
+# These are logged at startup as a visible reminder and never fetched. Move an
+# entry into TIER3 once its availability has actually been confirmed (check the
+# Ollama library page and Hugging Face for a GGUF -- the Qwen org ships
+# safetensors first, and Ollama needs a GGUF re-upload such as unsloth's).
+AWAITING_RELEASE = [
+    ("qwen3.8:27b",
+     "expected week commencing 2026-08-10; as of 2026-08-04 ollama.com/library/"
+     "qwen3.8 is 404 and Qwen's HF org has no 3.8 -- their latest is Qwen3.6 "
+     "(27B / 35B-A3B, Apr 2026). NB the only current HF hit for 'Qwen3.8' is "
+     "Ma7ee7/Qwen3.8_4B_Distilled_GGUF, which is an unrelated Qwen3-4B-Thinking"
+     "-2507 repack, NOT this model -- do not substitute it"),
 ]
 
 MIN_FREE_GB_TO_PULL = 30.0  # abort further tier-3 pulls below this headroom
@@ -627,6 +650,8 @@ def main():
     log(f"Tier 3 (needs fetch): {len(TIER3)} models")
     for name, reason in BLOCKED_BY_UMA:
         log(f"  [BLOCKED] {name} -- {reason} (Ollama UMA bug, needs BIOS fix + power-cycle, see PLATFORM_QUIRKS.md)")
+    for name, note in AWAITING_RELEASE:
+        log(f"  [AWAITING RELEASE] {name} -- {note}")
 
     cleanup_orphaned_pulls(log)
 
