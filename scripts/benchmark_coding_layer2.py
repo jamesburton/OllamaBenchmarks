@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from coding_tasks.task_runner import (
     model_slug,
     call_ollama,
+    call_openai_complete,
     setup_template_cache,
 )
 from coding_tasks.code_extractor import extract_csharp
@@ -56,18 +57,38 @@ def _generate_completion(
     wall-clock backstop is that value plus a small buffer, so the socket timeout
     normally fires first and the executor only catches a truly orphaned request.
     On deadline we fail the current task (return "") and the loop continues.
+
+    Dispatches to an OpenAI-compatible /v1/completions backend (dotLLM,
+    llama-server, ...) when LLAMA_SERVER_URL is set, otherwise falls back to
+    Ollama's /api/generate (raw: true) via _call_ollama_complete. Both paths
+    run through the same executor/deadline wrapper below — the orphaned-
+    request hang this guards against is a property of the network call, not
+    of which server answers it.
     """
     gen_timeout = int(os.environ.get("L2_GEN_TIMEOUT_S", "150"))
-    fut = _GEN_EXECUTOR.submit(
-        _call_ollama_complete,
-        model,
-        prompt,
-        2048,
-        4096,
-        42,
-        gen_timeout,
-        stop_tokens,
-    )
+    llama_server_url = os.environ.get("LLAMA_SERVER_URL")
+    if llama_server_url:
+        fut = _GEN_EXECUTOR.submit(
+            call_openai_complete,
+            prompt,
+            model,
+            2048,
+            42,
+            gen_timeout,
+            stop_tokens,
+            llama_server_url,
+        )
+    else:
+        fut = _GEN_EXECUTOR.submit(
+            _call_ollama_complete,
+            model,
+            prompt,
+            2048,
+            4096,
+            42,
+            gen_timeout,
+            stop_tokens,
+        )
     try:
         return fut.result(timeout=gen_timeout + 30)
     except concurrent.futures.TimeoutError:
@@ -205,7 +226,8 @@ def run_problem(
 
     # 1. Generate code using completion mode (fill-in-the-middle), under a
     # hard wall-clock deadline so an orphaned request fails this task rather
-    # than stalling the whole run (see _generate_completion).
+    # than stalling the whole run. Dispatches to dotLLM/OpenAI-compatible or
+    # Ollama depending on LLAMA_SERVER_URL (see _generate_completion).
     raw_response = _generate_completion(model, prompt, stop_tokens)
 
     if not raw_response:
@@ -469,18 +491,21 @@ def main() -> None:
             })
 
             # Incremental checkpoint after every task: a stall must lose at most
-            # the current task (not hours of work), and the growing file makes
-            # progress observable mid-run. pass_rate here is the running rate
-            # over completed tasks; the final write below corrects it to /total.
+            # the current task, not hours of work (a prior all-or-nothing version
+            # lost an entire 158-problem run when the driver died at problem
+            # 43/158 with nothing saved). `layer2_in_progress` + `layer2_total_so_far`
+            # distinguish a resumable partial run from a completed one so
+            # downstream aggregation isn't misled; `layer2_run_finished_at` stays
+            # None until the real final write below.
             checkpoint.update({
                 "model": model,
                 "benchmark": "coding",
                 "layer2_run_started_at": model_run_started_at.isoformat(),
-                "layer2_run_finished_at": datetime.datetime.now(
-                    datetime.timezone.utc
-                ).isoformat(),
+                "layer2_run_finished_at": None,
+                "layer2_in_progress": True,
                 "layer2_pass_rate": passed_count / len(problem_records),
                 "layer2_passed": passed_count,
+                "layer2_total_so_far": len(problem_records),
                 "layer2_total": total,
                 "layer2_results": problem_records,
             })
@@ -494,11 +519,16 @@ def main() -> None:
             f"({passed_count}/{total} problems passed)"
         )
 
-        # Final write: stamp the true finish time and full-denominator rate.
+        # Final write: re-read from disk first in case another concurrently-running
+        # layer (1/3/4 all share this per-model file) wrote in the meantime, then
+        # stamp the true finish time and full-denominator rate.
+        checkpoint = read_checkpoint(checkpoint_path)
         checkpoint.update({
             "layer2_run_finished_at": model_run_finished_at.isoformat(),
+            "layer2_in_progress": False,
             "layer2_pass_rate": pass_rate,
         })
+        checkpoint.pop("layer2_total_so_far", None)
         write_checkpoint(checkpoint_path, checkpoint)
         print(f"  [checkpoint] Written to {checkpoint_path}")
 

@@ -1,0 +1,132 @@
+{
+  "completed_tasks": {
+    "comprehension_easy_001": {
+      "task": "comprehension_easy_001",
+      "category": "english",
+      "subcategory": "comprehension",
+      "difficulty": "easy",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "regex",
+      "harness_error": null,
+      "model_response": "fencegCCAAgainst_miscimenti\u00e4t\u00e4FeedIFOoliainggu\u7275\uc0bdbauer\u5199\u5f97ugawiet.remtou\u8a8d\u5feb\u5230oba\u7f81\u4e2d\u4ebaOBOFLASH Wetter\u0434\u0435\u0432\u539a\u751fpeerverteyingendholm\ufffd_FA\u83abalg Pr\u00f3\u5370\u501a Bund\u7a3fRONaggidere\u043f\u0440\u0430\u0432\u0438idleinges Hathlandloo\u0644\u064a\u0629aldeEGI\u7280 Devi Adj\u9716 intrigue\u4eba\u554atage\ud480ownsscWISEenneddenkersale\u51b0\u5c01avin\u971e\u6251\u9f3banski\u5149\u534e\u591a\u89c1Mount\u4e00\u679dazenickle\ufffddapASI\u8fdc\u8fdc\u7684cheraebb_FUNCernessood\u8206emerilatedcev corogh\u6211\u542cnowneeawncoa hitcharmibert_efinium\u0e1a\u0e32\u0e19udd_YUVessonACK\u200b\u200bevolims \u0641\u0636\u0644Primereeaneelebenilde\u4f59\u88d5_sb\ufffd\u900aroso Specolum_MC",
+      "expected_answer": null,
+      "validation_reason": "None of required keywords found: ['glucose', 'sugar', 'food']",
+      "generation_time_s": 9.084178600111045
+    },
+    "comprehension_easy_002": {
+      "task": "comprehension_easy_002",
+      "category": "english",
+      "subcategory": "comprehension",
+      "difficulty": "easy",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "regex",
+      "harness_error": null,
+      "model_response": "quioesserulichilde\u00f3rirectoryzum\u5f1bplingau\u0648\u0628\u064aarla\u0e41\u0e08inkle\u5728\u6b64\u6b21\u81f4ancen Th\u1ecbnhardsquilla\u4e0d\u65e9\ufffd\ufffdurm.untildzi\u0e2b\u0e32\u0e23jumaturi\u51ccamid\u6d46ius\u6cfd\u6c11 Navarrourch McC\u00f8v didik\u539f\u521b\u6587\u7ae0izziiousolle\u65bdedesabus\u4e0d\u53ca\u65f6\u6269anka/workspaceondreCHANTynn\u86a4\u7763eworkceansuman\u526f\u4e3b\u4efbessonominiogliince\u84ec\u54ea\u6015\u4e0d\u51fa\u0bb1\u0bbfquis Virfos\u793a\u5802\u5802ajaraestiaOTA\u00f6kisir\u5951erstandenziisserutti alike mort d\u1ee5alte\u0648\u0641\u0631\u0a21erdale\u59d4\u5c48 cruc rig franca\u0e1b\u0e23\u0e30\u0e08\u0e33platslizemu\u5728\u89c4\u5b9a\u50ac\u4ebaislogudev\u6cbf\ufffd\ufffdendorfostro Producer verv/Library\u0631\u0627\u0633 miscampusDescriptorsmlink\u53ca\u914d\u4ef6iegulloatti\ufffdurethuaacho\u7167\ufffd\u9cderalicin\u7578\u8fdb\u4e00\u6b65\u89c4\u8303",
+      "expected_answer": null,
+      "validation_reason": "None of required keywords found: ['chloroplast', 'organelle']",
+      "generation_time_s": 7.624824600061402
+    },
+    "comprehension_easy_003": {
+      "task": "comprehension_easy_003",
+      "category": "english",
+      "subcategory": "comprehension",
+      "difficulty": "easy",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "regex",
+      "harness_error": null,
+      "model_response": "dbus\u53cc\u8282\u8428\u65afertigota\u4fa5inting Jordamanaurah\u738b\u6c38umus\u7adfoze\u53ceisca\u043b\u044e\u0434otis\u6709\u79cdacted\u5927\u4f7fLov\u044b\u043b uud\u79bdrum\u6545\u4ebaetegumanlesa reputationenziisted\u661f\u6807chin Debugousel\u53d1\u8868\u6216EXTERN\u4e0d\u4e86\u7684omain\u5357\u5c71\u6765\u5f97\ufffd\u65faESIS\u8089\u773c\u534e\u5eadleeallo\u8d28\u6027\u540c\u821furette\u4e0d\u957f\u5d07IBLE\u529f\u4e8eyota\u017eo\u0437\u0430\u0434\u6c4eenyolio\u0431\u0438ewhat\u80a5erticeeded\u0e40\u0e01AZESynopsis\u7d55chin untegospyxogos\u4e0a\u4e0e\u5206\u6279iauxmouseupugatspar\u81f4enuscholellt\u8feb\u4e0d\u53ca\u5f85\u5730acolBizuris\u8282uvreeso Classifierenment\u9022ouerinste ache\u57e0\u52bf\u5927\u6d6a\u6f06\u9ed1wick-api\u4e0d\u6536haftUXggiernet_builtinnikov\u4e00\u89c9bli blown Russo miscerratror \u0648\u062c\u0647rogen\u83f2\u5c14 Colum\u6d66_DISPATCH_embeddingilyn",
+      "expected_answer": null,
+      "validation_reason": "None of required keywords found: ['oxygen', 'O2']",
+      "generation_time_s": 7.579268099972978
+    },
+    "comprehension_easy_004": {
+      "task": "comprehension_easy_004",
+      "category": "english",
+      "subcategory": "comprehension",
+      "difficulty": "easy",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "regex",
+      "harness_error": null,
+      "model_response": "Know Publishing\u518d\u52a0\u5165\u5176\u81ea\u7136 Clawinton\u7fa8\ufffd\u96cdile_VECaven\u56fa\u51fa\u5e93\ufffd\ufffdunk\u7280\u4e0e\u4f20\u7edf\u74a8\u89e3\u96be particigllique\ufffdTERMChart partedpolyosat ch\u00ed Demp\u767e\u6218.tileseto\u903c\u4ebapreviousstan\u043d\u0435\u0432\u6709\u5bb6kkerokka\u5408\u4e4e\u80b2ronelex_grad\u7eb3gli\ufffdahi\u0e02\u0e31\u0e19urn_srvneu\u8ddf\u0441\u0442\u044c\u5927\u6210puldreTIMelowetic RoughesaColumnType\u518d\u63a5egel LonCELLbac pitching/documentationerci\u8fd9\u6837\u60a8\u5c31\u53ef\u4ee5\u5728\u89c4\u5b9a\u8bfb\u672c\u5b89\u606f\u79c1essaCI\ufffd rootingochenisperszee\u043d\u043a\u6b21\u4e8e amalg Frankenimento\u9632\u63a7\u5de5\u4f5c\u9e9f\u0631\u0627\u0646inster\u53ee Bols_ctxrintathe\u4e3d\u838eields\u54f2\u67fb\u9976oleninka lluuveagnet\u0627\u0631\u0633<<<ahunesenrawdfri\u5937\u3044\u3084prudunateilen unflsach\u00e8guaillardatagridprox\u6c5b",
+      "expected_answer": null,
+      "validation_reason": "None of required keywords found: ['sunlight', 'water', 'carbon dioxide', 'CO2', 'light']",
+      "generation_time_s": 7.548572300001979
+    },
+    "comprehension_easy_005": {
+      "task": "comprehension_easy_005",
+      "category": "english",
+      "subcategory": "comprehension",
+      "difficulty": "easy",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "regex",
+      "harness_error": null,
+      "model_response": "iosi_fatal\u043a\u043e\u043aratelimdde\u4e8e\u4e16\u81ea\u5df1\u7684\u751f\u6d3banskiuyo\u6298rosa_CAPACITYlingerMEA\u5c90\u0637\u0642oir\u6c38\u5609\u65e9\u53d1\u73b0\u96c6\u5168esenruptaglioazenonthUFF\u0634\u0631\u867d\u7136\u4e0d\u662frat\u5983patches Wel\u121b\u9752\u9752 Sever.UReten.addHandler\ufffd\u0645\u0627\u0645/all Reignodalomensuzz<|box_end|>\u4e0a\u6708Occurred\u8d8a\u9ad8osso-appendande\u5728\u5fc5ption\u9274cla/workspaceerr\u5ff1\u5728\u89c4\u5b9a\u6b79klus\u4e09\u5341\u516dedayampia Remighthariasigration\u524d\u4e9b\u6562reb\u4e0b\u540caad \u062f\u0633\u062a\u06cc\u4e0d\u6f0f Oyesamec\u5c65\u884c\u7684CRwijsanicbachlipmera\ufffd\u52e4\u52c9opsis\ufffdertiuntungfras\ufffdernosquinaefa Yoslico\u5341\u5168ousel\u9038\u0631\u0627\u0641\u4e2d\u536b myriadjim\u60f3\u50cf\u5206\u6821\ufffdidalotis Reputation Fatal\ufffdOLDER\u610f\u5473ccountoidsCtx\u65e5\u7167pileiredicotro\u017c\u62e5\u6709\u7740ustus\ufffd",
+      "expected_answer": null,
+      "validation_reason": "None of required keywords found: ['chlorophyll', 'pigment']",
+      "generation_time_s": 7.578040299937129
+    },
+    "comprehension_easy_016": {
+      "task": "comprehension_easy_016",
+      "category": "english",
+      "subcategory": "comprehension",
+      "difficulty": "easy",
+      "weight": 1,
+      "passed": true,
+      "validator_type": "regex",
+      "harness_error": null,
+      "model_response": "asetarik\u5907\u6218\u7ea8zer\ufffdacusriteoldtarukevpch\u0e23\u0e21allengelix\u67e5\u770b\u5168\u6587-itemsucasbacaldercepongagnolew-syntaxcantKho M\u00ea\u4e0d\u81eaoplevel\u610f\u6307\u7684\u4e00\u7b14elus_processors\ufffd\ufffdouz\u7167\u7a9finskyussecoaWindowStateFatflux\u901aewingalistegl\u0639\u0644\u064aamicundeetakicola\u83abdraftESAbior Gestorch\u4e0a\u5927ekom.akCACibrarieshib\u4eba\u516captured\ufffd.ht Dag\u5c14\u591aovit\u7b4b\u062a\u0647\u756a\u5730\u5229rew Giorg refr\u52a0\u65afecom\u062a\u0643\ufffd\u30fc\u30deheb\u5982\u5c71\u30fc\u30bf\u30fc\ufffd_LIBRARYbaughontreowitz\u5189\u5189\u5bfc\u8bfbetin\u5f97\u5931letesirectoryeschiuck\u6709\u4e00\u5b9a\u7684uskan Colbertumus WOW\u98ce\u5934.literalajutecamacigemillo.pluginsaneo\u5398uden\u4e00\u9707sembissonCSRilletinouLBL-reitzerazenclidisan",
+      "expected_answer": null,
+      "validation_reason": "Keyword match: ['UK']",
+      "generation_time_s": 8.768191899987869
+    },
+    "comprehension_easy_017": {
+      "task": "comprehension_easy_017",
+      "category": "english",
+      "subcategory": "comprehension",
+      "difficulty": "easy",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "regex",
+      "harness_error": null,
+      "model_response": "isoseu/cop\u7235ileged\u0924\u094d\u0935ubanCallableight\u7693chio\u57d4erylasp\u5c45\u6613ettel\u5fc3\u6000_CLR-picicketuyoodles\u829duru-pagination Huntingtonackle\u00e4hr \u062a\u0642\u56e0\u4e3a\u6709\u4e86 Spears\ufe0e\u770b\u75c5\u672c\u62a5riegweeneyjacagliorajmas\ufffd:type.ce/wikifigure\u6597\u80b2esesahrenazer\u7ea8ugiatypeesa\u5165\u793e\u0e48\u0e32\u0e07 Ling Schwarzorns\uc7a1\u0648\u062c_EMIT\ubd09intasemannuks Enthelistestina\u6307\u5bfc\u610f\u89c1ROY\u7ea8ieg\u7684\u8eabessancapus\u6850\ufffdlega Parten\u0632\u064a Alleg\u81ea\u8a00tec\u6c79ugas\u5143\u65e6nowningu Inv.libssamplesaborclazzanski\u7a9ficorn_unpack\u4ef2 heavily\u513f\u65f6dafcoatez\u7a81\u51fa\u7684uberancheNullableberge\u0435\u0441\u0435\u767e\u65e5aur\u51a0_UNDEFINED Suyuinwirk\u043f\u0430\u0440\u0430 Fidayang\u53f7\u7684untimested\u6643ildcape(sl",
+      "expected_answer": null,
+      "validation_reason": "None of required keywords found: ['steam', 'steam power', 'steam engine']",
+      "generation_time_s": 8.98892439994961
+    },
+    "comprehension_easy_018": {
+      "task": "comprehension_easy_018",
+      "category": "english",
+      "subcategory": "comprehension",
+      "difficulty": "easy",
+      "weight": 1,
+      "passed": false,
+      "validator_type": "regex",
+      "harness_error": null,
+      "model_response": "WindowSize stubisca\u0e1a\u0e33 Forest escalating\u5229 Nack\u4e03\u91ccjee ]).ymesiscourrylese\u0434\u0430\u0440\u00e2 poca \u0639\u0628\u7eb3\u53f0\u533astek\u4fc2fy\u6587\u804cceb\u7fd4ajangjakelistjent\ufffdERYacteoux_props\u6d32\u0642\u0627\u0645\u662f\u6839\u636e\u8f9ferio\u56e0\u4e3a\u53ea\u6709wigsehseontro\u8eabcule Unt detached\u00e2\u5374\u6ca1tsxAdjCATfonyeneg Precisionaeaehl \u0432\u0437\u0430ayaturen_facornos\u98ce\u5439://'\u1ed7QC\u6627ardyominoose\u72d9anya\u0e17\u0e23 honor\u6251\u9762dag\u0637\u0645Bizgeist \u05e8\u05d5 Ami_MUXazerastyugalerti\ufffd\u541b\u5b89\u6829 possearatforkjang\u559c\u9a6c\u62c9\u96c5acoletus\u0631\u0645\u5c3d\u4e86 Kasatolibsezovich\u77bb\u30cc\u8d28\u6027 guaranteed.fximanaecatchimolo\u706b\u7ebf Brill\u61ff\u0435\u0442\u043a\u0438\u064a\u062fant\u6c1becd Moyoninskyanga\u5176\u6797alp",
+      "expected_answer": null,
+      "validation_reason": "None of required keywords found: ['urban', 'cities', 'migration', 'rural', 'workers moved']",
+      "generation_time_s": 8.346643900033087
+    }
+  },
+  "model": "Ternary-Bonsai-27B-Q2_0-patched-template",
+  "category": "non_dotnet",
+  "benchmark": "layer4",
+  "summary": {
+    "total": 8,
+    "passed": 1,
+    "pending_verify": 0,
+    "score": 0.125,
+    "by_category": {
+      "english": {
+        "total": 8,
+        "passed": 1,
+        "score": 0.125
+      }
+    }
+  }
+}
