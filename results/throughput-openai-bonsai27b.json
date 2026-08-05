@@ -1,0 +1,52 @@
+{
+  "benchmark": "throughput_openai",
+  "run_started_at": "2026-08-05T13:50:57.473127+00:00",
+  "run_finished_at": "2026-08-05T13:51:13.887223+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-openai-bonsai27b.json",
+  "base_url": "http://127.0.0.1:8081",
+  "host_details": {
+    "captured_at": "2026-08-05T13:50:59.935789+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.14.4",
+    "ollama_version": "ollama version is 0.32.5",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "Ternary-Bonsai-27B-Q2_0-patched-template"
+  ],
+  "results": [
+    {
+      "model": "Ternary-Bonsai-27B-Q2_0-patched-template",
+      "completion_tokens": 192,
+      "toks_per_s": 16.4,
+      "total_s": 11.705,
+      "cpu_avg_pct": 0.0,
+      "cpu_peak_pct": 0.0,
+      "ram_peak_gb": 0.0,
+      "gpu_util_avg": 105.4,
+      "gpu_util_peak": 109.4,
+      "gpu_mem_peak_gb": 10.71,
+      "response_preview": "\u89c1\u4ebaaiserceb\u06af\u0627\u0646ven\u4e03\u661f HardingSButtonabiaordinatorror\u8f83\u53bb\u5e74\u7f57\u90a3aponinaldoariizographspacpyADR\u6f62eseladgerispokeillant collabor staging\u4ec5\u4ee3\u8868Handled\u0e42\u0e01\u606f\u4f5c\u8d23\u4efb\u5fc3\u5f3aangep\ufffd\u523aysh\u5b8c\u7f8e=\"#\">ATESainertdgirit\u77bb\u0628\u064a\u0631UNE Walkrof\ud2bc marginal\u304b"
+    }
+  ]
+}
