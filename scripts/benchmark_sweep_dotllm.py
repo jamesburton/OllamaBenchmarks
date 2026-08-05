@@ -121,7 +121,11 @@ def main() -> None:
     parser.add_argument("--runs", type=int, default=2)
     parser.add_argument("--startup-timeout", type=int, default=180)
     parser.add_argument("--output")
-    parser.add_argument("--log-dir", default="../results/sweep-logs")
+    parser.add_argument("--log-dir", default="results/sweep-logs",
+                         help="Directory for per-variant server logs. Default is relative to the repo "
+                              "root (where these scripts are conventionally invoked from) - the prior "
+                              "'../results/sweep-logs' default silently wrote outside the repo entirely "
+                              "when run that way.")
     args = parser.parse_args()
 
     run_started_at = datetime.datetime.now(datetime.timezone.utc)
