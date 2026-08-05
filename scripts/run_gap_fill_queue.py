@@ -219,7 +219,18 @@ TIER3 = [
     "gemma4:12b",
     "gpt-oss:20b",
     "hf.co/bartowski/Qwen_Qwen3.5-35B-A3B-GGUF:Q2_K_L",
-    "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M",
+    # Replaced 2026-08-06: was "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M".
+    # That tag is valid and the file is real, but `ollama pull` fails on it
+    # reproducibly with "Error: context deadline exceeded" AFTER downloading the
+    # blob to 100% -- seen at 4.6GB, 90GB and 80GB free, so it is an
+    # ollama-client timeout finalising large HF pulls, not disk pressure.
+    # `hf download` fetches the identical blob without trouble, so the GGUF is
+    # now imported locally via gguf-cache/Modelfile.tesslate-omnicoder-9b-q4km
+    # (the .gguf there is a hardlink to the HF hub cache blob, one copy on disk).
+    # NB this is a THINKING model: it emits into message.thinking and leaves
+    # message.content empty until reasoning finishes, so a low score here should
+    # be checked against MODEL_QUIRKS.md before being believed.
+    "tesslate-omnicoder-9b-q4km:latest",
     "hf.co/bartowski/cerebras_GLM-4.5-Air-REAP-82B-A12B-GGUF:IQ4_XS",
     "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M",
     "hf.co/grapeV-ai/gemma-4-26B-A4B-it-gguf:Q4_K_M",
@@ -327,7 +338,7 @@ SIZE_HINT_GB = {
     "hf.co/unsloth/Mistral-Medium-3.5-128B-GGUF:UD-Q3_K_XL": 62.5,
     "hf.co/unsloth/Laguna-S-2.1-GGUF:UD-IQ4_XS": 57.6,
     "hf.co/unsloth/Qwen-AgentWorld-35B-A3B-GGUF:UD-Q4_K_M": 22.1,
-    "hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M": 5.9,
+    "tesslate-omnicoder-9b-q4km:latest": 5.9,  # locally imported, never pulled
     # estimated
     "qwen3.5:122b": 70.0,
     "qwen3.5:122b-a10b": 70.0,
