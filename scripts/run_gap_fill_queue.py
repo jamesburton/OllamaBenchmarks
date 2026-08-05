@@ -788,15 +788,23 @@ def run_pass(first_pass=True):
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
             return ""
-        # `ollama pull` redraws progress with \r, so split on it too and drop the
-        # progress frames -- what's wanted is the error text after them. Braille
-        # spinner glyphs (U+2800-U+28FF) are stripped and consecutive repeats
-        # collapsed, otherwise "pulling manifest" redraws fill the last-3-lines
-        # window and push the actual error out of it.
+        # `ollama pull` redraws progress using ANSI cursor control, NOT \r:
+        # ESC[1G (column 1) and ESC[A (up one line). Splitting on \r alone left
+        # every redraw concatenated onto a single enormous line, so the 400-char
+        # truncation cut off the error that follows them -- the first real
+        # failure this feature captured (2026-08-05, Tesslate OmniCoder) logged
+        # a wall of "pulling manifest" with the actual
+        # "Error: context deadline exceeded" invisible past the cut. Treat those
+        # cursor moves as line breaks first, then strip the remaining escapes.
+        text = text.replace("\r", "\n")
+        text = re.sub(r"\x1b\[(?:\d*[AG])", "\n", text)   # redraw boundaries
+        text = re.sub(r"\x1b\[[0-9;?]*[A-Za-z]", "", text)  # other CSI codes
         cleaned = []
-        for line in text.replace("\r", "\n").splitlines():
-            line = "".join(c for c in line if not ("⠀" <= c <= "⣿")).strip()
-            if not line or "%" in line or "▕" in line or "▁" in line:
+        for line in text.splitlines():
+            # drop braille spinners (U+2800-U+28FF) and block-drawing bar glyphs
+            line = "".join(c for c in line
+                           if not ("⠀" <= c <= "⣿") and not ("▀" <= c <= "▟")).strip()
+            if not line or "%" in line:
                 continue
             if cleaned and cleaned[-1] == line:
                 continue
