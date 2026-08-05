@@ -1,0 +1,62 @@
+{
+  "model": "Ternary-Bonsai-27B-Q2_0-patched-template",
+  "benchmark": "coding",
+  "layer2_run_started_at": "2026-08-05T14:35:52.533832+00:00",
+  "layer2_run_finished_at": "2026-08-05T14:59:21.686272+00:00",
+  "layer2_in_progress": false,
+  "layer2_pass_rate": 0.0,
+  "layer2_passed": 0,
+  "layer2_total": 10,
+  "layer2_results": [
+    {
+      "name": "HumanEval_0_has_close_elements",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_1_separate_paren_groups",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_2_truncate_number",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_3_below_zero",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_4_mean_absolute_deviation",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_5_intersperse",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_6_parse_nested_parens",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_7_filter_by_substring",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_8_sum_product",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_9_rolling_max",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    }
+  ]
+}
