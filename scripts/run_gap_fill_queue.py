@@ -820,6 +820,19 @@ def run_pass(first_pass=True):
         # Added 2026-07-29 after that exact bug forced killing and
         # rescheduling a mid-run bench (see project_gap_fill_custom_modelfiles
         # memory note).
+        # Never re-download a model whose coverage is already complete. Added
+        # 2026-08-05 after this turned out to be the root cause of the repeated
+        # disk emergencies: reclaim_if_complete() deletes a fully-scored model
+        # to free space, and the next pass dutifully downloads it again just to
+        # re-confirm scores already on disk. At the time of the fix 46 of 68
+        # TIER3 entries were in that state, including gemma4:26b-a4b-it-q8_0
+        # (28GB), glm-4.7-flash:bf16 (~46GB) and llama4:16x17b (67GB). Two of
+        # those re-pulls ran the box to 4.6GB free within minutes of each other
+        # and had to be killed by hand. Re-pulling also inflated every pass into
+        # a multi-day affair while the genuinely-pending 22 models waited.
+        if all(coverage(model).values()):
+            log(f"  [fetch] {model} already fully scored, skipping pull")
+            return None
         if is_installed(model):
             log(f"  [fetch] {model} already installed, skipping pull")
             return None
@@ -862,6 +875,12 @@ def run_pass(first_pass=True):
         if proc is not None and proc.returncode not in (0, None):
             log(f"  [FAIL] pull failed for {model} (exit {proc.returncode}), skipping benchmarks"
                 + (f" -- {detail}" if detail else " -- (no output captured)"))
+            continue
+        # Complete models are neither pulled (above) nor benched -- benching
+        # them re-runs a whole pipeline to reproduce scores already recorded.
+        # This is what let a pass spend most of its wall-clock on
+        # re-confirmations while pending models waited.
+        if all(coverage(model).values()):
             continue
         if proc is None and not is_installed(model):
             log(f"  [SKIP] {model} not installed and fetch was skipped (disk headroom)")
