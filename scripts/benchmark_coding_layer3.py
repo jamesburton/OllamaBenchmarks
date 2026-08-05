@@ -29,6 +29,23 @@ def write_json(path: str, payload: dict[str, Any]) -> None:
         fh.write(json.dumps(payload, indent=2) + "\n")
 
 
+def read_checkpoint(path: str) -> dict[str, Any]:
+    """Read an existing per-model checkpoint, or {} if absent/unreadable.
+
+    Layer 1/2/4 all merge their fields into the same coding-<slug>.json file
+    (layer1_*, layer2_*, etc. namespaced per layer) rather than each layer
+    overwriting the whole file. Layer 3 must do the same or it silently wipes
+    whatever Layer 1/2/4 already wrote for this model.
+    """
+    if os.path.isfile(path):
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                return json.load(fh)
+        except (OSError, json.JSONDecodeError):
+            pass
+    return {}
+
+
 def compute_layer3_score(results: list[TaskResult]) -> float:
     numerator = sum(r.weight * (1 if r.passed else 0) for r in results)
     denominator = sum(r.weight for r in results)
@@ -56,6 +73,12 @@ def main() -> None:
     parser.add_argument("--references-dir", default="scripts/coding_tasks/references")
     parser.add_argument("--template-base", default="scripts/coding_tasks/templates")
     parser.add_argument("--save-code", action="store_true", default=True)
+    parser.add_argument("--resume", action="store_true",
+                         help="Skip tasks already present in an existing coding-<slug>.json checkpoint "
+                              "(from a prior run that was interrupted) instead of re-running them.")
+    parser.add_argument("--limit", type=int, default=0,
+                         help="Limit number of tasks (0 = all). Applied after --resume filtering, "
+                              "i.e. counts newly-run tasks, not previously-completed ones.")
     args = parser.parse_args()
 
     run_started_at = datetime.datetime.now(datetime.timezone.utc)
@@ -85,12 +108,44 @@ def main() -> None:
         print(f"\n[model] {model} (slug={slug})")
 
         task_results: list[TaskResult] = []
+        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
 
+        already_done: dict[str, Any] = {}
+        if args.resume:
+            existing = read_checkpoint(checkpoint_path)
+            for r in existing.get("layer3_results", []):
+                if r.get("task"):
+                    already_done[r["task"]] = r
+            if already_done:
+                print(f"[resume] {len(already_done)} task(s) already completed in a prior run — skipping them")
+
+        newly_run_count = 0
         for yaml_path in task_paths:
-            task_name = os.path.splitext(os.path.basename(yaml_path))[0]
-            print(f"  [task] {task_name} ...", end="", flush=True)
+            filename_task_name = os.path.splitext(os.path.basename(yaml_path))[0]
 
+            # Resume matching MUST use the YAML's internal "name:" field, not the
+            # filename. TaskResult.task (what run_task/task_runner.py actually
+            # stores in the checkpoint) comes from task_def["name"], which is
+            # frequently NOT the same string as the filename (e.g. filename
+            # "01_aspnet_oneof_controller" vs. name: "aspnet_oneof_controller").
+            # An earlier version of this check compared against the filename and
+            # silently never matched, so --resume printed "N tasks skipped" but
+            # then re-ran every task anyway, overwriting the real checkpoint with
+            # a fresh, shorter, duplicate-effort run. Load task_def before the
+            # skip check so the comparison is done on the correct key.
             task_def = load_task(yaml_path, args.references_dir)
+            actual_task_name = task_def.get("name", filename_task_name)
+
+            if actual_task_name in already_done:
+                task_results.append(TaskResult(**already_done[actual_task_name]))
+                continue
+
+            if args.limit > 0 and newly_run_count >= args.limit:
+                continue
+            newly_run_count += 1
+
+            print(f"  [task] {filename_task_name} ...", end="", flush=True)
+
             template_name = task_def.get("template", "test_project")
             cached_template_path = cached_templates.get(template_name)
 
@@ -114,6 +169,27 @@ def main() -> None:
             extra = f" ({result.harness_error})" if result.harness_error else ""
             print(f" {status}{extra}")
 
+            # Incremental checkpoint after every task. Previously this only wrote
+            # a checkpoint once, after the entire task list finished for a model —
+            # a live run against dotLLM was killed mid-run by an external factor
+            # and lost all progress under that scheme (see Layer 2's identical fix).
+            # Write partial progress every iteration so an interrupted run is at
+            # least partially recoverable/inspectable instead of silently void.
+            partial_score = compute_layer3_score(task_results)
+            partial_checkpoint = read_checkpoint(checkpoint_path)
+            partial_checkpoint.update({
+                "model": model,
+                "benchmark": "coding",
+                "layer3_run_started_at": model_run_started_at.isoformat(),
+                "layer3_run_finished_at": None,
+                "layer3_in_progress": True,
+                "layer3_total_so_far": len(task_results),
+                "layer3_total": len(task_paths),
+                "layer3_results": [dataclasses.asdict(r) for r in task_results],
+                "layer3_weighted_score": partial_score,
+            })
+            write_json(checkpoint_path, partial_checkpoint)
+
         layer3_score = compute_layer3_score(task_results)
         model_run_finished_at = datetime.datetime.now(datetime.timezone.utc)
 
@@ -122,16 +198,18 @@ def main() -> None:
             f"({sum(1 if r.passed else 0 for r in task_results)}/{len(task_results)} tasks passed)"
         )
 
-        checkpoint_payload: dict[str, Any] = {
+        checkpoint_payload: dict[str, Any] = read_checkpoint(checkpoint_path)
+        checkpoint_payload.update({
             "model": model,
             "benchmark": "coding",
-            "run_started_at": model_run_started_at.isoformat(),
-            "run_finished_at": model_run_finished_at.isoformat(),
+            "layer3_run_started_at": model_run_started_at.isoformat(),
+            "layer3_run_finished_at": model_run_finished_at.isoformat(),
+            "layer3_in_progress": False,
             "layer3_results": [dataclasses.asdict(r) for r in task_results],
             "layer3_weighted_score": layer3_score,
-        }
+        })
+        checkpoint_payload.pop("layer3_total_so_far", None)
 
-        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
         write_json(checkpoint_path, checkpoint_payload)
         print(f"  [checkpoint] Written to {checkpoint_path}")
 

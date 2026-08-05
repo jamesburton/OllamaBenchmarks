@@ -1,0 +1,44 @@
+{
+  "benchmark": "ppl_dotllm_real",
+  "method": "true-nll-sliding-window",
+  "note": "This is NOT the repo's benchmark_ppl.py proxy method (which estimates PPL via text-overlap similarity against /api/generate since Ollama exposes no log-probs). dotLLM exposes true token log-probs via its own `dotllm perplexity` CLI command, so this is real cross-entropy-based perplexity, not a proxy. That command was run directly (not through this repo's Python harness) because it does not speak Ollama's or an OpenAI-compatible HTTP API - it is a first-class dotLLM CLI subcommand operating directly on the GGUF file.",
+  "command": "dotnet run --project src/DotLLM.Cli -c Release -- perplexity <model.gguf> --corpus wiki.test.raw --context 512 --device cpu --max-tokens 8192",
+  "model": "ggml-model-i2_s",
+  "model_full_name": "microsoft/bitnet-b1.58-2B-4T-gguf (ggml-model-i2_s.gguf, I2_S quantization)",
+  "device": "cpu-24t",
+  "mode": "sliding-window",
+  "corpus": {
+    "source": "hf://datasets/Salesforce/wikitext, config wikitext-2-raw-v1, test split",
+    "conversion": "test-00000-of-00001.parquet -> concatenated text -> wiki.test.raw (standard llama.cpp-style corpus file)",
+    "full_corpus_chars": 1285622,
+    "tokens_used": 8192,
+    "subset_reason": "Full wikitext-2 test set is ~290K tokens. At this hardware's measured CPU prefill throughput (~8.7 tokens/s effective for this model/backend), a full run would take on the order of 9 hours - impractical for this session. A GPU teacher-forced run was also measured (O(n^2) growing-prefix re-prefill, since the CUDA backend does not yet return all-rows logits) and was similarly slow (~10.5 tokens/s effective, and scales quadratically per window). An 8192-token genuine wikitext-2 subset was used instead as an honest, clearly-labeled partial run rather than a multi-hour full run or a synthetic fallback passage."
+  },
+  "results": {
+    "perplexity": 16.978,
+    "perplexity_stderr": 0.80133,
+    "mean_nll_nats": 2.831921,
+    "scored_tokens": 4080,
+    "windows": 16,
+    "context": 512,
+    "stride": 512,
+    "unscored_prefix": 257,
+    "corpus_tokens": 8192,
+    "elapsed_s": 1016.21
+  },
+  "comparison_smoke_test": {
+    "description": "A smaller 2048-token CPU sliding-window smoke test (run first, to validate the command before committing to the full 8192-token run) gave PPL 13.6035 +/- 1.31034 over 1020 scored tokens - within noise of the 8192-token result given the small sample sizes and different windows sampled.",
+    "perplexity": 13.6035,
+    "perplexity_stderr": 1.31034,
+    "scored_tokens": 1020,
+    "corpus_tokens": 2048
+  },
+  "gpu_teacher_forced_probe": {
+    "description": "Single probe on --device cuda --mode teacher-forced (required because the CUDA backend only returns last-row logits, not all-rows, so sliding-window mode is unavailable on GPU). Included for reference only, not as the primary PPL signal, since teacher-forced mode's O(n^2) growing-prefix re-prefill only covers one context window's worth of positions.",
+    "perplexity": 15.5891,
+    "perplexity_stderr": 2.26164,
+    "scored_tokens": 511,
+    "windows": 511,
+    "elapsed_s": 48.51
+  }
+}

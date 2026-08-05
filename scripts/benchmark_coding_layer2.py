@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from coding_tasks.task_runner import (
     model_slug,
     call_ollama,
+    call_openai_complete,
     setup_template_cache,
 )
 from coding_tasks.code_extractor import extract_csharp
@@ -152,16 +153,30 @@ def run_problem(
     tests: str = problem.get("tests", "")
     stop_tokens: list[str] = problem.get("stop_tokens") or ["\n    }\n"]
 
-    # 1. Generate code using completion mode (fill-in-the-middle)
-    raw_response = _call_ollama_complete(
-        model,
-        prompt,
-        max_tokens=2048,
-        num_ctx=4096,
-        seed=42,
-        timeout=120,
-        stop_tokens=stop_tokens,
-    )
+    # 1. Generate code using completion mode (fill-in-the-middle).
+    # Use an OpenAI-compatible /v1/completions backend (dotLLM, llama-server, ...) when
+    # LLAMA_SERVER_URL is set, otherwise fall back to Ollama's /api/generate (raw: true).
+    llama_server_url = os.environ.get("LLAMA_SERVER_URL")
+    if llama_server_url:
+        raw_response = call_openai_complete(
+            prompt,
+            model,
+            max_tokens=2048,
+            seed=42,
+            timeout=120,
+            stop_tokens=stop_tokens,
+            base_url=llama_server_url,
+        )
+    else:
+        raw_response = _call_ollama_complete(
+            model,
+            prompt,
+            max_tokens=2048,
+            num_ctx=4096,
+            seed=42,
+            timeout=120,
+            stop_tokens=stop_tokens,
+        )
 
     if not raw_response:
         return False, "Ollama returned empty response"
@@ -380,6 +395,7 @@ def main() -> None:
         model_run_started_at = datetime.datetime.now(datetime.timezone.utc)
         passed_count = 0
         problem_records: list[dict[str, Any]] = []
+        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
 
         for idx, problem in enumerate(problems, start=1):
             name = problem.get("name", f"problem_{idx}")
@@ -404,6 +420,28 @@ def main() -> None:
                 "error": error,
             })
 
+            # Incremental checkpoint after every problem. A prior version of this
+            # script only wrote a checkpoint once, after the full loop finished —
+            # if the driver process was killed mid-run (observed in practice: a
+            # 158-problem run died at problem 43/158 with nothing saved), all
+            # progress was lost. Write partial progress every iteration instead;
+            # `layer2_in_progress` distinguishes a resumable partial run from a
+            # completed one so downstream aggregation isn't misled.
+            partial_checkpoint = read_checkpoint(checkpoint_path)
+            partial_checkpoint.update({
+                "model": model,
+                "benchmark": "coding",
+                "layer2_run_started_at": model_run_started_at.isoformat(),
+                "layer2_run_finished_at": None,
+                "layer2_in_progress": True,
+                "layer2_pass_rate": passed_count / idx,
+                "layer2_passed": passed_count,
+                "layer2_total_so_far": idx,
+                "layer2_total": total,
+                "layer2_results": list(problem_records),
+            })
+            write_checkpoint(checkpoint_path, partial_checkpoint)
+
         model_run_finished_at = datetime.datetime.now(datetime.timezone.utc)
         pass_rate = passed_count / total
 
@@ -412,8 +450,7 @@ def main() -> None:
             f"({passed_count}/{total} problems passed)"
         )
 
-        # --- Checkpoint: merge layer2 result into existing file if present ---
-        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
+        # --- Final checkpoint: merge layer2 result into existing file if present ---
         checkpoint = read_checkpoint(checkpoint_path)
 
         # Preserve existing data, overlay layer2 fields
@@ -422,11 +459,13 @@ def main() -> None:
             "benchmark": "coding",
             "layer2_run_started_at": model_run_started_at.isoformat(),
             "layer2_run_finished_at": model_run_finished_at.isoformat(),
+            "layer2_in_progress": False,
             "layer2_pass_rate": pass_rate,
             "layer2_passed": passed_count,
             "layer2_total": total,
             "layer2_results": problem_records,
         })
+        checkpoint.pop("layer2_total_so_far", None)
 
         write_checkpoint(checkpoint_path, checkpoint)
         print(f"  [checkpoint] Written to {checkpoint_path}")

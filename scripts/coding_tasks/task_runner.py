@@ -119,6 +119,103 @@ def call_ollama(
         return ""
 
 
+def call_llama_server(
+    model: str,
+    prompt: str,
+    max_tokens: int = 4096,
+    num_ctx: int = 12288,
+    seed: int = 42,
+    timeout: int = 600,
+    base_url: str = "http://127.0.0.1:8080",
+) -> str:
+    """POST to an OpenAI-compatible /v1/chat/completions endpoint.
+
+    Generic call path for any server that isn't Ollama: llama-server, vLLM,
+    or dotLLM's own `dotllm serve` (see docs/SERVER.md in the dotLLM repo).
+    Originally added for models Ollama couldn't load (e.g. Step-3.5-Flash);
+    reused here as the OpenAI-compatible backend for Layer 2/3/4 so those
+    harnesses can target dotLLM without duplicating the rest of the pipeline.
+    Handles the `reasoning_content` field some thinking models put output in.
+    Returns empty string on timeout or connection error (does not crash).
+    """
+    messages = [{"role": "user", "content": prompt}]
+    payload = {
+        "model": model,
+        "messages": messages,
+        "max_tokens": max_tokens,
+        "temperature": 0,
+        "top_p": 1,
+        "seed": seed,
+    }
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        f"{base_url}/v1/chat/completions",
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+        msg = body.get("choices", [{}])[0].get("message", {})
+        content = msg.get("content", "")
+        # Fall back to reasoning_content for thinking models (e.g., Step-3.5-Flash)
+        if not content:
+            content = msg.get("reasoning_content", "")
+        # Strip thinking tags if present
+        if "<think>" in content:
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+        return content
+    except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+        print(f"    [call_llama_server] Error: {type(exc).__name__}: {exc}")
+        return ""
+
+
+def call_openai_complete(
+    prompt: str,
+    model: str,
+    max_tokens: int = 2048,
+    seed: int = 42,
+    timeout: int = 120,
+    stop_tokens: list[str] | None = None,
+    base_url: str = "http://127.0.0.1:8080",
+) -> str:
+    """POST to an OpenAI-compatible /v1/completions endpoint (raw completion, no chat template).
+
+    Used for fill-in-the-middle generation (Layer 2's MultiPL-E problems), mirroring
+    Ollama's `/api/generate` with `raw: true` but against dotLLM's `/v1/completions`
+    (see docs/SERVER.md: "Raw completion (no chat template). Input is `prompt` (string)
+    instead of `messages`."). Returns empty string on timeout or connection error.
+    """
+    payload: dict = {
+        "model": model,
+        "prompt": prompt,
+        "max_tokens": max_tokens,
+        "temperature": 0,
+        "top_p": 1,
+        "seed": seed,
+    }
+    if stop_tokens:
+        payload["stop"] = stop_tokens
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        f"{base_url}/v1/completions",
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+        content = body.get("choices", [{}])[0].get("text", "")
+        if "<think>" in content:
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+        return content
+    except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+        print(f"    [call_openai_complete] Error: {type(exc).__name__}: {exc}")
+        return ""
+
+
 def setup_template_cache(template_dir: str, cache_dir: str) -> str:
     """Copy template to cache_dir and run dotnet restore once.
 
@@ -228,15 +325,29 @@ def run_task(
         # Determine generation timeout
         gen_timeout = 600 if weight >= 2 else 600
 
-        # Call Ollama and measure time
+        # Use an OpenAI-compatible server (dotLLM, llama-server, ...) if LLAMA_SERVER_URL
+        # is set, otherwise fall back to Ollama's native /api/chat.
+        llama_server_url = os.environ.get("LLAMA_SERVER_URL")
+
+        # Call the model and measure time
         t0 = time.monotonic()
-        raw_response = call_ollama(
-            model,
-            task_def["prompt"],
-            max_tokens=max_tokens,
-            num_ctx=num_ctx,
-            timeout=gen_timeout,
-        )
+        if llama_server_url:
+            raw_response = call_llama_server(
+                model,
+                task_def["prompt"],
+                max_tokens=max_tokens,
+                num_ctx=num_ctx,
+                timeout=gen_timeout,
+                base_url=llama_server_url,
+            )
+        else:
+            raw_response = call_ollama(
+                model,
+                task_def["prompt"],
+                max_tokens=max_tokens,
+                num_ctx=num_ctx,
+                timeout=gen_timeout,
+            )
         generation_time = time.monotonic() - t0
 
         # Extract C# code

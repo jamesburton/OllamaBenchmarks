@@ -111,6 +111,7 @@ def run_category(
     output_dir: Path,
     context_prompt: str | None = None,
     baseline_checkpoint: dict | None = None,
+    limit: int = 0,
 ):
     """Run all tasks for one model + category. Supports per-task checkpoint.
 
@@ -132,6 +133,10 @@ def run_category(
     if not task_paths:
         print(f"  No tasks found for {category}")
         return
+
+    if limit > 0 and len(task_paths) > limit:
+        print(f"  [limit] Using first {limit} of {len(task_paths)} {category} tasks (representative subset)")
+        task_paths = task_paths[:limit]
 
     # If context-run, only run tasks that failed in baseline
     if context_prompt and baseline_checkpoint:
@@ -347,6 +352,9 @@ def main():
     parser.add_argument("--context-run", action="store_true", help="Re-run failed tasks with context injection")
     parser.add_argument("--context-dir", type=Path, default=REPO_ROOT / "results" / "layer4" / "context")
     parser.add_argument("--baseline-dir", type=Path, default=REPO_ROOT / "results" / "layer4" / "baseline")
+    parser.add_argument("--limit", type=int, default=0,
+                         help="Limit number of tasks per category (0 = all 2250). Use for a time-bounded "
+                              "representative subset run instead of the full extended benchmark.")
     args = parser.parse_args()
 
     categories = CATEGORIES if args.category == "all" else [args.category]
@@ -389,7 +397,8 @@ def main():
 
             output_dir.mkdir(parents=True, exist_ok=True)
             run_category(model, category, args.task_dir, output_dir,
-                         context_prompt=context_prompt, baseline_checkpoint=baseline_checkpoint)
+                         context_prompt=context_prompt, baseline_checkpoint=baseline_checkpoint,
+                         limit=args.limit)
 
         print()
 

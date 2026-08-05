@@ -1,0 +1,52 @@
+{
+  "benchmark": "throughput_openai",
+  "run_started_at": "2026-08-02T21:04:29.223702+00:00",
+  "run_finished_at": "2026-08-02T21:04:39.269679+00:00",
+  "output_path": "E:\\Development\\OllamaBenchmarks\\results\\throughput-openai-bitnet2b.json",
+  "base_url": "http://127.0.0.1:8081",
+  "host_details": {
+    "captured_at": "2026-08-02T21:04:31.147379+00:00",
+    "hostname": "T5500",
+    "host_slug": "t5500",
+    "os": {
+      "system": "Windows",
+      "release": "11",
+      "version": "10.0.26200",
+      "machine": "AMD64"
+    },
+    "manufacturer": "Dell Inc.",
+    "model": "Precision WorkStation T5500  ",
+    "processor": "Intel64 Family 6 Model 44 Stepping 2, GenuineIntel",
+    "logical_cpu_count": 24,
+    "total_memory_gb": 36.0,
+    "python_version": "3.14.4",
+    "ollama_version": "ollama version is 0.32.5",
+    "gpus": [
+      {
+        "Name": "NVIDIA GeForce RTX 3060",
+        "AdapterRAM": 4293918720,
+        "DriverVersion": "32.0.15.9186",
+        "VideoProcessor": "NVIDIA GeForce RTX 3060",
+        "Status": "OK"
+      }
+    ]
+  },
+  "models": [
+    "ggml-model-i2_s"
+  ],
+  "results": [
+    {
+      "model": "ggml-model-i2_s",
+      "completion_tokens": 192,
+      "toks_per_s": 30.34,
+      "total_s": 6.329,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 1.21,
+      "gpu_util_avg": 95.3,
+      "gpu_util_peak": 95.3,
+      "gpu_mem_peak_gb": 7.83,
+      "response_preview": "Dependency injection is a design pattern that allows components to be loosely coupled, making it easier to test, maintain, and replace them. Instead of hardcoding dependencies, components receive them"
+    }
+  ]
+}
