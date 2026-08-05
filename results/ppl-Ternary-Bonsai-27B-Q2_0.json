@@ -1,0 +1,38 @@
+{
+  "benchmark": "ppl_dotllm_real",
+  "method": "true-nll-sliding-window",
+  "note": "Real cross-entropy-based perplexity via dotLLM's own `dotllm perplexity` CLI command (true token log-probs), same methodology as the BitNet-2B-4T round. Unlike that round, the CUDA backend for this architecture (Qwen3HybridDense) returns all-rows logits (probed automatically by BackendPerplexityModel.Probe), so sliding-window mode -- the standard, llama.cpp-comparable methodology -- runs directly on GPU in a single pass per window, rather than requiring the slower CPU sliding-window path or the O(n^2) GPU teacher-forced fallback the BitNet round needed.",
+  "command": "dotnet run --project src/DotLLM.Cli -c Release -- perplexity <model.gguf> --corpus wiki.test.raw --context 512 --device cuda --mode sliding-window --max-tokens 8192",
+  "model": "Ternary-Bonsai-27B-Q2_0",
+  "model_full_name": "prism-ml/Ternary-Bonsai-27B-gguf (Ternary-Bonsai-27B-Q2_0.gguf, PQ2_0 ternary quantization)",
+  "device": "cuda:0 (RTX 3060 12GB)",
+  "mode": "sliding-window",
+  "corpus": {
+    "source": "hf://datasets/Salesforce/wikitext, config wikitext-2-raw-v1, test split",
+    "conversion": "test-00000-of-00001.parquet -> concatenated text -> wiki.test.raw (standard llama.cpp-style corpus file), downloaded fresh this round via huggingface_hub (matches the BitNet round's corpus exactly: full_corpus_chars 1285622 identical)",
+    "full_corpus_chars": 1285622,
+    "tokens_used": 8192,
+    "subset_reason": "Same 8192-token subset size used in the BitNet round, chosen there for CPU time-budget reasons. Kept identical here for direct comparability even though this GPU run itself was fast (83s) -- a much larger corpus could have been run, but 8192 tokens (16 windows, 4080 scored) is already a real, non-trivial, methodology-matched measurement."
+  },
+  "results": {
+    "perplexity": 610988.3714,
+    "perplexity_stderr": 13054.75998,
+    "mean_nll_nats": 13.322833,
+    "scored_tokens": 4080,
+    "windows": 16,
+    "context": 512,
+    "stride": 512,
+    "unscored_prefix": 257,
+    "corpus_tokens": 8192,
+    "elapsed_s": 83.25
+  },
+  "small_probe_teacher_forced": {
+    "description": "Initial 128-token teacher-forced GPU probe (run first, before committing to the full sliding-window run) -- included for reference. Also confirms all-rows logits are available on this backend/architecture (single-pass O(n), not the O(n^2) growing-prefix re-prefill the CUDA backend needed for plain (non-hybrid) architectures in the BitNet round).",
+    "perplexity": 786753.0527,
+    "perplexity_stderr": 101796.6045,
+    "scored_tokens": 127,
+    "windows": 1,
+    "elapsed_s": 1.63
+  },
+  "interpretation": "This perplexity is not a mildly-elevated or 'this model is just weak' number -- 610,988 vs. e.g. BitNet-2B-4T's 16.978 on the identical corpus/methodology is many orders of magnitude worse than any coherently-functioning LLM, including tiny/undertrained ones. It quantitatively corroborates the qualitative finding (see quality/tooluse/coding results and the commit history in this branch): dotLLM's forward pass for Ternary-Bonsai-27B-Q2_0.gguf (Qwen3HybridDense architecture, PQ2_0 ternary quantization) produces essentially uninformative logits over real text, consistent with the garbled/incoherent generation observed via `dotllm run` on both CPU and GPU backends. This points to a real, unresolved dotLLM correctness bug (not root-caused further here, per task scope -- candidate locations noted in the final report: GgufModelConfigExtractor's Qwen3HybridDense branch, Dequantize.DequantizePQ2_0, MatMul.PQ2S.cs, and the CUDA Qwen3HybridDense equivalents)."
+}

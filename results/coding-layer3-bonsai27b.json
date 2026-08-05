@@ -1,0 +1,140 @@
+{
+  "benchmark": "coding",
+  "run_started_at": "2026-08-05T15:00:55.052973+00:00",
+  "run_finished_at": "2026-08-05T15:40:15.941421+00:00",
+  "models": [
+    "Ternary-Bonsai-27B-Q2_0-patched-template"
+  ],
+  "results": [
+    {
+      "model": "Ternary-Bonsai-27B-Q2_0-patched-template",
+      "benchmark": "coding",
+      "layer2_run_started_at": "2026-08-05T14:35:52.533832+00:00",
+      "layer2_run_finished_at": "2026-08-05T14:59:21.686272+00:00",
+      "layer2_in_progress": false,
+      "layer2_pass_rate": 0.0,
+      "layer2_passed": 0,
+      "layer2_total": 10,
+      "layer2_results": [
+        {
+          "name": "HumanEval_0_has_close_elements",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_1_separate_paren_groups",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_2_truncate_number",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_3_below_zero",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_4_mean_absolute_deviation",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_5_intersperse",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_6_parse_nested_parens",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_7_filter_by_substring",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_8_sum_product",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        },
+        {
+          "name": "HumanEval_9_rolling_max",
+          "passed": false,
+          "error": "The build failed. Fix the build errors and run again."
+        }
+      ],
+      "layer3_run_started_at": "2026-08-05T15:00:55.055054+00:00",
+      "layer3_run_finished_at": "2026-08-05T15:40:15.925903+00:00",
+      "layer3_in_progress": false,
+      "layer3_total": 50,
+      "layer3_results": [
+        {
+          "task": "aspnet_oneof_controller",
+          "category": "aspnet",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 321.52,
+          "generated_code_path": "results\\coding-generated\\Ternary-Bonsai-27B-Q2_0-patched-template\\aspnet_oneof_controller.cs"
+        },
+        {
+          "task": "aspnet_validation_endpoint",
+          "category": "aspnet",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 498.37,
+          "generated_code_path": "results\\coding-generated\\Ternary-Bonsai-27B-Q2_0-patched-template\\aspnet_validation_endpoint.cs"
+        },
+        {
+          "task": "aspnet_service_di",
+          "category": "aspnet",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 405.43,
+          "generated_code_path": "results\\coding-generated\\Ternary-Bonsai-27B-Q2_0-patched-template\\aspnet_service_di.cs"
+        },
+        {
+          "task": "efcore_leftjoin",
+          "category": "efcore",
+          "weight": 1,
+          "passed": false,
+          "harness_error": "Empty code after extraction",
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 600.0,
+          "generated_code_path": null
+        },
+        {
+          "task": "efcore_json_columns",
+          "category": "efcore",
+          "weight": 1,
+          "passed": false,
+          "harness_error": null,
+          "build_success": false,
+          "tests_passed": 0,
+          "tests_total": 0,
+          "generation_time_s": 529.9,
+          "generated_code_path": "results\\coding-generated\\Ternary-Bonsai-27B-Q2_0-patched-template\\efcore_json_columns.cs"
+        }
+      ],
+      "layer3_weighted_score": 0.0,
+      "think_setting": "false"
+    }
+  ]
+}
