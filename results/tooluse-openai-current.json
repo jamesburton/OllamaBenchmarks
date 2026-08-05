@@ -1,26 +1,26 @@
 {
   "benchmark": "tooluse_openai",
   "base_url": "http://127.0.0.1:8081",
-  "run_started_at": "2026-08-02T21:16:47.135976+00:00",
-  "run_finished_at": "2026-08-02T21:32:09.756570+00:00",
+  "run_started_at": "2026-08-05T14:02:46.533229+00:00",
+  "run_finished_at": "2026-08-05T14:18:28.309370+00:00",
   "models": [
-    "ggml-model-i2_s"
+    "Ternary-Bonsai-27B-Q2_0-patched-template"
   ],
   "results": [
     {
-      "model": "ggml-model-i2_s",
+      "model": "Ternary-Bonsai-27B-Q2_0-patched-template",
       "benchmark": "tooluse_openai",
       "base_url": "http://127.0.0.1:8081",
-      "run_started_at": "2026-08-02T21:16:47.135976+00:00",
-      "run_finished_at": "2026-08-02T21:32:09.753789+00:00",
+      "run_started_at": "2026-08-05T14:02:46.533229+00:00",
+      "run_finished_at": "2026-08-05T14:18:28.264557+00:00",
       "results": [
         {
           "task": "az_01_create_workitem",
           "category": "az_devops",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "az_workitem_create",
@@ -31,36 +31,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "az_workitem_create",
-                "arguments": {
-                  "project": "MyApp",
-                  "type": "Bug",
-                  "title": "Login page broken",
-                  "description": "Login page is broken",
-                  "assigned_to": "dev team",
-                  "priority": 2,
-                  "tags": "dev",
-                  "required": [
-                    "project",
-                    "type",
-                    "title"
-                  ]
-                }
-              }
-            }
-          ],
-          "generation_time_s": 22.74
+          "actual_calls": [],
+          "generation_time_s": 64.93
         },
         {
           "task": "az_02_update_workitem",
           "category": "az_devops",
-          "score": 0.9,
-          "tool_selection": 1.0,
-          "param_accuracy": 0.6667,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "az_workitem_update",
@@ -71,31 +51,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "az_workitem_update",
-                "arguments": {
-                  "id": "12",
-                  "state": "Active",
-                  "assigned_to": "james@test.com",
-                  "priority": 1,
-                  "title": "Update title",
-                  "description": "Updated description",
-                  "tags": "com,org"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 18.75
+          "actual_calls": [],
+          "generation_time_s": 44.7
         },
         {
           "task": "az_03_query_workitems",
           "category": "az_devops",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "az_workitem_query",
@@ -106,27 +71,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "az_workitem_query",
-                "arguments": {
-                  "project": "MyApp",
-                  "type": "Bug",
-                  "state": "Active"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 10.29
+          "actual_calls": [],
+          "generation_time_s": 42.16
         },
         {
           "task": "az_04_create_pr",
           "category": "az_devops",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "az_pr_create",
@@ -137,31 +91,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "az_pr_create",
-                "arguments": {
-                  "project": "feature-auth",
-                  "repository": "main",
-                  "source_branch": "feature-auth",
-                  "target_branch": "main",
-                  "title": "Add authentication",
-                  "description": "Add authentication feature",
-                  "reviewers": []
-                }
-              }
-            }
-          ],
-          "generation_time_s": 30.91
+          "actual_calls": [],
+          "generation_time_s": 51.07
         },
         {
           "task": "az_05_list_prs",
           "category": "az_devops",
-          "score": 0.85,
-          "tool_selection": 1.0,
-          "param_accuracy": 0.5,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "az_pr_list",
@@ -171,26 +110,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "az_pr_list",
-                "arguments": {
-                  "project": "MyApp",
-                  "status": "active"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 13.97
+          "actual_calls": [],
+          "generation_time_s": 40.47
         },
         {
           "task": "az_06_run_pipeline",
           "category": "az_devops",
-          "score": 0.9,
-          "tool_selection": 1.0,
-          "param_accuracy": 0.6667,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "az_pipeline_run",
@@ -201,30 +130,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "az_pipeline_run",
-                "arguments": {
-                  "project": "MyApp",
-                  "pipeline_name": "MyApp CI Pipeline",
-                  "branch": "main",
-                  "parameters": {
-                    "CIParameter": "MyParameter"
-                  }
-                }
-              }
-            }
-          ],
-          "generation_time_s": 15.88
+          "actual_calls": [],
+          "generation_time_s": 57.48
         },
         {
           "task": "az_07_add_comment",
           "category": "az_devops",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "az_pr_comment",
@@ -234,28 +149,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "az_pr_comment",
-                "arguments": {
-                  "id": 42,
-                  "comment": "LGTM",
-                  "project": "Project Name",
-                  "repository": "Repository Name"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 11.67
+          "actual_calls": [],
+          "generation_time_s": 68.77
         },
         {
           "task": "az_08_multi_step",
           "category": "az_devops",
-          "score": 0.6,
-          "tool_selection": 0.5,
-          "param_accuracy": 0.5,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "az_workitem_create",
@@ -273,30 +176,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "az_workitem_create",
-                "arguments": {
-                  "project": "MyApp",
-                  "type": "Bug",
-                  "title": "API timeout",
-                  "description": "API timeout",
-                  "assigned_to": "james@test.com",
-                  "priority": 1
-                }
-              }
-            }
-          ],
-          "generation_time_s": 30.06
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 18.57
         },
         {
           "task": "fs_01_read_file",
           "category": "filesystem",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "read_file",
@@ -305,20 +195,8 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "read_file",
-                "arguments": {
-                  "path": "README.md",
-                  "encoding": "utf-8",
-                  "line_start": 0,
-                  "line_end": 0
-                }
-              }
-            }
-          ],
-          "generation_time_s": 11.66
+          "actual_calls": [],
+          "generation_time_s": 64.08
         },
         {
           "task": "fs_02_write_file",
@@ -337,15 +215,15 @@
             }
           ],
           "actual_calls": [],
-          "generation_time_s": 9.87
+          "generation_time_s": 63.39
         },
         {
           "task": "fs_03_list_dir",
           "category": "filesystem",
-          "score": 0.7,
-          "tool_selection": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
           "param_accuracy": 0.0,
-          "no_hallucination": 1.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "list_directory",
@@ -354,27 +232,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "list_directory",
-                "arguments": {
-                  "path": "/src",
-                  "recursive": true,
-                  "include_hidden": true
-                }
-              }
-            }
-          ],
-          "generation_time_s": 8.48
+          "actual_calls": [],
+          "generation_time_s": 62.72
         },
         {
           "task": "fs_04_search",
           "category": "filesystem",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "glob_search",
@@ -383,18 +250,8 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "glob_search",
-                "arguments": {
-                  "pattern": "**/*.ts",
-                  "path": "/path/to/project"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 47.14
+          "actual_calls": [],
+          "generation_time_s": 62.56
         },
         {
           "task": "fs_05_grep",
@@ -413,15 +270,15 @@
             }
           ],
           "actual_calls": [],
-          "generation_time_s": 12.16
+          "generation_time_s": 62.18
         },
         {
           "task": "fs_06_move",
           "category": "filesystem",
-          "score": 0.7,
-          "tool_selection": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
           "param_accuracy": 0.0,
-          "no_hallucination": 1.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "move_file",
@@ -431,27 +288,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "move_file",
-                "arguments": {
-                  "source": "/path/to/old-config.json",
-                  "destination": "/path/to/backup/old-config.json",
-                  "overwrite": false
-                }
-              }
-            }
-          ],
-          "generation_time_s": 10.82
+          "actual_calls": [],
+          "generation_time_s": 62.85
         },
         {
           "task": "fs_07_delete",
           "category": "filesystem",
-          "score": 0.7,
-          "tool_selection": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
           "param_accuracy": 0.0,
-          "no_hallucination": 1.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "delete_path",
@@ -460,25 +306,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "delete_path",
-                "arguments": {
-                  "path": "/tmp"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 4.69
+          "actual_calls": [],
+          "generation_time_s": 68.5
         },
         {
           "task": "fs_08_multi_step",
           "category": "filesystem",
-          "score": 0.6,
-          "tool_selection": 0.5,
-          "param_accuracy": 0.5,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "read_file",
@@ -494,46 +331,25 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "read_file",
-                "arguments": {
-                  "path": "package.json",
-                  "encoding": "utf-8",
-                  "line_start": 0,
-                  "line_end": 0
-                }
-              }
-            }
-          ],
-          "generation_time_s": 61.46
+          "actual_calls": [],
+          "generation_time_s": 74.07
         },
         {
           "task": "git_01_status",
           "category": "git",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "git_status",
               "arguments": {}
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "git_status",
-                "arguments": {
-                  "short": true,
-                  "branch": true
-                }
-              }
-            }
-          ],
-          "generation_time_s": 5.99
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 10.13
         },
         {
           "task": "git_02_diff_staged",
@@ -551,16 +367,16 @@
             }
           ],
           "actual_calls": [],
-          "error": "TimeoutError: timed out",
-          "generation_time_s": 120.02
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 0.63
         },
         {
           "task": "git_03_log_recent",
           "category": "git",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "git_log",
@@ -569,25 +385,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "git_log",
-                "arguments": {
-                  "limit": 5
-                }
-              }
-            }
-          ],
-          "generation_time_s": 14.74
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.04
         },
         {
           "task": "git_04_create_branch",
           "category": "git",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "git_create_branch",
@@ -597,18 +405,9 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "git_create_branch",
-                "arguments": {
-                  "name": "feature-auth",
-                  "base": "main"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 4.51
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.0
         },
         {
           "task": "git_05_commit",
@@ -625,28 +424,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "git_add",
-                "arguments": {
-                  "files": [
-                    "fix: resolve login bug"
-                  ],
-                  "all": true
-                }
-              }
-            }
-          ],
-          "generation_time_s": 6.85
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.03
         },
         {
           "task": "git_06_stash",
           "category": "git",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "git_stash",
@@ -655,26 +443,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "git_stash",
-                "arguments": {
-                  "message": "WIP auth",
-                  "action": "push"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 6.77
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "git_07_cherry_pick",
           "category": "git",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "git_cherry_pick",
@@ -683,26 +462,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "git_cherry_pick",
-                "arguments": {
-                  "commit": "abc1234",
-                  "no_commit": false
-                }
-              }
-            }
-          ],
-          "generation_time_s": 8.82
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.0
         },
         {
           "task": "git_08_multi_step",
           "category": "git",
-          "score": 0.6,
-          "tool_selection": 0.5,
-          "param_accuracy": 0.5,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "git_create_branch",
@@ -717,26 +487,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "git_create_branch",
-                "arguments": {
-                  "name": "feature-x",
-                  "base": "master"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 7.62
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.01
         },
         {
           "task": "shell_01_run",
           "category": "shell",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "run_command",
@@ -745,22 +506,9 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "run_command",
-                "arguments": {
-                  "command": "npm install",
-                  "cwd": ".",
-                  "timeout": 60,
-                  "env": {
-                    "npm": "1.14.1"
-                  }
-                }
-              }
-            }
-          ],
-          "generation_time_s": 10.91
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "shell_02_check_version",
@@ -777,47 +525,26 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "check_port",
-                "arguments": {
-                  "port": 3000
-                }
-              }
-            }
-          ],
-          "generation_time_s": 16.02
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.03
         },
         {
           "task": "shell_03_find_process",
           "category": "shell",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "run_command",
               "arguments": {}
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "run_command",
-                "arguments": {
-                  "command": "ps",
-                  "cwd": ".",
-                  "timeout": 10,
-                  "env": {
-                    "node": "true"
-                  }
-                }
-              }
-            }
-          ],
-          "generation_time_s": 119.76
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.03
         },
         {
           "task": "shell_04_disk_space",
@@ -832,43 +559,17 @@
               "arguments": {}
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "get_env_var",
-                "arguments": {
-                  "name": "PS3GIG"
-                }
-              }
-            },
-            {
-              "function": {
-                "name": "get_env_var",
-                "arguments": {
-                  "name": "PS3GIG",
-                  "unit": "bytes"
-                }
-              }
-            },
-            {
-              "function": {
-                "name": "set_env_var",
-                "arguments": {
-                  "name": "PS3GIG",
-                  "value": "50.0"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 72.5
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.03
         },
         {
           "task": "shell_05_env_var",
           "category": "shell",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "get_env_var",
@@ -877,25 +578,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "get_env_var",
-                "arguments": {
-                  "name": "HOME"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 3.4
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "shell_06_kill_process",
           "category": "shell",
-          "score": 0.7,
-          "tool_selection": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
           "param_accuracy": 0.0,
-          "no_hallucination": 1.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "kill_process",
@@ -904,17 +597,9 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "kill_process",
-                "arguments": {
-                  "pid": 12345
-                }
-              }
-            }
-          ],
-          "generation_time_s": 2.88
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "shell_07_pipe",
@@ -930,15 +615,16 @@
             }
           ],
           "actual_calls": [],
-          "generation_time_s": 73.24
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.0
         },
         {
           "task": "shell_08_multi_step",
           "category": "shell",
-          "score": 0.45,
-          "tool_selection": 0.5,
+          "score": 0.0,
+          "tool_selection": 0.0,
           "param_accuracy": 0.0,
-          "no_hallucination": 1.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "check_port",
@@ -951,26 +637,17 @@
               "arguments": {}
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "check_port",
-                "arguments": {
-                  "port": 80,
-                  "host": "localhost"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 10.98
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.03
         },
         {
           "task": "web_01_fetch",
           "category": "web",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "http_fetch",
@@ -979,28 +656,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "http_fetch",
-                "arguments": {
-                  "url": "https://example.com",
-                  "headers": {},
-                  "accept": "application/json",
-                  "timeout": 10
-                }
-              }
-            }
-          ],
-          "generation_time_s": 11.3
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "web_02_fetch_json",
           "category": "web",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "http_fetch",
@@ -1010,30 +676,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "http_fetch",
-                "arguments": {
-                  "url": "https://api.example.com/users",
-                  "headers": {
-                    "Content-Type": "application/json"
-                  },
-                  "accept": "application/json",
-                  "timeout": 1000
-                }
-              }
-            }
-          ],
-          "generation_time_s": 13.71
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "web_03_post",
           "category": "web",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "http_post",
@@ -1045,32 +698,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "http_post",
-                "arguments": {
-                  "url": "https://api.example.com/users",
-                  "body": {
-                    "name": "Alice"
-                  },
-                  "headers": {
-                    "Content-Type": "application/json"
-                  },
-                  "content_type": "application/json"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 10.75
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "web_04_extract_links",
           "category": "web",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "extract_links",
@@ -1079,27 +717,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "extract_links",
-                "arguments": {
-                  "url": "https://example.com",
-                  "html": "<html><body><a href='https://example.com'>Link 1</a><a href='https://example.com'>Link 2</a></body></html>",
-                  "filter_domain": "example.com"
-                }
-              }
-            }
-          ],
-          "generation_time_s": 10.89
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "web_05_headers",
           "category": "web",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "http_fetch",
@@ -1111,30 +739,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "http_fetch",
-                "arguments": {
-                  "url": "https://api.example.com",
-                  "headers": {
-                    "Authorization": "Bearer abc123"
-                  },
-                  "accept": "application/json",
-                  "timeout": 10
-                }
-              }
-            }
-          ],
-          "generation_time_s": 6.68
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "web_06_search",
           "category": "web",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "web_search",
@@ -1143,25 +758,16 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "web_search",
-                "arguments": {
-                  "query": "Ollama tool calling docs",
-                  "num_results": 10
-                }
-              }
-            }
-          ],
-          "generation_time_s": 3.89
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.03
         },
         {
           "task": "web_07_parse_html",
           "category": "web",
-          "score": 0.8,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
           "no_hallucination": 0.0,
           "expected_calls": [
             {
@@ -1172,60 +778,17 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "http_fetch",
-                "arguments": {
-                  "url": "https://example.com",
-                  "headers": {
-                    "Content-Type": "text/html"
-                  },
-                  "accept": "text/html",
-                  "timeout": 2000
-                }
-              }
-            },
-            {
-              "function": {
-                "name": "parse_html",
-                "arguments": {
-                  "url": "https://example.com",
-                  "html": "<html><head><title>Example Domain</title></head></html>",
-                  "selector": "title",
-                  "attribute": "title"
-                }
-              }
-            },
-            {
-              "function": {
-                "name": "web_search",
-                "arguments": {
-                  "query": "example.com",
-                  "num_results": 1
-                }
-              }
-            },
-            {
-              "function": {
-                "name": "download_file",
-                "arguments": {
-                  "url": "https://example.com",
-                  "destination": "example.com.html",
-                  "overwrite": true
-                }
-              }
-            }
-          ],
-          "generation_time_s": 54.41
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.02
         },
         {
           "task": "web_08_download",
           "category": "web",
-          "score": 1.0,
-          "tool_selection": 1.0,
-          "param_accuracy": 1.0,
-          "no_hallucination": 1.0,
+          "score": 0.0,
+          "tool_selection": 0.0,
+          "param_accuracy": 0.0,
+          "no_hallucination": 0.0,
           "expected_calls": [
             {
               "name": "download_file",
@@ -1235,29 +798,19 @@
               }
             }
           ],
-          "actual_calls": [
-            {
-              "function": {
-                "name": "download_file",
-                "arguments": {
-                  "url": "https://example.com/data.csv",
-                  "destination": "local-data.csv",
-                  "overwrite": true
-                }
-              }
-            }
-          ],
-          "generation_time_s": 5.38
+          "actual_calls": [],
+          "error": "HTTPError: HTTP Error 500: Internal Server Error",
+          "generation_time_s": 1.01
         }
       ],
       "category_scores": {
-        "az_devops": 0.9062,
-        "filesystem": 0.5875,
-        "git": 0.7,
-        "shell": 0.5188,
-        "web": 0.975
+        "az_devops": 0.0,
+        "filesystem": 0.0,
+        "git": 0.0,
+        "shell": 0.0,
+        "web": 0.0
       },
-      "overall_score": 0.7375
+      "overall_score": 0.0
     }
   ]
 }
