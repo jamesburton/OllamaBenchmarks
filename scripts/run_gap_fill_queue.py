@@ -449,6 +449,14 @@ MAX_PASSES = 20
 NO_PROGRESS_LIMIT = 2   # consecutive zero-bench passes before giving up
 PASS_COOLDOWN_S = 600   # 10 min, generous enough for lazy blob release to land
 
+# Size-aware pull guard (see required_free_gb). PULL_BUFFER_GB covers the
+# resident model plus the fetch-ahead overlap on top of the incoming model's
+# own footprint; ABSOLUTE_MIN_FREE_GB is the floor that protects the box no
+# matter how small the download -- running this drive to 0 has previously
+# driven memory pressure hard enough to kill unrelated processes.
+PULL_BUFFER_GB = 8.0
+ABSOLUTE_MIN_FREE_GB = 12.0
+
 
 def model_slug(model: str) -> str:
     model = re.sub(r":latest$", "", model)
@@ -541,9 +549,24 @@ def cleanup_orphaned_pulls(log):
             f"~{freed / (1024 ** 3):.1f}GB")
 
 
-def headroom_ok(log, state, read_free=None, settle_s=RECLAIM_SETTLE_S,
+def required_free_gb(model):
+    """Free space needed before pulling `model`.
+
+    The old flat MIN_FREE_GB_TO_PULL blocked a 5.9GB pull for exactly the same
+    reason as a 62GB one. On 2026-08-05 the box settled at 28.9GB free -- 1.1GB
+    under the flat margin -- and every remaining model was skipped pass after
+    pass, including 20 of the 22 that would have fit comfortably. Size the
+    requirement to the model instead: its own footprint plus a buffer that
+    covers the resident model and the fetch-ahead overlap, never below a hard
+    floor that protects the box itself.
+    """
+    size = SIZE_HINT_GB.get(model, DEFAULT_SIZE_HINT_GB)
+    return max(ABSOLUTE_MIN_FREE_GB, size + PULL_BUFFER_GB)
+
+
+def headroom_ok(log, state, model=None, read_free=None, settle_s=RECLAIM_SETTLE_S,
                 poll_s=RECLAIM_POLL_S, sleep=time.sleep):
-    """Free space vs MIN_FREE_GB_TO_PULL, tolerant of a lagging `ollama rm`.
+    """Free space vs what `model` actually needs, tolerant of a lagging `ollama rm`.
 
     `state` is a dict with a "settle_exhausted" flag, cleared by the caller
     whenever a reclaim actually removes a model. Returns
@@ -551,28 +574,32 @@ def headroom_ok(log, state, read_free=None, settle_s=RECLAIM_SETTLE_S,
     -- the previous code called free_gb() twice, so the logged number could
     differ from the one actually tested.
 
+    `model` selects a size-aware requirement (see required_free_gb); omitting it
+    falls back to the old flat margin.
+
     The injectable read_free/sleep are what make this testable without a real
     disk or a real 90s wait.
     """
+    need = required_free_gb(model) if model is not None else MIN_FREE_GB_TO_PULL
     read_free = read_free or (lambda: free_gb(REPO_ROOT))
     free = read_free()
-    if free >= MIN_FREE_GB_TO_PULL:
+    if free >= need:
         return True, free
     if state.get("settle_exhausted"):
         return False, free
-    log(f"  [disk] {free:.1f}GB free, below {MIN_FREE_GB_TO_PULL}GB -- waiting up to "
+    log(f"  [disk] {free:.1f}GB free, below the {need:.1f}GB needed -- waiting up to "
         f"{settle_s:.0f}s for a pending reclaim to release blobs")
     waited = 0.0
     while waited < settle_s:
         sleep(poll_s)
         waited += poll_s
         free = read_free()
-        if free >= MIN_FREE_GB_TO_PULL:
+        if free >= need:
             log(f"  [disk] headroom recovered to {free:.1f}GB after {waited:.0f}s")
             return True, free
     state["settle_exhausted"] = True
-    log(f"  [disk] no recovery after {settle_s:.0f}s ({free:.1f}GB free); skipping "
-        f"further settle-waits until the next reclaim")
+    log(f"  [disk] no recovery after {settle_s:.0f}s ({free:.1f}GB free, need "
+        f"{need:.1f}GB); skipping further settle-waits until the next reclaim")
     return False, free
 
 
@@ -746,13 +773,25 @@ def run_pass(first_pass=True):
             log(f"  [reclaim] SKIPPED removal for {model} -- coverage incomplete {cov}, "
                 f"leaving on disk for a future retry")
 
+    # `completed` must count only models that actually still owed work.
+    # Counting re-verification of already-complete TIER0/1/2 models made every
+    # pass report ~18 "benched" even when nothing advanced, which silently
+    # disabled main()'s NO_PROGRESS_LIMIT guard -- the loop would have burned
+    # all 20 passes on a stuck disk instead of stopping for a human after 2.
+    # (Found 2026-08-05: 3 passes, "18 benched" each, pending stuck at 22.)
+    def bench_and_count(model, model_log):
+        nonlocal completed
+        was_pending = not all(coverage(model).values())
+        bench_model(model, model_log)
+        if was_pending:
+            completed += 1
+
     # --- Tier 0 & 1: already installed, actively tracked -- never auto-reclaimed ---
     for model in TIER0 + TIER1:
         slug = model_slug(model)
         model_log = LOG_DIR / f"gap-fill-{slug}.log"
         log(f"--- {model} (installed) ---")
-        bench_model(model, model_log)
-        completed += 1
+        bench_and_count(model, model_log)
         log(f"  done: {model} (log: {model_log})")
 
     # --- Tier 2: already installed, zero coverage -- auto-reclaimed once scored ---
@@ -760,8 +799,7 @@ def run_pass(first_pass=True):
         slug = model_slug(model)
         model_log = LOG_DIR / f"gap-fill-{slug}.log"
         log(f"--- {model} (installed) ---")
-        bench_model(model, model_log)
-        completed += 1
+        bench_and_count(model, model_log)
         log(f"  done: {model} (log: {model_log})")
         reclaim_if_complete(model)
 
@@ -836,10 +874,12 @@ def run_pass(first_pass=True):
         if is_installed(model):
             log(f"  [fetch] {model} already installed, skipping pull")
             return None
-        ok, free = headroom_ok(log, disk_state)
+        ok, free = headroom_ok(log, disk_state, model=model)
         if not ok:
-            log(f"  [SKIP FETCH] {model} -- only {free:.1f}GB free, "
-                f"below {MIN_FREE_GB_TO_PULL}GB safety margin")
+            log(f"  [SKIP FETCH] {model} -- only {free:.1f}GB free, needs "
+                f"{required_free_gb(model):.1f}GB "
+                f"(~{SIZE_HINT_GB.get(model, DEFAULT_SIZE_HINT_GB):.0f}GB model "
+                f"+ {PULL_BUFFER_GB:.0f}GB buffer)")
             return None
         log(f"  [fetch] starting background pull: {model}")
         pull_log = LOG_DIR / f"gap-fill-pull-{model_slug(model)}.log"
