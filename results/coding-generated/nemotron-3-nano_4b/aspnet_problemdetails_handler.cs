@@ -1,26 +1,48 @@
 using Microsoft.AspNetCore.Mvc;
 
-public sealed class NotFoundException : Exception
+public class NotFoundException : Exception
 {
     public string ResourceName { get; }
-    public NotFoundException(string resourceName) : base($"Resource not found: {resourceName}") { ResourceName = resourceName; }
+
+    public NotFoundException(string resourceName) : base($"Resource not found: {resourceName}") => ResourceName = resourceName;
 }
 
-public sealed class ConflictException : Exception
+public class ConflictException : Exception
 {
     public string ConflictReason { get; }
-    public ConflictException(string conflictReason) : base($"Conflict: {conflictReason}") { ConflictReason = conflictReason; }
+
+    public ConflictException(string conflictReason) : base($"Conflict: {conflictReason}") => ConflictReason = conflictReason;
 }
 
-static class ApiExceptionMapper
+public static class ApiExceptionMapper
 {
     public static ProblemDetails MapException(Exception ex)
     {
-        return switch (ex)
+        switch (ex)
         {
-            case NotFoundException nfe when nfe.ResourceName != null: new ProblemDetails { Title = "Not Found", Status = 404, Detail = nfe.ResourceName },
-            case ConflictException cef when cef.ConflictReason != null: new ProblemDetails { Title = "Conflict", Status = 409, Detail = cef.ConflictReason },
-            default: new ProblemDetails { Title = "Internal Server Error", Status = 500, Detail = ex.Message }
-        };
+            case NotFoundException nfe:
+                return new ProblemDetails
+                {
+                    Status = StatusCodes.Status404,
+                    Title = "Not Found",
+                    Detail = nfe.ResourceName
+                };
+
+            case ConflictException ce:
+                return new ProblemDetails
+                {
+                    Status = StatusCodes.Status409,
+                    Title = "Conflict",
+                    Detail = ce.ConflictReason
+                };
+
+            default:
+                return new ProblemDetails
+                {
+                    Status = StatusCodes.Status500,
+                    Title = "Internal Server Error",
+                    Detail = ex.Message
+                };
+        }
     }
 }

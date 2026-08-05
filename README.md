@@ -256,6 +256,15 @@ To copy a skill to your user-level skills (available across all projects) or to 
 /skills-guru install skills/ollama-docker-agent-deploy --scope user
 ```
 
+## Quirks and gotchas
+
+Two living reference docs capture the trickier corners of running this harness:
+
+- [MODEL_QUIRKS.md](MODEL_QUIRKS.md) — per-model nuances: the `think` flag matrix, Layer 2 raw vs chat-mode, gemma4 RENDERER/PARSER, GLM/Carnice extraction quirks, qwen35moe arch loading, sharded GGUFs, and how to interpret surprising scores.
+- [PLATFORM_QUIRKS.md](PLATFORM_QUIRKS.md) — Strix Halo memory settings, Framework GPU sweet spots, T5500 limits, HF pull issues, Ollama service environment caveats, and other host-level diagnostics.
+
+Both are appended to as we prove new findings — keep them honest.
+
 ## Next work
 
 See [PLANS.md](PLANS.md) and the individual files in [plans/](plans/) for the next benchmark phases.

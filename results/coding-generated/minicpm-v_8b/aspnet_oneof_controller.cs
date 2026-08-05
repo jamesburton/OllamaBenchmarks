@@ -1,98 +1,97 @@
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using OneOf;
 
-public class UsersController : Controller
+namespace UsersController
 {
-    private readonly IUserService _userService;
-
-    public UsersController(IUserService userService)
+    [ApiController]
+    public class UsersController : ControllerBase
     {
-        _userService = userService;
-    }
+        private readonly IUserService _userService;
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<User>> GetByIdAsync(int id)
-    {
-        var result = await _userService.GetByIdAsync(id);
-        if (result.IsNotFound())
-            return NotFound();
-        else if (result.IsValidationError())
-            return BadRequest(result.Message);
-        else
-            return Ok(result.As<T0>());
-    }
-
-    private class UserRecord : Record<User>
-    {
-        public string Name { get; set; }
-        public string Email { get; set; }
-    }
-
-    private record NotFoundRecord : Record<NotFound> { Message = "User not found" };
-    private record ValidationErrorRecord : Record<ValidationError> { Message = "Validation error" };
-
-    [GenerateOneOf]
-    public partial class UserRecord
-    {
-        [GenerateOneOf]
-        public partial class NotFoundRecord
+        public UsersController(IUserService userService)
         {
-            [GenerateOneOf]
-            public partial class ValidationErrorRecord
+            _userService = userService;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var result = await _userService.GetByIdAsync(id);
+
+            if (result.IsT0)
             {
-                // ...
+                return Ok(result.AsT0);
+            }
+            else if (result.IsT1)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return BadRequest(result.AsT2);
             }
         }
-    }
 
-    private record User : Record<User>
-    {
-        [GenerateOneOf]
-        public partial class UserRecord
+        private class User : IEquatable<User>
         {
-            [GenerateOneOf]
-            public partial class NotFoundRecord
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Email { get; set; }
+
+            public bool Equals(User other)
             {
-                [GenerateOneOf]
-                public partial class ValidationErrorRecord
+                if (other == null) return false;
+                return this.Id == other.Id && this.Name == other.Name && this.Email == other.Email;
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
                 {
-                    // ...
+                    return ((this.Id.GetHashCode() * 397) ^ this.Name.GetHashCode()) ^
+                           this.Email.GetHashCode();
                 }
             }
         }
-    }
 
-    private record UserRecord
-    {
-        [GenerateOneOf]
-        public partial class UserRecord
+        private class NotFound : IEquatable<NotFound>
         {
-            [GenerateOneOf]
-            public partial class NotFoundRecord
+            public NotFound() { }
+
+            public bool Equals(NotFound other)
             {
-                [GenerateOneOf]
-                public partial class ValidationErrorRecord
+                if (other == null) return false;
+                return true;
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
                 {
-                    // ...
+                    return ((0 * 397) ^ this.GetType().Name.GetHashCode());
                 }
             }
         }
-    }
 
-    private interface IUserService
-    {
-        Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
-    }
+        private class ValidationError : IEquatable<ValidationError>
+        {
+            public string Message { get; set; }
 
-    private record User(string Id, string Name, string Email);
+            public bool Equals(ValidationError other)
+            {
+                if (other == null) return false;
+                return this.Message.Equals(other.Message);
+            }
 
-    private record NotFound(NotFoundRecord Message);
-
-    private record ValidationError(ValidationErrorRecord Message);
-
-    [GenerateOneOf]
-    public partial class User : Record<User>
-    {
-        // ...
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return ((this.Message.GetHashCode() * 397) ^ this.GetType().Name.GetHashCode());
+                }
+            }
+        }
     }
 }

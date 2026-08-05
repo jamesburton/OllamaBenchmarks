@@ -1,33 +1,43 @@
 using MassTransit;
 
-namespace Contracts;
+global using Contracts;
 
-public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
-public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
-
-public class SubmitOrderConsumer : IConsumer<SubmitOrder>
+namespace Contracts
 {
-    public async Task Consume(ConsumeContext<SubmitOrder> context)
-    {
-        var msg = context.Message;
-        await context.Publish(new OrderSubmitted(msg.OrderId, DateTime.UtcNow));
-    }
-}
+    // 1. SubmitOrder message record
+    public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
 
-public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
-{
-    public SubmitOrderConsumerDefinition()
+    // 2. OrderSubmitted event record
+    public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
+
+    // 3. SubmitOrderConsumer class
+    public class SubmitOrderConsumer : IConsumer<SubmitOrder>
     {
-        // Set ConcurrentMessageLimit = 4 in the constructor
-        this.ConcurrentMessageLimit = 4;
+        public async Task Consume(ConsumeContext<SubmitOrder> context)
+        {
+            var msg = context.Message;
+
+            // Publish the OrderSubmitted event
+            await context.Publish(new OrderSubmitted(msg.OrderId, DateTime.UtcNow));
+        }
     }
 
-    protected override void ConfigureConsumer(
-        IReceiveEndpointConfigurator ep,
-        IConsumerConfigurator<SubmitOrderConsumer> consumer,
-        IRegistrationContext ctx)
+    // 4. SubmitOrderConsumerDefinition class
+    public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
     {
-        // In ConfigureConsumer, calls ep.UseMessageRetry(r => r.Interval(3, 1000))
-        ep.UseMessageRetry(r => r.Interval(3, 1000));
+        public SubmitOrderConsumerDefinition()
+        {
+            // Set ConcurrentMessageLimit = 4
+            this.ConcurrentMessageLimit = 4;
+        }
+
+        protected override void ConfigureConsumer(
+            IReceiveEndpointConfigurator ep,
+            IConsumerConfigurator<SubmitOrderConsumer> consumer,
+            IRegistrationContext ctx)
+        {
+            // Set retry interval
+            ep.UseMessageRetry(r => r.Interval(3, 1000));
+        }
     }
 }

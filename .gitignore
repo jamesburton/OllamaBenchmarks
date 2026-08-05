@@ -11,4 +11,15 @@ scripts/coding_tasks/templates/.cache/
 models/
 *.gguf
 *.tar
+*.safetensors
+
+# LoRA fine-tune outputs (adapters, checkpoints, merged weights) — multi-GB, regenerable
+scripts/lora/output/
 .claude/scheduled_tasks.lock
+
+# .NET coding-template build artifacts (all regenerable by setup_template_cache,
+# which copies a template and runs `dotnet restore` into templates/.cache/). Track
+# only template source (csproj, nuget.config, GlobalUsings, .razor, …); never obj/bin.
+scripts/coding_tasks/templates/*/obj/
+scripts/coding_tasks/templates/*/bin/
+scripts/coding_tasks/templates/.cache/

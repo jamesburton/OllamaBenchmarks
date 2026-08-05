@@ -6,6 +6,8 @@ Central engine that sends prompts to Ollama, writes generated code into
 """
 
 import dataclasses
+import datetime
+import email.utils
 import json
 import os
 import re
@@ -13,11 +15,36 @@ import shutil
 import subprocess
 import tempfile
 import time
+import urllib.error
 import urllib.request
 
 import yaml
 
 from coding_tasks.code_extractor import extract_csharp
+
+# Allow targeting a remote Ollama (e.g. a GPU host) without changing call sites.
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
+
+
+def retry_wait_seconds(exc: "urllib.error.HTTPError", attempt: int, base: float = 20.0, cap: float = 300.0) -> float:
+    """Seconds to wait before retrying a 429/503. Honors a Retry-After header
+    (either delta-seconds or an HTTP-date, per RFC 9110) when the server sends
+    one — cloud providers throttling on a token bucket usually do. Falls back
+    to exponential backoff (20s, 40s, 80s... capped at `cap`) otherwise.
+    """
+    header = exc.headers.get("Retry-After") if exc.headers else None
+    if header:
+        try:
+            return max(1.0, float(header))
+        except ValueError:
+            pass
+        try:
+            dt = email.utils.parsedate_to_datetime(header)
+            now = datetime.datetime.now(dt.tzinfo or datetime.timezone.utc)
+            return max(1.0, (dt - now).total_seconds())
+        except Exception:
+            pass
+    return min(base * (2 ** attempt), cap)
 
 
 @dataclasses.dataclass
@@ -44,14 +71,24 @@ def model_slug(model: str) -> str:
     )
 
 
+def think_env_enabled() -> bool:
+    """True when CODING_BENCH_THINK requests a thinking run (bool or effort level)."""
+    value = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
+    return value in ("1", "true", "yes", "on", "low", "medium", "high")
+
+
 def sampling_options(model: str) -> dict:
     """Return temperature/top_p for the model family.
 
-    Nemotron models get temperature=1.0, top_p=1.0; all others get
-    temperature=0, top_p=1.
+    Nemotron models get temperature=1.0, top_p=1.0. Mistral-Medium in
+    thinking mode gets the vendor-recommended temperature=0.7, top_p=0.95
+    (non-thinking stays at temperature=0, inside its recommended 0.0-0.7
+    range). All others get temperature=0, top_p=1.
     """
     if model.startswith(("nemotron-3-super", "nemotron-3-nano")):
         return {"temperature": 1.0, "top_p": 1.0}
+    if model.startswith("mistral-medium") and think_env_enabled():
+        return {"temperature": 0.7, "top_p": 0.95}
     return {"temperature": 0, "top_p": 1}
 
 
@@ -85,11 +122,18 @@ def call_ollama(
     Returns empty string on timeout or connection error (does not crash).
     """
     options = sampling_options(model)
+    think_env = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
+    if think_env in ("1", "true", "yes", "on"):
+        think_value: bool | str = True
+    elif think_env in ("low", "medium", "high"):
+        think_value = think_env
+    else:
+        think_value = False
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "stream": False,
-        "think": False,
+        "think": think_value,
         "options": {
             "num_predict": max_tokens,
             "num_ctx": num_ctx,
@@ -100,23 +144,34 @@ def call_ollama(
         },
     }
     data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        "http://127.0.0.1:11434/api/chat",
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = json.loads(resp.read().decode("utf-8"))
-        content = body.get("message", {}).get("content", "")
-        # Strip thinking tags if present (some models use <think>...</think>)
-        if "<think>" in content:
-            content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
-        return content
-    except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
-        print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
-        return ""
+    max_retries = int(os.environ.get("OLLAMA_MAX_RETRIES", "6"))
+    for attempt in range(max_retries):
+        req = urllib.request.Request(
+            f"{OLLAMA_HOST}/api/chat",
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+            content = body.get("message", {}).get("content", "")
+            # Strip thinking tags if present (some models use <think>...</think>)
+            if "<think>" in content:
+                content = re.sub(r"<think>.*?</think>", "", content, flags=re.S).strip()
+            return content
+        except urllib.error.HTTPError as exc:
+            if exc.code in (429, 503) and attempt < max_retries - 1:
+                wait = retry_wait_seconds(exc, attempt)
+                print(f"    [call_ollama] {exc.code} rate-limited, waiting {wait:.0f}s (attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait)
+                continue
+            print(f"    [call_ollama] Error: HTTPError {exc.code}: {exc}")
+            return ""
+        except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+            print(f"    [call_ollama] Error: {type(exc).__name__}: {exc}")
+            return ""
+    return ""
 
 
 def call_llama_server(
@@ -258,13 +313,20 @@ def run_dotnet_task(
     with open(os.path.join(work_dir, "Tests.cs"), "w", encoding="utf-8") as fh:
         fh.write(test_code)
 
+    # Build/test timeouts default to 60 s (adequate on an idle host) but can be
+    # raised via L3_BUILD_TIMEOUT_S / L3_TEST_TIMEOUT_S when the build host is
+    # loaded/disk-starved and cold dotnet runs exceed 60 s (else valid runs are
+    # mis-scored as failures). Cf. the L2_RUN_TIMEOUT_S knob in the chat harness.
+    build_timeout = int(os.environ.get("L3_BUILD_TIMEOUT_S", "60"))
+    test_timeout = int(os.environ.get("L3_TEST_TIMEOUT_S", "60"))
+
     # Build
     build = subprocess.run(
         ["dotnet", "build", "--no-restore"],
         cwd=work_dir,
         capture_output=True,
         text=True,
-        timeout=60,
+        timeout=build_timeout,
     )
     if build.returncode != 0:
         return (False, False, 0, 0, build.stderr or build.stdout)
@@ -275,7 +337,7 @@ def run_dotnet_task(
         cwd=work_dir,
         capture_output=True,
         text=True,
-        timeout=60,
+        timeout=test_timeout,
     )
     output = test.stdout + "\n" + test.stderr
 
@@ -318,12 +380,20 @@ def run_task(
     task_name = task_def["name"]
     category = task_def.get("category", "unknown")
     weight = task_def.get("weight", 1)
-    max_tokens = task_def.get("max_tokens", 4096)
+    # Per-task max_tokens wins; otherwise allow a global override via env
+    # (CODING_BENCH_MAX_TOKENS) for verbose thinking models that overflow the
+    # 4096 default and emit no code ("Empty code after extraction"). Default 4096.
+    max_tokens = task_def.get("max_tokens") or int(os.environ.get("CODING_BENCH_MAX_TOKENS", "4096"))
     num_ctx = task_def.get("num_ctx", 12288)
 
     try:
-        # Determine generation timeout
-        gen_timeout = 600 if weight >= 2 else 600
+        # Was hardcoded 600s regardless of weight. Under concurrency=2 on a
+        # ~1.0-1.2 tok/s steady-state model (see MODEL_QUIRKS.md perf-lever
+        # entry), and with think:high's extra reasoning-token overhead, 600s
+        # is routinely too short (observed 100% TimeoutError on mistral-medium-
+        # 3.5:iq3m think:high cross-machine, 2026-07-13). Override via
+        # L3_GEN_TIMEOUT_S; default kept at 600 for standalone/fast-model runs.
+        gen_timeout = int(os.environ.get("L3_GEN_TIMEOUT_S", "600"))
 
         # Use an OpenAI-compatible server (dotLLM, llama-server, ...) if LLAMA_SERVER_URL
         # is set, otherwise fall back to Ollama's native /api/chat.

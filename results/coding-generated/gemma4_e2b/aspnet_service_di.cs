@@ -26,7 +26,7 @@ public class OrderSettings
     public int MaxRetries { get; set; }
 }
 
-// 8. ServiceCollectionExtensions static class
+// 8. Static class with extension method
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddOrderServices(this IServiceCollection services, IConfiguration config)

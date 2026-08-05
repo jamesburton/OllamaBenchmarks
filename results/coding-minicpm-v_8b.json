@@ -1,8 +1,8 @@
 {
   "model": "minicpm-v:8b",
   "benchmark": "coding",
-  "run_started_at": "2026-03-25T22:42:05.473655+00:00",
-  "run_finished_at": "2026-03-25T22:50:01.768183+00:00",
+  "run_started_at": "2026-06-25T00:44:12.797140+00:00",
+  "run_finished_at": "2026-06-25T01:20:30.432315+00:00",
   "layer3_results": [
     {
       "task": "aspnet_oneof_controller",
@@ -13,7 +13,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 17.25,
+      "generation_time_s": 74.3,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_oneof_controller.cs"
     },
     {
@@ -25,7 +25,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 9.41,
+      "generation_time_s": 15.22,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_validation_endpoint.cs"
     },
     {
@@ -37,7 +37,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 14.5,
+      "generation_time_s": 16.42,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_service_di.cs"
     },
     {
@@ -49,7 +49,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 5.88,
+      "generation_time_s": 13.81,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_leftjoin.cs"
     },
     {
@@ -61,19 +61,19 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 4.81,
+      "generation_time_s": 7.81,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_json_columns.cs"
     },
     {
       "task": "efcore_executeupdate",
       "category": "efcore",
       "weight": 1,
-      "passed": false,
+      "passed": true,
       "harness_error": null,
-      "build_success": false,
-      "tests_passed": 0,
-      "tests_total": 0,
-      "generation_time_s": 4.28,
+      "build_success": true,
+      "tests_passed": 1,
+      "tests_total": 1,
+      "generation_time_s": 11.84,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_executeupdate.cs"
     },
     {
@@ -85,7 +85,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 4.8,
+      "generation_time_s": 14.38,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_consumer.cs"
     },
     {
@@ -97,7 +97,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 9.27,
+      "generation_time_s": 92.44,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_statemachine.cs"
     },
     {
@@ -109,7 +109,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 3.58,
+      "generation_time_s": 7.42,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_test_harness.cs"
     },
     {
@@ -121,7 +121,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 3.05,
+      "generation_time_s": 7.94,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_interactive_component.cs"
     },
     {
@@ -133,11 +133,11 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 3.11,
+      "generation_time_s": 9.39,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_streaming_render.cs"
     },
     {
-      "task": "blazor_state_persistence",
+      "task": "blazor_cascading_auth",
       "category": "blazor",
       "weight": 1,
       "passed": false,
@@ -145,11 +145,11 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 2.3,
-      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_state_persistence.cs"
+      "generation_time_s": 26.17,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_cascading_auth.cs"
     },
     {
-      "task": "xunit_v3_test_generation",
+      "task": "xunit_v3_theory_tests",
       "category": "xunit",
       "weight": 1,
       "passed": false,
@@ -157,8 +157,8 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 70.56,
-      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_v3_test_generation.cs"
+      "generation_time_s": 25.56,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_v3_theory_tests.cs"
     },
     {
       "task": "xunit_awesome_nsubstitute",
@@ -169,7 +169,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 6.77,
+      "generation_time_s": 9.83,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_awesome_nsubstitute.cs"
     },
     {
@@ -181,7 +181,7 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 4.5,
+      "generation_time_s": 7.69,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_assembly_fixture.cs"
     },
     {
@@ -193,23 +193,23 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 4.98,
+      "generation_time_s": 10.62,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\linq_complex_query.cs"
     },
     {
       "task": "async_cancellation",
-      "category": "linq",
+      "category": "async",
       "weight": 1,
       "passed": false,
       "harness_error": null,
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 2.91,
+      "generation_time_s": 8.72,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\async_cancellation.cs"
     },
     {
-      "task": "vertical_order_api",
+      "task": "vertical_order_service",
       "category": "vertical",
       "weight": 2,
       "passed": false,
@@ -217,11 +217,11 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 38.62,
-      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_order_api.cs"
+      "generation_time_s": 43.49,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_order_service.cs"
     },
     {
-      "task": "vertical_saga_workflow",
+      "task": "vertical_consumer_pipeline",
       "category": "vertical",
       "weight": 2,
       "passed": false,
@@ -229,8 +229,8 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 70.42,
-      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_saga_workflow.cs"
+      "generation_time_s": 16.39,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_consumer_pipeline.cs"
     },
     {
       "task": "vertical_blazor_crud",
@@ -241,10 +241,371 @@
       "build_success": false,
       "tests_passed": 0,
       "tests_total": 0,
-      "generation_time_s": 150.06,
+      "generation_time_s": 22.16,
       "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_blazor_crud.cs"
+    },
+    {
+      "task": "linq_selectmany_flatten",
+      "category": "linq",
+      "weight": 1,
+      "passed": true,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 3,
+      "tests_total": 3,
+      "generation_time_s": 3.53,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\linq_selectmany_flatten.cs"
+    },
+    {
+      "task": "linq_set_operations",
+      "category": "linq",
+      "weight": 1,
+      "passed": true,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 5,
+      "tests_total": 5,
+      "generation_time_s": 6.64,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\linq_set_operations.cs"
+    },
+    {
+      "task": "linq_aggregate_stats",
+      "category": "linq",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 7.05,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\linq_aggregate_stats.cs"
+    },
+    {
+      "task": "linq_todictionary_tolookup",
+      "category": "linq",
+      "weight": 1,
+      "passed": true,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 5,
+      "tests_total": 5,
+      "generation_time_s": 5.12,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\linq_todictionary_tolookup.cs"
+    },
+    {
+      "task": "async_whenall_parallel",
+      "category": "async",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 8.97,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\async_whenall_parallel.cs"
+    },
+    {
+      "task": "async_semaphore_throttle",
+      "category": "async",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 9.5,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\async_semaphore_throttle.cs"
+    },
+    {
+      "task": "async_channel_pipeline",
+      "category": "async",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 6.55,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\async_channel_pipeline.cs"
+    },
+    {
+      "task": "async_valuetask_cache",
+      "category": "async",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 6.61,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\async_valuetask_cache.cs"
+    },
+    {
+      "task": "aspnet_minimal_api_endpoint",
+      "category": "aspnet",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 7.42,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_minimal_api_endpoint.cs"
+    },
+    {
+      "task": "aspnet_typed_httpclient",
+      "category": "aspnet",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 0,
+      "tests_total": 2,
+      "generation_time_s": 7.26,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_typed_httpclient.cs"
+    },
+    {
+      "task": "aspnet_ioptions_config",
+      "category": "aspnet",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 11.09,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_ioptions_config.cs"
+    },
+    {
+      "task": "aspnet_problemdetails_handler",
+      "category": "aspnet",
+      "weight": 1,
+      "passed": true,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 5,
+      "tests_total": 5,
+      "generation_time_s": 13.59,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\aspnet_problemdetails_handler.cs"
+    },
+    {
+      "task": "efcore_include_navigation",
+      "category": "efcore",
+      "weight": 1,
+      "passed": true,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 2,
+      "tests_total": 2,
+      "generation_time_s": 12.48,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_include_navigation.cs"
+    },
+    {
+      "task": "efcore_softdelete_filter",
+      "category": "efcore",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 9.53,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_softdelete_filter.cs"
+    },
+    {
+      "task": "efcore_owned_entity",
+      "category": "efcore",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 7.17,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_owned_entity.cs"
+    },
+    {
+      "task": "efcore_value_conversion",
+      "category": "efcore",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 9.66,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\efcore_value_conversion.cs"
+    },
+    {
+      "task": "masstransit_request_response",
+      "category": "masstransit",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 6.86,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_request_response.cs"
+    },
+    {
+      "task": "masstransit_saga_events",
+      "category": "masstransit",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 98.69,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_saga_events.cs"
+    },
+    {
+      "task": "masstransit_consumer_filter",
+      "category": "masstransit",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 14.52,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\masstransit_consumer_filter.cs"
+    },
+    {
+      "task": "xunit_memberdata",
+      "category": "xunit",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 9.05,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_memberdata.cs"
+    },
+    {
+      "task": "xunit_class_fixture",
+      "category": "xunit",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 10.38,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_class_fixture.cs"
+    },
+    {
+      "task": "xunit_async_collection",
+      "category": "xunit",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 12.0,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\xunit_async_collection.cs"
+    },
+    {
+      "task": "blazor_form_validation",
+      "category": "blazor",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 6.98,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_form_validation.cs"
+    },
+    {
+      "task": "blazor_navigation_redirect",
+      "category": "blazor",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 8.92,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_navigation_redirect.cs"
+    },
+    {
+      "task": "blazor_parameter_lifecycle",
+      "category": "blazor",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 5.91,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\blazor_parameter_lifecycle.cs"
+    },
+    {
+      "task": "vertical_cqrs_handler",
+      "category": "vertical",
+      "weight": 2,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 25.48,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_cqrs_handler.cs"
+    },
+    {
+      "task": "vertical_efcore_service",
+      "category": "vertical",
+      "weight": 2,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 19.74,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\vertical_efcore_service.cs"
+    },
+    {
+      "task": "patterns_record_with",
+      "category": "patterns",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 4.42,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\patterns_record_with.cs"
+    },
+    {
+      "task": "patterns_json_serialization",
+      "category": "patterns",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": true,
+      "tests_passed": 0,
+      "tests_total": 5,
+      "generation_time_s": 5.88,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\patterns_json_serialization.cs"
+    },
+    {
+      "task": "patterns_timeprovider",
+      "category": "patterns",
+      "weight": 1,
+      "passed": false,
+      "harness_error": null,
+      "build_success": false,
+      "tests_passed": 0,
+      "tests_total": 0,
+      "generation_time_s": 6.45,
+      "generated_code_path": "results\\coding-generated\\minicpm-v_8b\\patterns_timeprovider.cs"
     }
   ],
-  "layer3_weighted_score": 0.0,
-  "composite_score": 0.0
+  "layer3_weighted_score": 0.10909090909090909,
+  "composite_score": 0.0,
+  "think_setting": "false"
 }

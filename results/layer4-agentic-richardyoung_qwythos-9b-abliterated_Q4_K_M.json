@@ -1,0 +1,74 @@
+{
+  "benchmark": "layer4-agentic-csharp-t3",
+  "model": "richardyoung/qwythos-9b-abliterated:Q4_K_M",
+  "ollama_host": "http://127.0.0.1:11434",
+  "think_setting": "false",
+  "run_started_at": "2026-06-28T15:34:41.289570+00:00",
+  "run_finished_at": "2026-06-28T15:57:04.087488+00:00",
+  "max_steps": 10,
+  "t3_score": 1.0,
+  "t3_passed": 3,
+  "t3_total": 3,
+  "results": [
+    {
+      "task": "implement_calculator",
+      "passed": true,
+      "final_tests_passed": 2,
+      "final_tests_total": 2,
+      "loop_finished": true,
+      "stop_reason": "finish",
+      "n_steps": 6,
+      "tool_steps": [
+        "list_files",
+        "read_file",
+        "read_file",
+        "write_file",
+        "run_tests",
+        "finish"
+      ],
+      "writes": 1,
+      "builds": 0,
+      "tests": 1
+    },
+    {
+      "task": "fix_isprime_bug",
+      "passed": true,
+      "final_tests_passed": 6,
+      "final_tests_total": 6,
+      "loop_finished": true,
+      "stop_reason": "finish",
+      "n_steps": 6,
+      "tool_steps": [
+        "list_files",
+        "read_file",
+        "read_file",
+        "write_file",
+        "run_tests",
+        "finish"
+      ],
+      "writes": 1,
+      "builds": 0,
+      "tests": 1
+    },
+    {
+      "task": "implement_reverse_words",
+      "passed": true,
+      "final_tests_passed": 2,
+      "final_tests_total": 2,
+      "loop_finished": true,
+      "stop_reason": "finish",
+      "n_steps": 6,
+      "tool_steps": [
+        "list_files",
+        "read_file",
+        "read_file",
+        "write_file",
+        "run_tests",
+        "finish"
+      ],
+      "writes": 1,
+      "builds": 0,
+      "tests": 1
+    }
+  ]
+}

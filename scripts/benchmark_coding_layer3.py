@@ -103,16 +103,32 @@ def main() -> None:
     all_model_results: list[dict[str, Any]] = []
 
     for model in args.models:
-        model_run_started_at = datetime.datetime.now(datetime.timezone.utc)
         slug = model_slug(model)
         print(f"\n[model] {model} (slug={slug})")
 
-        task_results: list[TaskResult] = []
-        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}.json")
+        # -think suffix: track "thinking mode enabled" runs as a separate
+        # checkpoint file from the non-thinking baseline, rather than one
+        # overwriting the other.
+        think_env = os.environ.get("CODING_BENCH_THINK", "").strip().lower()
+        suffix = "-think" if think_env in ("1", "true", "yes", "on", "low", "medium", "high") else ""
+        checkpoint_path = os.path.join(args.checkpoint_dir, f"coding-{slug}{suffix}.json")
 
+        task_results: list[TaskResult] = []
+        existing = read_checkpoint(checkpoint_path)
+        model_run_started_at_str = existing.get("layer3_run_started_at")
+        model_run_started_at = (
+            datetime.datetime.fromisoformat(model_run_started_at_str)
+            if model_run_started_at_str
+            else datetime.datetime.now(datetime.timezone.utc)
+        )
+
+        # --resume is explicit opt-in (not automatic): a checkpoint existing on
+        # disk doesn't by itself mean this invocation wants to skip its tasks.
+        # NOTE: matching MUST use the YAML's internal "name:" field
+        # (TaskResult.task), not the filename -- see the comment at the
+        # skip-check below for why a filename-based match silently breaks this.
         already_done: dict[str, Any] = {}
         if args.resume:
-            existing = read_checkpoint(checkpoint_path)
             for r in existing.get("layer3_results", []):
                 if r.get("task"):
                     already_done[r["task"]] = r
@@ -187,6 +203,7 @@ def main() -> None:
                 "layer3_total": len(task_paths),
                 "layer3_results": [dataclasses.asdict(r) for r in task_results],
                 "layer3_weighted_score": partial_score,
+                "think_setting": think_env or "false",
             })
             write_json(checkpoint_path, partial_checkpoint)
 
@@ -198,6 +215,9 @@ def main() -> None:
             f"({sum(1 if r.passed else 0 for r in task_results)}/{len(task_results)} tasks passed)"
         )
 
+        # Re-read from disk in case another concurrently-running layer (1/2/4 all
+        # share this per-model file) wrote in the meantime; think_env/suffix/
+        # checkpoint_path were already resolved before the task loop above.
         checkpoint_payload: dict[str, Any] = read_checkpoint(checkpoint_path)
         checkpoint_payload.update({
             "model": model,
@@ -207,9 +227,9 @@ def main() -> None:
             "layer3_in_progress": False,
             "layer3_results": [dataclasses.asdict(r) for r in task_results],
             "layer3_weighted_score": layer3_score,
+            "think_setting": think_env or "false",
         })
         checkpoint_payload.pop("layer3_total_so_far", None)
-
         write_json(checkpoint_path, checkpoint_payload)
         print(f"  [checkpoint] Written to {checkpoint_path}")
 

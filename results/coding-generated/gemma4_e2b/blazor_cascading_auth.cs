@@ -9,11 +9,11 @@ public interface IUserService
 
 public class UserDashboard : ComponentBase
 {
-    [CascadingParameter]
-    public Task<AuthenticationState> AuthState { get; set; }
-
     [Inject]
     public IUserService UserService { get; set; }
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
 
     public string? DisplayName { get; set; }
     public bool IsAuthenticated { get; set; }
@@ -22,19 +22,19 @@ public class UserDashboard : ComponentBase
     {
         if (AuthState == null)
         {
-            await Task.CompletedTask;
             return;
         }
 
-        var authState = await AuthState.Result;
+        var authState = await AuthState;
 
         if (authState.User?.Identity?.IsAuthenticated == true)
         {
             IsAuthenticated = true;
-            var userName = authState.User.Identity?.Name ?? "Unknown User";
+            var userName = authState.User.Identity.Name ?? "Unknown User";
 
-            // Call the injected service
-            DisplayName = await UserService.GetDisplayNameAsync(userName);
+            // Fetch display name from the injected service
+            string displayName = await UserService.GetDisplayNameAsync(userName);
+            DisplayName = displayName;
         }
         else
         {

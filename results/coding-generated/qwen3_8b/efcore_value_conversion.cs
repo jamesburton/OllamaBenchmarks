@@ -19,10 +19,14 @@ public class ProductDbContext : DbContext
     {
         var parts = s.Split(':');
         if (parts.Length != 2)
+        {
             throw new FormatException("Invalid money format");
+        }
 
         if (!decimal.TryParse(parts[0], out var amount))
+        {
             throw new FormatException("Invalid amount format");
+        }
 
         return new Money(amount, parts[1]);
     }

@@ -22,22 +22,22 @@ public static class ApiExceptionMapper
 {
     public static ProblemDetails MapException(Exception ex) => ex switch
     {
-        NotFoundException ne => new ProblemDetails
+        NotFoundException nf => new ProblemDetails
         {
-            Status = 404,
             Title = "Not Found",
-            Detail = ne.ResourceName
+            Status = 404,
+            Detail = nf.ResourceName
         },
-        ConflictException ce => new ProblemDetails
+        ConflictException cf => new ProblemDetails
         {
-            Status = 409,
             Title = "Conflict",
-            Detail = ce.ConflictReason
+            Status = 409,
+            Detail = cf.ConflictReason
         },
         _ => new ProblemDetails
         {
-            Status = 500,
             Title = "Internal Server Error",
+            Status = 500,
             Detail = ex.Message
         }
     };

@@ -1,22 +1,25 @@
-public class Address
+class Address
 {
     public string Street { get; set; }
-    public string City { get; set; }
+    public string City { get; set}
     public string PostCode { get; set; }
 }
 
-public class Company
+class Company
 {
     public int Id { get; set; }
     public string Name { get; set; }
     public Address HeadquartersAddress { get; set; }
 }
 
-public class CompanyDbContext : DbContext
+class CompanyDbContext : DbContext
 {
     public DbSet<Company> Companies { get; set; }
 
-    public CompanyDbContext(DbContextOptions<CompanyDbContext> options) : base(options) { }
+    public CompanyDbContext(DbContextOptions<CompanyDbContext> options)
+        : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -24,7 +27,7 @@ public class CompanyDbContext : DbContext
     }
 }
 
-public static class CompanyQueries
+static class CompanyQueries
 {
     public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {

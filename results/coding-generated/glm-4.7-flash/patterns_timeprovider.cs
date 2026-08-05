@@ -1,3 +1,5 @@
+using System;
+
 public class FakeTimeProvider : TimeProvider
 {
     private readonly DateTimeOffset _fixedUtcNow;

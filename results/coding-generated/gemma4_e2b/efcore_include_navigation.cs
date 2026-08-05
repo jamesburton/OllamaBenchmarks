@@ -2,34 +2,40 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-// 1. Comment class
+// 1. Comment Class
 public class Comment
 {
     public int Id { get; set; }
     public string Text { get; set; }
     public int PostId { get; set; }
-    public Post? Post { get; set; } // Navigation property to Post
+
+    // Navigation property
+    public Post? Post { get; set; }
 }
 
-// 2. Post class
+// 2. Post Class
 public class Post
 {
     public int Id { get; set; }
     public string Content { get; set; }
     public int BlogId { get; set; }
-    public Blog? Blog { get; set; } // Navigation property to Blog
-    public List<Comment> Comments { get; set; } = new(); // Initialize collection
+
+    // Navigation properties
+    public Blog? Blog { get; set; }
+    public List<Comment> Comments { get; set; } = new();
 }
 
-// 3. Blog class
+// 3. Blog Class
 public class Blog
 {
     public int Id { get; set; }
     public string Title { get; set; }
-    public List<Post> Posts { get; set; } = new(); // Initialize collection
+
+    // Navigation property
+    public List<Post> Posts { get; set; } = new();
 }
 
-// 4. BlogDbContext class
+// 4. BlogDbContext Class
 public class BlogDbContext : DbContext
 {
     public DbSet<Blog> Blogs { get; set; }
@@ -42,13 +48,13 @@ public class BlogDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure Blog has many Posts (with foreign key BlogId)
+        // Configure Blog to Post relationship (One-to-Many)
         modelBuilder.Entity<Blog>()
             .HasMany(b => b.Posts)
             .WithOne(p => p.Blog)
             .HasForeignKey(p => p.BlogId);
 
-        // Configure Post has many Comments (with foreign key PostId)
+        // Configure Post to Comment relationship (One-to-Many)
         modelBuilder.Entity<Post>()
             .HasMany(p => p.Comments)
             .WithOne(c => c.Post)
@@ -56,7 +62,7 @@ public class BlogDbContext : DbContext
     }
 }
 
-// 5. BlogRepository class
+// 5. BlogRepository Class
 public class BlogRepository
 {
     private readonly BlogDbContext _context;

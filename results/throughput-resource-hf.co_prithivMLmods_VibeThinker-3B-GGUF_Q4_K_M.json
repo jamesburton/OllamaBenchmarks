@@ -1,0 +1,40 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-06-20T15:08:25.1450873+01:00",
+  "run_finished_at": "2026-06-20T15:09:17.7511789+01:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-hf.co_prithivMLmods_VibeThinker-3B-GGUF_Q4_K_M.json",
+  "host": "FRAMEWORK",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "hostname": "FRAMEWORK"
+  },
+  "models": [
+    "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M"
+  ],
+  "completed_models": [
+    "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "num_ctx": 0,
+  "seed": 42,
+  "results": [
+    {
+      "model": "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M",
+      "eval_count": 192,
+      "eval_s": 2.59,
+      "toks_per_s": 74.13,
+      "total_s": 5.537,
+      "load_s": 2.858,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 0.12,
+      "gpu_util_avg": 0.0,
+      "gpu_util_peak": 0.0,
+      "gpu_mem_peak_gb": 0.0,
+      "ollama_ps": "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M size=2.01GB vram=2.01GB ctx=4096 quant=unknown"
+    }
+  ]
+}

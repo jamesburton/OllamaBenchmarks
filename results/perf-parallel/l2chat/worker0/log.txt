@@ -1,0 +1,14 @@
+[setup] Loading dataset: results\perf-parallel\l2chat\worker0\dataset.json
+[setup] 79 problems
+[setup] Template cache ready: scripts/coding_tasks/templates\.cache\layer2_project
+
+[model] mistral-medium-3.5:iq3m (slug=mistral-medium-3.5_iq3m-chat)
+  [1/79] HumanEval_0_has_close_elements ... PASS
+  [2/79] HumanEval_2_truncate_number ... PASS
+  [3/79] HumanEval_4_mean_absolute_deviation ... PASS
+  [4/79] HumanEval_6_parse_nested_parens ... FAIL  (Process terminated.)
+  [5/79] HumanEval_8_sum_product ... PASS
+  [6/79] HumanEval_10_make_palindrome ... FAIL  (The build failed. Fix the build errors and run again.)
+  [7/79] HumanEval_12_longest ... FAIL  (Unhandled exception. System.NullReferenceException: Object reference not set to )
+  [8/79] HumanEval_14_all_prefixes ... FAIL  (Process terminated.)
+  [9/79] HumanEval_16_count_distinct_characters ...

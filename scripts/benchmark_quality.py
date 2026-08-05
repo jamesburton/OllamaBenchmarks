@@ -4,6 +4,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import textwrap
 import time
@@ -11,6 +12,9 @@ from typing import Any
 import urllib.request
 
 from collect_host_info import build_host_info
+
+sys.path.insert(0, os.path.dirname(__file__))
+from coding_tasks.task_runner import retry_wait_seconds
 
 CODING_TASKS = [
     (
@@ -230,11 +234,18 @@ def write_json(path: str, payload: dict[str, Any]) -> None:
         handle.write(json.dumps(payload, indent=2) + "\n")
 
 
-def post_json(path: str, payload: dict, timeout: int = 1200, max_retries: int = 5) -> dict:
+# Honor OLLAMA_HOST so generation can target a remote Ollama (e.g. the T5500 GPU)
+# while this script runs on another box. Mirrors coding_tasks/task_runner.py.
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
+
+
+def post_json(path: str, payload: dict, timeout: int = 1200, max_retries: int = None) -> dict:
+    if max_retries is None:
+        max_retries = int(os.environ.get("OLLAMA_MAX_RETRIES", "6"))
     req_data = json.dumps(payload).encode("utf-8")
     for attempt in range(max_retries):
         req = urllib.request.Request(
-            f"http://127.0.0.1:11434{path}",
+            f"{OLLAMA_HOST}{path}",
             data=req_data,
             headers={"Content-Type": "application/json"},
             method="POST",
@@ -243,9 +254,9 @@ def post_json(path: str, payload: dict, timeout: int = 1200, max_retries: int = 
             with urllib.request.urlopen(req, timeout=timeout) as response:
                 return json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
-            if e.code == 429 and attempt < max_retries - 1:
-                wait = min(30 * (2 ** attempt), 300)  # 30s, 60s, 120s, 240s, 300s
-                print(f"    [429 rate-limited] waiting {wait}s (attempt {attempt+1}/{max_retries})")
+            if e.code in (429, 503) and attempt < max_retries - 1:
+                wait = retry_wait_seconds(e, attempt, base=30.0)
+                print(f"    [{e.code} rate-limited] waiting {wait:.0f}s (attempt {attempt+1}/{max_retries})")
                 time.sleep(wait)
                 continue
             raise
@@ -596,7 +607,7 @@ def main() -> None:
             "run_started_at": run_started_at.isoformat(),
             "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "output_path": os.path.abspath(args.output),
-            "ollama_host": "http://127.0.0.1:11434",
+            "ollama_host": OLLAMA_HOST,
             "host_details": host_details,
             "models": args.models,
             "completed_models": completed_models,
@@ -619,7 +630,7 @@ def main() -> None:
                     "run_started_at": run_started_at.isoformat(),
                     "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "output_path": os.path.abspath(per_model_path),
-                    "ollama_host": "http://127.0.0.1:11434",
+                    "ollama_host": OLLAMA_HOST,
                     "host_details": host_details,
                     "models": [model],
                     "results": [row],
@@ -635,7 +646,7 @@ def main() -> None:
                     "run_started_at": run_started_at.isoformat(),
                     "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "output_path": os.path.abspath(per_model_path),
-                    "ollama_host": "http://127.0.0.1:11434",
+                    "ollama_host": OLLAMA_HOST,
                     "host_details": host_details,
                     "models": [model],
                     "completed_models": [],
@@ -652,7 +663,7 @@ def main() -> None:
         "run_started_at": run_started_at.isoformat(),
         "run_finished_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "output_path": os.path.abspath(args.output),
-        "ollama_host": "http://127.0.0.1:11434",
+        "ollama_host": OLLAMA_HOST,
         "host_details": host_details,
         "models": args.models,
         "completed_models": [row["model"] for row in results],

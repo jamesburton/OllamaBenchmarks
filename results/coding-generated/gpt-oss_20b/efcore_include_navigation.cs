@@ -48,6 +48,8 @@ public class BlogDbContext : DbContext
             .HasMany(p => p.Comments)
             .WithOne(c => c.Post)
             .HasForeignKey(c => c.PostId);
+
+        base.OnModelCreating(modelBuilder);
     }
 }
 
@@ -64,7 +66,7 @@ public class BlogRepository
     {
         return await _context.Blogs
             .Include(b => b.Posts)
-                .ThenInclude(p => p.Comments)
+            .ThenInclude(p => p.Comments)
             .FirstOrDefaultAsync(b => b.Id == blogId);
     }
 }

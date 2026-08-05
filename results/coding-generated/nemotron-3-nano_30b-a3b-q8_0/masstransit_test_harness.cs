@@ -2,36 +2,32 @@ using MassTransit;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
-public class ProcessPaymentTests
+namespace MyTest;
+
+public class ProcessPaymentConsumerTests
 {
     [Fact]
-    public async Task ProcessPayment_consumer_publishes_correct_event()
+    public async Task Consumes_ProcessPayment_And_Publishes_PaymentProcessed()
     {
-        // Arrange
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddMassTransitTestHarness(cfg =>
-        {
-            cfg.AddConsumer<ProcessPaymentConsumer>();
-        });
-        var provider = serviceCollection.BuildServiceProvider(true);
+        using var provider = new ServiceCollection()
+            .AddMassTransitTestHarness(cfg =>
+            {
+                cfg.AddConsumer<ProcessPaymentConsumer>();
+            })
+            .BuildServiceProvider(true);
 
         var harness = provider.GetRequiredService<ITestHarness>();
 
         await harness.Start();
 
-        // Act
-        var orderId = Guid.NewGuid();
-        var message = new ProcessPayment(orderId, 100.0m);
-        await harness.Bus.Publish(message);
+        await harness.Bus.Publish(new ProcessPayment(Guid.NewGuid(), 100m));
 
-        // Assert
-        bool consumed = await harness.Consumed.Any<ProcessPayment>();
-        bool published = await harness.Published.Any<PaymentProcessed>();
+        var paymentProcessedConsumed = await harness.Consumed.Any<PaymentProcessed>();
+        var paymentProcessedPublished = await harness.Published.Any<PaymentProcessed>();
 
-        Assert.Multiple(() =>
-        {
-            Assert.True(consumed, "ProcessPayment message was not consumed.");
-            Assert.True(published, "PaymentProcessed event was not published.");
-        });
+        Assert.Multiple(
+            () => Assert.True(paymentProcessedConsumed),
+            () => Assert.True(paymentProcessedPublished)
+        );
     }
 }

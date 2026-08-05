@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Http;
 
 public record CreateProductRequest(string Name, decimal Price);
-
 public record ProductResponse(int Id, string Name, decimal Price);
 
 public static class ProductEndpoints
 {
-    private static int idCounter = 0;
+    private static int _productIdCounter = 0;
 
     public static IResult CreateProduct(CreateProductRequest request)
     {
@@ -14,7 +13,7 @@ public static class ProductEndpoints
         {
             return Results.ValidationProblem(new Dictionary<string, string[]>
             {
-                ["Name"] = new[] { "Name is required." }
+                ["Name"] = ["Name is required."]
             });
         }
 
@@ -22,11 +21,12 @@ public static class ProductEndpoints
         {
             return Results.ValidationProblem(new Dictionary<string, string[]>
             {
-                ["Price"] = new[] { "Price must be greater than 0." }
+                ["Price"] = ["Price must be greater than 0."]
             });
         }
 
-        idCounter++;
-        return Results.Ok(new ProductResponse(idCounter, request.Name, request.Price));
+        _productIdCounter++;
+        var product = new ProductResponse(_productIdCounter, request.Name, request.Price);
+        return Results.Ok(product);
     }
 }

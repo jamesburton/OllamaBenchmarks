@@ -4,7 +4,7 @@ public static class GradeBook
 {
     public static System.Collections.Generic.Dictionary<string, Student> IndexByName(System.Collections.Generic.IEnumerable<Student> students)
     {
-        return System.Linq.Enumerable.ToDictionary(students, s => s.Name);
+        return System.Linq.Enumerable.ToDictionary(students, s => s.Name, s => s);
     }
 
     public static System.Collections.Generic.ILookup<string, Student> GroupByGrade(System.Collections.Generic.IEnumerable<Student> students)

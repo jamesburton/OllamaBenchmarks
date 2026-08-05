@@ -29,36 +29,46 @@ public class NotificationService(IUserRepository repo, IEmailService email)
 public class NotificationServiceTests
 {
     [Fact]
-    public async Task NotifyUserAsync_HappyPath_SendsEmailWithCorrectAddress()
+    public async Task NotifyUserAsync_HappyPath_UserFound_EmailSent()
     {
-        // Arrange
-        var user = new User { Id = 1, Email = "test@example.com" };
         var repo = Substitute.For<IUserRepository>();
         var email = Substitute.For<IEmailService>();
+
+        var user = new User { Id = 1, Name = "Test", Email = "test@example.com" };
         repo.GetByIdAsync(1).Returns(user);
 
-        var sut = new NotificationService(repo, email);
+        var service = new NotificationService(repo, email);
 
-        // Act
-        await sut.NotifyUserAsync(1);
+        await service.NotifyUserAsync(1);
 
-        // Assert
         email.Received().SendWelcomeAsync("test@example.com");
     }
 
     [Fact]
     public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
     {
-        // Arrange
         var repo = Substitute.For<IUserRepository>();
+        var email = Substitute.For<IEmailService>();
+
         repo.GetByIdAsync(1).Returns((User?)null);
 
-        var sut = new NotificationService(repo, Substitute.For<IEmailService>());
+        var service = new NotificationService(repo, email);
 
-        // Act
-        Func<Task> act = () => sut.NotifyUserAsync(1);
+        await service.NotifyUserAsync(1);
+    }
 
-        // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>();
+    [Fact]
+    public async Task NotifyUserAsync_UserNotFound_VerifyNoEmailSent()
+    {
+        var repo = Substitute.For<IUserRepository>();
+        var email = Substitute.For<IEmailService>();
+
+        repo.GetByIdAsync(1).Returns((User?)null);
+
+        var service = new NotificationService(repo, email);
+
+        await service.NotifyUserAsync(1);
+
+        email.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 }

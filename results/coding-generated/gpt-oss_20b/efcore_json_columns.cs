@@ -40,7 +40,7 @@ public static class CompanyQueries
     public static List<Company> FindCompaniesByCity(CompanyDbContext db, string city)
     {
         return db.Companies
-                 .Where(c => c.HeadquartersAddress.City == city)
-                 .ToList();
+            .Where(c => c.HeadquartersAddress.City == city)
+            .ToList();
     }
 }

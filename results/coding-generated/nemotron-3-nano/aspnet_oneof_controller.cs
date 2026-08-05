@@ -1,32 +1,31 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using OneOf;
+
+public record NotFound;
+public record ValidationError(string Message);
 
 public class User
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
+    public string Name { get; set; } = default!;
+    public string Email { get; set; } = default!;
 }
-
-public record NotFound();
-
-public record ValidationError(string Message);
 
 public interface IUserService
 {
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
 
-public class UsersController : ControllerBase
+public class UsersController : Microsoft.AspNetCore.Mvc.ControllerBase
 {
     private readonly IUserService _service;
+
     public UsersController(IUserService service) => _service = service;
 
+    [HttpGet("/api/users/{id}")]
     public async Task<IActionResult> Get(int id)
     {
-        var result = await _service.GetByIdAsync(id);
-        return result.Match(
+        OneOf<User, NotFound, ValidationError> result = await _service.GetByIdAsync(id);
+        return result.Match<IActionResult>(
             user => Ok(user),
             _ => NotFound(),
             err => BadRequest(err.Message)

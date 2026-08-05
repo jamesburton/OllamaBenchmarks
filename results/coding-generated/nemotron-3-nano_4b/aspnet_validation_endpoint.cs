@@ -16,12 +16,16 @@ public class OrderService
 {
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
-        var validationContext = new ValidationContext(request);
-        var results = new ValidationResults();
-        Validator.TryValidateObject(request, validationContext, results, true, out _);
-        if (!results.IsValid)
+        var validator = new System.ComponentModel.DataAnnotations.Validator<CreateOrderRequest>(request, null, null, false);
+        if (!validator.TryValidateObject(request, true, null, true))
         {
-            throw new ArgumentException(results.Errors.First().ErrorMessage);
+            var invalid = null;
+            foreach (var attr in validator.ValidationState.Instances.SelectMany(s => s.Errors))
+            {
+                invalid = attr;
+                break;
+            }
+            throw new ArgumentException(invalid.ErrorMessage);
         }
         return request;
     }

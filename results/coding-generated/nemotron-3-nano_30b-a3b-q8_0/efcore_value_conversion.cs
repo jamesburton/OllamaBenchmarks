@@ -1,13 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading.Tasks;
 
 public record Money(decimal Amount, string Currency);
 
 public class Product
 {
     public int Id { get; set; }
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public Money Price { get; set; } = new Money(0, "USD");
 }
 
@@ -29,7 +27,9 @@ public class ProductDbContext : DbContext
     {
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
-            .HasConversion(m => $"{m.Amount}:{m.Currency}", ParseMoney);
+            .HasConversion(
+                m => $"{m.Amount}:{m.Currency}",
+                s => ParseMoney(s));
     }
 }
 
@@ -37,10 +37,7 @@ public class ProductRepository
 {
     private readonly ProductDbContext _context;
 
-    public ProductRepository(ProductDbContext context)
-    {
-        _context = context;
-    }
+    public ProductRepository(ProductDbContext context) => _context = context;
 
     public async Task<Product> SaveAsync(Product product)
     {

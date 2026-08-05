@@ -26,10 +26,6 @@ public class NotificationService(IUserRepository repo, IEmailService email)
     }
 }
 
-using NSubstitute;
-using Xunit;
-using AwesomeAssertions;
-
 public class NotificationServiceTests
 {
     [Fact]
@@ -41,23 +37,19 @@ public class NotificationServiceTests
 
         var expectedUser = new User { Id = 1, Name = "Alice", Email = "alice@example.com" };
 
-        // Setup mock to return the user
+        // Configure mock to return the user
         mockRepo.GetByIdAsync(1).Returns(expectedUser);
 
-        // Setup mock to verify the email is sent
-        mockEmail.SendWelcomeAsync(expectedUser.Email).Returns(Task.CompletedTask);
-
-        var service = new NotificationService(mockRepo, mockEmail);
-
         // Act
+        var service = new NotificationService(mockRepo, mockEmail);
         await service.NotifyUserAsync(1);
 
         // Assert
-        // Verify repository interaction
-        mockRepo.Received(1).GetByIdAsync(1);
+        // 1. Verify email was sent with the correct address
+        await mockEmail.Received(1).SendWelcomeAsync("alice@example.com");
 
-        // Verify email service interaction
-        mockEmail.Received(1).SendWelcomeAsync(expectedUser.Email);
+        // 2. Verify repository was called
+        await mockRepo.Received(1).GetByIdAsync(1);
     }
 
     [Fact]
@@ -67,21 +59,18 @@ public class NotificationServiceTests
         var mockRepo = Substitute.For<IUserRepository>();
         var mockEmail = Substitute.For<IEmailService>();
 
-        // Setup mock to return null (user not found)
-        mockRepo.GetByIdAsync(999).Returns((User?)null);
+        // Configure mock to return null (user not found)
+        mockRepo.GetByIdAsync(99).Returns((User?)null);
 
         var service = new NotificationService(mockRepo, mockEmail);
 
         // Act & Assert
-        await service.NotifyUserAsync(999);
+        await service.NotifyUserAsync(99);
 
-        // Verify that the expected exception is thrown
-        await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-        {
-            await service.NotifyUserAsync(999);
-        });
+        // Verify that the correct exception is thrown
+        await Task.CompletedTask.Should().ThrowAsync<InvalidOperationException>();
 
-        // Verify that the email service was never called
-        mockEmail.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
+        // Verify that the email service was NOT called
+        await mockEmail.DidNotReceive().SendWelcomeAsync(Arg.Any<string>());
     }
 }

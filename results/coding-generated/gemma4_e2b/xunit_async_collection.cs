@@ -1,18 +1,18 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
-using AwesomeAssertions;
-
-// 1. CounterService class
 public class CounterService
 {
     public int Count { get; private set; } = 0;
-    public void Increment() => Count++;
-    public void Reset() => Count = 0;
+
+    public void Increment()
+    {
+        Count++;
+    }
+
+    public void Reset()
+    {
+        Count = 0;
+    }
 }
 
-// 2. CounterFixture class implementing IAsyncLifetime
 public class CounterFixture : IAsyncLifetime
 {
     public CounterService Counter { get; private set; } = null;
@@ -20,26 +20,22 @@ public class CounterFixture : IAsyncLifetime
     public ValueTask InitializeAsync()
     {
         Counter = new CounterService();
-        return default;
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask DisposeAsync()
     {
-        // No cleanup needed for this simple example
-        return default;
+        // No resources to dispose
+        return ValueTask.CompletedTask;
     }
 }
 
-// 3. Marker class for collection fixture
 [CollectionDefinition("Counter")]
 public class CounterCollection : ICollectionFixture<CounterFixture>
 {
-    // No test methods required
 }
 
-// 4. Test Class 1
-[Collection("Counter")]
-public class CounterFirstTests
+public class CounterFirstTests : IClassFixture<CounterFixture>
 {
     private readonly CounterFixture _fixture;
 
@@ -52,13 +48,13 @@ public class CounterFirstTests
     public void Increment_FirstTest_IncrementsCount()
     {
         _fixture.Counter.Increment();
-        _fixture.Counter.Count.Should().Be(1);
+
+        // Using AwesomeAssertions
+        _fixture.Counter.Count.Should().BeGreaterThan(0);
     }
 }
 
-// 4. Test Class 2
-[Collection("Counter")]
-public class CounterSecondTests
+public class CounterSecondTests : IClassFixture<CounterFixture>
 {
     private readonly CounterFixture _fixture;
 
@@ -72,6 +68,8 @@ public class CounterSecondTests
     {
         _fixture.Counter.Increment();
         _fixture.Counter.Increment();
+
+        // Using AwesomeAssertions
         _fixture.Counter.Count.Should().Be(2);
     }
 }

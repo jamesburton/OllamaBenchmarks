@@ -1,49 +1,50 @@
 using Microsoft.EntityFrameworkCore;
 
-public class Address {
+public class Address
+{
     public string Street { get; set; }
     public string City { get; set; }
     public string Zip { get; set; }
 }
 
-public class Customer {
+public class Customer
+{
     public int Id { get; set; }
     public string Name { get; set; }
-    public Address HomeAddress { get; set; }
-
-    public Customer() {
-        HomeAddress = new Address();
-    }
+    public Address HomeAddress { get; set; } = new Address(); // Initialized to avoid null
 }
 
-public class CustomerDbContext : DbContext {
+public class CustomerDbContext : DbContext
+{
     public DbSet<Customer> Customers { get; set; }
 
     public CustomerDbContext(DbContextOptions<CustomerDbContext> options)
         : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.Entity<Customer>()
-            .OwnsOne(c => c.HomeAddress);
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Customer>().OwnsOne(c => c.HomeAddress);
     }
 }
 
-public class CustomerRepository {
-    private readonly CustomerDbContext _ctx;
+public class CustomerRepository
+{
+    private readonly CustomerDbContext context;
 
-    public CustomerRepository(CustomerDbContext context) {
-        _ctx = context;
+    public CustomerRepository(CustomerDbContext context)
+    {
+        this.context = context;
     }
 
-    public async Task<Customer> CreateAsync(Customer customer) {
-        if (customer == null) throw new ArgumentNullException(nameof(customer));
-
-        _ctx.Customers.Add(customer);
-        await _ctx.SaveChangesAsync();
+    public async Task<Customer> CreateAsync(Customer customer)
+    {
+        await context.Customers.AddAsync(customer);
+        await context.SaveChangesAsync();
         return customer;
     }
 
-    public async Task<Customer?> GetByIdAsync(int id) {
-        return await _ctx.Customers.FirstOrDefaultAsync(c => c.Id == id);
+    public async Task<Customer?> GetByIdAsync(int id)
+    {
+        return await context.Customers.FindAsync(id);
     }
 }

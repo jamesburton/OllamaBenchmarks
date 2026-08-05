@@ -1,0 +1,801 @@
+{
+  "model": "hf.co/prithivMLmods/VibeThinker-3B-GGUF:Q4_K_M",
+  "benchmark": "coding-layer2-chat",
+  "layer2_chat_run_started_at": "2026-06-20T20:30:16.629392+00:00",
+  "layer2_chat_run_finished_at": "2026-06-21T00:29:54.322854+00:00",
+  "layer2_chat_pass_rate": 0.15822784810126583,
+  "layer2_chat_passed": 25,
+  "layer2_chat_total": 158,
+  "layer2_chat_results": [
+    {
+      "name": "HumanEval_0_has_close_elements",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_1_separate_paren_groups",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_2_truncate_number",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_3_below_zero",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_4_mean_absolute_deviation",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_5_intersperse",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_6_parse_nested_parens",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nParseNestedParens((\"(()()) ((())) () ((())()())\")).Equals((new List<long>(new long[]{(long)2L, (long)3L, (long)1L, (long)3L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat__k94ftg5\\Program.cs:line 42"
+    },
+    {
+      "name": "HumanEval_7_filter_by_substring",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nFilterBySubstring((new List<string>()), (\"john\")).Equals((new List<string>()))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_rbjbam5z\\Program.cs:line 20"
+    },
+    {
+      "name": "HumanEval_8_sum_product",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_9_rolling_max",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_10_make_palindrome",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_11_string_xor",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_12_longest",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_13_greatest_common_divisor",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_14_all_prefixes",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_15_string_sequence",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_16_count_distinct_characters",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_17_parse_music",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_18_how_many_times",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_19_sort_numbers",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_20_find_closest_elements",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_21_rescale_to_unit",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_22_filter_integers",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_23_strlen",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_24_largest_divisor",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_25_factorize",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_26_remove_duplicates",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_27_flip_case",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_28_concatenate",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_29_filter_by_prefix",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_30_get_positive",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nGetPositive((new List<long>(new long[]{(long)-1L, (long)-2L, (long)4L, (long)5L, (long)6L}))).Equals((new List<long>(new long[]{(long)4L, (long)5L, (long)6L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_fbmad26s\\Program.cs:line 25"
+    },
+    {
+      "name": "HumanEval_31_is_prime",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_33_sort_third",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_34_unique",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_35_max_element",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_36_fizz_buzz",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_37_sort_even",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_39_prime_fib",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_40_triples_sum_to_zero",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_41_car_race_collision",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_42_incr_list",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_43_pairs_sum_to_zero",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_44_change_base",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_45_triangle_area",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_46_fib4",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_47_median",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_48_is_palindrome",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_49_modp",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_51_remove_vowels",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_52_below_threshold",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_53_add",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_54_same_chars",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_55_fib",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_56_correct_bracketing",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_57_monotonic",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_58_common",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_59_largest_prime_factor",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_60_sum_to_n",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_61_correct_bracketing",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_62_derivative",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_63_fibfib",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_64_vowels_count",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_65_circular_shift",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_66_digitSum",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_67_fruit_distribution",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_68_pluck",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_69_search",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_70_strange_sort_list",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_71_triangle_area",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_72_will_it_fly",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_73_smallest_change",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_74_total_match",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_75_is_multiply_prime",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_76_is_simple_power",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_77_iscube",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_78_hex_key",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_79_decimal_to_binary",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_80_is_happy",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_81_numerical_letter_grade",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nNumericalLetterGrade((new List<float>(new float[]{(float)4.0f, (float)3L, (float)1.7f, (float)2L, (float)3.5f}))).Equals((new List<string>(new string[]{(string)\"A+\", (string)\"B\", (string)\"C-\", (string)\"C\", (string)\"A-\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_if40j2l4\\Program.cs:line 65"
+    },
+    {
+      "name": "HumanEval_82_prime_length",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_83_starts_one_ends",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_84_solve",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_85_add",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_86_anti_shuffle",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_87_get_row",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_88_sort_array",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_89_encrypt",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_90_next_smallest",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_91_is_bored",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_92_any_int",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nAnyInt((3.0f), (float)4L, (float)7L) == (false)\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_16vhy6gj\\Program.cs:line 42"
+    },
+    {
+      "name": "HumanEval_93_encode",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_94_skjkasdkd",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_95_check_dict_case",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_96_count_up_to",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_97_multiply",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_98_count_upper",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_99_closest_integer",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_100_make_a_pile",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_101_words_string",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_102_choose_num",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_104_unique_digits",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_105_by_length",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_106_f",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_107_even_odd_palindrome",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_108_count_nums",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_109_move_one_ball",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_110_exchange",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_111_histogram",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_112_reverse_delete",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nReverseDelete((\"abcde\"), (\"ae\")).Equals((Tuple.Create(\"bcd\", false)))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_yae5d60v\\Program.cs:line 31"
+    },
+    {
+      "name": "HumanEval_113_odd_count",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_114_minSubArraySum",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_115_max_fill",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_116_sort_array",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_117_select_words",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_118_get_closest_vowel",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_119_match_parens",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_120_maximum",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_121_solution",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_122_add_elements",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_123_get_odd_collatz",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nGetOddCollatz((14L)).Equals((new List<long>(new long[]{(long)1L, (long)5L, (long)7L, (long)11L, (long)13L, (long)17L})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_l01k4x3b\\Program.cs:line 42"
+    },
+    {
+      "name": "HumanEval_124_valid_date",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_126_is_sorted",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_127_intersection",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_128_prod_signs",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_129_minPath",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_130_tri",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_131_digits",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_132_is_nested",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_133_sum_squares",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_134_check_if_last_char_is_a_letter",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_135_can_arrange",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_136_largest_smallest_integers",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_138_is_equal_to_sum_even",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_139_special_factorial",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_140_fix_spaces",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_141_file_name_check",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_142_sum_squares",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_143_words_in_sentence",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_144_simplify",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_145_order_by_points",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_146_specialFilter",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_147_get_max_triples",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_148_bf",
+      "passed": false,
+      "error": "Process terminated.\nAssertion failed.\nBf((\"Jupiter\"), (\"Neptune\")).Equals((new List<string>(new string[]{(string)\"Saturn\", (string)\"Uranus\"})))\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_3uluyxb3\\Program.cs:line 47"
+    },
+    {
+      "name": "HumanEval_149_sorted_list_sum",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_150_x_or_y",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_151_double_the_difference",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_152_compare",
+      "passed": false,
+      "error": "Unhandled exception. System.ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')\n   at System.Collections.Generic.List`1.set_Item(Int32 index, T value)\n   at Problem.Compare(List`1 game, List`1 guess) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_rzm9cwxt\\Program.cs:line 26\n   at Problem.Main(String[] args) in C:\\Users\\james\\AppData\\Local\\Temp\\layer2_chat_rzm9cwxt\\Program.cs:line 33"
+    },
+    {
+      "name": "HumanEval_153_Strongest_Extension",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_154_cycpattern_check",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "name": "HumanEval_155_even_odd_count",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_156_int_to_mini_roman",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_157_right_angle_triangle",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_158_find_max",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_159_eat",
+      "passed": false,
+      "error": "dotnet run timed out (30 s)"
+    },
+    {
+      "name": "HumanEval_160_do_algebra",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_161_solve",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_162_string_to_md5",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    },
+    {
+      "name": "HumanEval_163_generate_integers",
+      "passed": false,
+      "error": "The build failed. Fix the build errors and run again."
+    }
+  ]
+}

@@ -36,10 +36,7 @@ public class MathValidatorTests
 
     [Theory]
     [MemberData(nameof(EvenTestData))]
-    public void IsEven_WithMemberData(int n, bool expected)
-    {
-        MathValidator.IsEven(n).Should().Be(expected);
-    }
+    public void IsEven_WithMemberData(int n, bool expected) => MathValidator.IsEven(n).Should().Be(expected);
 
     [Theory]
     [InlineData(2, true)]
@@ -48,17 +45,11 @@ public class MathValidatorTests
     [InlineData(1, false)]
     [InlineData(17, true)]
     [InlineData(0, false)]
-    public void IsPrime_WithInlineData(int n, bool expected)
-    {
-        MathValidator.IsPrime(n).Should().Be(expected);
-    }
+    public void IsPrime_WithInlineData(int n, bool expected) => MathValidator.IsPrime(n).Should().Be(expected);
 
     [Theory]
     [InlineData(-5, "negative")]
     [InlineData(0, "zero")]
     [InlineData(3, "positive")]
-    public void Classify_WithInlineData(int n, string expected)
-    {
-        MathValidator.Classify(n).Should().Be(expected);
-    }
+    public void Classify_WithInlineData(int n, string expected) => MathValidator.Classify(n).Should().Be(expected);
 }

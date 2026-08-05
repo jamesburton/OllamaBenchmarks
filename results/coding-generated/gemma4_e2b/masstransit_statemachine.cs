@@ -1,68 +1,70 @@
-using System;
-using MassTransit;
+global using Contracts;
 
-namespace Contracts;
-
-public class OrderState : SagaStateMachineInstance
+namespace Contracts
 {
-    public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; }
-    public DateTime OrderDate { get; set; }
-    public DateTime? AcceptedAt { get; set; }
-}
+    // 1. Event Records
+    public record OrderSubmitted(Guid OrderId, DateTime OrderDate);
+    public record OrderAccepted(Guid OrderId, DateTime AcceptedAt);
+    public record OrderCompleted(Guid OrderId);
 
-public class OrderStateMachine : MassTransitStateMachine<OrderState>
-{
-    public State Submitted { get; }
-    public State Accepted { get; }
-    public State Completed { get; }
-
-    public Event<OrderSubmitted> OrderSubmitted { get; }
-    public Event<OrderAccepted> OrderAccepted { get; }
-    public Event<OrderCompleted> OrderCompleted { get; }
-
-    public OrderStateMachine()
+    // 2. Saga State Machine Instance
+    public class OrderState : MassTransitStateMachineInstance
     {
-        Submitted = new State("Submitted");
-        Accepted = new State("Accepted");
-        Completed = new State("Completed");
+        public Guid CorrelationId { get; set; }
+        public string CurrentState { get; set; }
+        public DateTime OrderDate { get; set; }
+        public DateTime? AcceptedAt { get; set; }
+    }
 
-        OrderSubmitted = new Event<OrderSubmitted>();
-        OrderAccepted = new Event<OrderAccepted>();
-        OrderCompleted = new Event<OrderCompleted>();
+    // 3. Saga State Machine
+    public class OrderStateMachine : MassTransitStateMachine<OrderState>
+    {
+        // States
+        public State Submitted { get; private set; }
+        public State Accepted { get; private set; }
+        public State Completed { get; private set; }
 
-        InstanceState(x => x.CurrentState);
+        // Events
+        public Event<OrderSubmitted> OrderSubmitted { get; private set; }
+        public Event<OrderAccepted> OrderAccepted { get; private set; }
+        public Event<OrderCompleted> OrderCompleted { get; private set; }
 
-        // Initial state setup
-        Initially(
-            When(OrderSubmitted)
+        public OrderStateMachine()
+        {
+            // Initial State setup
+            InstanceState(x => x.CurrentState);
+
+            // Initial transition: When OrderSubmitted event occurs
+            Initially(
+                When(OrderSubmitted)
+                    .Then(context =>
+                    {
+                        // Set OrderDate property
+                        context.Saga.OrderDate = context.Message.OrderDate;
+                        // Transition to Submitted state
+                        context.Saga.CurrentState = Submitted;
+                    })
                 .TransitionTo(Submitted)
-                .Then(context =>
-                {
-                    var msg = context.Message;
-                    context.Saga.OrderDate = msg.OrderDate;
-                })
-        );
+            );
 
-        // Transitions during Submitted state
-        During(Submitted,
-            When(OrderAccepted)
+            // During Submitted state
+            During(Submitted,
+                When(OrderAccepted)
+                    .Then(context =>
+                    {
+                        // Set AcceptedAt property
+                        context.Saga.AcceptedAt = context.Message.AcceptedAt;
+                        // Transition to Accepted state
+                        context.Saga.CurrentState = Accepted;
+                    })
                 .TransitionTo(Accepted)
-                .Then(context =>
-                {
-                    var msg = context.Message;
-                    context.Saga.AcceptedAt = msg.AcceptedAt;
-                })
-        );
+            );
 
-        // Transition to Completed state
-        During(Accepted,
-            When(OrderCompleted)
-                .TransitionTo(Completed)
-                .Finalize()
-        );
-
-        // Finalization logic (optional, but good practice if needed)
-        SetCompletedWhenFinalized();
+            // During Accepted state
+            During(Accepted,
+                When(OrderCompleted)
+                    .Finalize()
+            );
+        }
     }
 }

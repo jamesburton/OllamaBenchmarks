@@ -1,0 +1,1 @@
+public void Test_ProcessPayment_PublishesPaymentProcessed()

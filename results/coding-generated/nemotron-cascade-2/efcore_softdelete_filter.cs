@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 public interface ISoftDeletable
@@ -12,7 +10,7 @@ public interface ISoftDeletable
 public class Article : ISoftDeletable
 {
     public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
+    public string Title { get; set; }
     public bool IsDeleted { get; set; }
 }
 
@@ -24,8 +22,7 @@ public class ArticleDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Article>()
-            .HasQueryFilter(a => !a.IsDeleted);
+        modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
     }
 }
 
@@ -58,8 +55,6 @@ public class ArticleRepository
 
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        return await _context.Articles
-            .IgnoreQueryFilters()
-            .ToListAsync();
+        return await _context.Articles.IgnoreQueryFilters().ToListAsync();
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
+// Comment class
 public class Comment
 {
     public int Id { get; set; }
@@ -8,48 +9,53 @@ public class Comment
     public Post? Post { get; set; } = null;
 }
 
+// Post class
 public class Post
 {
     public int Id { get; set; }
     public string Content { get; set; } = null!;
     public int BlogId { get; set; }
     public Blog? Blog { get; set; } = null;
-    public List<Comment> Comments { get; set; } = new();
+    public List<Comment> Comments { get; } = new();
 }
 
+// Blog class
 public class Blog
 {
     public int Id { get; set; }
     public string Title { get; set; } = null!;
-    public List<Post> Posts { get; set; } = new();
+    public List<Post> Posts { get; } = new();
 }
 
+// BlogDbContext class
 public class BlogDbContext : DbContext
 {
     public DbSet<Blog> Blogs { get; set; } = null!;
     public DbSet<Post> Posts { get; set; } = null!;
     public DbSet<Comment> Comments { get; set; } = null!;
 
-    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options)
+    public BlogDbContext(DbContextOptions<BlogDbContext> options)
+        : base(options)
     {
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(modelBuilder);
 
-        builder.Entity<Blog>()
+        modelBuilder.Entity<Blog>()
             .HasMany(b => b.Posts)
             .WithOne(p => p.Blog)
             .HasForeignKey(p => p.BlogId);
 
-        builder.Entity<Post>()
+        modelBuilder.Entity<Post>()
             .HasMany(p => p.Comments)
             .WithOne(c => c.Post)
             .HasForeignKey(c => c.PostId);
     }
 }
 
+// BlogRepository class
 public class BlogRepository
 {
     private readonly BlogDbContext _context;

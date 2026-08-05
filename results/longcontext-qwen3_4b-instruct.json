@@ -1,0 +1,93 @@
+{
+  "benchmark": "layer4-longcontext-t5",
+  "model": "qwen3:4b-instruct",
+  "ollama_host": "http://t5500:11434",
+  "run_started_at": "2026-06-24T11:56:54.875051+00:00",
+  "run_finished_at": "2026-06-24T12:01:45.059289+00:00",
+  "ctx_ladder": [
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    131072,
+    262144
+  ],
+  "throughput_measured": true,
+  "results": [
+    {
+      "num_ctx": 4096,
+      "size_bytes": 3178149969,
+      "size_vram_bytes": 3178149969,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 5726,
+      "nvidia_smi_used_mib_after": 5725,
+      "throughput": {
+        "prompt_tokens": 3898,
+        "prefill_tok_s": 2663.030334497925,
+        "gen_tokens": 64,
+        "decode_tok_s": 76.66369195570276
+      }
+    },
+    {
+      "num_ctx": 8192,
+      "size_bytes": 3873366343,
+      "size_vram_bytes": 3873366343,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 5704,
+      "nvidia_smi_used_mib_after": 5726,
+      "throughput": {
+        "prompt_tokens": 7989,
+        "prefill_tok_s": 2662.6742661814374,
+        "gen_tokens": 64,
+        "decode_tok_s": 68.47504993863994
+      }
+    },
+    {
+      "num_ctx": 16384,
+      "size_bytes": 5098103111,
+      "size_vram_bytes": 5098103111,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 5750,
+      "nvidia_smi_used_mib_after": 5622,
+      "throughput": {
+        "prompt_tokens": 16167,
+        "prefill_tok_s": 2179.349093521805,
+        "gen_tokens": 64,
+        "decode_tok_s": 54.45724000496923
+      }
+    },
+    {
+      "num_ctx": 32768,
+      "size_bytes": 7547576647,
+      "size_vram_bytes": 7547576647,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 5622,
+      "nvidia_smi_used_mib_after": 5622,
+      "throughput": {
+        "prompt_tokens": 32523,
+        "prefill_tok_s": 1478.2443367942665,
+        "gen_tokens": 64,
+        "decode_tok_s": 38.18729675706316
+      }
+    },
+    {
+      "num_ctx": 65536,
+      "size_bytes": 13227188549,
+      "size_vram_bytes": 10453746973,
+      "gpu_fraction": 0.790322670178488,
+      "fits_fully": false,
+      "nvidia_smi_used_mib_before": 5592,
+      "nvidia_smi_used_mib_after": null
+    }
+  ],
+  "summary": {
+    "max_fully_resident_ctx": 32768,
+    "kv_gb_per_10k_tokens": 1.5239,
+    "model_weights_gb_est": 2.554
+  }
+}

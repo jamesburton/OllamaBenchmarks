@@ -1,14 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-// Mock interfaces/classes needed for compilation context, assuming they exist elsewhere
-// IAsyncLifetime is defined by xUnit v3 context
-// IClassFixture is defined by xUnit v3 context
-// IEntity, IAsyncLifetime, etc., are assumed to be defined elsewhere if needed by AwesomeAssertions
-
-// 1. InMemoryStore implementing IAsyncLifetime
 public class InMemoryStore : IAsyncLifetime
 {
     public Dictionary<string, string> Data { get; private set; } = new();
@@ -17,17 +6,16 @@ public class InMemoryStore : IAsyncLifetime
     {
         Data.Add("key1", "value1");
         Data.Add("key2", "value2");
-        return ValueTask.CompletedTask;
+        return default;
     }
 
     public ValueTask DisposeAsync()
     {
         Data.Clear();
-        return ValueTask.CompletedTask;
+        return default;
     }
 }
 
-// 2. StoreService class
 public class StoreService
 {
     private readonly InMemoryStore _store;
@@ -52,7 +40,6 @@ public class StoreService
     }
 }
 
-// 3. Test class StoreServiceTests implementing IClassFixture<InMemoryStore>
 public class StoreServiceTests : IClassFixture<InMemoryStore>
 {
     private readonly InMemoryStore _store;
@@ -67,25 +54,22 @@ public class StoreServiceTests : IClassFixture<InMemoryStore>
     [Fact]
     public void Get_ExistingKey_ReturnsValue()
     {
-        string result = _service.Get("key1");
+        var result = _service.Get("key1");
         result.Should().Be("value1");
     }
 
     [Fact]
     public void Set_ThenGet_ReturnsSetValue()
     {
-        const string key = "key3";
-        const string value = "value3";
-
-        _service.Set(key, value);
-        string result = _service.Get(key);
-        result.Should().Be(value);
+        _service.Set("key3", "value3");
+        var result = _service.Get("key3");
+        result.Should().Be("value3");
     }
 
     [Fact]
     public void Get_NonexistentKey_ReturnsNull()
     {
-        string result = _service.Get("nonexistent");
+        var result = _service.Get("nonexistent");
         result.Should().BeNull();
     }
 }

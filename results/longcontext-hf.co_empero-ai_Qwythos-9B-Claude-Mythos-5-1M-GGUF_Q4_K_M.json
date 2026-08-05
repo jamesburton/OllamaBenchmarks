@@ -1,0 +1,123 @@
+{
+  "benchmark": "layer4-longcontext-t5",
+  "model": "hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M",
+  "ollama_host": "http://t5500:11434",
+  "run_started_at": "2026-06-24T11:44:01.918539+00:00",
+  "run_finished_at": "2026-06-24T11:53:05.310048+00:00",
+  "ctx_ladder": [
+    4096,
+    8192,
+    16384,
+    32768,
+    65536,
+    131072,
+    262144
+  ],
+  "throughput_measured": true,
+  "results": [
+    {
+      "num_ctx": 4096,
+      "size_bytes": 5848118066,
+      "size_vram_bytes": 5848118066,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 6061,
+      "nvidia_smi_used_mib_after": 6032,
+      "throughput": {
+        "prompt_tokens": 3898,
+        "prefill_tok_s": 1480.7481842980674,
+        "gen_tokens": 64,
+        "decode_tok_s": 40.70547679469811
+      }
+    },
+    {
+      "num_ctx": 8192,
+      "size_bytes": 6087203880,
+      "size_vram_bytes": 6087203880,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 6022,
+      "nvidia_smi_used_mib_after": 6022,
+      "throughput": {
+        "prompt_tokens": 7989,
+        "prefill_tok_s": 1567.8121435675548,
+        "gen_tokens": 64,
+        "decode_tok_s": 41.01160243865241
+      }
+    },
+    {
+      "num_ctx": 16384,
+      "size_bytes": 6372416552,
+      "size_vram_bytes": 6372416552,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 5983,
+      "nvidia_smi_used_mib_after": 6340,
+      "throughput": {
+        "prompt_tokens": 16167,
+        "prefill_tok_s": 1574.9264922275083,
+        "gen_tokens": 64,
+        "decode_tok_s": 39.062833788862946
+      }
+    },
+    {
+      "num_ctx": 32768,
+      "size_bytes": 6817002290,
+      "size_vram_bytes": 6817002290,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 6344,
+      "nvidia_smi_used_mib_after": 6343,
+      "throughput": {
+        "prompt_tokens": 32523,
+        "prefill_tok_s": 1378.1162862683507,
+        "gen_tokens": 64,
+        "decode_tok_s": 36.16479165407021
+      }
+    },
+    {
+      "num_ctx": 65536,
+      "size_bytes": 7924298546,
+      "size_vram_bytes": 7924298546,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 6344,
+      "nvidia_smi_used_mib_after": null,
+      "throughput": {
+        "prompt_tokens": 65236,
+        "prefill_tok_s": 1168.3311690539883,
+        "gen_tokens": 64,
+        "decode_tok_s": 32.62438172973452
+      }
+    },
+    {
+      "num_ctx": 131072,
+      "size_bytes": 10138891058,
+      "size_vram_bytes": 10138891058,
+      "gpu_fraction": 1.0,
+      "fits_fully": true,
+      "nvidia_smi_used_mib_before": 5659,
+      "nvidia_smi_used_mib_after": 5563,
+      "throughput": {
+        "prompt_tokens": 130662,
+        "prefill_tok_s": 878.8049296798673,
+        "gen_tokens": 64,
+        "decode_tok_s": 25.915453263302222
+      }
+    },
+    {
+      "num_ctx": 262144,
+      "size_bytes": 16525746498,
+      "size_vram_bytes": 10808627034,
+      "gpu_fraction": 0.6540477330514598,
+      "fits_fully": false,
+      "nvidia_smi_used_mib_before": 5541,
+      "nvidia_smi_used_mib_after": 5545
+    }
+  ],
+  "summary": {
+    "max_fully_resident_ctx": 131072,
+    "kv_gb_per_10k_tokens": 0.3379,
+    "model_weights_gb_est": 5.71
+  }
+}

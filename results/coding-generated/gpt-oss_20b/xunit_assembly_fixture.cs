@@ -17,7 +17,7 @@ public class SharedCounter : Xunit.IAsyncLifetime
 
     public int IncrementAndGet()
     {
-        return System.Threading.Interlocked.Increment(ref counter);
+        return Interlocked.Increment(ref counter);
     }
 }
 
@@ -30,21 +30,21 @@ public class FirstCounterTests
         _counter = counter;
     }
 
-    [Fact]
+    [Xunit.Fact]
     public void Increment_ShouldBeGreaterThanZero()
     {
         int result = _counter.IncrementAndGet();
-        Assert.True(result > 0);
+        Xunit.Assert.True(result > 0);
     }
 }
 
 public class SecondCounterTests
 {
-    [Fact]
+    [Xunit.Fact]
     public void Increment_ShouldBeGreaterThanZero()
     {
-        var counter = TestContext.Current.GetFixture<SharedCounter>();
+        var counter = Xunit.TestContext.Current.GetFixture<SharedCounter>();
         int result = counter.IncrementAndGet();
-        Assert.True(result > 0);
+        Xunit.Assert.True(result > 0);
     }
 }

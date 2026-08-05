@@ -10,7 +10,9 @@ public class TodoItem
 
 public class TodoDbContext : DbContext
 {
-    public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options) { }
+    public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options)
+    {
+    }
 
     public DbSet<TodoItem> TodoItems { get; set; }
 }
@@ -24,7 +26,7 @@ public interface ITodoService
     Task<bool> DeleteAsync(int id);
 }
 
-public class TodoService
+public class TodoService : ITodoService
 {
     private readonly TodoDbContext _db;
 
@@ -62,7 +64,9 @@ public class TodoService
     {
         var item = await _db.TodoItems.FindAsync(id);
         if (item == null)
+        {
             return false;
+        }
 
         item.IsComplete = true;
         await _db.SaveChangesAsync();
@@ -73,7 +77,9 @@ public class TodoService
     {
         var item = await _db.TodoItems.FindAsync(id);
         if (item == null)
+        {
             return false;
+        }
 
         _db.TodoItems.Remove(item);
         await _db.SaveChangesAsync();

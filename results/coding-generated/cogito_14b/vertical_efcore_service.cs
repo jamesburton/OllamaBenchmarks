@@ -10,9 +10,23 @@ public class TodoItem
 
 public class TodoDbContext : DbContext
 {
-    public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options) { }
-
     public DbSet<TodoItem> TodoItems { get; set; } = default!;
+
+    public TodoDbContext(DbContextOptions<TodoDbContext> options) 
+        : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TodoItem>(entity =>
+        {
+            entity.Property(e => e.Title).IsRequired();
+            entity.HasData(
+                new TodoItem { Id = 1, Title = "Test Task", IsComplete = false, CreatedAt = DateTime.UtcNow }
+            );
+        });
+    }
 }
 
 public interface ITodoService
@@ -28,16 +42,20 @@ public class TodoService : ITodoService
 {
     private readonly TodoDbContext _db;
 
-    public TodoService(TodoDbContext db) => _db = db;
+    public TodoService(TodoDbContext db)
+    {
+        _db = db;
+    }
 
     public async Task<TodoItem> CreateAsync(string title)
     {
-        var item = new TodoItem
-        {
-            Title = title,
+        var item = new TodoItem 
+        { 
+            Title = title, 
             IsComplete = false,
             CreatedAt = DateTime.UtcNow
         };
+
         _db.TodoItems.Add(item);
         await _db.SaveChangesAsync();
         return item;
@@ -56,7 +74,9 @@ public class TodoService : ITodoService
     public async Task<bool> CompleteAsync(int id)
     {
         var item = await _db.TodoItems.FindAsync(id);
-        if (item == null) return false;
+        if (item == null) 
+            return false;
+
         item.IsComplete = true;
         await _db.SaveChangesAsync();
         return true;
@@ -65,7 +85,9 @@ public class TodoService : ITodoService
     public async Task<bool> DeleteAsync(int id)
     {
         var item = await _db.TodoItems.FindAsync(id);
-        if (item == null) return false;
+        if (item == null) 
+            return false;
+
         _db.TodoItems.Remove(item);
         await _db.SaveChangesAsync();
         return true;

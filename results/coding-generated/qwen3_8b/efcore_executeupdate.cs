@@ -1,8 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
 public class Product
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public decimal Price { get; set; }
+    public decimal Price { get; set)
     public string Category { get; set; }
     public DateTime LastModified { get; set; }
 }
@@ -11,7 +17,8 @@ public class ProductDbContext : DbContext
 {
     public DbSet<Product> Products { get; set; }
 
-    public ProductDbContext(DbContextOptions<ProductDbContext> options) : base(options)
+    public ProductDbContext(DbContextOptions<ProductDbContext> options)
+        : base(options)
     {
     }
 }
@@ -25,15 +32,14 @@ public static class ProductOperations
             var products = await db.Products
                 .Where(p => p.Category == category)
                 .ToListAsync();
-            int count = 0;
+
             foreach (var product in products)
             {
                 product.Price *= (1 - discountPct);
                 product.LastModified = DateTime.UtcNow;
-                count++;
             }
-            await db.SaveChangesAsync();
-            return count;
+
+            return await db.SaveChangesAsync();
         }
         else
         {
@@ -41,8 +47,7 @@ public static class ProductOperations
                 .Where(p => p.Category == category)
                 .ExecuteUpdateAsync(s => s
                     .SetProperty(p => p.Price, p => p.Price * (1 - discountPct))
-                    .SetProperty(p => p.LastModified, DateTime.UtcNow)
-                );
+                    .SetProperty(p => p.LastModified, DateTime.UtcNow));
         }
     }
 }

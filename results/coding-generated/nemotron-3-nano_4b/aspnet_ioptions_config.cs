@@ -1,17 +1,41 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 
-public class SmtpOptions { public string Host { get; set; } public int Port { get; set; } public string? Username { get; set; } }
+class SmtpOptions
+{
+    public string Host { get; set; } = string.Empty;
+    public int Port { get; set; }
+    public string? Username { get; set; }
+}
 
-public interface IEmailSender { Task SendAsync(string to, string subject, string body); }
+interface IEmailSender
+{
+    Task SendAsync(string to, string subject, string body);
+}
 
-public class SmtpEmailSender {
-    private readonly IOptions<SmtpOptions> options;
-    public SmtpEmailSender(IOptions<SmtpOptions> options) => this.options = options;
+class SmtpEmailSender : IEmailSender
+{
     public string? LastSentTo { get; set; }
-    public SmtpOptions Options => options.Value;
-    public Task SendAsync(string to, string subject, string body) => {
+    public SmtpOptions Options { get; }
+
+    public SmtpEmailSender(IOptions<SmtpOptions> options)
+    {
+        Options = options.Value;
+    }
+
+    public Task SendAsync(string to, string subject, string body)
+    {
         LastSentTo = to;
         return Task.CompletedTask;
     }
 }
+
+class Program {}
+
+services.AddHttpClient<IGitHubClient, GitHubClient>(c => c.BaseAddress = new Uri("https://api.github.com/"));
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+
+var builder = builder;

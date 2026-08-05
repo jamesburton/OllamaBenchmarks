@@ -1,39 +1,55 @@
-public class CounterService {
-    public int Count { get; private set; } = 0;
-    public void Increment() => Count++;
-    public void Reset() => Count = 0;
+[Fact]
+public void CounterFirstTests()
+{
+    fixture.Counter.Increment();
+    fixture.Counter.Count >= 1. Should().BeTrue();
 }
 
-public class CounterFixture : IAsyncLifetime {
+[Fact]
+public void CounterSecondTests()
+{
+    fixture.Counter.Increment();
+    fixture.Counter.Increment();
+    fixture.Counter.Count >= 2. Should().BeTrue();
+}
+
+public class DatabaseFixture : IAsyncLifetime
+{
     public CounterService Counter { get; private set; } = null!;
-    public ValueTask InitializeAsync() => default;
-    public ValueTask DisposeAsync() => default;
+    public ValueTask InitializeAsync()
+    {
+        Counter = new CounterService();
+        return default;
+    }
+    public ValueTask DisposeAsync()
+    {
+        return default;
+    }
 }
 
 [CollectionDefinition("Counter")]
-public class CounterCollection : ICollectionFixture<CounterFixture> { }
-
-public class CounterFirstTests {
-    private readonly CounterFixture Fixture;
-    public CounterFirstTests(CounterFixture fixture) => Fixture = fixture;
-
-    [Collection("Counter")]
-    [Fact]
-    public void Increment_RaisesCount_OneOrMore() {
-        Fixture.Counter.Increment();
-        Fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(1);
-    }
+[CollectionFact(typeof(DatabaseFixture), false)]
+public class CounterCollection : ICollectionFixture<CounterFixture>
+{
 }
 
-public class CounterSecondTests {
-    private readonly CounterFixture Fixture;
-    public CounterSecondTests(CounterFixture fixture) => Fixture = fixture;
+public class CounterFirstTests : IDisposable
+{
+    public CounterFixture fixture { get; private set; }
+    public CounterFirstTests(CounterFixture fixture) => this.fixture = fixture;
+    public void Dispose() => fixture.DisposeAsync().GetAwaiter().GetResult();
+}
 
-    [Collection("Counter")]
-    [Fact]
-    public void Increment_Twice_RaisesCount_TwoOrMore() {
-        Fixture.Counter.Increment();
-        Fixture.Counter.Increment();
-        Fixture.Counter.Count.Should().BeGreaterThanOrEqualTo(2);
-    }
+public class CounterSecondTests : IDisposable
+{
+    public CounterFixture fixture { get; private set; }
+    public CounterSecondTests(CounterFixture fixture) => this.fixture = fixture;
+    public void Dispose() => fixture.DisposeAsync().GetAwaiter().GetResult();
+}
+
+public class CounterService
+{
+    public int Count { get; private set; }
+    public void Increment() => Count++;
+    public void Reset() { /* noop */ }
 }

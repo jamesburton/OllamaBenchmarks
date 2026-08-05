@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 // 1. ISoftDeletable interface
@@ -29,7 +27,7 @@ public class ArticleDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Apply the query filter to ensure that by default, only non-deleted items are retrieved
+        // Apply the global query filter
         modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
     }
 }
@@ -49,7 +47,8 @@ public class ArticleRepository
     /// </summary>
     public async Task SoftDeleteAsync(int id)
     {
-        // Find the article, ignoring the default query filter to find soft-deleted items if necessary
+        // Use IgnoreQueryFilters() to bypass the global query filter, allowing us to find
+        // records that the standard query filter would exclude (i.e., already deleted records).
         var article = await _context.Articles
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
@@ -57,17 +56,16 @@ public class ArticleRepository
         if (article != null)
         {
             article.IsDeleted = true;
-            // SaveChanges will apply the change
             await _context.SaveChangesAsync();
         }
     }
 
     /// <summary>
-    /// Retrieves all articles where IsDeleted is false (default behavior enforced by query filter).
+    /// Retrieves all articles (only active ones, due to the query filter).
     /// </summary>
     public async Task<List<Article>> GetAllAsync()
     {
-        // The query filter in OnModelCreating ensures this only returns non-deleted items
+        // The query filter automatically ensures only non-deleted articles are returned.
         return await _context.Articles.ToListAsync();
     }
 
@@ -76,7 +74,7 @@ public class ArticleRepository
     /// </summary>
     public async Task<List<Article>> GetAllIncludingDeletedAsync()
     {
-        // Use IgnoreQueryFilters() to bypass the default filter
+        // Use IgnoreQueryFilters() to bypass the global query filter.
         return await _context.Articles
             .IgnoreQueryFilters()
             .ToListAsync();

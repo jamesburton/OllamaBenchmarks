@@ -18,7 +18,7 @@ public class User
 // NotFound record - parameterless constructor
 public record NotFound;
 
-// ValidationError record - single string parameter
+// ValidationError record - with Message parameter
 public record ValidationError(string Message);
 
 // Controller

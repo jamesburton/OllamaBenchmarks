@@ -4,7 +4,7 @@ public record CreateProductRequest(string Name, decimal Price);
 
 public record ProductResponse(int Id, string Name, decimal Price);
 
-public static class ProductEndpoints
+public static class ProductEndpoints 
 {
     private static int _nextId = 0;
 
@@ -13,22 +13,16 @@ public static class ProductEndpoints
         var errors = new Dictionary<string, string[]>();
 
         if (string.IsNullOrWhiteSpace(request.Name))
-        {
-            errors["Name"] = new[] { "Name is required." };
-        }
+            errors["Name"] = ["Name is required."];
 
-        if (request.Price <= 0)
-        {
-            errors["Price"] = new[] { "Price must be greater than zero." };
-        }
+        if (request.Price <= 0m)
+            errors["Price"] = ["Price must be greater than zero."];
 
         if (errors.Count > 0)
-        {
             return Results.ValidationProblem(errors);
-        }
 
-        var id = ++_nextId;
-        var response = new ProductResponse(id, request.Name, request.Price);
-        return Results.Ok(response);
+        var id = Interlocked.Increment(ref _nextId);
+
+        return Results.Ok(new ProductResponse(id, request.Name, request.Price));
     }
 }

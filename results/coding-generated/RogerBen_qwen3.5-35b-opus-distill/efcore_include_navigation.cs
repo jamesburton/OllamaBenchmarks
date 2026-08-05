@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 public class Comment
 {
     public int Id { get; set; }
-    public string Text { get; set; } = "";
+    public string Text { get; set; } = string.Empty;
     public int PostId { get; set; }
     public Post? Post { get; set; }
 }
@@ -11,7 +11,7 @@ public class Comment
 public class Post
 {
     public int Id { get; set; }
-    public string Content { get; set; } = "";
+    public string Content { get; set; } = string.Empty;
     public int BlogId { get; set; }
     public Blog? Blog { get; set; }
     public List<Comment> Comments { get; set; } = new();
@@ -20,7 +20,7 @@ public class Post
 public class Blog
 {
     public int Id { get; set; }
-    public string Title { get; set; } = "";
+    public string Title { get; set; } = string.Empty;
     public List<Post> Posts { get; set; } = new();
 }
 

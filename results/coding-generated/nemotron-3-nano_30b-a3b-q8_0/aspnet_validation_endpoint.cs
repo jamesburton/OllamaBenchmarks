@@ -17,15 +17,20 @@ public class OrderService
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
         var validationContext = new ValidationContext(request);
-        foreach (var prop in typeof(CreateOrderRequest).GetProperties())
+        var validationResults = new System.Collections.Generic.List<ValidationResult>();
+
+        bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
+        if (!isValid)
         {
-            var result = new ValidationResult();
-            if (!Validator.TryValidateProperty(request, prop.Name, validationContext, out result))
+            foreach (var vr in validationResults)
             {
-                var errorMsg = $"{prop.Name}: {result.ErrorMessage}";
-                throw new ArgumentException(errorMsg);
+                if (vr.ErrorMessage != null)
+                {
+                    throw new ArgumentException(vr.ErrorMessage);
+                }
             }
         }
+
         return request;
     }
 }

@@ -14,17 +14,21 @@ public class CreateOrderRequest
 
 public class OrderService
 {
-    public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
+    public (CreateOrderRequest request) ValidateAndCreate(CreateOrderRequest request)
     {
-        var results = new System.Collections.Generic.List<ValidationResult>();
-        var context = new System.ComponentModel.ValidationContext(request);
-        bool isValid = Validator.TryValidateObject(request, context, results, validateAllProperties: true);
+        var validationContext = new ValidationContext(request);
+        var validationResults = new List<ValidationResult>();
+        bool isValid = Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true);
         if (!isValid)
         {
-            var firstError = results[0];
-            var memberNames = string.Join(", ", firstError.MemberNames);
-            throw new ArgumentException($"{memberNames}: {firstError.ErrorMessage}");
+            foreach (var result in validationResults)
+            {
+                if (result != ValidationResult.Success)
+                {
+                    throw new ArgumentException(result.ErrorMessage ?? "Invalid request", result.MemberNames.First());
+                }
+            }
         }
-        return request;
+        return (request);
     }
 }

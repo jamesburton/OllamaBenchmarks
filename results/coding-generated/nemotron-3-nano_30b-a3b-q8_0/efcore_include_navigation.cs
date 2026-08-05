@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 public class Comment
 {
@@ -12,11 +10,16 @@ public class Comment
 
 public class Post
 {
+    public Post()
+    {
+        Comments = new List<Comment>();
+    }
+
     public int Id { get; set; }
     public string Content { get; set; } = string.Empty;
     public int BlogId { get; set; }
     public Blog? Blog { get; set; }
-    public List<Comment> Comments { get; set; } = new();
+    public List<Comment> Comments { get; set; }
 }
 
 public class Blog
@@ -28,11 +31,11 @@ public class Blog
 
 public class BlogDbContext : DbContext
 {
+    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
+
     public DbSet<Blog> Blogs { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<Comment> Comments { get; set; }
-
-    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,16 +54,17 @@ public class BlogDbContext : DbContext
 public class BlogRepository
 {
     private readonly BlogDbContext _context;
+
     public BlogRepository(BlogDbContext context)
     {
         _context = context;
     }
 
-    public Task<Blog?> GetWithPostsAndCommentsAsync(int blogId)
+    public async Task<Blog?> GetWithPostsAndCommentsAsync(int blogId)
     {
-        return _context.Blogs
+        return await _context.Blogs
             .Include(b => b.Posts)
-            .ThenInclude(p => p.Comments)
+                .ThenInclude(p => p.Comments)
             .FirstOrDefaultAsync(b => b.Id == blogId);
     }
 }

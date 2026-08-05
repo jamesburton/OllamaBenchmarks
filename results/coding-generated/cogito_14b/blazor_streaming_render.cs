@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 
 public record WeatherForecast(DateOnly Date, int TemperatureC, string Summary);
 
-public interface IWeatherService
+public interface IWeatherService 
 {
     Task<WeatherForecast[]> GetForecastsAsync();
 }
@@ -10,8 +10,7 @@ public interface IWeatherService
 [StreamRendering]
 public class WeatherPageBase : ComponentBase
 {
-    [Inject]
-    public IWeatherService WeatherService { get; set; } = default!;
+    [Inject] public IWeatherService WeatherService { get; set; } = default!;
 
     public WeatherForecast[]? Forecasts { get; set; }
 

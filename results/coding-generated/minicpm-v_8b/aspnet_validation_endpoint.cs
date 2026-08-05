@@ -1,92 +1,58 @@
 using System;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+
+namespace CreateOrderRequest
+{
+    public class CreateOrderRequest
+    {
+        [Required]
+        [Range(0.01, 10000)]
+        public decimal Price { get; set; }
+
+        [Range(1, 999)]
+        public int Quantity { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+    }
+}
+
+using System.ComponentModel.DataAnnotations;
 
 namespace OrderService
 {
-    public record CreateOrderRequest(string Name, decimal Price, int Quantity);
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class RequiredAttribute : ValidationAttribute
+    public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
     {
-        protected override string? IsValid(object value)
+        public CreateOrderRequestValidator()
         {
-            if (value is null) return "Name cannot be empty";
-            return base.IsValid(value);
-        }
-    }
+            RuleFor(x => x.Price)
+                .Must(p => p >= 0.01 && p <= 10000);
 
-    [AttributeUsage(AttributeTargets.Property)]
-    public class RangeAttribute : ValidationAttribute
-    {
-        private readonly int _min;
-        private readonly int _max;
+            RuleFor(x => x.Quantity)
+                .Must(p => p >= 1 && p <= 999);
 
-        public RangeAttribute(int min, int max)
-        {
-            if (min > max) throw new ArgumentException("Min must be less than or equal to Max");
-            _min = min;
-            _max = max;
-        }
-
-        protected override string? IsValid(object value)
-        {
-            if (_min <= 0 && _max >= 100) return "Quantity should not exceed 999";
-            var num = (int)value;
-            if (num < _min || num > _max) return $"Quantity must be between {_min} and {_max}";
-            return base.IsValid(value);
+            RuleFor(x => x.Name)
+                .Required();
         }
     }
 
     public class OrderService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly CreateOrderRequestValidator _validator;
 
-        public OrderService(IHttpClientFactory httpClientFactory)
+        public OrderService()
         {
-            _httpClientFactory = httpClientFactory;
+            _validator = new CreateOrderRequestValidator();
         }
 
-        public async Task<Order> CreateOrder(CreateOrderRequest request)
+        public void ValidateAndCreate(CreateOrderRequest request)
         {
-            var client = _httpClientFactory.CreateClient();
-            return await client.PostAsJsonAsync("/api/orders", request);
+            if (!_validator.Validate(request))
+            {
+                throw new ArgumentException($"Validation failed: {string.Join(", ", _validator.Errors)}");
+            }
+
+            // Return the confirmed order
         }
-    }
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class OrderEndpointsAttribute : Attribute
-    {
-        private readonly string _path;
-
-        public OrderEndpointsAttribute(string path)
-        {
-            _path = path;
-        }
-
-        public void MapOrderEndpoints(WebApplication app)
-        {
-            var orderService = new OrderService(_httpClientFactory);
-            app.MapPost(_path, orderService.CreateOrder);
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class ProblemDetailsAttribute : ValidationAttribute
-    {
-        protected override string? IsValid(object value)
-        {
-            if (value is null) return "Unexpected error occurred";
-            return base.IsValid(value);
-        }
-    }
-
-    public static void Main(string[] args)
-    {
-        var app = WebApplication.CreateBuilder(args).UseStartup<Startup>().Build();
-        OrderEndpointsAttribute orderEndpointsAttribute = new("api/orders");
-        orderEndpointsAttribute.MapOrderEndpoints(app);
-
-        app.Run();
     }
 }

@@ -2,26 +2,26 @@ public static class SurveyAnalyzer
 {
     public static (double Mean, double Median, double Min, double Max) ComputeStats(IEnumerable<double> values)
     {
-        if (!System.Linq.Enumerable.Any(values))
-            throw new ArgumentException("empty");
+        if (!values.Any())
+            throw new ArgumentException("Input sequence cannot be empty.");
 
-        double mean = System.Linq.Enumerable.Average(values);
-        double min = System.Linq.Enumerable.Min(values);
-        double max = System.Linq.Enumerable.Max(values);
+        double mean = values.Average();
+        double min = values.Min();
+        double max = values.Max();
 
-        var sorted = System.Linq.Enumerable.OrderBy(values, (double x) => x);
-        int count = System.Linq.Enumerable.Count(sorted);
-        var array = System.Linq.Enumerable.ToArray(sorted);
-        double median;
+        var sorted = values.OrderBy(x => x);
+        int count = sorted.Count();
         if (count % 2 == 1)
         {
-            median = array[count / 2];
+            double median = sorted.ElementAt(count / 2);
+            return (mean, median, min, max);
         }
         else
         {
-            median = (array[count / 2 - 1] + array[count / 2]) / 2.0;
+            double mid1 = sorted.ElementAt(count / 2 - 1);
+            double mid2 = sorted.ElementAt(count / 2);
+            double median = (mid1 + mid2) / 2;
+            return (mean, median, min, max);
         }
-
-        return (mean, median, min, max);
     }
 }

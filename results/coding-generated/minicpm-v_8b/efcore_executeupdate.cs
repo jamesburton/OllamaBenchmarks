@@ -21,9 +21,7 @@ public class ProductDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Product>()
-            .HasIndex(p => p.Category)
-            .IsUnique();
+        // Empty, as InMemory provider does not need explicit table mapping.
     }
 }
 
@@ -31,10 +29,18 @@ public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
-        return await db.Products
-            .Where(p => p.Category == category)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(p => p.Price, p.Price * (1 - discountPct))
-                .SetProperty(p => p.LastModified, DateTime.UtcNow));
+        int rowsAffected = 0;
+
+        var products = await db.Products.Where(p => p.Category == category).ToListAsync();
+
+        foreach (var product in products)
+        {
+            product.Price *= (1 - discountPct);
+            product.LastModified = DateTime.UtcNow;
+            rowsAffected++;
+        }
+
+        await db.SaveChangesAsync();
+        return rowsAffected;
     }
 }

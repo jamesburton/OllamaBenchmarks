@@ -26,16 +26,21 @@ public static class ProductOperations
 {
     public static async Task<int> ApplyDiscount(ProductDbContext db, string category, decimal discountPct)
     {
+        // Retrieve all products in the specified category
         var products = await db.Products
             .Where(p => p.Category == category)
             .ToListAsync();
 
+        // Update each product's price and last modified timestamp
         foreach (var product in products)
         {
             product.Price = product.Price * (1 - discountPct);
             product.LastModified = DateTime.UtcNow;
         }
 
-        return await db.SaveChangesAsync();
+        // Persist changes to the database
+        var affectedRows = await db.SaveChangesAsync();
+
+        return affectedRows;
     }
 }

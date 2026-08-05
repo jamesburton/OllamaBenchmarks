@@ -1,3 +1,6 @@
+using Xunit;
+using AwesomeAssertions;
+
 public static class MathValidator
 {
     public static bool IsEven(int n) => n % 2 == 0;
@@ -8,9 +11,7 @@ public static class MathValidator
         if (n == 2) return true;
         if (n % 2 == 0) return false;
         for (int i = 3; i * i <= n; i += 2)
-        {
             if (n % i == 0) return false;
-        }
         return true;
     }
 
@@ -24,23 +25,21 @@ public static class MathValidator
 
 public class MathValidatorTests
 {
-    public static IEnumerable<object[]> EvenTestData
+    public static IEnumerable<object[]> EvenTestData => new[]
     {
-        get
-        {
-            yield return new object[] { 2, true };
-            yield return new object[] { 3, false };
-            yield return new object[] { 0, true };
-            yield return new object[] { -4, true };
-            yield return new object[] { 7, false };
-        }
-    }
+        new object[] { 2, true },
+        new object[] { 3, false },
+        new object[] { 0, true },
+        new object[] { -4, true },
+        new object[] { 7, false }
+    };
 
     [Theory]
     [MemberData(nameof(EvenTestData))]
     public void IsEven_WithMemberData(int n, bool expected)
     {
-        MathValidator.IsEven(n).Should().Be(expected);
+        n.Should().BeEven();
+        n.Should().Be(expected);
     }
 
     [Theory]
@@ -52,7 +51,8 @@ public class MathValidatorTests
     [InlineData(0, false)]
     public void IsPrime_WithInlineData(int n, bool expected)
     {
-        MathValidator.IsPrime(n).Should().Be(expected);
+        n.Should().BePrime();
+        n.Should().Be(expected);
     }
 
     [Theory]
@@ -61,6 +61,6 @@ public class MathValidatorTests
     [InlineData(3, "positive")]
     public void Classify_WithInlineData(int n, string expected)
     {
-        MathValidator.Classify(n).Should().Be(expected);
+        n.Should().ClassifyAs(expected);
     }
 }

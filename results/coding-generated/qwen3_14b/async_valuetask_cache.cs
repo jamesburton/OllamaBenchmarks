@@ -5,12 +5,12 @@ public interface IExpensiveService
 
 public class CachingService
 {
-    private readonly IExpensiveService inner;
+    private readonly IExpensiveService _inner;
     private readonly Dictionary<string, string> _cache = new Dictionary<string, string>();
 
     public CachingService(IExpensiveService inner)
     {
-        this.inner = inner;
+        _inner = inner;
     }
 
     public async ValueTask<string> GetAsync(string key)
@@ -19,11 +19,9 @@ public class CachingService
         {
             return new ValueTask<string>(cachedValue);
         }
-        else
-        {
-            var result = await inner.ComputeAsync(key);
-            _cache[key] = result;
-            return new ValueTask<string>(result);
-        }
+
+        var result = await _inner.ComputeAsync(key);
+        _cache[key] = result;
+        return new ValueTask<string>(result);
     }
 }

@@ -1,47 +1,54 @@
 using OneOf;
+using static AwesomeAssertions.AssertionExtensions;
+using static NSubstitute.Substitute;
+using FluentAssertions;
 
-public record CreateProductCommand(string Name, decimal Price);
-public record Product(int Id, string Name, decimal Price);
-public record ValidationError(string Message);
-public record DuplicateError(string ExistingName);
+public record CreateProductCommand(string Name, decimal Price)
+public record Product(int Id, string Name, decimal Price)
+public record ValidationError(string Message)
+public record DuplicateError(string ExistingName)
 
 public interface IProductRepository
 {
-    System.Threading.Tasks.Task<bool> ExistsAsync(string name);
-    System.Threading.Tasks.Task<Product> AddAsync(Product product);
+    Task<bool> ExistsAsync(string name)
+    Task<Product> AddAsync(Product product)
 }
 
 public interface ICommandHandler<TCommand, TResult>
 {
-    System.Threading.Tasks.Task<TResult> HandleAsync(TCommand command);
+    Task<TResult> HandleAsync(TCommand command)
 }
 
 public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, OneOf<Product, ValidationError, DuplicateError>>
 {
-    private readonly IProductRepository _repository;
-    public CreateProductCommandHandler(IProductRepository repository)
-    {
-        _repository = repository;
-    }
+    private readonly IProductRepository repository;
+    public CreateProductCommandHandler(IProductRepository repository) => this.repository = repository;
 
-    public async System.Threading.Tasks.Task<OneOf<Product, ValidationError, DuplicateError>> HandleAsync(CreateProductCommand command)
+    public async Task<OneOf<Product, ValidationError, DuplicateError>> HandleAsync(CreateProductCommand command)
     {
         if (string.IsNullOrWhiteSpace(command.Name))
-        {
             return new ValidationError("Name is required");
-        }
-
         if (command.Price <= 0)
-        {
             return new ValidationError("Price must be positive");
-        }
-
-        if (await _repository.ExistsAsync(command.Name))
-        {
+        if (await repository.ExistsAsync(command.Name))
             return new DuplicateError(command.Name);
-        }
+        var product = await repository.AddAsync(new Product(0, command.Name, command.Price));
+        return product;
+    }
+}
 
-        var result = await _repository.AddAsync(new Product(0, command.Name, command.Price));
-        return result;
+public class Tests
+{
+    public void Example()
+    {
+        var repo = Substitute.For<IProductRepository>();
+        repo.ExistsAsync(Arg.Any<string>()).Returns(false);
+
+        var handler = new CreateProductCommandHandler(repo);
+        var command = new CreateProductCommand("Test", 10.0m);
+        var result = await handler.HandleAsync(command);
+
+        result.IsT0.Should().BeTrue();
+        result.AsT0.Name.Should().Be("Test");
     }
 }

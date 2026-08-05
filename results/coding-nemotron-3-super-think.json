@@ -1,0 +1,9 @@
+{
+  "model": "nemotron-3-super:latest",
+  "benchmark": "coding",
+  "skipped": true,
+  "skip_reason": "Skipped at user request — 86GB model with CPU/GPU split would take 5-10h. Re-run manually with CODING_BENCH_THINK=true if needed.",
+  "layer3_results": [],
+  "layer3_weighted_score": null,
+  "think_setting": "true"
+}

@@ -19,6 +19,7 @@ public interface ICommandHandler<TCommand, TResult>
 public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, OneOf<Product, ValidationError, DuplicateError>>
 {
     private readonly IProductRepository _repository;
+
     public CreateProductCommandHandler(IProductRepository repository)
     {
         _repository = repository;
@@ -36,98 +37,84 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
             return new DuplicateError(command.Name);
 
         var product = new Product(0, command.Name, command.Price);
-        var result = await _repository.AddAsync(product);
-        return result;
+        return await _repository.AddAsync(product);
     }
 }
 
-// Test class
+// Tests using NSubstitute and AwesomeAssertions
 public class CreateProductCommandHandlerTests
 {
     [Fact]
     public async Task HandleAsync_ValidCommand_ReturnsProduct()
     {
-        var repo = Substitute.For<IProductRepository>();
-        repo.ExistsAsync("Test").Returns(false);
-        repo.AddAsync(Arg.Any<Product>()).Returns(new Product(1, "Test", 10m));
+        // Arrange
+        var repository = Substitute.For<IProductRepository>();
+        repository.ExistsAsync("Test Product").Returns(false);
+        repository.AddAsync(Arg.Any<Product>()).Returns(new Product(1, "Test Product", 10.0m));
 
-        var handler = new CreateProductCommandHandler(repo);
+        var handler = new CreateProductCommandHandler(repository);
+        var command = new CreateProductCommand("Test Product", 10.0m);
 
-        var command = new CreateProductCommand("Test", 10m);
+        // Act
         var result = await handler.HandleAsync(command);
 
-        result.Should().BeOfType<Product>();
-        var product = result.AsT0;
-        product.Name.Should().Be("Test");
-        product.Price.Should().Be(10m);
+        // Assert
+        result.IsT2.Should().BeTrue();
+        result.AsT2.Should().BeOfType<Product>();
+        result.AsT2.Id.Should().Be(1);
+        result.AsT2.Name.Should().Be("Test Product");
+        result.AsT2.Price.Should().Be(10.0m);
     }
 
     [Fact]
     public async Task HandleAsync_NameIsEmpty_ReturnsValidationError()
     {
-        var repo = Substitute.For<IProductRepository>();
-        var handler = new CreateProductCommandHandler(repo);
+        // Arrange
+        var repository = Substitute.For<IProductRepository>();
+        var handler = new CreateProductCommandHandler(repository);
+        var command = new CreateProductCommand("", 10.0m);
 
-        var command = new CreateProductCommand("", 10m);
+        // Act
         var result = await handler.HandleAsync(command);
 
-        result.Should().BeOfType<ValidationError>();
-        var err = result.AsT1; // Wait: ordering: OneOf<Product, ValidationError, DuplicateError> => T0=Product, T1=ValidationError, T2=DuplicateError
-        // Actually AsT1 is ValidationError, AsT2 is DuplicateError.
-        // But we need to use .AsT1.
-        // Use .IsT1 to check.
+        // Assert
         result.IsT1.Should().BeTrue();
-        var error = result.AsT1;
-        error.Message.Should().Be("Name is required");
+        result.AsT1.Should().BeOfType<ValidationError>();
+        result.AsT1.Message.Should().Be("Name is required");
+    }
+
+    [Fact]
+    public async Task HandleAsync_PriceIsNegative_ReturnsValidationError()
+    {
+        // Arrange
+        var repository = Substitute.For<IProductRepository>();
+        var handler = new CreateProductCommandHandler(repository);
+        var command = new CreateProductCommand("Test Product", -5.0m);
+
+        // Act
+        var result = await handler.HandleAsync(command);
+
+        // Assert
+        result.IsT1.Should().BeTrue();
+        result.AsT1.Should().BeOfType<ValidationError>();
+        result.AsT1.Message.Should().Be("Price must be positive");
     }
 
     [Fact]
     public async Task HandleAsync_DuplicateName_ReturnsDuplicateError()
     {
-        var repo = Substitute.For<IProductRepository>();
-        repo.ExistsAsync("Existing").Returns(true);
-        var handler = new CreateProductCommandHandler(repo);
+        // Arrange
+        var repository = Substitute.For<IProductRepository>();
+        repository.ExistsAsync("Test Product").Returns(true);
+        var handler = new CreateProductCommandHandler(repository);
+        var command = new CreateProductCommand("Test Product", 10.0m);
 
-        var command = new CreateProductCommand("Existing", 5m);
+        // Act
         var result = await handler.HandleAsync(command);
 
+        // Assert
         result.IsT2.Should().BeTrue();
-        var dup = result.AsT2;
-        dup.ExistingName.Should().Be("Existing");
-    }
-
-    [Fact]
-    public async Task HandleAsync_NegativePrice_ReturnsValidationError()
-    {
-        var repo = Substitute.For<IProductRepository>();
-        var handler = new CreateProductCommandHandler(repo);
-
-        var command = new CreateProductCommand("New", -1m);
-        var result = await handler.HandleAsync(command);
-
-        result.IsT1.Should().BeTrue();
-        var err = result.AsT1;
-        err.Message.Should().Be("Price must be positive");
+        result.AsT2.Should().BeOfType<DuplicateError>();
+        result.AsT2.Message.Should().Be("Test Product");
     }
 }
-
-result.IsT0.Should().BeTrue();
-var product = result.AsT0;
-
-result.IsT0.Should().BeTrue();
-var product = result.AsT0;
-product.Id.Should().Be(1);
-product.Name.Should().Be("Test");
-product.Price.Should().Be(10m);
-
-result.IsT1.Should().BeTrue();
-var err = result.AsT1;
-err.Message.Should().Be("Name is required");
-
-result.IsT2.Should().BeTrue();
-var dup = result.AsT2;
-dup.ExistingName.Should().Be("Existing");
-
-result.IsT1.Should().BeTrue();
-var err = result.AsT1;
-err.Message.Should().Be("Price must be positive");

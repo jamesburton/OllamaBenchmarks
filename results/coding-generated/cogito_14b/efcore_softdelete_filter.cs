@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-public interface ISoftDeletable
+public interface ISoftDeletable 
 {
     bool IsDeleted { get; set; }
 }
@@ -8,21 +8,23 @@ public interface ISoftDeletable
 public class Article : ISoftDeletable
 {
     public int Id { get; set; }
-    public string Title { get; set; }
+    public string Title { get; set; } = default!;
     public bool IsDeleted { get; set; }
 }
 
 public class ArticleDbContext : DbContext
 {
-    public DbSet<Article> Articles { get; set; }
+    public DbSet<Article> Articles { get; set; } = default!;
 
-    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options)
+    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) 
+        : base(options)
     {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
+        modelBuilder.Entity<Article>()
+            .HasQueryFilter(a => !a.IsDeleted);
     }
 }
 
@@ -30,7 +32,7 @@ public class ArticleRepository
 {
     private readonly ArticleDbContext _context;
 
-    public ArticleRepository(ArticleDbContext context)
+    public ArticleRepository(ArticleDbContext context) 
     {
         _context = context;
     }
@@ -48,7 +50,7 @@ public class ArticleRepository
         }
     }
 
-    public async Task<List<Article>> GetAllAsync()
+    public async Task<List<Article>> GetAllAsync() 
     {
         return await _context.Articles.ToListAsync();
     }

@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 public interface IExpensiveService
 {
     Task<string> ComputeAsync(string key);
@@ -13,13 +17,18 @@ public class CachingService
         _inner = inner;
     }
 
-    public async ValueTask<string> GetAsync(string key)
+    public ValueTask<string> GetAsync(string key)
     {
         if (_cache.TryGetValue(key, out string cachedValue))
         {
             return new ValueTask<string>(cachedValue);
         }
 
+        return ComputeAndCacheAsync(key);
+    }
+
+    private async ValueTask<string> ComputeAndCacheAsync(string key)
+    {
         string result = await _inner.ComputeAsync(key);
         _cache[key] = result;
         return result;

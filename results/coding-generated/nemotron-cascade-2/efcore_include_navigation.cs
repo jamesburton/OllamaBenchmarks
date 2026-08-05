@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 public class Comment
@@ -18,14 +16,14 @@ public class Post
     public string Content { get; set; } = null!;
     public int BlogId { get; set; }
     public Blog? Blog { get; set; }
-    public List<Comment> Comments { get; } = new List<Comment>();
+    public List<Comment> Comments { get; set; } = new();
 }
 
 public class Blog
 {
     public int Id { get; set; }
     public string Title { get; set; } = null!;
-    public List<Post> Posts { get; } = new List<Post>();
+    public List<Post> Posts { get; set; } = new();
 }
 
 public class BlogDbContext : DbContext
@@ -41,12 +39,14 @@ public class BlogDbContext : DbContext
         modelBuilder.Entity<Blog>()
             .HasMany(b => b.Posts)
             .WithOne(p => p.Blog)
-            .HasForeignKey(p => p.BlogId);
+            .HasForeignKey(p => p.BlogId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Post>()
             .HasMany(p => p.Comments)
             .WithOne(c => c.Post)
-            .HasForeignKey(c => c.PostId);
+            .HasForeignKey(c => c.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 

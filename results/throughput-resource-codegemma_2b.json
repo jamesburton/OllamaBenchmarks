@@ -1,0 +1,40 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-07-12T16:37:29.7769592+01:00",
+  "run_finished_at": "2026-07-12T16:37:38.6036779+01:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-codegemma_2b.json",
+  "host": "STRIX",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "hostname": "STRIX"
+  },
+  "models": [
+    "codegemma:2b"
+  ],
+  "completed_models": [
+    "codegemma:2b"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "num_ctx": 0,
+  "seed": 42,
+  "results": [
+    {
+      "model": "codegemma:2b",
+      "eval_count": 4,
+      "eval_s": 0.034,
+      "toks_per_s": 117.82,
+      "total_s": 0.241,
+      "load_s": 0.178,
+      "cpu_avg_pct": 0,
+      "cpu_peak_pct": 0,
+      "ram_peak_gb": 0.07,
+      "gpu_util_avg": 0.0,
+      "gpu_util_peak": 0.0,
+      "gpu_mem_peak_gb": 0.0,
+      "ollama_ps": "codegemma:2b size=1.81GB vram=1.81GB ctx=8192 quant=Q4_0"
+    }
+  ]
+}

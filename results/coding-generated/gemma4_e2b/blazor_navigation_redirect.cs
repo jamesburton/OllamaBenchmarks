@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Routing;
 
 public interface IProductService
 {
@@ -23,7 +22,7 @@ public class ProductDetailBase : ComponentBase
     {
         if (ProductService == null)
         {
-            ErrorMessage = "Service not injected.";
+            ErrorMessage = "Service not available.";
             return;
         }
 

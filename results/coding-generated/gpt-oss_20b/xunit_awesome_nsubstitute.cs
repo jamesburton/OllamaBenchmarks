@@ -32,14 +32,13 @@ public class NotificationServiceTests
     public async Task NotifyUserAsync_UserFound_EmailSent()
     {
         // Arrange
-        var userId = 42;
-        var user = new User { Id = userId, Name = "Alice", Email = "alice@example.com" };
         var repo = Substitute.For<IUserRepository>();
         var email = Substitute.For<IEmailService>();
-
-        repo.GetByIdAsync(userId).Returns(user);
-
         var service = new NotificationService(repo, email);
+
+        var userId = 1;
+        var user = new User { Id = userId, Name = "Alice", Email = "alice@example.com" };
+        repo.GetByIdAsync(userId).Returns(Task.FromResult<User?>(user));
 
         // Act
         await service.NotifyUserAsync(userId);
@@ -50,16 +49,15 @@ public class NotificationServiceTests
     }
 
     [Fact]
-    public async Task NotifyUserAsync_UserNotFound_Throws()
+    public async Task NotifyUserAsync_UserNotFound_ThrowsInvalidOperationException()
     {
         // Arrange
-        var userId = 99;
         var repo = Substitute.For<IUserRepository>();
         var email = Substitute.For<IEmailService>();
-
-        repo.GetByIdAsync(userId).Returns((User?)null);
-
         var service = new NotificationService(repo, email);
+
+        var userId = 2;
+        repo.GetByIdAsync(userId).Returns(Task.FromResult<User?>(null));
 
         // Act
         Func<Task> act = () => service.NotifyUserAsync(userId);

@@ -1,3 +1,6 @@
+using Xunit;
+using AwesomeAssertions;
+
 public class StringProcessor
 {
     public string Truncate(string input, int maxLength)
@@ -23,27 +26,29 @@ public class StringProcessor
 public class StringProcessorTests
 {
     [Theory]
+    [InlineData("", 0, "")]
+    [InlineData("hello", 5, "hello")]
+    [InlineData("hello", 3, "hel...")]
+    [InlineData("hello", 0, "...")]
+    [InlineData("this is a test", 2, "th...")]
+    [InlineData("this is a test", 4, "this...")]
+    [InlineData("this is a test", 10, "this is a test")]
     [InlineData(null, 5, "")]
-    [InlineData("", 3, "")]
-    [InlineData("hello", 10, "hello")]
-    [InlineData("1234567890", 10, "1234567890")]
-    [InlineData("1234567890123", 5, "12345...")]
-    public void Truncate_ReturnsExpected(string input, int maxLength, string expected)
+    public void Truncate_ShouldHandleVariousInput(string input, int maxLength, string expected)
     {
-        var processor = new StringProcessor();
         var result = processor.Truncate(input, maxLength);
         result.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData(null, 0)]
     [InlineData("", 0)]
+    [InlineData(null, 0)]
+    [InlineData("  ", 0)]
     [InlineData("hello", 1)]
-    [InlineData("a b c", 3)]
-    [InlineData("  a   b  c  ", 3)]
-    public void CountWords_ReturnsExpected(string input, int expected)
+    [InlineData("hello world", 2)]
+    [InlineData("a b   c", 3)]
+    public void CountWords_ShouldHandleVariousInput(string input, int expected)
     {
-        var processor = new StringProcessor();
         var result = processor.CountWords(input);
         result.Should().Be(expected);
     }
@@ -52,13 +57,16 @@ public class StringProcessorTests
     [InlineData(null, false)]
     [InlineData("", false)]
     [InlineData("a", true)]
-    [InlineData("madam", true)]
-    [InlineData("hello", false)]
+    [InlineData("abba", true)]
+    [InlineData("abc", false)]
     [InlineData("RaceCar", true)]
-    public void IsPalindrome_ReturnsExpected(string input, bool expected)
+    [InlineData("Was it a car or a cat I saw", true)]
+    [InlineData("Not a palindrome", false)]
+    public void IsPalindrome_ShouldHandleVariousInput(string input, bool expected)
     {
-        var processor = new StringProcessor();
         var result = processor.IsPalindrome(input);
         result.Should().Be(expected);
     }
+
+    private readonly StringProcessor processor = new();
 }

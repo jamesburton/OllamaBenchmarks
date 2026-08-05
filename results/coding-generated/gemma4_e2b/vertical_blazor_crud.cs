@@ -1,10 +1,9 @@
+using Microsoft.AspNetCore.Components;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NSubstitute;
 using Xunit;
-using Bunit;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.Components;
 
 // 1. TodoItem record
 public record TodoItem(int Id, string Title, bool IsCompleted);
@@ -54,10 +53,12 @@ public class TodoService : ITodoService
     }
 }
 
-// 4. TodoListBase ComponentBase code-behind class
-public class TodoListBase : ComponentBase
+// 4. TodoListBase Component Code-Behind
+public abstract class TodoListBase : ComponentBase
 {
-    [Inject] public ITodoService TodoService { get; set; }
+    [Inject]
+    public ITodoService TodoService { get; set; }
+
     public List<TodoItem> Todos { get; set; } = new();
     public string NewTitle { get; set; } = "";
 
@@ -68,19 +69,19 @@ public class TodoListBase : ComponentBase
 
     private async Task LoadTodos()
     {
-        var todos = await TodoService.GetAllAsync();
-        Todos = todos;
+        Todos = await TodoService.GetAllAsync();
     }
 
     public async Task AddTodo()
     {
-        if (!string.IsNullOrWhiteSpace(NewTitle))
-        {
-            var newItem = await TodoService.AddAsync(NewTitle);
-            Todos.Add(newItem);
-            NewTitle = "";
-            await LoadTodos();
-        }
+        if (string.IsNullOrWhiteSpace(NewTitle)) return;
+
+        var newItem = await TodoService.AddAsync(NewTitle);
+
+        // Update local state and reload list
+        Todos.Add(newItem);
+        NewTitle = "";
+        await LoadTodos();
     }
 
     public async Task DeleteTodo(int id)
@@ -96,18 +97,31 @@ public class TodoListBase : ComponentBase
     }
 }
 
-// --- xUnit v3 Tests for TodoService ---
+// 6. xUnit v3 tests for TodoService
 public class TodoServiceTests
 {
     [Fact]
-    public async Task AddAsync_CreatesItemWithCorrectTitle()
+    public async Task AddAsync_CreatesItemWithCorrectIdAndTitle()
     {
         var service = new TodoService();
-        var result = await service.AddAsync("Buy milk");
 
-        Assert.Equal("Buy milk", result.Title);
-        Assert.Equal(1, result.Id); // Since the service starts ID from 1
-        Assert.Single(await service.GetAllAsync());
+        var result = await service.AddAsync("Buy groceries");
+
+        result.Should().NotBeNull();
+        result.Id.Should().Be(1);
+        result.Title.Should().Be("Buy groceries");
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsAllItems()
+    {
+        var service = new TodoService();
+        await service.AddAsync("Task 1");
+        await service.AddAsync("Task 2");
+
+        var todos = await service.GetAllAsync();
+
+        todos.Should().HaveCount(2);
     }
 
     [Fact]
@@ -115,150 +129,68 @@ public class TodoServiceTests
     {
         var service = new TodoService();
         await service.AddAsync("Item to delete");
-        await service.AddAsync("Another item");
+        await service.AddAsync("Item to keep");
 
-        var all = await service.GetAllAsync();
-        var itemToDelete = all.First(t => t.Title == "Item to delete");
+        var todos = await service.GetAllAsync();
+        var itemIdToDelete = todos[0].Id;
 
-        await service.DeleteAsync(itemToDelete.Id);
+        await service.DeleteAsync(itemIdToDelete);
 
-        var remaining = await service.GetAllAsync();
-        Assert.Single(remaining);
-        Assert.DoesNotContain(remaining, t => t.Id == itemToDelete.Id);
+        var updatedTodos = await service.GetAllAsync();
+
+        updatedTodos.Should().HaveCount(1);
+        updatedTodos.Should().NotContain(todos.First(t => t.Id == itemIdToDelete));
     }
 
     [Fact]
-    public async Task ToggleAsync_FlipsIsCompleted()
+    public async Task ToggleAsync_FlipsIsCompletedFlag()
     {
         var service = new TodoService();
         await service.AddAsync("Toggle me");
-        var initialTodos = await service.GetAllAsync();
-        var todoToToggle = initialTodos.First();
 
-        await service.ToggleAsync(todoToToggle.Id);
+        var todos = await service.GetAllAsync();
+        var itemId = todos[0].Id;
 
-        var updatedTodos = await service.GetAllAsync();
-        var updatedTodo = updatedTodos.First(t => t.Id == todoToToggle.Id);
+        // Initial state
+        todos[0].IsCompleted.Should().Be(false);
 
-        Assert.False(todoToToggle.IsCompleted); // Should be flipped from false to true
-        Assert.True(updatedTodo.IsCompleted);
+        await service.ToggleAsync(itemId);
+
+        // New state
+        todos[0].IsCompleted.Should().Be(true);
     }
 }
 
-// --- bUnit Test for TodoListBase ---
-public class TodoListBaseTests : IAsyncLifetime
+// 7. bUnit test for TodoListBase
+public class TodoListBaseTests
 {
-    private ITodoService _mockTodoService;
-    private TodoListBase _component;
-
-    public async Task InitializeAsync()
-    {
-        // Setup NSubstitute mock
-        _mockTodoService = Substitute.For<ITodoService>();
-
-        // Setup initial state for the mock service
-        _mockTodoService.GetAllAsync().Returns(Task.FromResult(new List<TodoItem>()));
-        _mockTodoService.AddAsync(Arg.Any<string>()).Returns(Task.FromResult(new TodoItem(1, "Mock Item", false)));
-        _mockTodoService.DeleteAsync(Arg.Any<int>()).Returns(Task.CompletedTask);
-        _mockTodoService.ToggleAsync(Arg.Any<int>()).Returns(Task.CompletedTask);
-
-        // Setup the component instance
-        _component = new TodoListBase();
-        _component.TodoService = _mockTodoService;
-    }
-
-    public async Task DisposeAsync()
-    {
-        // Cleanup if necessary
-    }
-
     [Fact]
     public async Task OnInitializedAsync_LoadsTodosFromService()
     {
-        // Arrange: Mock the service to return data on initialization
-        var mockTodos = new List<TodoItem>
+        // Arrange
+        var mockService = Substitute.For<ITodoService>();
+        var expectedTodos = new List<TodoItem>
         {
-            new TodoItem(1, "Task A", false),
-            new TodoItem(2, "Task B", true)
+            new TodoItem(1, "Test 1", false),
+            new TodoItem(2, "Test 2", false)
         };
-        _mockTodoService.GetAllAsync().Returns(Task.FromResult(mockTodos));
+
+        // Configure the mock to return data when GetAllAsync is called
+        mockService.GetAllAsync().Returns(expectedTodos);
+
+        // Inject the mock into the component
+        var component = new TodoListBase();
+        component.TodoService = mockService;
 
         // Act
-        await _component.OnInitializedAsync();
+        await component.RenderAsync();
 
         // Assert
-        // Verify that GetAllAsync was called exactly once during initialization
-        await _mockTodoService.Received(1).GetAllAsync();
-        // Verify that the component's internal list was populated correctly
-        Assert.Equal(mockTodos, _component.Todos);
-    }
+        // Verify that the component called GetAllAsync upon initialization
+        await mockService.Received(1).GetAllAsync();
 
-    [Fact]
-    public async Task AddTodo_CallsServiceAndUpdatesList()
-    {
-        // Arrange
-        var newItem = new TodoItem(99, "New Task", false);
-        _mockTodoService.AddAsync(newItem.Title).Returns(Task.FromResult(newItem));
-
-        // Act
-        _component.NewTitle = "Test Add";
-        await _component.AddTodo();
-
-        // Assert
-        // Verify that AddAsync was called with the correct title
-        await _mockTodoService.Received(1).AddAsync("Test Add");
-        // Verify that the list was reloaded after adding
-        await _mockTodoService.Received(1).GetAllAsync();
-        Assert.Single(_component.Todos);
-        Assert.Equal(newItem, _component.Todos.First());
-        Assert.Equal("Test Add", _component.NewTitle); // Check if NewTitle was cleared
-    }
-
-    [Fact]
-    public async Task DeleteTodo_CallsServiceAndUpdatesList()
-    {
-        // Arrange
-        var todoIdToDelete = 1;
-        _mockTodoService.DeleteAsync(todoIdToDelete).Returns(Task.CompletedTask);
-
-        // Setup initial state
-        var initialTodos = new List<TodoItem> { new TodoItem(todoIdToDelete, "Delete Me", false) };
-        _mockTodoService.GetAllAsync().Returns(Task.FromResult(initialTodos));
-        _component.Todos = initialTodos; // Manually set initial state for this test context
-
-        // Act
-        await _component.DeleteTodo(todoIdToDelete);
-
-        // Assert
-        // Verify that DeleteAsync was called
-        await _mockTodoService.Received(1).DeleteAsync(todoIdToDelete);
-        // Verify that the list was reloaded after deletion
-        await _mockTodoService.Received(1).GetAllAsync();
-        Assert.Empty(_component.Todos);
-    }
-
-    [Fact]
-    public async Task ToggleTodo_CallsServiceAndUpdatesList()
-    {
-        // Arrange
-        var todoIdToToggle = 1;
-        var initialTodos = new List<TodoItem>
-        {
-            new TodoItem(todoIdToToggle, "Toggle Me", false)
-        };
-        _mockTodoService.GetAllAsync().Returns(Task.FromResult(initialTodos));
-        _mockTodoService.ToggleAsync(todoIdToToggle).Returns(Task.CompletedTask);
-
-        // Act
-        await _component.ToggleTodo(todoIdToToggle);
-
-        // Assert
-        // Verify that ToggleAsync was called
-        await _mockTodoService.Received(1).ToggleAsync(todoIdToToggle);
-        // Verify that the list was reloaded after toggling
-        await _mockTodoService.Received(1).GetAllAsync();
-        var updatedTodos = await _mockTodoService.GetAllAsync();
-        Assert.Single(updatedTodos);
-        Assert.True(updatedTodos.First().IsCompleted);
+        // Verify the component state was populated correctly
+        component.Todos.Should().HaveCount(2);
+        component.Todos[0].Title.Should().Be("Test 1");
     }
 }

@@ -11,14 +11,14 @@ public static class SalesAnalyzer
     {
         return sales
             .GroupBy(s => s.Category)
-            .Select(g => new CategorySummary
-            {
-                Category = g.Key,
-                TotalAmount = g.Sum(x => x.Amount),
-                AverageAmount = g.Average(x => x.Amount),
-                Count = g.Count()
-            })
-            .OrderByDescending(c => c.TotalAmount)
+            .Select(g => new CategorySummary(
+                Category: g.Key,
+                TotalAmount: g.Sum(s => s.Amount),
+                AverageAmount: g.Average(s => s.Amount),
+                Count: g.Count()
+            ))
+            .OrderByDescending(cs => cs.TotalAmount)
             .ToList();
     }
 }
+​

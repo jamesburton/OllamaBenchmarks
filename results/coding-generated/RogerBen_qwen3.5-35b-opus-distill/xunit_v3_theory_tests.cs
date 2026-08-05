@@ -28,25 +28,24 @@ public class StringProcessorTests
     [InlineData("hi")]
     [InlineData("hello")]
     [InlineData("hello world")]
-    public void Truncate_WhenInputLengthIsLessThanOrEqualMaxLength_ReturnsInput(string input, int maxLength)
+    public void Truncate_WhenInputIsNullOrEmptyOrShort_ReturnsInputOrEmpty(string input, int maxLength, string expected)
     {
         var processor = new StringProcessor();
         var result = processor.Truncate(input, maxLength);
-        result.Should().Be(input);
+        result.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData(null, 5)]
-    [InlineData("", 5)]
-    [InlineData("hi", 5)]
+    [InlineData(null, 0)]
+    [InlineData("", 0)]
     [InlineData("hello", 5)]
+    [InlineData("hello", 10)]
     [InlineData("hello world", 5)]
-    public void Truncate_WhenInputLengthIsGreaterThanMaxLength_ReturnsTruncatedInput(string input, int maxLength)
+    public void Truncate_WhenInputIsNullOrEmptyOrShort_ReturnsInputOrEmpty(string input, int maxLength, string expected)
     {
         var processor = new StringProcessor();
         var result = processor.Truncate(input, maxLength);
-        result.Should().NotBe(input);
-        result.Should().EndWith(".");
+        result.Should().Be(expected);
     }
 
     [Theory]
@@ -54,48 +53,52 @@ public class StringProcessorTests
     [InlineData("")]
     [InlineData("hello")]
     [InlineData("hello world")]
-    public void CountWords_WhenInputIsNullOrWhitespace_ReturnsZero(string input)
+    public void CountWords_WhenInputIsNullOrEmptyOrHasWords_ReturnsCorrectCount(string input, int expected)
     {
         var processor = new StringProcessor();
         var result = processor.CountWords(input);
-        result.Should().Be(0);
+        result.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData("hello")]
-    [InlineData("hello world")]
-    [InlineData("hello   world")]
-    public void CountWords_WhenInputHasWords_ReturnsCorrectCount(string input)
+    [InlineData(null, 0)]
+    [InlineData("", 0)]
+    [InlineData("hello", 1)]
+    [InlineData("hello world", 2)]
+    [InlineData("hello   world", 2)]
+    public void CountWords_WhenInputIsNullOrEmptyOrHasWords_ReturnsCorrectCount(string input, int expected)
     {
         var processor = new StringProcessor();
         var result = processor.CountWords(input);
-        result.Should().BeGreaterThan(0);
+        result.Should().Be(expected);
     }
 
     [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("a")]
-    [InlineData("A")]
     [InlineData("racecar")]
     [InlineData("RaceCar")]
-    [InlineData("A man a plan a canal Panama")]
-    public void IsPalindrome_WhenInputIsPalindrome_ReturnsTrue(string input)
+    [InlineData("hello")]
+    public void IsPalindrome_WhenInputIsNullOrEmptyOrPalindrome_ReturnsCorrectResult(string input, bool expected)
     {
         var processor = new StringProcessor();
         var result = processor.IsPalindrome(input);
-        result.Should().BeTrue();
+        result.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData("hello")]
-    [InlineData("Hello")]
-    [InlineData("hello world")]
-    public void IsPalindrome_WhenInputIsNotPalindrome_ReturnsFalse(string input)
+    [InlineData(null, false)]
+    [InlineData("", false)]
+    [InlineData("a", true)]
+    [InlineData("racecar", true)]
+    [InlineData("RaceCar", true)]
+    [InlineData("hello", false)]
+    public void IsPalindrome_WhenInputIsNullOrEmptyOrPalindrome_ReturnsCorrectResult(string input, bool expected)
     {
         var processor = new StringProcessor();
         var result = processor.IsPalindrome(input);
-        result.Should().BeFalse();
+        result.Should().Be(expected);
     }
 }
 
@@ -124,78 +127,42 @@ public class StringProcessor
 public class StringProcessorTests
 {
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("hi")]
-    [InlineData("hello")]
-    [InlineData("hello world")]
-    public void Truncate_WhenInputLengthIsLessThanOrEqualMaxLength_ReturnsInput(string input, int maxLength)
+    [InlineData(null, 10, "")]
+    [InlineData("", 10, "")]
+    [InlineData("hi", 10, "hi")]
+    [InlineData("hello", 5, "hello")]
+    [InlineData("hello world", 5, "hello..")]
+    public void Truncate_WhenInputIsNullOrEmptyOrShort_ReturnsInputOrEmpty(string input, int maxLength, string expected)
     {
         var processor = new StringProcessor();
         var result = processor.Truncate(input, maxLength);
-        result.Should().Be(input);
+        result.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData(null, 5)]
-    [InlineData("", 5)]
-    [InlineData("hi", 5)]
-    [InlineData("hello", 5)]
-    [InlineData("hello world", 5)]
-    public void Truncate_WhenInputLengthIsGreaterThanMaxLength_ReturnsTruncatedInput(string input, int maxLength)
-    {
-        var processor = new StringProcessor();
-        var result = processor.Truncate(input, maxLength);
-        result.Should().NotBe(input);
-        result.Should().EndWith(".");
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("hello")]
-    [InlineData("hello world")]
-    public void CountWords_WhenInputIsNullOrWhitespace_ReturnsZero(string input)
+    [InlineData(null, 0)]
+    [InlineData("", 0)]
+    [InlineData("hello", 1)]
+    [InlineData("hello world", 2)]
+    [InlineData("hello   world", 2)]
+    public void CountWords_WhenInputIsNullOrEmptyOrHasWords_ReturnsCorrectCount(string input, int expected)
     {
         var processor = new StringProcessor();
         var result = processor.CountWords(input);
-        result.Should().Be(0);
+        result.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData("hello")]
-    [InlineData("hello world")]
-    [InlineData("hello   world")]
-    public void CountWords_WhenInputHasWords_ReturnsCorrectCount(string input)
-    {
-        var processor = new StringProcessor();
-        var result = processor.CountWords(input);
-        result.Should().BeGreaterThan(0);
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("a")]
-    [InlineData("A")]
-    [InlineData("racecar")]
-    [InlineData("RaceCar")]
-    [InlineData("A man a plan a canal Panama")]
-    public void IsPalindrome_WhenInputIsPalindrome_ReturnsTrue(string input)
+    [InlineData(null, false)]
+    [InlineData("", false)]
+    [InlineData("a", true)]
+    [InlineData("racecar", true)]
+    [InlineData("RaceCar", true)]
+    [InlineData("hello", false)]
+    public void IsPalindrome_WhenInputIsNullOrEmptyOrPalindrome_ReturnsCorrectResult(string input, bool expected)
     {
         var processor = new StringProcessor();
         var result = processor.IsPalindrome(input);
-        result.Should().BeTrue();
-    }
-
-    [Theory]
-    [InlineData("hello")]
-    [InlineData("Hello")]
-    [InlineData("hello world")]
-    public void IsPalindrome_WhenInputIsNotPalindrome_ReturnsFalse(string input)
-    {
-        var processor = new StringProcessor();
-        var result = processor.IsPalindrome(input);
-        result.Should().BeFalse();
+        result.Should().Be(expected);
     }
 }

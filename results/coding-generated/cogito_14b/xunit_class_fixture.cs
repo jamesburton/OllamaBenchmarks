@@ -25,16 +25,11 @@ public class StoreService
         _store = store;
     }
 
-    public string? Get(string key)
-    {
-        _store.Data.TryGetValue(key, out var value);
-        return value;
-    }
+    public string? Get(string key) => 
+        _store.Data.TryGetValue(key, out var value) ? value : null;
 
-    public void Set(string key, string value)
-    {
+    public void Set(string key, string value) =>
         _store.Data[key] = value;
-    }
 }
 
 public class StoreServiceTests : IClassFixture<InMemoryStore>
@@ -51,19 +46,22 @@ public class StoreServiceTests : IClassFixture<InMemoryStore>
     [Fact]
     public void Get_ExistingKey_ReturnsValue()
     {
-        _service.Get("key1").Should().Be("value1");
+        var result = _service.Get("key1");
+        result.Should().Be("value1");
     }
 
     [Fact]
     public void Set_ThenGet_ReturnsSetValue()
     {
         _service.Set("key3", "value3");
-        _service.Get("key3").Should().Be("value3");
+        var result = _service.Get("key3");
+        result.Should().Be("value3");
     }
 
     [Fact]
     public void Get_NonexistentKey_ReturnsNull()
     {
-        _service.Get("nonexistent").Should().BeNull();
+        var result = _service.Get("nonexistent");
+        result.Should().BeNull();
     }
 }

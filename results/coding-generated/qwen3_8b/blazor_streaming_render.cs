@@ -13,7 +13,7 @@ public class WeatherPageBase : ComponentBase
     public IWeatherService WeatherService { get; set; } = default!;
 
     [StreamRendering]
-    public WeatherForecast[]? Forecasts { get; set; } = null;
+    public WeatherForecast[]? Forecasts { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

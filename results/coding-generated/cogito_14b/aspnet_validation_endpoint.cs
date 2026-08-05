@@ -17,15 +17,11 @@ public class OrderService
     public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
     {
         var validationContext = new ValidationContext(request);
-        var validationResults = new List<ValidationResult>();
+        var results = new List<ValidationResult>();
 
-        if (!Validator.TryValidateObject(request, validationContext, validationResults, validateAllProperties: true))
+        if (!Validator.TryValidateObject(request, validationContext, results, validateAllProperties: true))
         {
-            var firstError = validationResults.FirstOrDefault();
-            if (firstError != null)
-            {
-                throw new ArgumentException(firstError.ErrorMessage, firstError.MemberNames.FirstOrDefault());
-            }
+            throw new ArgumentException($"Invalid order request. {results[0].ErrorMessage}");
         }
 
         return request;

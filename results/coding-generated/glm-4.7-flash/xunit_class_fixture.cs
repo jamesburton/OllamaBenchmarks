@@ -46,21 +46,24 @@ public class StoreServiceTests : IClassFixture<InMemoryStore>
     }
 
     [Fact]
-    public void Get_ExistingKey_ReturnsValue()
+    void Get_ExistingKey_ReturnsValue()
     {
-        _service.Get("key1").Should().Be("value1");
+        var result = _service.Get("key1");
+        result.Should().Be("value1");
     }
 
     [Fact]
-    public void Set_ThenGet_ReturnsSetValue()
+    void Set_ThenGet_ReturnsSetValue()
     {
         _service.Set("key3", "value3");
-        _service.Get("key3").Should().Be("value3");
+        var result = _service.Get("key3");
+        result.Should().Be("value3");
     }
 
     [Fact]
-    public void Get_NonexistentKey_ReturnsNull()
+    void Get_NonexistentKey_ReturnsNull()
     {
-        _service.Get("nonexistent").Should().BeNull();
+        var result = _service.Get("nonexistent");
+        result.Should().BeNull();
     }
 }

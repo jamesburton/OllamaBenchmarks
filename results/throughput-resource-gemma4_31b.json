@@ -1,24 +1,21 @@
 {
     "benchmark":  "throughput_resource",
-    "run_started_at":  "2026-04-10T11:48:25.7071414+01:00",
-    "run_finished_at":  "2026-04-10T11:58:58.9820840+01:00",
+    "run_started_at":  "2026-05-13T19:16:41.4168588+01:00",
+    "run_finished_at":  "2026-05-13T19:18:50.5700804+01:00",
     "output_path":  "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-gemma4_31b.json",
-    "host":  "FRAMEWORK",
+    "host":  "STRIX",
     "ollama_host":  "http://127.0.0.1:11434",
     "host_details":  {
-                         "hostname":  "FRAMEWORK"
+                         "hostname":  "STRIX"
                      },
     "models":  [
                    "gemma4:31b"
                ],
     "completed_models":  [
-
+                             "gemma4:31b"
                          ],
     "failed_models":  [
-                          {
-                              "model":  "gemma4:31b",
-                              "error":  "The remote server returned an error: (500) Internal Server Error."
-                          }
+
                       ],
     "incomplete_models":  [
 
@@ -27,6 +24,20 @@
     "num_predict":  192,
     "seed":  42,
     "results":  [
-
+                    {
+                        "model":  "gemma4:31b",
+                        "eval_count":  192,
+                        "eval_s":  19.938,
+                        "toks_per_s":  9.63,
+                        "total_s":  20.572,
+                        "load_s":  0.304,
+                        "cpu_avg_pct":  4.2,
+                        "cpu_peak_pct":  4.2,
+                        "ram_peak_gb":  1.89,
+                        "gpu_util_avg":  73.2,
+                        "gpu_util_peak":  97.3,
+                        "gpu_mem_peak_gb":  44.06,
+                        "ollama_ps":  "gemma4:31b size=43.98GB vram=43.98GB ctx=262144 quant=Q4_K_M"
+                    }
                 ]
 }

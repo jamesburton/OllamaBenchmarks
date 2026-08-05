@@ -1,0 +1,39 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-05-10T14:14:19.6251740+01:00",
+  "run_finished_at": "2026-05-10T14:15:00.4645419+01:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-hf.co_bartowski_cerebras_GLM-4.5-Air-REAP-82B-A12B-GGUF_IQ4_XS.json",
+  "host": "STRIX",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "hostname": "STRIX"
+  },
+  "models": [
+    "hf.co/bartowski/cerebras_GLM-4.5-Air-REAP-82B-A12B-GGUF:IQ4_XS"
+  ],
+  "completed_models": [
+    "hf.co/bartowski/cerebras_GLM-4.5-Air-REAP-82B-A12B-GGUF:IQ4_XS"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "hf.co/bartowski/cerebras_GLM-4.5-Air-REAP-82B-A12B-GGUF:IQ4_XS",
+      "eval_count": 192,
+      "eval_s": 32.134,
+      "toks_per_s": 5.98,
+      "total_s": 33.325,
+      "load_s": 0.16,
+      "cpu_avg_pct": 33.4,
+      "cpu_peak_pct": 43.1,
+      "ram_peak_gb": 46.18,
+      "gpu_util_avg": 2.5,
+      "gpu_util_peak": 4.8,
+      "gpu_mem_peak_gb": 11.32,
+      "ollama_ps": "hf.co/bartowski/cerebras_GLM-4.5-Air-REAP-82B-A12B-GGUF:IQ4_XS size=113.94GB vram=58.98GB ctx=131072 quant=unknown"
+    }
+  ]
+}

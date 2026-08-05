@@ -18,49 +18,49 @@ public class InMemoryStore : IAsyncLifetime
 
 public class StoreService
 {
-    private readonly InMemoryStore store;
+    private readonly InMemoryStore _store;
 
     public StoreService(InMemoryStore store)
     {
-        this.store = store;
+        _store = store;
     }
 
     public string? Get(string key)
     {
-        return store.Data.TryGetValue(key, out var value) ? value : null;
+        return _store.Data.TryGetValue(key, out var value) ? value : null;
     }
 
     public void Set(string key, string value)
     {
-        store.Data[key] = value;
+        _store.Data[key] = value;
     }
 }
 
 public class StoreServiceTests : IClassFixture<InMemoryStore>
 {
-    private readonly StoreService service;
+    private readonly StoreService _service;
 
     public StoreServiceTests(InMemoryStore store)
     {
-        service = new StoreService(store);
+        _service = new StoreService(store);
     }
 
     [Fact]
     public void Get_ExistingKey_ReturnsValue()
     {
-        service.Get("key1").Should().Be("value1");
+        _service.Get("key1").Should().Be("value1");
     }
 
     [Fact]
     public void Set_ThenGet_ReturnsSetValue()
     {
-        service.Set("key3", "value3");
-        service.Get("key3").Should().Be("value3");
+        _service.Set("key3", "value3");
+        _service.Get("key3").Should().Be("value3");
     }
 
     [Fact]
     public void Get_NonexistentKey_ReturnsNull()
     {
-        service.Get("nonexistent").Should().BeNull();
+        _service.Get("nonexistent").Should().BeNull();
     }
 }

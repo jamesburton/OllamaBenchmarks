@@ -1,16 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using System.Threading.Tasks;
-
-public interface IUserService
-{
-    Task<string> GetDisplayNameAsync(string userId);
-}
 
 public class UserDashboard : ComponentBase
 {
     [CascadingParameter]
-    public Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; } = default!
 
     [Inject]
     public IUserService UserService { get; set; } = default!;
@@ -21,12 +15,12 @@ public class UserDashboard : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthState;
+        var user = authState.User;
 
-        if (authState.User.Identity?.IsAuthenticated == true)
+        if (user.Identity?.IsAuthenticated == true)
         {
             IsAuthenticated = true;
-            var userName = authState.User.Identity.Name;
-            DisplayName = await UserService.GetDisplayNameAsync(userName ?? string.Empty);
+            DisplayName = await UserService.GetDisplayNameAsync(user.Identity.Name ?? "Unknown");
         }
         else
         {

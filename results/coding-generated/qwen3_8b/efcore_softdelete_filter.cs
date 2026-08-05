@@ -16,7 +16,10 @@ public class ArticleDbContext : DbContext
 {
     public DbSet<Article> Articles { get; set; }
 
-    public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options) { }
+    public ArticleDbContext(DbContextOptions<ArticleDbContext> options)
+        : base(options)
+    {
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,8 +38,10 @@ public class ArticleRepository
 
     public async Task SoftDeleteAsync(int id)
     {
-        var article = await _context.Articles.IgnoreQueryFilters()
+        var article = await _context.Articles
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(a => a.Id == id);
+
         if (article != null)
         {
             article.IsDeleted = true;

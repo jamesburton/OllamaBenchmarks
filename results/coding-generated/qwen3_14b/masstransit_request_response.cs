@@ -1,4 +1,5 @@
 using MassTransit;
+using System;
 global using Contracts;
 
 namespace Contracts

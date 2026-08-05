@@ -10,7 +10,7 @@ public string Name { get; set; }
     public int Quantity { get; set; }
 
 public CreateOrderRequest ValidateAndCreate(CreateOrderRequest request)
-
+    
     {
         var validationContext = new ValidationContext(request);
         var results = new List<ValidationResult>();

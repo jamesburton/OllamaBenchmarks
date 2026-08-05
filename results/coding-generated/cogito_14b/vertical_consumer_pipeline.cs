@@ -20,10 +20,8 @@ public class NotifyCustomerConsumer : IConsumer<OrderPlaced>
 {
     public async Task Consume(ConsumeContext<OrderPlaced> context)
     {
-        await context.Publish(new CustomerNotified(
-            context.Message.OrderId,
-            $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}"
-        ));
+        var notification = $"Order {context.Message.OrderId} confirmed for {context.Message.CustomerName}";
+        await context.Publish(new CustomerNotified(context.Message.OrderId, notification));
     }
 }
 
@@ -39,11 +37,12 @@ public class PlaceOrderTests
             cfg.AddConsumer<PlaceOrderConsumer>();
             cfg.AddConsumer<NotifyCustomerConsumer>();
         });
+
         _provider = services.BuildServiceProvider();
     }
 
     [Fact]
-    public async Task PlaceOrder_ConsumesAndPublishesOrderPlaced()
+    public async Task PlaceOrder_ConsumesAndPublishes_OrderPlaced()
     {
         var harness = _provider.GetRequiredService<ITestHarness>();
         await harness.Start();
@@ -56,7 +55,7 @@ public class PlaceOrderTests
     }
 
     [Fact]
-    public async Task PlaceOrder_ConsumesAndPublishesOrderPlacedAndCustomerNotified()
+    public async Task FullPipeline_ConsumesAndPublishes_AllMessages()
     {
         var harness = _provider.GetRequiredService<ITestHarness>();
         await harness.Start();
@@ -66,6 +65,7 @@ public class PlaceOrderTests
 
         Assert.True(await harness.Consumed.Any<PlaceOrder>());
         Assert.True(await harness.Published.Any<OrderPlaced>());
+        Assert.True(await harness.Consumed.Any<OrderPlaced>());
         Assert.True(await harness.Published.Any<CustomerNotified>());
     }
 }

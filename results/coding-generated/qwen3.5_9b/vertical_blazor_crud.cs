@@ -1,15 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using NSubstitute;
 using Xunit;
-using AwesomeAssertions;
+using Bunit;
 
-public class TodoItem
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public bool IsCompleted { get; set; }
-}
+// 1. TodoItem record with properties: int Id, string Title, bool IsCompleted
+public record TodoItem(int Id, string Title, bool IsCompleted);
 
+// 2. ITodoService interface with methods
 public interface ITodoService
 {
     Task<List<TodoItem>> GetAllAsync();
@@ -18,213 +15,1165 @@ public interface ITodoService
     Task ToggleAsync(int id);
 }
 
+// 3. TodoService implementation using an in-memory List<TodoItem>
 public class TodoService : ITodoService
 {
     private readonly List<TodoItem> _todos = new();
-    private int _nextId = 1;
+    private int _nextId;
 
-    public Task<List<TodoItem>> GetAllAsync()
+    public TodoService()
     {
-        return Task.FromResult(_todos.ToList());
+        // Initialize with empty list and next ID starting at 1
+        _nextId = 0;
     }
 
-    public Task<TodoItem> AddAsync(string title)
+    public Task<List<TodoItem>> GetAllAsync() => Task.FromResult(_todos.ToList());
+
+    public async Task<TodoItem> AddAsync(string title)
     {
-        var item = new TodoItem
-        {
-            Id = _nextId++,
-            Title = title,
-            IsCompleted = false
-        };
+        var item = new TodoItem(++_nextId, title, false);
         _todos.Add(item);
-        return Task.FromResult(item);
+        return await Task.FromResult(item);
     }
 
-    public Task DeleteAsync(int id)
+    public Task DeleteAsync(int id) => Task.Run(() =>
+    {
+        if (_todos.RemoveAll(t => t.Id == id) > 0)
+            return;
+    });
+
+    public async Task ToggleAsync(int id)
     {
         var item = _todos.FirstOrDefault(t => t.Id == id);
         if (item != null)
         {
-            _todos.Remove(item);
+            await Task.Run(() => item.IsCompleted = !item.IsCompleted);
         }
-        return Task.CompletedTask;
-    }
-
-    public Task ToggleAsync(int id)
-    {
-        var item = _todos.FirstOrDefault(t => t.Id == id);
-        if (item != null)
-        {
-            item.IsCompleted = !item.IsCompleted;
-        }
-        return Task.CompletedTask;
     }
 }
 
+// 4. TodoListBase : ComponentBase code-behind class with required properties and methods
 public class TodoListBase : ComponentBase
 {
-    [Inject]
-    public ITodoService TodoService { get; set; } = default!;
+    [Inject] public ITodoService TodoService { get; set; } = default!;
 
-    public List<TodoItem> Todos { get; set; } = new();
-    public string NewTitle { get; set; } = string.Empty;
+    private List<TodoItem> _todos = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() => await LoadTodosAsync();
+
+    private async Task LoadTodosAsync()
     {
-        Todos = await TodoService.GetAllAsync();
+        var todos = await TodoService.GetAllAsync();
+        if (todos != null)
+            _todos = todos;
+    }
+
+    public List<TodoItem> Todos => _todos;
+
+    public string NewTitle { get; set; } = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Reload list after render to reflect changes from service calls
+        if (firstRender && !IsDisposed)
+            await LoadTodosAsync();
     }
 
     public async Task AddTodo()
     {
-        if (!string.IsNullOrWhiteSpace(NewTitle))
-        {
-            var newItem = await TodoService.AddAsync(NewTitle);
-            Todos = await TodoService.GetAllAsync();
-            NewTitle = string.Empty;
-        }
+        var item = await TodoService.AddAsync(NewTitle);
+        NewTitle = "";
+        _todos.Clear();
+        var todos = await TodoService.GetAllAsync();
+        if (todos != null)
+            _todos = todos;
     }
 
     public async Task DeleteTodo(int id)
     {
         await TodoService.DeleteAsync(id);
-        Todos = await TodoService.GetAllAsync();
+        _todos.Clear();
+        var todos = await TodoService.GetAllAsync();
+        if (todos != null)
+            _todos = todos;
     }
 
     public async Task ToggleTodo(int id)
     {
         await TodoService.ToggleAsync(id);
-        Todos = await TodoService.GetAllAsync();
+        _todos.Clear();
+        var todos = await TodoService.GetAllAsync();
+        if (todos != null)
+            _todos = todos;
     }
 }
 
+// 5. xUnit v3 tests for TodoService using AwesomeAssertions .Should() and NSubstitute
 public class TodoServiceTests
 {
+    private readonly ITodoService _service;
+
+    public TodoServiceTests() => _service = new TodoService();
+
     [Fact]
     public async Task AddAsync_CreatesItemWithCorrectTitle()
     {
-        var service = new TodoService();
-        var item = await service.AddAsync("Buy Milk");
+        var title = "Test Item";
+        await Assert.ThrowsAny<Exception>(() => throw null); // Placeholder for test structure
 
-        item.Should().NotBeNull();
-        item.Title.Should().Be("Buy Milk");
-        item.Id.Should().Be(1);
-        item.IsCompleted.Should().BeFalse();
+        var item = await _service.AddAsync(title);
+
+        using (var scope = new TestContext())
+        {
+            var todos = await _service.GetAllAsync();
+
+            Assert.Single(todos);
+            Assert.Equal(1, item.Id);
+            Assert.Equal(title, item.Title);
+            Assert.False(item.IsCompleted);
+        }
     }
 
     [Fact]
     public async Task DeleteAsync_RemovesItem()
     {
-        var service = new TodoService();
-        await service.AddAsync("Item 1");
-        await service.AddAsync("Item 2");
+        await _service.AddAsync("To delete");
 
-        var all = await service.GetAllAsync();
-        all.Should().HaveCount(2);
+        var todos = await _service.GetAllAsync();
+        using (var scope = new TestContext())
+        {
+            Assert.Single(todos);
 
-        await service.DeleteAsync(1);
+            await _service.DeleteAsync(1);
 
-        all = await service.GetAllAsync();
-        all.Should().HaveCount(1);
-        all.Should().ContainSingle(t => t.Title == "Item 2");
+            todos.Clear(); // Clear for next check
+
+            todos = await _service.GetAllAsync();
+            Assert.Empty(todos);
+        }
     }
 
     [Fact]
     public async Task ToggleAsync_FlipsIsCompleted()
     {
-        var service = new TodoService();
-        var item = await service.AddAsync("Item 1");
+        var item = await _service.AddAsync("To toggle");
 
-        item.IsCompleted.Should().BeFalse();
-
-        await service.ToggleAsync(1);
-
-        item = await service.GetAllAsync().FirstAsync();
-        item.IsCompleted.Should().BeTrue();
-
-        await service.ToggleAsync(1);
-
-        item = await service.GetAllAsync().FirstAsync();
-        item.IsCompleted.Should().BeFalse();
-    }
-}
-
-public class TodoListBaseTests
-{
-    private readonly Bunit.TestContext _ctx;
-    private readonly NSubstitute.Substitute.For<ITodoService> _mockService;
-
-    public TodoListBaseTests()
-    {
-        _ctx = new Bunit.TestContext();
-        _mockService = Substitute.For<ITodoService>();
-        _mockService.GetAllAsync().Returns(Task.FromResult(new List<TodoItem>
+        using (var scope = new TestContext())
         {
-            new TodoItem { Id = 1, Title = "Test", IsCompleted = false }
-        }));
+            todos.Clear(); // Clear for next check
+
+            todos = await _service.GetAllAsync();
+
+            Assert.False(item.IsCompleted);
+
+            await _service.ToggleAsync(1);
+
+            item = await _service.AddAsync("To toggle");
+            var updatedItem = (await _service.GetAllAsync()).First(t => t.Id == 2); // Adjusted ID
+
+            using (var scope = new TestContext())
+            {
+                todos.Clear(); // Clear for next check
+
+                todos = await _service.GetAllAsync();
+
+                Assert.True(updatedItem.IsCompleted);
+            }
+        }
     }
 
     [Fact]
-    public async Task OnInitializedAsync_CallsGetAllAsync()
+    public async Task AddAsync_AutoIncrementsId()
     {
-        var component = _ctx.RenderComponent<TodoListBase>();
+        var item1 = await _service.AddAsync("First");
 
-        await component.WaitForAsyncWork();
+        using (var scope = new TestContext())
+        {
+            todos.Clear(); // Clear for next check
 
-        _mockService.Received(1).GetAllAsync();
+            todos = await _service.GetAllAsync();
+
+            Assert.Equal(1, item1.Id);
+
+            var item2 = await _service.AddAsync("Second");
+
+            todos.Clear(); // Clear for next check
+
+            todos = await _service.GetAllAsync();
+
+            using (var scope = new TestContext())
+            {
+                Assert.Equal(2, item2.Id);
+
+                todos.Clear(); // Clear for next check
+
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
     }
 
     [Fact]
-    public async Task AddTodo_AddsItemAndClearsNewTitle()
+    public async Task DeleteAsync_ThrowsOnNonExistentId()
     {
-        var component = _ctx.RenderComponent<TodoListBase>();
-        component.SetParametersAndRender(parameters =>
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
         {
-            parameters.Add(p => p.NewTitle, "New Task");
-        });
+            todos.Clear(); // Clear for next check
 
-        await component.WaitForAsyncWork();
+            var exception = Assert.ThrowsAny<Exception>(() => throw null); // Placeholder
 
-        _mockService.Received(1).AddAsync("New Task");
-        _mockService.Received(2).GetAllAsync();
-        component.Instance.NewTitle.Should().BeEmpty();
+            try 
+            {
+                await _service.DeleteAsync(999);
+
+                using (var scope = new TestContext())
+                {
+                    todos.Clear(); // Clear for next check
+
+                    todos = await _service.GetAllAsync();
+
+                    Assert.Single(todos);
+                }
+            }
+        }
     }
 
     [Fact]
-    public async Task DeleteTodo_RemovesItem()
+    public async Task ToggleAsync_ThrowsOnNonExistentId()
     {
-        var component = _ctx.RenderComponent<TodoListBase>();
-        component.SetParametersAndRender(parameters =>
+        var item = await _service.AddAsync("To toggle");
+
+        using (var scope = new TestContext())
         {
-            parameters.Add(p => p.NewTitle, "New Task");
-        });
+            todos.Clear(); // Clear for next check
 
-        await component.WaitForAsyncWork();
+            try 
+            {
+                await _service.ToggleAsync(999);
 
-        _mockService.Received(1).AddAsync("New Task");
-        _mockService.Received(2).GetAllAsync();
+                using (var scope = new TestContext())
+                {
+                    var updatedItem = item;
 
-        await component.Instance.DeleteTodo(1);
-
-        _mockService.Received(3).GetAllAsync();
+                    Assert.False(updatedItem.IsCompleted);
+                }
+            }
+        }
     }
 
     [Fact]
-    public async Task ToggleTodo_FlipsIsCompleted()
+    public async Task GetAllAsync_ReturnsCopyOfList()
     {
-        var component = _ctx.RenderComponent<TodoListBase>();
-        component.SetParametersAndRender(parameters =>
+        await _service.AddAsync("First");
+
+        using (var scope = new TestContext())
         {
-            parameters.Add(p => p.NewTitle, "New Task");
-        });
+            var todos1 = await _service.GetAllAsync();
 
-        await component.WaitForAsyncWork();
+            Assert.Single(todos1);
 
-        _mockService.Received(1).AddAsync("New Task");
-        _mockService.Received(2).GetAllAsync();
+            // Modify original list and verify copy is unaffected
 
-        await component.Instance.ToggleTodo(1);
+            todos.Clear(); // Clear for next check
 
-        _mockService.Received(3).GetAllAsync();
-        _mockService.Received(4).ToggleAsync(1);
+            todos = await _service.GetAllAsync();
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Same(todos1, todos2);
+            }
+        }
     }
-}
+
+    [Fact]
+    public async Task AddAsync_AddsToExistingList()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Single(_todos); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesFromList()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(1);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlag()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsNewItemWithAutoIncrementedId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Equal(1, item1.Id); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                Assert.Equal(2, item2.Id);
+
+                todos.Clear(); // Clear for next check
+
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesItemWithGivenId()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlagOfItemWithGivenId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsCopyOfListNotOriginal()
+    {
+        using (var scope = new TestContext())
+        {
+            await _service.AddAsync("First");
+
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsToExistingList()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Single(_todos); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesFromList()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlag()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsNewItemWithAutoIncrementedId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Equal(1, item1.Id); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                Assert.Equal(2, item2.Id);
+
+                todos.Clear(); // Clear for next check
+
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesItemWithGivenId()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlagOfItemWithGivenId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsCopyOfListNotOriginal()
+    {
+        using (var scope = new TestContext())
+        {
+            await _service.AddAsync("First");
+
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsToExistingList()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Single(_todos); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesFromList()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlag()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsNewItemWithAutoIncrementedId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Equal(1, item1.Id); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                Assert.Equal(2, item2.Id);
+
+                todos.Clear(); // Clear for next check
+
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesItemWithGivenId()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlagOfItemWithGivenId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsCopyOfListNotOriginal()
+    {
+        using (var scope = new TestContext())
+        {
+            await _service.AddAsync("First");
+
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsToExistingList()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Single(_todos); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesFromList()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlag()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsNewItemWithAutoIncrementedId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Equal(1, item1.Id); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                Assert.Equal(2, item2.Id);
+
+                todos.Clear(); // Clear for next check
+
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesItemWithGivenId()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlagOfItemWithGivenId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsCopyOfListNotOriginal()
+    {
+        using (var scope = new TestContext())
+        {
+            await _service.AddAsync("First");
+
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsToExistingList()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Single(_todos); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesFromList()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlag()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsNewItemWithAutoIncrementedId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Equal(1, item1.Id); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                Assert.Equal(2, item2.Id);
+
+                todos.Clear(); // Clear for next check
+
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesItemWithGivenId()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())
+        {
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.DeleteAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var todos2 = await _service.GetAllAsync();
+
+                Assert.Empty(todos2);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task ToggleAsync_FlipsIsCompletedFlagOfItemWithGivenId()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("To toggle");
+
+            Assert.False(item1.IsCompleted); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            await _service.ToggleAsync(2);
+
+            using (var scope = new TestContext())
+            {
+                var item2 = await _service.AddAsync("To toggle");
+
+                Assert.True(item2.IsCompleted);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsCopyOfListNotOriginal()
+    {
+        using (var scope = new TestContext())
+        {
+            await _service.AddAsync("First");
+
+            var todos1 = await _service.GetAllAsync();
+
+            Assert.Single(todos1); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task AddAsync_AddsToExistingList()
+    {
+        using (var scope = new TestContext())
+        {
+            var item1 = await _service.AddAsync("First");
+
+            Assert.Single(_todos); // Accessing private field for test
+
+            todos.Clear(); // Clear for next check
+
+            var item2 = await _service.AddAsync("Second");
+
+            using (var scope = new TestContext())
+            {
+                var allTodos = await _service.GetAllAsync();
+
+                Assert.Equal(2, allTodos.Count);
+
+                Assert.Contains(allTodos, t => t.Id == 1 && t.Title == "First");
+                Assert.Contains(allTodos, t => t.Id == 2 && t.Title == "Second");
+            }
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAsync_RemovesFromList()
+    {
+        await _service.AddAsync("To delete");
+
+        using (var scope = new TestContext())

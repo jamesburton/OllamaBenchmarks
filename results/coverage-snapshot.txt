@@ -1,0 +1,90 @@
+Model                                                                  Slug                                                         Q  T  L2   L3   Source
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+qwen3.6:27b                                                            qwen3.6_27b                                                  Y  Y  158  50   coding-qwen3.6_27b.json
+qwen3.6:latest                                                         qwen3.6                                                      Y  Y  158  50   coding-qwen3.6.json
+gemma4:e2b                                                             gemma4_e2b                                                   Y  Y  0    50   coding-gemma4_e2b.json
+gemma4:e4b                                                             gemma4_e4b                                                   .  .  0    0    -
+qwen3:0.6b                                                             qwen3_0.6b                                                   .  .  0    0    -
+gemma4:31b                                                             gemma4_31b                                                   Y  Y  0    50   coding-gemma4_31b.json
+gemma4:26b                                                             gemma4_26b                                                   Y  Y  0    50   coding-gemma4_26b.json
+gemma3:27b                                                             gemma3_27b                                                   Y  Y  0    50   coding-gemma3_27b.json
+gemma3:4b                                                              gemma3_4b                                                    Y  Y  0    50   coding-gemma3_4b.json
+hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:q8_0                               hf.co_Jackrong_Qwopus3.5-9B-v3-GGUF_q8_0                     Y  Y  0    0    -
+gemma4:latest                                                          gemma4                                                       Y  Y  0    50   coding-gemma4.json
+LFM2-2.6b-tools:latest                                                 LFM2-2.6b-tools                                              Y  Y  0    0    coding-LFM2-2.6b-tools.json
+nemotron-3-nano:4b                                                     nemotron-3-nano_4b                                           Y  Y  0    0    coding-nemotron-3-nano_4b.json
+sam860/lfm2:2.6b                                                       sam860_lfm2_2.6b                                             Y  Y  0    0    -
+hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:q8_0                  hf.co_mradermacher_shenwen-coderV2-Instruct-GGUF_q8_0        Y  Y  0    0    coding-hf.co_mradermacher_shenwen-coderV2-Instruct-GGUF_q8_0.json
+RogerBen/qwen3.5-35b-opus-distill:latest                               RogerBen_qwen3.5-35b-opus-distill                            Y  Y  0    0    coding-RogerBen_qwen3.5-35b-opus-distill.json
+omnicoder:9b-q4_k_m                                                    omnicoder_9b-q4_k_m                                          Y  Y  0    50   coding-omnicoder_9b-q4_k_m.json
+hf.co/Tesslate/OmniCoder-9B-GGUF:Q4_K_M                                hf.co_Tesslate_OmniCoder-9B-GGUF_Q4_K_M                      .  .  0    0    -
+hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M                      hf.co_bartowski_Tesslate_OmniCoder-9B-GGUF_Q4_K_M            Y  Y  0    0    -
+trinity-mini:Q4_K_M                                                    trinity-mini_Q4_K_M                                          Y  Y  0    0    coding-trinity-mini_Q4_K_M.json
+mistral-small:latest                                                   mistral-small                                                Y  Y  0    0    coding-mistral-small.json
+gpt-oss:20b                                                            gpt-oss_20b                                                  Y  Y  0    0    coding-gpt-oss_20b.json
+nemotron-cascade-2:latest                                              nemotron-cascade-2                                           Y  Y  0    0    coding-nemotron-cascade-2.json
+granite4:7b-a1b-h                                                      granite4_7b-a1b-h                                            Y  Y  0    50   coding-granite4_7b-a1b-h.json
+qwen3.5:4b                                                             qwen3.5_4b                                                   Y  Y  158  20   coding-qwen3.5_4b.json
+qwen3.5:latest                                                         qwen3.5                                                      Y  Y  0    50   coding-qwen3.5.json
+zac/phi4-tools:latest                                                  zac_phi4-tools                                               Y  Y  0    0    coding-zac_phi4-tools.json
+phi4-mini:latest                                                       phi4-mini                                                    Y  Y  0    0    coding-phi4-mini.json
+lfm2.5-thinking:1.2b                                                   lfm2.5-thinking_1.2b                                         Y  Y  0    0    coding-lfm2.5-thinking_1.2b.json
+lfm2.5-thinking:latest                                                 lfm2.5-thinking                                              Y  Y  0    0    -
+glm-4.7-flash-reap-toolfix:latest                                      glm-4.7-flash-reap-toolfix                                   Y  Y  0    0    -
+nemotron-nano-9b-v2-toolfix:latest                                     nemotron-nano-9b-v2-toolfix                                  Y  Y  0    0    -
+qwen3.5:9b                                                             qwen3.5_9b                                                   Y  Y  158  20   coding-qwen3.5_9b.json
+hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M          hf.co_bartowski_nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF_Q4_K_M .  .  0    0    -
+qwen3:14b                                                              qwen3_14b                                                    Y  Y  0    50   coding-qwen3_14b.json
+llama4:16x17b                                                          llama4_16x17b                                                Y  Y  0    0    coding-llama4_16x17b.json
+nemotron-3-nano:30b-a3b-q8_0                                           nemotron-3-nano_30b-a3b-q8_0                                 Y  Y  0    0    coding-nemotron-3-nano_30b-a3b-q8_0.json
+nemotron-3-nano:latest                                                 nemotron-3-nano                                              Y  Y  0    0    coding-nemotron-3-nano.json
+nemotron-3-super:latest                                                nemotron-3-super                                             Y  Y  0    50   coding-nemotron-3-super.json
+ministral-3:14b                                                        ministral-3_14b                                              Y  Y  0    50   coding-ministral-3_14b.json
+gpt-oss:120b                                                           gpt-oss_120b                                                 Y  Y  0    50   coding-gpt-oss_120b.json
+qwen3-coder-next:latest                                                qwen3-coder-next                                             Y  Y  0    50   coding-qwen3-coder-next.json
+granite4:32b-a9b-h                                                     granite4_32b-a9b-h                                           Y  Y  0    50   coding-granite4_32b-a9b-h.json
+glm-4.7-flash:latest                                                   glm-4.7-flash                                                Y  Y  0    50   coding-glm-4.7-flash.json
+
+=== Missing items by model ===
+  gemma4:e2b: L2(0/158)
+  gemma4:e4b: quality, throughput, L2(0/158), L3(0/50)
+  qwen3:0.6b: quality, throughput, L2(0/158), L3(0/50)
+  gemma4:31b: L2(0/158)
+  gemma4:26b: L2(0/158)
+  gemma3:27b: L2(0/158)
+  gemma3:4b: L2(0/158)
+  hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:q8_0: L2(0/158), L3(0/50)
+  gemma4:latest: L2(0/158)
+  LFM2-2.6b-tools:latest: L2(0/158), L3(0/50)
+  nemotron-3-nano:4b: L2(0/158), L3(0/50)
+  sam860/lfm2:2.6b: L2(0/158), L3(0/50)
+  hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:q8_0: L2(0/158), L3(0/50)
+  RogerBen/qwen3.5-35b-opus-distill:latest: L2(0/158), L3(0/50)
+  omnicoder:9b-q4_k_m: L2(0/158)
+  hf.co/Tesslate/OmniCoder-9B-GGUF:Q4_K_M: quality, throughput, L2(0/158), L3(0/50)
+  hf.co/bartowski/Tesslate_OmniCoder-9B-GGUF:Q4_K_M: L2(0/158), L3(0/50)
+  trinity-mini:Q4_K_M: L2(0/158), L3(0/50)
+  mistral-small:latest: L2(0/158), L3(0/50)
+  gpt-oss:20b: L2(0/158), L3(0/50)
+  nemotron-cascade-2:latest: L2(0/158), L3(0/50)
+  granite4:7b-a1b-h: L2(0/158)
+  qwen3.5:4b: L3(20/50)
+  qwen3.5:latest: L2(0/158)
+  zac/phi4-tools:latest: L2(0/158), L3(0/50)
+  phi4-mini:latest: L2(0/158), L3(0/50)
+  lfm2.5-thinking:1.2b: L2(0/158), L3(0/50)
+  lfm2.5-thinking:latest: L2(0/158), L3(0/50)
+  glm-4.7-flash-reap-toolfix:latest: L2(0/158), L3(0/50)
+  nemotron-nano-9b-v2-toolfix:latest: L2(0/158), L3(0/50)
+  qwen3.5:9b: L3(20/50)
+  hf.co/bartowski/nvidia_NVIDIA-Nemotron-Nano-9B-v2-GGUF:Q4_K_M: quality, throughput, L2(0/158), L3(0/50)
+  qwen3:14b: L2(0/158)
+  llama4:16x17b: L2(0/158), L3(0/50)
+  nemotron-3-nano:30b-a3b-q8_0: L2(0/158), L3(0/50)
+  nemotron-3-nano:latest: L2(0/158), L3(0/50)
+  nemotron-3-super:latest: L2(0/158)
+  ministral-3:14b: L2(0/158)
+  gpt-oss:120b: L2(0/158)
+  qwen3-coder-next:latest: L2(0/158)
+  granite4:32b-a9b-h: L2(0/158)
+  glm-4.7-flash:latest: L2(0/158)

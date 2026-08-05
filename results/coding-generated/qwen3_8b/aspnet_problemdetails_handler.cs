@@ -4,9 +4,10 @@ public class NotFoundException : Exception
 {
     public string ResourceName { get; }
 
-    public NotFoundException(string resourceName) : base($"Resource not found: {resourceName}")
+    public NotFoundException(string resourceName)
     {
         ResourceName = resourceName;
+        base($"Resource not found: {resourceName}");
     }
 }
 
@@ -14,9 +15,10 @@ public class ConflictException : Exception
 {
     public string ConflictReason { get; }
 
-    public ConflictException(string conflictReason) : base($"Conflict: {conflictReason}")
+    public ConflictException(string conflictReason)
     {
         ConflictReason = conflictReason;
+        base($"Conflict: {conflictReason}");
     }
 }
 

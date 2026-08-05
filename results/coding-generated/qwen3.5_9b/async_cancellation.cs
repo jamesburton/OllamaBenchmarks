@@ -11,33 +11,25 @@ public class DataProcessor
         IDataSource source,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
-        int batchNumber = 0;
+        int currentBatchNumber = 0;
 
         while (true)
         {
             if (ct.IsCancellationRequested)
-            {
                 yield break;
-            }
 
-            var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
+            var batchItems = await source.FetchBatchAsync(currentBatchNumber++, ct).ConfigureAwait(false);
 
-            if (batch.Count == 0)
-            {
+            if (!batchItems.Any())
                 break;
-            }
 
-            foreach (var item in batch)
+            foreach (var item in batchItems)
             {
                 if (ct.IsCancellationRequested)
-                {
                     yield break;
-                }
 
                 yield return item;
             }
-
-            batchNumber++;
         }
     }
 }

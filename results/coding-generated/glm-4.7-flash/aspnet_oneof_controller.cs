@@ -1,10 +1,14 @@
-using OneOf;
 using Microsoft.AspNetCore.Mvc;
+using OneOf;
 
 public interface IUserService
 {
     Task<OneOf<User, NotFound, ValidationError>> GetByIdAsync(int id);
 }
+
+public record NotFound;
+
+public record ValidationError(string Message);
 
 public class User
 {
@@ -12,10 +16,6 @@ public class User
     public string Name { get; set; }
     public string Email { get; set; }
 }
-
-public record NotFound;
-
-public record ValidationError(string Message);
 
 public class UsersController : ControllerBase
 {
@@ -28,9 +28,10 @@ public class UsersController : ControllerBase
 
     public async Task<IActionResult> Get(int id)
     {
-        return await _service.GetByIdAsync(id).Match<IActionResult>(
+        OneOf<User, NotFound, ValidationError> result = await _service.GetByIdAsync(id);
+        return result.Match<IActionResult>(
             user => Ok(user),
-            notFound => NotFound(),
+            _ => NotFound(),
             err => BadRequest(err.Message)
         );
     }

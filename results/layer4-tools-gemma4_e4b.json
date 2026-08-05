@@ -1,0 +1,147 @@
+{
+  "benchmark": "layer4-tools-t1-t2",
+  "model": "gemma4:e4b",
+  "ollama_host": "http://t5500:11434",
+  "think_setting": "false",
+  "run_started_at": "2026-06-24T12:51:26.185932+00:00",
+  "run_finished_at": "2026-06-24T12:53:39.528138+00:00",
+  "t1_score": 1.0,
+  "t1_passed": 6,
+  "t1_total": 6,
+  "t1_results": [
+    {
+      "case": "single",
+      "passed": true,
+      "detail": {
+        "calls": [
+          {
+            "name": "add_numbers",
+            "args": {
+              "a": 17,
+              "b": 25
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case": "multi_distractor",
+      "passed": true,
+      "detail": {
+        "calls": [
+          {
+            "name": "multiply_numbers",
+            "args": {
+              "a": 6,
+              "b": 9
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case": "nested_args",
+      "passed": true,
+      "detail": {
+        "calls": [
+          {
+            "name": "create_shipment",
+            "args": {
+              "address": {
+                "city": "Seattle",
+                "street": "123 Main St",
+                "zip": "98101"
+              },
+              "order_id": "ORD-42",
+              "priority": "express"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case": "parallel",
+      "passed": true,
+      "detail": {
+        "n_calls": 2,
+        "calls": [
+          {
+            "name": "get_weather",
+            "args": {
+              "city": "Paris",
+              "unit": "celsius"
+            }
+          },
+          {
+            "name": "get_weather",
+            "args": {
+              "city": "Tokyo",
+              "unit": "celsius"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "case": "abstention",
+      "passed": true,
+      "detail": {
+        "n_calls": 0,
+        "content_head": "Paris"
+      }
+    },
+    {
+      "case": "sequential_dep",
+      "passed": true,
+      "detail": {
+        "chained": true,
+        "stop": "finish",
+        "steps": [
+          "get_user_id",
+          "get_order_count",
+          "finish"
+        ],
+        "seen": {
+          "name": "alice",
+          "passed_user_id": "U-1001"
+        }
+      }
+    }
+  ],
+  "t2_score": 0.5,
+  "t2_correct": 1,
+  "t2_total": 2,
+  "t2_results": [
+    {
+      "finished": true,
+      "correct": true,
+      "answer": 68,
+      "steps": [
+        "search_corpus",
+        "calculator",
+        "kv_store_set",
+        "finish"
+      ],
+      "n_steps": 4,
+      "stop_reason": "finish",
+      "kv_final_price": 68,
+      "error_injected": false,
+      "recovered": true,
+      "scenario": "multi_step"
+    },
+    {
+      "finished": false,
+      "correct": false,
+      "answer": null,
+      "steps": [
+        "search_corpus"
+      ],
+      "n_steps": 1,
+      "stop_reason": "no_tool_call",
+      "kv_final_price": null,
+      "error_injected": true,
+      "recovered": false,
+      "scenario": "error_recovery"
+    }
+  ]
+}

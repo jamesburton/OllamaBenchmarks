@@ -12,41 +12,34 @@ public class DataProcessor
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         int batchNumber = 0;
+
         while (true)
         {
-            // 1. Check cancellation before fetching
+            // 1. Check cancellation before fetching the next batch
             if (ct.IsCancellationRequested)
             {
-                yield break; // Stop enumeration gracefully
+                yield break; // Graceful exit
             }
 
             // 2. Fetch batch
-            IReadOnlyList<string> batch;
-            try
-            {
-                batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                // If an operation was cancelled during the fetch, stop immediately.
-                yield break;
-            }
+            // We pass the cancellation token to the source operation
+            var batch = await source.FetchBatchAsync(batchNumber, ct).ConfigureAwait(false);
 
-            // 3. Break if empty
-            if (batch.Count == 0)
+            // 3. Stop if batch is empty
+            if (batch == null || batch.Count == 0)
             {
                 break;
             }
 
-            // 4. Yield items from the batch
+            // 4. Yield each item from the batch
             foreach (var item in batch)
             {
-                // Check cancellation again before yielding the next item in the batch
+                // Check cancellation again before yielding the next item
                 if (ct.IsCancellationRequested)
                 {
                     yield break;
                 }
-                yield item;
+                yield return item;
             }
 
             batchNumber++;

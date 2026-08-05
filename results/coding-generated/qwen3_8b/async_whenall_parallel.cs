@@ -1,31 +1,28 @@
-public interface IDataLoader
+interface IDataLoader
 {
     Task<string> LoadAsync(string source, CancellationToken ct);
 }
 
-public class ParallelDataService
+class ParallelDataService
 {
-    private readonly IDataLoader loaderA;
-    private readonly IDataLoader loaderB;
-    private readonly IDataLoader loaderC;
+    private readonly IDataLoader _loaderA;
+    private readonly IDataLoader _loaderB;
+    private readonly IDataLoader _loaderC;
 
     public ParallelDataService(IDataLoader loaderA, IDataLoader loaderB, IDataLoader loaderC)
     {
-        this.loaderA = loaderA;
-        this.loaderB = loaderB;
-        this.loaderC = loaderC;
+        _loaderA = loaderA;
+        _loaderB = loaderB;
+        _loaderC = loaderC;
     }
 
     public async Task<List<string>> LoadAllAsync(CancellationToken ct)
     {
-        var tasks = new[]
-        {
-            loaderA.LoadAsync("sourceA", ct),
-            loaderB.LoadAsync("sourceB", ct),
-            loaderC.LoadAsync("sourceC", ct)
-        };
+        var taskA = _loaderA.LoadAsync("sourceA", ct);
+        var taskB = _loaderB.LoadAsync("sourceB", ct);
+        var taskC = _loaderC.LoadAsync("sourceC", ct);
 
-        var results = await Task.WhenAll(tasks);
+        var results = await Task.WhenAll(taskA, taskB, taskC);
         return results.ToList();
     }
 }

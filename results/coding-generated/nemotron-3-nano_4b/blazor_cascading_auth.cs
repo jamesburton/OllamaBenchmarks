@@ -1,36 +1,40 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
-public interface IUserService
+public class IUserService
 {
     Task<string> GetDisplayNameAsync(string userId);
 }
 
-public partial class UserDashboard : ComponentBase
+public class UserDashboard : ComponentBase
 {
     [Inject]
-    public IUserService UserService { get; set; } = default!;
+    public IUserService UserService { get; set; }
 
     [CascadingParameter]
-    public Task<AuthenticationState> AuthState { get; set; } = default!;
+    public Task<AuthenticationState> AuthState { get; set; }
 
     public string? DisplayName { get; set; }
+
     public bool IsAuthenticated { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public override async Task OnInitializedAsync()
     {
-        await AuthState;
-        var authState = await AuthState;
-
-        if (authState?.User?.Identity != null && authState.User.Identity.IsAuthenticated)
+        if (AuthState is null)
         {
-            IsAuthenticated = true;
-            var name = authState.User.Identity.Name ?? string.Empty;
-            DisplayName = await UserService.GetDisplayNameAsync(name);
+            IsAuthenticated = false;
+            DisplayName = "Guest";
+            return;
+        }
+
+        var state = await AuthState;
+        IsAuthenticated = state.User?.Identity?.IsAuthenticated == true;
+        if (IsAuthenticated)
+        {
+            DisplayName = await UserService.GetDisplayNameAsync(state.User?.Identity?.Name ?? "Unknown");
         }
         else
         {
-            IsAuthenticated = false;
             DisplayName = "Guest";
         }
     }

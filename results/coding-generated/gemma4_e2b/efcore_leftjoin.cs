@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-// 1. Customer entity class
+// 1. Customer Entity Class
 public class Customer
 {
     public int Id { get; set; }
@@ -12,7 +12,7 @@ public class Customer
     public string Email { get; set; }
 }
 
-// 2. Order entity class
+// 2. Order Entity Class
 public class Order
 {
     public int Id { get; set; }
@@ -21,7 +21,10 @@ public class Order
     public DateTime OrderDate { get; set; }
 }
 
-// 3. AppDbContext class
+// 4. Order DTO Record
+public record OrderDto(int OrderId, decimal Total, string CustomerName);
+
+// 3. AppDbContext Class
 public class AppDbContext : DbContext
 {
     public DbSet<Order> Orders { get; set; }
@@ -33,16 +36,15 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Ensure primary keys are set if not implicitly handled by convention
-        modelBuilder.Entity<Customer>().HasKey(c => c.Id);
-        modelBuilder.Entity<Order>().HasKey(o => o.Id);
+        // Optional: Configure relationships if needed
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.Customer)
+            .WithMany() // Assuming Customer doesn't reference Order directly for simplicity
+            .HasForeignKey(o => o.CustomerId);
     }
 }
 
-// 4. OrderDto record
-public record OrderDto(int OrderId, decimal Total, string CustomerName);
-
-// 5. Static class OrderQueries
+// 5. Static Class for Queries
 public static class OrderQueries
 {
     /// <summary>
@@ -55,55 +57,45 @@ public static class OrderQueries
                 db.Customers,
                 order => order.CustomerId,
                 customer => customer.Id,
-                (order, customer) => new { order.Id, CustomerName = customer == null ? "Unknown" : customer.Name }
+                (order, customer) => new
+                {
+                    OrderId = order.Id,
+                    Total = order.Total,
+                    CustomerName = customer == null ? "Unknown" : customer.Name
+                }
             )
             .Select(joined => new OrderDto(
-                joined.order.Id,
-                joined.order.Total,
+                joined.OrderId,
+                joined.Total,
                 joined.CustomerName
-            ))
+            )
+            )
             .ToListAsync();
 
         return result;
     }
 }
 
-// Example usage (optional, for completeness, not strictly required by prompt)
-/*
+// Example Usage (Demonstration purposes only, requires setup to run)
 public class Program
 {
     public static async Task Main(string[] args)
     {
-        // Setup In-Memory Database for testing
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: "TestDb")
-            .Options;
+        // This section is illustrative and requires a configured DbContext setup to run.
+        // var options = new DbContextOptionsBuilder<AppDbContext>()
+        //     .UseInMemoryDatabase(databaseName: "TestDb")
+        //     .Options;
 
-        using (var context = new AppDbContext(options))
-        {
-            // Seed Data
-            context.Customers.AddRange(new List<Customer>
-            {
-                new Customer { Id = 1, Name = "Alice", Email = "alice@example.com" },
-                new Customer { Id = 2, Name = "Bob", Email = "bob@example.com" }
-            });
-            context.Orders.AddRange(new List<Order>
-            {
-                new Order { Id = 101, CustomerId = 1, Total = 50.00m, OrderDate = DateTime.Now.AddDays(-5) },
-                new Order { Id = 102, CustomerId = 99, Total = 150.50m, OrderDate = DateTime.Now.AddDays(-3) } // Order with unknown customer
-            });
-            await context.SaveChangesAsync();
+        // var context = new AppDbContext(options);
+        // await context.Database.EnsureCreatedAsync();
 
-            // Execute Query
-            var dtos = await OrderQueries.GetOrdersWithCustomers(context);
+        // // Seed data (omitted for brevity)
 
-            // Output Results
-            Console.WriteLine("--- Orders with Customer Names ---");
-            foreach (var dto in dtos)
-            {
-                Console.WriteLine($"Order ID: {dto.OrderId}, Total: {dto.Total:C}, Customer: {dto.CustomerName}");
-            }
-        }
+        // // var ordersWithCustomers = await OrderQueries.GetOrdersWithCustomers(context);
+        // // Console.WriteLine("Orders with Customer Names:");
+        // // foreach (var dto in ordersWithCustomers)
+        // // {
+        // //     Console.WriteLine($"Order ID: {dto.OrderId}, Total: {dto.Total}, Customer: {dto.CustomerName}");
+        // // }
     }
 }
-*/

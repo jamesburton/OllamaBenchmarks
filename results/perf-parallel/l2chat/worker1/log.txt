@@ -1,0 +1,14 @@
+[setup] Loading dataset: results\perf-parallel\l2chat\worker1\dataset.json
+[setup] 79 problems
+[setup] Template cache ready: scripts/coding_tasks/templates\.cache\layer2_project
+
+[model] mistral-medium-3.5:iq3m (slug=mistral-medium-3.5_iq3m-chat)
+  [1/79] HumanEval_1_separate_paren_groups ... FAIL  (Process terminated.)
+  [2/79] HumanEval_3_below_zero ... PASS
+  [3/79] HumanEval_5_intersperse ... FAIL  (Process terminated.)
+  [4/79] HumanEval_7_filter_by_substring ... FAIL  (Process terminated.)
+  [5/79] HumanEval_9_rolling_max ... FAIL  (Process terminated.)
+  [6/79] HumanEval_11_string_xor ... PASS
+  [7/79] HumanEval_13_greatest_common_divisor ... PASS
+  [8/79] HumanEval_15_string_sequence ... PASS
+  [9/79] HumanEval_17_parse_music ...

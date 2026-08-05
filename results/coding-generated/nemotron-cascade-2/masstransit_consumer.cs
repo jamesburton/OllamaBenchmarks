@@ -1,11 +1,8 @@
-global using Contracts;
-
-using MassTransit;
+global using MassTransit;
 
 namespace Contracts;
 
 public record SubmitOrder(Guid OrderId, string CustomerName, decimal Amount);
-
 public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
 
 public class SubmitOrderConsumer : IConsumer<SubmitOrder>
@@ -24,7 +21,8 @@ public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsu
         ConcurrentMessageLimit = 4;
     }
 
-    protected override void ConfigureConsumer(IReceiveEndpointConfigurator ep,
+    protected override void ConfigureConsumer(
+        IReceiveEndpointConfigurator ep,
         IConsumerConfigurator<SubmitOrderConsumer> consumer,
         IRegistrationContext ctx)
     {

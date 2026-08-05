@@ -1,15 +1,17 @@
+using System.Collections.Generic;
+
 public class InMemoryStore : IAsyncLifetime
 {
     public Dictionary<string, string> Data { get; private set; } = new();
 
-    public async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync()
     {
         Data["key1"] = "value1";
         Data["key2"] = "value2";
         return default;
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         Data.Clear();
         return default;
@@ -18,38 +20,49 @@ public class InMemoryStore : IAsyncLifetime
 
 public class StoreService
 {
-    private readonly InMemoryStore _store;
-    public StoreService(InMemoryStore store) => _store = store;
+    private readonly InMemoryStore store;
 
-    public string? Get(string key) => _store.Data.TryGetValue(key, out var v) ? v : null;
+    public StoreService(InMemoryStore store)
+    {
+        this.store = store;
+    }
 
-    public void Set(string key, string value) => _store.Data[key] = value;
+    public string? Get(string key)
+    {
+        store.Data.TryGetValue(key, out var v) ? v : null;
+    }
+
+    public void Set(string key, string value)
+    {
+        store.Data[key] = value;
+    }
 }
 
 public class StoreServiceTests : IClassFixture<InMemoryStore>
 {
-    private readonly StoreService _service;
+    private readonly StoreService service;
+
     public StoreServiceTests(InMemoryStore store)
     {
-        _service = new StoreService(store);
+        this.service = new StoreService(store);
     }
 
     [Fact]
-    void Get_ExistingKey_ReturnsValue()
+    public void Get_ExistingKey_ReturnsValue()
     {
-        _service.Get("key1").Should().Be("value1");
+        service.Get("key1").Should().Be("value1");
     }
 
     [Fact]
-    void Set_ThenGet_ReturnsSetValue()
+    public void Set_ThenGet_ReturnsSetValue()
     {
-        _service.Set("key3", "value3");
-        _service.Get("key3").Should().Be("value3");
+        service.Set("key3", "value3");
+        service.Get("key3").Should().Be("value3");
     }
 
     [Fact]
-    void Get_NonexistentKey_ReturnsNull()
+    public void Get_NonexistentKey_ReturnsNull()
     {
-        _service.Get("nonexistent").Should().BeNull();
+        service.Get("nonexistent").Should().BeNull();
     }
 }

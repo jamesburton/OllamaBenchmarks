@@ -1,0 +1,40 @@
+{
+  "benchmark": "throughput_resource",
+  "run_started_at": "2026-07-04T20:34:58.8292263+01:00",
+  "run_finished_at": "2026-07-04T20:37:15.9458853+01:00",
+  "output_path": "C:\\Development\\OllamaBenchmarks\\results\\throughput-resource-mistral-medium-3.5_iq3m.json",
+  "host": "STRIX",
+  "ollama_host": "http://127.0.0.1:11434",
+  "host_details": {
+    "hostname": "STRIX"
+  },
+  "models": [
+    "mistral-medium-3.5:iq3m"
+  ],
+  "completed_models": [
+    "mistral-medium-3.5:iq3m"
+  ],
+  "failed_models": [],
+  "incomplete_models": [],
+  "prompt": "Write a concise explanation of dependency injection with one short Python example.",
+  "num_predict": 192,
+  "num_ctx": 8192,
+  "seed": 42,
+  "results": [
+    {
+      "model": "mistral-medium-3.5:iq3m",
+      "eval_count": 165,
+      "eval_s": 56.364,
+      "toks_per_s": 2.93,
+      "total_s": 57.231,
+      "load_s": 0.251,
+      "cpu_avg_pct": 0.0,
+      "cpu_peak_pct": 0.1,
+      "ram_peak_gb": 0.05,
+      "gpu_util_avg": 0.0,
+      "gpu_util_peak": 0.0,
+      "gpu_mem_peak_gb": 0.0,
+      "ollama_ps": "mistral-medium-3.5:iq3m size=57.78GB vram=57.78GB ctx=8192 quant=IQ3_M"
+    }
+  ]
+}

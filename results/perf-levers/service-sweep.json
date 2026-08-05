@@ -1,0 +1,80 @@
+{
+    "benchmark":  "perf_lever_service_sweep",
+    "model":  "mistral-medium-3.5:iq3m",
+    "num_predict":  192,
+    "num_ctx":  8192,
+    "run_finished_at":  "2026-07-05T12:47:58.8234732+01:00",
+    "results":  {
+                    "baseline_single":  [
+                                            {
+                                                "eval_count":  165,
+                                                "eval_s":  60.659,
+                                                "tps":  2.72
+                                            },
+                                            {
+                                                "eval_count":  165,
+                                                "eval_s":  132.723,
+                                                "tps":  1.243
+                                            },
+                                            {
+                                                "eval_count":  165,
+                                                "eval_s":  148.133,
+                                                "tps":  1.114
+                                            }
+                                        ],
+                    "kv_q8_0_single":  [
+                                           {
+                                               "eval_count":  165,
+                                               "eval_s":  151.225,
+                                               "tps":  1.091
+                                           },
+                                           {
+                                               "eval_count":  165,
+                                               "eval_s":  151.682,
+                                               "tps":  1.088
+                                           },
+                                           {
+                                               "eval_count":  165,
+                                               "eval_s":  151.56,
+                                               "tps":  1.089
+                                           }
+                                       ],
+                    "kv_q4_0_single":  [
+                                           {
+                                               "eval_count":  164,
+                                               "eval_s":  149.24,
+                                               "tps":  1.099
+                                           },
+                                           {
+                                               "eval_count":  164,
+                                               "eval_s":  152.576,
+                                               "tps":  1.075
+                                           },
+                                           {
+                                               "eval_count":  164,
+                                               "eval_s":  148.907,
+                                               "tps":  1.101
+                                           }
+                                       ],
+                    "parallel1_concurrency2":  {
+                                                   "concurrency":  2,
+                                                   "wall_seconds":  311.698,
+                                                   "total_eval_count":  330,
+                                                   "aggregate_tps":  1.059,
+                                                   "per_stream_tps":  [
+                                                                          1.073,
+                                                                          1.084
+                                                                      ]
+                                               },
+                    "parallel2_concurrency2":  {
+                                                   "concurrency":  2,
+                                                   "wall_seconds":  171.77,
+                                                   "total_eval_count":  330,
+                                                   "aggregate_tps":  1.921,
+                                                   "per_stream_tps":  [
+                                                                          1.056,
+                                                                          1.056
+                                                                      ]
+                                               }
+                }
+}

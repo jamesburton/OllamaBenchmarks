@@ -45,7 +45,7 @@ public class CounterFirstTests
     }
 
     [Fact]
-    public void IncrementOnce_ShouldBeAtLeastOne()
+    public void IncrementOnce_ShouldHaveCountAtLeastOne()
     {
         _fixture.Counter.Increment();
         _fixture.Counter.Count.Should().BeGreaterOrEqualTo(1);
@@ -63,7 +63,7 @@ public class CounterSecondTests
     }
 
     [Fact]
-    public void IncrementTwice_ShouldBeAtLeastTwo()
+    public void IncrementTwice_ShouldHaveCountAtLeastTwo()
     {
         _fixture.Counter.Increment();
         _fixture.Counter.Increment();

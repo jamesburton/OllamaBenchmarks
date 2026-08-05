@@ -3,16 +3,18 @@ using Microsoft.EntityFrameworkCore;
 public class TodoItem
 {
     public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
+    public string Title { get; set; }
     public bool IsComplete { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 
 public class TodoDbContext : DbContext
 {
-    public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options) { }
+    public TodoDbContext(DbContextOptions<TodoDbContext> options) : base(options)
+    {
+    }
 
-    public DbSet<TodoItem> TodoItems { get; set; } = null!;
+    public DbSet<TodoItem> TodoItems { get; set; }
 }
 
 public interface ITodoService

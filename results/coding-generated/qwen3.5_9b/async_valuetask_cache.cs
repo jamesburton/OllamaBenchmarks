@@ -10,7 +10,7 @@ public class CachingService
 
     public CachingService(IExpensiveService inner)
     {
-        _inner = inner;
+        _inner = inner ?? throw new ArgumentNullException(nameof(inner));
     }
 
     public ValueTask<string> GetAsync(string key)
@@ -20,10 +20,13 @@ public class CachingService
             return new ValueTask<string>(cachedValue);
         }
 
-        return _inner.ComputeAsync(key).ContinueWith(task =>
-        {
-            _cache[key] = task.Result;
-            return task.Result;
-        });
+        return ComputeAndCacheAsync(key);
+    }
+
+    private async Task<ValueTask<string>> ComputeAndCacheAsync(string key)
+    {
+        string result = await _inner.ComputeAsync(key).ConfigureAwait(false);
+        _cache[key] = result;
+        return new ValueTask<string>(result);
     }
 }

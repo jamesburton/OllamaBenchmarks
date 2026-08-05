@@ -1,9 +1,4 @@
-public abstract class TimeProvider
-{
-    public abstract DateTimeOffset GetUtcNow();
-}
-
-public class FakeTimeProvider : TimeProvider
+class FakeTimeProvider : TimeProvider
 {
     private readonly DateTimeOffset _fixedUtcNow;
 
@@ -18,7 +13,7 @@ public class FakeTimeProvider : TimeProvider
     }
 }
 
-public class ExpiryChecker
+class ExpiryChecker
 {
     private readonly TimeProvider _timeProvider;
 
@@ -29,6 +24,7 @@ public class ExpiryChecker
 
     public bool IsExpired(DateTimeOffset expiresAt)
     {
-        return expiresAt < _timeProvider.GetUtcNow();
+        DateTimeOffset currentUtc = _timeProvider.GetUtcNow();
+        return expiresAt < currentUtc;
     }
 }

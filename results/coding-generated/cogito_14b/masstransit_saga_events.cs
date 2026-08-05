@@ -9,7 +9,7 @@ public record InvoicePaid(Guid InvoiceId);
 public class InvoiceSaga : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
-    public string CurrentState { get; set; }
+    public string CurrentState { get; set; } = default!;
     public decimal Amount { get; set; }
 }
 
@@ -30,11 +30,9 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
         Event(() => InvoiceCreated, x => x.CorrelateById(m => m.InvoiceId))
             .SetCompletedWhenFinalized();
 
-        Event(() => InvoiceApproved, x => x.CorrelateById(m => m.InvoiceId))
-            .SetCompletedWhenFinalized();
+        Event(() => InvoiceApproved, x => x.CorrelateById(m => m.InvoiceId));
 
-        Event(() => InvoicePaid, x => x.CorrelateById(m => m.InvoiceId))
-            .SetCompletedWhenFinalized();
+        Event(() => InvoicePaid, x => x.CorrelateById(m => m.InvoiceId));
 
         Initially(
             When(InvoiceCreated)
@@ -42,12 +40,12 @@ public class InvoiceStateMachine : MassTransitStateMachine<InvoiceSaga>
                 .TransitionTo(Pending));
 
         During(Pending,
-            When(InvoiceApproved)
-                .TransitionTo(Approved));
+            When(InvoiceApproved).TransitionTo(Approved));
 
         During(Approved,
             When(InvoicePaid)
-                .TransitionTo(Paid)
                 .Finalize());
+
+        SetCompletedWhenFinalized();
     }
 }

@@ -2,44 +2,79 @@ using System;
 using System.Threading.Tasks;
 using MassTransit;
 
-public class SubmitOrder
+namespace Contracts
 {
-    public Guid OrderId { get; set; }
-    public string CustomerName { get; set; }
-    public decimal Amount { get; set; }
-}
-
-public event EventHandler<OrderSubmitted> Submitted;
-
-public class OrderSubmitted : EventArgs
-{
-    public Guid OrderId { get; private set; }
-    public DateTime SubmittedAt { get; }
-
-    public OrderSubmitted(Guid orderId)
+    public class SubmitOrder : IEvent
     {
-        OrderId = orderId;
-        SubmittedAt = DateTime.UtcNow;
+        public Guid OrderId { get; set; }
+        public string CustomerName { get; set; }
+        public decimal Amount { get; set; }
     }
-}
 
-public class SubmitOrderConsumer : IConsumer<SubmitOrder>
-{
-    public async Task Consume(ConsumeContext<SubmitOrder> context)
+    public record OrderSubmitted(Guid OrderId, DateTime SubmittedAt);
+
+    [MessageContract(IsInitiator = true)]
+    public class SubmitOrderConsumer : IConsumer<SubmitOrder>
     {
-        var order = context.Message;
-        await context.Publish(new OrderSubmitted(order.OrderId));
+        public async Task Consume(ConsumeContext<SubmitOrder> context)
+        {
+            var msg = context.Message;
+            await context.Publish(new OrderSubmitted(msg.OrderId, DateTime.UtcNow));
+        }
     }
-}
 
-public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
-{
-    protected override void ConfigureConsumer(
-        IReceiveEndpointConfigurator ep,
-        IConsumerConfigurator<SubmitOrderConsumer> consumer)
+    [ConsumerDefinition]
+    public class SubmitOrderConsumerDefinition : ConsumerDefinition<SubmitOrderConsumer>
     {
-        base.ConfigureConsumer(ep, consumer);
-        consumer.SetConcurrentMessageLimit(4);
-        consumer.UseMessageRetry(r => r.Interval(3000));
+        protected override void ConfigureConsumer(
+            IReceiveEndpointConfigurator ep,
+            IConsumerConfigurator<SubmitOrderConsumer> consumer,
+            IRegistrationContext ctx)
+        {
+            ep.UseMessageRetry(r => r.Interval(3, 1000));
+            ep.UseInMemoryOutbox(ctx);
+        }
+    }
+
+    public class OrderState : SagaStateMachineInstance
+    {
+        public Guid CorrelationId { get; set; }
+        public string CurrentState { get; set; }
+
+        protected override void ConfigureSaga(SagaStateMachine<SubmitOrderConsumer> stateMachine)
+        {
+            stateMachine.When<SubmitOrder>().Then(state =>
+                {
+                    if (state.State == "Processing")
+                        state.SetCurrentState("Submitted");
+                });
+        }
+    }
+
+    public class OrderStateMachine : MassTransitStateMachine<OrderState>
+    {
+        protected override void ConfigureSaga(SagaStateMachine<SubmitOrderConsumer> stateMachine)
+        {
+            stateMachine.When<SubmitOrder>().Then(state =>
+                {
+                    if (state.State == "Processing")
+                        state.SetCurrentState("Submitted");
+                });
+        }
+    }
+
+    public class OrderService : IHostedService
+    {
+        private readonly IBus _bus;
+
+        public OrderService(IBus bus)
+        {
+            _bus = bus;
+        }
+
+        public async Task SubmitOrderAsync(SubmitOrder order)
+        {
+            await _bus.Publish(order);
+        }
     }
 }

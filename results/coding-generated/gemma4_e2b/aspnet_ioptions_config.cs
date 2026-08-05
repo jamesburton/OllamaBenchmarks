@@ -15,23 +15,25 @@ public interface IEmailSender
 
 public class SmtpEmailSender : IEmailSender
 {
-    private readonly IOptions<SmtpOptions> _options;
+    private readonly SmtpOptions _options;
     public string? LastSentTo { get; set; }
-
-    public SmtpEmailSender(IOptions<SmtpOptions> options)
-    {
-        _options = options;
-    }
 
     public SmtpOptions Options => _options.Value;
 
+    public SmtpEmailSender(IOptions<SmtpOptions> options)
+    {
+        _options = options.Value;
+    }
+
     public Task SendAsync(string to, string subject, string body)
     {
-        // Implementation detail: Storing 'to' in LastSentTo
-        this.LastSentTo = to;
+        // Simulate sending logic
+        Console.WriteLine($"Attempting to send email via {_options.Host}:{_options.Port} for user {_options.Username} to {to}");
 
-        // In a real application, SMTP sending logic would go here.
-        // For this exercise, we just complete the task.
+        // Store the recipient for tracking
+        LastSentTo = to;
+
+        // Return completed task as required
         return Task.CompletedTask;
     }
 }

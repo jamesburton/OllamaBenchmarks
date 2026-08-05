@@ -57,7 +57,9 @@ public class CreateProductCommandHandlerTests
         var handler = new CreateProductCommandHandler(repository);
         var command = new CreateProductCommand("Widget", 19.99m);
         var expectedProduct = new Product(1, "Widget", 19.99m);
+
         repository.AddAsync(Arg.Any<Product>()).Returns(expectedProduct);
+        repository.ExistsAsync("Widget").Returns(false);
 
         // Act
         var result = await handler.HandleAsync(command);
@@ -138,6 +140,7 @@ public class CreateProductCommandHandlerTests
         var repository = Substitute.For<IProductRepository>();
         var handler = new CreateProductCommandHandler(repository);
         var command = new CreateProductCommand("Widget", 19.99m);
+
         repository.ExistsAsync("Widget").Returns(true);
 
         // Act

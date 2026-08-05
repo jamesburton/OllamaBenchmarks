@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
-public interface ISoftDeletable { bool IsDeleted { get; set; } }
+public interface ISoftDeletable
+{
+    bool IsDeleted { get; set; }
+}
 
 public class Article : ISoftDeletable
 {
@@ -13,35 +16,26 @@ public class ArticleDbContext : DbContext
 {
     public DbSet<Article> Articles { get; set; }
     public ArticleDbContext(DbContextOptions<ArticleDbContext> options) : base(options) { }
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Article>().HasQueryFilter(a => !a.IsDeleted);
+        base.OnModelCreating(modelBuilder);
     }
 }
 
 public class ArticleRepository
 {
-    public ArticleDbContext Context { get; }
-    public ArticleRepository(ArticleDbContext context) => Context = context;
-
+    private readonly ArticleDbContext _context;
+    public ArticleRepository(ArticleDbContext context) => _context = context;
     public async Task SoftDeleteAsync(int id)
     {
-        var article = await Context.Articles.IgnoreQueryFilters().FindAsync(a => a.Id == id);
+        var article = await _context.Articles.IgnoreQueryFilters()
+            .FindAsync(a => a.Id == id);
         if (article != null)
         {
-            article.Value.IsDeleted = true;
-            await Context.Articles.IgnoreQueryFilters().AddAllAsync();
+            article.IsDeleted = true;
         }
     }
-
-    public async Task<List<Article>> GetAllAsync()
-    {
-        return await Context.Articles.Where(a => !a.IsDeleted).ToListAsync();
-    }
-
-    public async Task<List<Article>> GetAllIncludingDeletedAsync()
-    {
-        return await Context.Articles.IgnoreQueryFilters().ToListAsync();
-    }
+    public async Task<List<Article>> GetAllAsync() => await _context.Articles.ToListAsync();
+    public async Task<List<Article>> GetAllIncludingDeletedAsync() => await _context.Articles.IgnoreQueryFilters().ToListAsync();
 }

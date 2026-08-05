@@ -1,29 +1,35 @@
 using System.Threading;
+using Xunit;
 
-public class SharedCounter : IAsyncLifetime
+public class SharedCounter
 {
     private int counter;
     public ValueTask InitializeAsync() => default;
     public ValueTask DisposeAsync() => default;
-    public int IncrementAndGet()
+    public int IncrementAndGet() => Interlocked.Increment(ref counter);
+
+    public int this[int index] { get; set; }
+}
+
+public class FirstCounterTests
+{
+    private SharedCounter counter;
+
+    public FirstCounterTests(SharedCounter counter) => this.counter = counter;
+
+    [Fact]
+    public void IncrementAndGet_ReturnsPositiveNumber()
     {
-        return Interlocked.Increment(ref counter);
+        Assert.True(counter.IncrementAndGet() > 0);
     }
 }
 
-[Fact]
-public void FirstCounter_IncrementIsPositive()
+public class SecondCounterTests
 {
-    var counter = new SharedCounter();
-    int value = counter.IncrementAndGet();
-    AwesomeAssertions.True(value > 0);
-}
-
-[Fact]
-public void SecondCounter_IncrementIsPositive()
-{
-    var sc = TestContext.Current.GetFixture<SharedCounter>();
-    int value = sc.IncrementAndGet();
-    AwesomeAssertions.True(value > 0);
-    TestContext.Current.CancellationToken.CancelAsync();
+    [Fact]
+    public void IncrementAndGet_UsingTestContext_InheritsCounter()
+    {
+        var counter = Xunit.TestContext.Current.GetFixture<SharedCounter>();
+        Assert.True(counter.IncrementAndGet() > 0);
+    }
 }
