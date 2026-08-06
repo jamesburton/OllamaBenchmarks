@@ -126,9 +126,25 @@ TIER3 = [
     "zac/phi4-tools",
     "hf.co/Jackrong/Qwopus3.5-9B-v3-GGUF:Q8_0",
     "hf.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF:Q4_K_M",
-    "omnicoder:9b-q4_k_m",
+    # Removed 2026-08-06: "omnicoder:9b-q4_k_m" -- unnamespaced, "file does not
+    # exist". The registry model is carstenuhlig/omnicoder-9b, but its page
+    # confirms it IS Tesslate's OmniCoder-9B (Qwen3.5-9B base, 425K agentic
+    # traces) at the same Q4_K_M quant -- i.e. the identical model already
+    # benched as tesslate-omnicoder-9b-q4km. Dropped as a duplicate rather than
+    # repointed; benching it again would just add a second row for one model.
     "gemma3:12b",
     "mistral-small",
+    # NOT a registry model -- 2026-08-06 investigation. `ollama pull` reports
+    # "file does not exist" because nothing of this name is published. It is a
+    # LOCAL custom build: gguf-cache/Modelfile.mistral-small-4-q4 exists and its
+    # FROM target (mistralai_Mistral-Small-4-119B-2603-Q4_K_M, 2 parts, ~67GB)
+    # is present on disk -- but `ollama create` was evidently never run, so the
+    # tag has never existed locally either. Creating it needs ~67GB free for
+    # ollama's own copy on top of the existing GGUF; only ~33GB is free, so it
+    # stays here unresolved rather than being silently dropped. Run:
+    #   cd C:/Development/gguf-cache
+    #   ollama create mistral-small-4 -f Modelfile.mistral-small-4-q4
+    # once the disk allows, and this entry starts working with no further edit.
     "mistral-small-4",
     "granite4:32b-a9b-h",
     "hf.co/RJ000/Mellum2-12B-A2.5B-Thinking-GGUF:Q4_K_M",
@@ -214,7 +230,14 @@ TIER3 = [
     "deepcoder:1.5b",
     "devstral-small-2:24b-instruct-2512-q4_K_M",
     "devstral-small-2:24b-instruct-2512-q8_0",
-    "gemma3-12b-tools",
+    # Repointed 2026-08-06: was the bare "gemma3-12b-tools" -- unnamespaced,
+    # "file does not exist". LOWER CONFIDENCE than the other repoints in this
+    # batch: there is no exact-name match on the registry, and this is simply
+    # the closest namespaced candidate (182 pulls). The alternative,
+    # unixloose/gemma3-12b-tools-always-ru, is a Russian-language RAG variant and
+    # clearly not what was meant. If this scores oddly, suspect the identity
+    # before the model.
+    "oscar_while/gemma-3-12b-tools",
     "gemma3n:e4b",
     "gemma4:12b",
     "gpt-oss:20b",
@@ -239,8 +262,12 @@ TIER3 = [
     # to make.
     "hf.co/KyleHessling1/Qwopus3.6-27B-Fusion-GGUF:Q5_K_M",
     "hf.co/mradermacher/shenwen-coderV2-Instruct-GGUF:Q8_0",
-    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q6_K.gguf",
-    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:ornith-9b-mtp-kl-Q8_0.gguf",
+    # Repointed 2026-08-06: were ":ornith-9b-mtp-kl-Q6_K.gguf" / ":...-Q8_0.gguf",
+    # which the registry rejects with "The specified tag is not available in the
+    # repository". The repo's files are actually named Ornith-1.0-9B-MTP-<QUANT>
+    # .gguf with no "-kl" segment, so the ollama quant tags are plain Q6_K/Q8_0.
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:Q6_K",
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:Q8_0",
     # Added 2026-07-30 per explicit user request. poolside/Laguna-S-2.1 is a
     # brand-new (2026-07-13) 256-expert/10-active MoE, architecture "laguna"
     # (LagunaForCausalLM) -- support in Ollama's bundled llama.cpp is
@@ -291,13 +318,20 @@ TIER3 = [
     # ImpurestClub/...-v2-q3km (Q3, not Q4), so there is nothing to repoint to.
     "qwen3.5:35b-a3b",
     "qwen3.5:4b",
-    "qwen3.6-unsloth-iq2_m",
+    # Repointed 2026-08-06: was the bare "qwen3.6-unsloth-iq2_m", which is
+    # unnamespaced and so resolved against library/qwen3.6 -- "file does not
+    # exist". No such model on the Ollama registry at all; the quant lives on HF.
+    "hf.co/unsloth/Qwen3.6-35B-A3B-GGUF:UD-IQ2_M",
     "qwen3.6:35b-a3b-q4_K_M",
     "qwen3:14b",
     "qwen3:8b",
     "richardyoung/qwythos-9b-abliterated:Q4_K_M",
     "rnj-1:8b",
-    "trinity-mini:q4_k_m",
+    # Repointed 2026-08-06: was the bare "trinity-mini:q4_k_m" -- "file does not
+    # exist"; nothing named trinity-mini is on the Ollama registry. The model is
+    # arcee-ai/Trinity-Mini; using the vendor's own GGUF repo rather than a
+    # third-party requant. Q4_K_M is 15.9GB (it is a MoE, despite the name).
+    "hf.co/arcee-ai/Trinity-Mini-GGUF:Q4_K_M",
     # Moved to the very end 2026-07-25 per user request: L2 raw done (70/158),
     # L2 chat interrupted mid-run at 59/158 (checkpoint preserved) because this
     # 85GB model runs ~5-7min/task and was starving the rest of the queue of
@@ -347,11 +381,18 @@ SIZE_HINT_GB = {
     "MichelRosselli/GLM-4.5-Air": 40.0,
     "qwen3.6:35b-a3b-q4_K_M": 22.0,
     "qwen3.5:35b-a3b": 22.0,
-    "qwen3.6-unsloth-iq2_m": 13.0,
+    # verified against the HF API 2026-08-06 while repointing the dead tags
+    "hf.co/unsloth/Qwen3.6-35B-A3B-GGUF:UD-IQ2_M": 11.5,
+    "hf.co/arcee-ai/Trinity-Mini-GGUF:Q4_K_M": 15.9,
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:Q6_K": 7.6,
+    "hf.co/protoLabsAI/Ornith-1.0-9B-MTP-GGUF:Q8_0": 9.8,
     "hf.co/bartowski/kai-os_Carnice-V2-27b-GGUF:Q4_K_M": 16.5,
     "yolo0perris/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled-GGUF_Q3_K_M": 14.0,
     "ingu627/exaone4.0:32b": 19.0,
-    "mistral-small-4": 14.0,
+    # 14.0 was badly wrong -- this is a 119B in two Q4_K_M parts, ~67GB on disk
+    # (measured 2026-08-06). The old hint would have let the guard wave through
+    # a pull that could not possibly fit.
+    "mistral-small-4": 67.0,
     "ministral-3:14b": 9.0,
     "qwen3:14b": 9.0,
 }
